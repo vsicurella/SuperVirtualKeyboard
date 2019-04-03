@@ -33,8 +33,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	addChildComponent(scaleEdit.get());
 
 	setResizable(true, true);
-	setSize(1000, 400);
-	setResizeLimits(50, 50, 10e4, 10e4);
+	setSize(1000, 250);
+	setResizeLimits(640, 100, 10e4, 10e4);
 
 	view.get()->setViewPositionProportionately(0.6, 0);
 
