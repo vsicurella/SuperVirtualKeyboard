@@ -14,9 +14,8 @@
 #include "PluginProcessor.h"
 
 #include "ScaleEditPopup.h"
-#include "..\..\ScaleVisualizer\Source\Structures\ModeLayout.h"
-#include "..\..\ScaleVisualizer\Source\Views\ViewPianoComponent.h"
-
+#include "Structures\ModeLayout.h"
+#include "Views\ViewPianoComponent.h"
 //==============================================================================
 /**
 */
