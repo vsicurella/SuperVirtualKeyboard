@@ -41,6 +41,9 @@ public:
 	void changeListenerCallback(ChangeBroadcaster*) override;
 	void timerCallback() override;
 	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
+	void focusGained(FocusChangeType changeType) override;
+
+
 
 private:
     // This reference is provided as a quick way for your editor to

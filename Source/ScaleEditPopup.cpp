@@ -97,10 +97,17 @@ ScaleEditPopup::ScaleEditPopup ()
 
 
     //[UserPreSize]
-	int i = 0;
+	StringArray presetNames;
 	for (HashMap<String, std::vector<int>>::Iterator key (*presets.get()); key.next();)
 	{
-		scalePresets->addItem(key.getKey(), ++i);
+		presetNames.add(key.getKey());
+	}
+	presetNames.sortNatural();
+
+	int i = 0;
+	for (auto str : presetNames)
+	{
+		scalePresets.get()->addItem(str, ++i);
 	}
     //[/UserPreSize]
 

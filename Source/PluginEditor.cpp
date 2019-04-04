@@ -35,6 +35,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	setResizable(true, true);
 	setSize(1000, 250);
 	setResizeLimits(640, 100, 10e4, 10e4);
+	setBroughtToFrontOnMouseClick(true);
 
 	view.get()->setViewPositionProportionately(0.6, 0);
 
@@ -99,3 +100,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInp
 {
 	externalMidi.processNextMidiEvent(message);
 }
+
+void SuperVirtualKeyboardAudioProcessorEditor::focusGained(FocusChangeType changeType)
+{
+	setWantsKeyboardFocus(true);
+}
+
