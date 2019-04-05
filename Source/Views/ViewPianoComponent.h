@@ -22,7 +22,8 @@
 */
 
 class ViewPianoComponent : public Component,
-                           public MidiKeyboardStateListener // Only for displaying external MIDI input
+	public ApplicationCommandTarget,
+	public MidiKeyboardStateListener // Only for displaying external MIDI input
 {
 public:
 	// Might want to implement the Button class more in the future 
@@ -33,27 +34,27 @@ public:
 		int* keyboardSize;
 		int keyNumber;
 		float modeDegree;
-        
-        float widthMod = 1;
-        float heightMod = 1;
-        float xOffset = 0;
-        float yOffset = 0;
 
-//		Pitch* mappedPitch = nullptr;
+		float widthMod = -1;
+		float heightMod = -1;
+		float xOffset = 0;
+		float yOffset = 0;
+
+		//Pitch* mappedPitch = nullptr;
 		int mappedMIDInote;
-        int externalMidiState = 0;
+		int externalMidiState = 0;
 
 		// Properties
-        float* orderWidthRatio;
-        float* orderHeightRatio;
 		int order; // front most keys are 0, "black" keys are 1, etc
-        
-        Colour color;
-        int activeColor = 0;
+		float orderWidthRatio;
+		float orderHeightRatio;
+
+		Colour color;
+		int activeColor = 0;
 
 		// Methods
 
-		PianoKeyComponent(int* sizeIn, int keyNumIn);
+		PianoKeyComponent(String nameIn, int keyNumIn);
 
 		void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 	};
@@ -87,15 +88,13 @@ public:
 	};
 
 	struct PianoMenuBar : public Component,
-							//public ApplicationCommandTarget,
-							public MenuBarModel
+		public MenuBarModel
 	{
 		std::unique_ptr<MenuBarComponent> menu;
 
 		StringArray options;
-		
-		PianoMenuBar();
 
+		PianoMenuBar(ApplicationCommandManager* cmdMgrIn);
 		~PianoMenuBar();
 
 		StringArray getMenuBarNames() override;
@@ -104,22 +103,51 @@ public:
 
 		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
 
+		void PianoMenuBar::resized() override;
 
 	};
 
-	ViewPianoComponent();
+	//===============================================================================================
 
+	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn);
 	~ViewPianoComponent() {};
 
+	enum CommandIDs
+	{
+		setPianoHorizontal = 1,
+		setPianoVerticalL,
+		setPianoVerticalR,
+		sendScaleToPiano,
+		pianoPlayMode,
+		pianoEditMode,
+		setKeyMidiNote,
+		setKeyColor,
+		setMidiNoteOffset
+	};
+
+	enum PianoMode
+	{
+		playMode = 1,
+		editMode
+	};
+
+	enum PianoOrientation
+	{
+		horizontal = 1,
+		verticalLeft,
+		verticalRight
+	};
+
 	//===============================================================================================
-    
+
 	float get_min_height();
 
 	MidiKeyboardState* get_keyboard_state();
-    
+
 	Point<int> get_position_of_key(int midiNoteIn);
 
-	int get_key_from_position(Point<int> posIn);
+	PianoKeyComponent* get_key_from_position(Point<int> posIn);
+	PianoKeyComponent* get_key_from_position(const MouseEvent& e);
 
 	float get_velocity(PianoKeyComponent* keyIn, const MouseEvent& e);
 
@@ -130,8 +158,29 @@ public:
 	void apply_steps_layout(juce::String strIn);
 
 	void apply_steps_layout(std::vector<int> stepsIn);
-    
-    //===============================================================================================
+
+	//===============================================================================================
+
+	Point<float> get_key_proportions(PianoKeyComponent* keyIn);
+
+	Colour get_key_color(PianoKeyComponent* keyIn);
+
+	void all_notes_off();
+
+	void isolate_last_note();
+
+	//===============================================================================================
+	
+	ApplicationCommandTarget* getNextCommandTarget();
+
+	void getAllCommands(Array< CommandID > &commands);
+
+	void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result);
+
+	bool perform(const InvocationInfo &info);
+
+	//===============================================================================================
+
 
 	void mouseExit(const MouseEvent& e) override;
 
@@ -140,7 +189,7 @@ public:
 	void mouseDrag(const MouseEvent& e) override;
 
 	void mouseUp(const MouseEvent& e) override;
-    
+
 	void mouseMove(const MouseEvent& e) override;
 
 	//===============================================================================================
@@ -150,51 +199,64 @@ public:
 	bool keyPressed(const KeyPress& key) override;
 
 	void modifierKeysChanged(const ModifierKeys& modifiers) override;
-    
-    //===============================================================================================
-    
+
+	//===============================================================================================
+
 
 	void paint(Graphics& g) override;
 
 	void resized() override;
-    
+
 	void visibilityChanged() override;
-    
-    //===============================================================================================
-    
-    void triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn);
-    
-    void triggerKeyNoteOff(PianoKeyComponent* key);
-    
+
+	//===============================================================================================
+
+	void triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn);
+
+	void triggerKeyNoteOff(PianoKeyComponent* key);
+
 	void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
-    
+
 	void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
-    
-    //===============================================================================================
+
+	//===============================================================================================
+
 
 private:
-    // Functionality
+	// Functionality
+	ApplicationCommandManager* appCmdMgr;
 	PianoKeyGrid grid;
 	MidiKeyboardState keyboardState;
 	MidiBuffer buffer;
-	int lastNoteClicked = 0;
+
+	std::unique_ptr<PianoMenuBar> menu;
+
+	int lastKeyOver = 0;
+	int lastKeyClicked = 0;
 
 	// Data
 	OwnedArray<PianoKeyComponent> keys;
-    std::vector<std::vector<PianoKeyComponent*>> keysOrder;
+	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
 
-    // Parameters
+	// Parameters
 	std::vector<int> scaleLayout;
 	std::vector<int> scaleOrder;
-	juce::String defaultMOS = "2,2,1,2,2,2,1,";
+	juce::String defaultMOS = "2 2 1 2 2 2 1";
 
-    int tuningSize;
-    int notesToShow;
-    int rows;
+	int tuningSize;
+	int notesToShow;
+	int rows;
+
+	int pianoModeSelected = 1;
+	int pianoOrientationSelected = 1;
 
 	int midiChannelSelected = 1;
 	int midiNoteOffset = 0;
 	bool mpeOn = false;
+
+	std::unique_ptr<std::vector<std::vector<int>>> keyOrdersRatios;
+	std::vector<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
+											Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
     
     // Properties
 
@@ -216,16 +278,8 @@ private:
     bool ctrlHeld = false;
 	bool upHeld = false;
 	bool downHeld = false;
-    
-    std::vector<std::vector<float>> keyOrderRatios = { {1.0f, 0.6f, 0.5f, 0.4f, 0.3f, 0.2f},
-													   {1.0f, 0.55f, 0.45f, 0.38f, 0.27f, 0.18f} };
-    
-    Colour keyOrderColors[6] = {Colours::white, Colours::black, Colours::red, Colours::blue, Colours::green, Colours::pink};
-    Colour keyOrderColorsH[6] = {Colours::lightgrey, Colours::darkgrey, Colours::red.brighter(), Colours::blue.brighter(), Colours::green.brighter(), Colours::pink.brighter()};
-    
+        
     bool displayIsReady = false;
-    
-    Colour test = Colours::green;
-	
+    	
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ViewPianoComponent)
 };

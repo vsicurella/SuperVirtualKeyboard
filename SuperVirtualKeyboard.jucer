@@ -23,10 +23,10 @@
       <FILE id="wQNCqf" name="ModeLayout.h" compile="0" resource="0" file="../ScaleVisualizer/Source/Structures/ModeLayout.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="Views">
-      <FILE id="EPQ3XL" name="ViewPianoComponent.cpp" compile="1" resource="0"
-            file="../ScaleVisualizer/Source/Views/ViewPianoComponent.cpp"/>
-      <FILE id="SMEeL8" name="ViewPianoComponent.h" compile="0" resource="0"
-            file="../ScaleVisualizer/Source/Views/ViewPianoComponent.h"/>
+      <FILE id="Ox8uc2" name="ViewPianoComponent.cpp" compile="1" resource="0"
+            file="Source/Views/ViewPianoComponent.cpp"/>
+      <FILE id="QG30fI" name="ViewPianoComponent.h" compile="0" resource="0"
+            file="Source/Views/ViewPianoComponent.h"/>
     </GROUP>
     <GROUP id="{A7D2C7CC-19E6-C0EB-2D98-E236A874958F}" name="Windows">
       <FILE id="nUMOtt" name="PianoWindow.h" compile="0" resource="0" file="../ScaleVisualizer/Source/Windows/PianoWindow.h"/>

@@ -15,10 +15,9 @@
 
 //==============================================================================
 
-ViewPianoComponent::PianoKeyComponent::PianoKeyComponent(int* sizeIn, int keyNumIn)
-	: Button("Key " + String(keyNumIn))
+ViewPianoComponent::PianoKeyComponent::PianoKeyComponent(String nameIn, int keyNumIn)
+	: Button(nameIn)
 {
-	keyboardSize = sizeIn;
 	keyNumber = keyNumIn;
 	mappedMIDInote = keyNumber;
 
@@ -85,7 +84,7 @@ void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
 	Point<int> pt;
 
 	float colToPlace = ceil(key->modeDegree);
-	int offset = (key->order > 0) * (int)(key->getWidth() / 2.0) * (*key->orderWidthRatio + 1);
+	int offset = (key->order > 0) * (int)(key->getWidth() / 2.0) * (key->orderWidthRatio + 1);
 
 	if (key->order > 0)
 	{
@@ -110,11 +109,13 @@ void ViewPianoComponent::PianoKeyGrid::place_key_layout(OwnedArray<PianoKeyCompo
 
 //===============================================================================================
 
-ViewPianoComponent::PianoMenuBar::PianoMenuBar()
+ViewPianoComponent::PianoMenuBar::PianoMenuBar(ApplicationCommandManager* cmdMgrIn)
 {
-	menu = std::unique_ptr<MenuBarComponent>(new MenuBarComponent());
+	menu.reset(new MenuBarComponent(this));
+	addAndMakeVisible(menu.get());
+	setApplicationCommandManagerToWatch(cmdMgrIn);
 
-		
+	setSize(1000, 80);
 }
 
 ViewPianoComponent::PianoMenuBar::~PianoMenuBar()
@@ -122,11 +123,10 @@ ViewPianoComponent::PianoMenuBar::~PianoMenuBar()
 
 }
 
+
 StringArray ViewPianoComponent::PianoMenuBar::getMenuBarNames()
 {
-	return { "Edit Mode",
-		"Save as...",
-		"Orientation" };
+	return {"File", "Mode", "Orientation"};
 }
 
 void ViewPianoComponent::PianoMenuBar::menuItemSelected(int menuItemID, int topLevelMenuIndex)
@@ -139,12 +139,15 @@ PopupMenu ViewPianoComponent::PianoMenuBar::getMenuForIndex(int topLevelMenuInde
 	return PopupMenu();
 }
 
+void ViewPianoComponent::PianoMenuBar::resized()
+{
+	setSize(getParentWidth(), 80);
+}
+
 //===============================================================================================
 
-ViewPianoComponent::ViewPianoComponent()
+ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 {
-	setName("Piano Viewer Component");
-
 	// Default values
 	tuningSize = 12;
 	modeSize = 7;
@@ -154,16 +157,24 @@ ViewPianoComponent::ViewPianoComponent()
 	modeKeysSize = 0;
 	removeMouseListener(this);
 
+	appCmdMgr = &cmdMgrIn;
+	menu.reset(new PianoMenuBar(appCmdMgr));
+	menu.get()->setName("Piano Menu");
+	addAndMakeVisible(menu.get());
+	
+
 	// Create children (piano keys)        
 	for (int i = 0; i < notesToShow; i++)
 	{
-		PianoKeyComponent* key = new PianoKeyComponent(&notesToShow, i);
+		String keyName = "Key " + String(i);
+		PianoKeyComponent* key = new PianoKeyComponent(keyName, i);
 		addChildComponent(keys.add(key));
 	}
 
 	addMouseListener(this, true);
-
 	setRepaintsOnMouseActivity(true);
+	toBack();
+	
 	setOpaque(true);
 
 	// Apply default layout
@@ -188,20 +199,34 @@ Point<int> ViewPianoComponent::get_position_of_key(int midiNoteIn)
 	return key->getPosition();
 }
 
-int ViewPianoComponent::get_key_from_position(Point<int> posIn)
+ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position(Point<int> posIn)
 {
-	int keyNum = -1;
-
+	PianoKeyComponent* keyOut = nullptr;
+	
 	if (reallyContains(posIn, true))
 	{
 		Component* c = getComponentAt(posIn);
-		PianoKeyComponent* key = dynamic_cast<PianoKeyComponent*>(c);
-
-		if (c != this)
-			keyNum = key->keyNumber;
+		
+		if (c->getName().startsWith("Key"))
+			keyOut = dynamic_cast<PianoKeyComponent*>(c);	
 	}
 
-	return keyNum;
+	return keyOut;
+}
+
+ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position(const MouseEvent& e)
+{
+	PianoKeyComponent* keyOut = nullptr;
+
+	Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
+
+	if (e.eventComponent->getName().startsWith("Key") &&
+		reallyContains(mousePosition, true))
+	{
+		keyOut = dynamic_cast<PianoKeyComponent*>(getComponentAt(mousePosition));
+	}
+
+	return keyOut;
 }
 
 float ViewPianoComponent::get_velocity(PianoKeyComponent* keyIn, const MouseEvent& e)
@@ -243,11 +268,12 @@ void ViewPianoComponent::apply_layout(std::vector<int> layoutIn, bool samePeriod
 		key = keys.getUnchecked(i);
 
 		key->order = scaleLayout.at(i % tuningSize);
-		key->orderWidthRatio = &(keyOrderRatios.at(0)[key->order]);
-		key->orderHeightRatio = &(keyOrderRatios.at(1)[key->order]);
+		auto ratios = get_key_proportions(key);
+		key->orderWidthRatio = ratios.x;
+		key->orderHeightRatio = ratios.y;
 
-		key->setColour(0, keyOrderColors[key->order]);
-		key->setColour(1, keyOrderColorsH[key->order]);
+		key->setColour(0, get_key_color(key));
+		key->setColour(1, get_key_color(key).contrasting(0.2));
 		key->setColour(2, Colours::yellow);
 
 		key->modeDegree = modeKeysSize + (key->order / (modeOrder + 1.0));
@@ -275,7 +301,6 @@ void ViewPianoComponent::apply_layout(std::vector<int> layoutIn, bool samePeriod
 	grid.set_mode_keys(modeKeysSize, modeOrder);
 
 	// Calculate properties
-	toBack();
 	displayIsReady = true;
 	resized();
 }
@@ -292,67 +317,176 @@ void ViewPianoComponent::apply_steps_layout(std::vector<int> stepsIn)
 
 //===============================================================================================
 
+Point<float> ViewPianoComponent::get_key_proportions(PianoKeyComponent* keyIn)
+{
+	Point<float>  out;
+	float defaultRatio = 1.0f - (keyIn->order > 0) * 0.8 * (2, 1.0f / (modeOrder - keyIn->order + 2));
+
+	if (keyIn->widthMod > 0)
+		out.x = keyIn->widthMod;
+	else
+		out.x = defaultRatio;
+
+	if (keyIn->heightMod > 0)
+		out.y = keyIn->heightMod;
+	else
+		out.y = defaultRatio;
+
+	return out;
+}
+
+Colour ViewPianoComponent::get_key_color(PianoKeyComponent* keyIn)
+{
+	// implement custom colors
+	return keyOrderColors.at(keyIn->order % keyOrderColors.size());
+}
+
+void ViewPianoComponent::all_notes_off()
+{
+	PianoKeyComponent* key;
+
+	for (int i = 0; i < keys.size(); i++)
+	{
+		key = keys.getUnchecked(i);
+		triggerKeyNoteOff(key);
+	}
+	repaint();
+}
+
+void ViewPianoComponent::isolate_last_note()
+{
+	if (lastKeyClicked >= 0 && lastKeyClicked < 128)
+	{
+		PianoKeyComponent* last = keys.getUnchecked(lastKeyClicked);
+		PianoKeyComponent* key;
+
+		for (int i = 0; i < keys.size(); i++)
+		{
+			key = keys.getUnchecked(i);
+
+			if (key == last)
+				continue;
+
+			triggerKeyNoteOff(key);
+		}
+		repaint();
+	}
+}
+
+
+//===============================================================================================
+
+ApplicationCommandTarget* ViewPianoComponent::getNextCommandTarget()
+{
+	return findFirstTargetParentComponent();
+}
+
+void ViewPianoComponent::getAllCommands(Array< CommandID > &c)
+{
+	Array<CommandID> commands{
+		CommandIDs::setPianoHorizontal,
+		CommandIDs::setPianoVerticalL,
+		CommandIDs::setPianoVerticalR,
+		CommandIDs::sendScaleToPiano };
+
+	c.addArray(commands);
+}
+
+void ViewPianoComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+{
+	switch (commandID)
+	{
+	case CommandIDs::setPianoHorizontal:
+		result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
+		result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
+		result.addDefaultKeypress('w', ModifierKeys::shiftModifier);
+		break;
+	case CommandIDs::setPianoVerticalL:
+		result.setInfo("Vertical Left Layout", "Draws the piano with the left facing orientation", "Piano", 0);
+		result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
+		result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+		break;
+	case CommandIDs::setPianoVerticalR:
+		result.setInfo("Vertical Right Layout", "Draws the piano with the right facing orientation", "Piano", 0);
+		result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	default:
+		break;
+	}
+}
+
+bool ViewPianoComponent::perform(const InvocationInfo &info)
+{
+	switch (info.commandID)
+	{
+	case CommandIDs::setPianoHorizontal:
+		// TBI
+		break;
+	case CommandIDs::setPianoVerticalL:
+		// TBI
+		break;
+	case CommandIDs::setPianoVerticalR:
+		// TBI
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
+//===============================================================================================
+
+
 void ViewPianoComponent::mouseExit(const MouseEvent& e)
 {
-	if (e.eventComponent != this)
-	{
-		PianoKeyComponent* key = dynamic_cast<PianoKeyComponent*>(e.eventComponent);
+	PianoKeyComponent* key = keys.getUnchecked(lastKeyOver);
 
-		if (!shiftHeld || key->activeColor < 2)
-			key->activeColor = 0;
-	}
+	if (!shiftHeld || key->activeColor < 2)
+		key->activeColor = 0;
 }
 
 void ViewPianoComponent::mouseDown(const MouseEvent& e)
 {
-	if (e.eventComponent != this)
-	{
-		PianoKeyComponent* key = dynamic_cast<PianoKeyComponent*>(e.eventComponent);
-		
+	PianoKeyComponent* key = get_key_from_position(e);
+	if (key)
+	{		
         if (shiftHeld && !altHeld && key->activeColor == 2)
         {
             // note off
             triggerKeyNoteOff(key);
-            key->activeColor = 0;
-            lastNoteClicked = 0;
+            lastKeyClicked = 0;
         }
         else
         {
 			if (altHeld)
 			{
-				PianoKeyComponent* oldKey = keys.getUnchecked(lastNoteClicked);
-				oldKey->activeColor = 0;
+				PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked);
 				triggerKeyNoteOff(oldKey);
 			}
 
-            key->activeColor = 2;
             triggerKeyNoteOn(key, get_velocity(key, e));
-            lastNoteClicked = key->keyNumber;
+            lastKeyClicked = key->keyNumber;
         }
 	}
 }
 
 void ViewPianoComponent::mouseDrag(const MouseEvent& e)
 {
-	Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
-	int currentKey = get_key_from_position(mousePosition);
+	PianoKeyComponent* key = get_key_from_position(e);
 
-	if (currentKey != -1)
+	if (key)
 	{
-		PianoKeyComponent* key = keys.getUnchecked(currentKey);
-
-		if (currentKey != lastNoteClicked)
+		if (key->keyNumber != lastKeyClicked)
 		{
-			PianoKeyComponent* oldKey = keys.getUnchecked(lastNoteClicked % keys.size());
+			PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked % keys.size());
 			if (!shiftHeld)
 			{
-				oldKey->activeColor = 0;
-                triggerKeyNoteOff(oldKey);
+				triggerKeyNoteOff(oldKey);
 			}
 
-			key->activeColor = 2;
-            triggerKeyNoteOn(key, get_velocity(key, e));
-			lastNoteClicked = currentKey;
+			triggerKeyNoteOn(key, get_velocity(key, e));
+			lastKeyClicked = key->keyNumber;
 			repaint();
 		}
 	}
@@ -360,23 +494,13 @@ void ViewPianoComponent::mouseDrag(const MouseEvent& e)
 
 void ViewPianoComponent::mouseUp(const MouseEvent& e)
 {
-	if (e.eventComponent != this)
+	PianoKeyComponent* key = get_key_from_position(e);
+
+	if (key)
 	{
 		if (!shiftHeld)
 		{
-			PianoKeyComponent* key;
-			for (int i = 0; i < keys.size(); i++)
-			{
-				key = keys.getUnchecked(i);
-
-				// MIDI
-                triggerKeyNoteOff(key);
-
-				// GUI
-				key->activeColor = 0;
-			}
-
-			key = dynamic_cast<PianoKeyComponent*>(e.eventComponent);
+			isolate_last_note();
 			key->activeColor = 1;
 			repaint();
 		}
@@ -385,11 +509,16 @@ void ViewPianoComponent::mouseUp(const MouseEvent& e)
 
 void ViewPianoComponent::mouseMove(const MouseEvent& e)
 {
-	if (e.eventComponent != this)
+	PianoKeyComponent* key = get_key_from_position(e);
+
+	if (key)
 	{
-		PianoKeyComponent* key = dynamic_cast<PianoKeyComponent*>(e.eventComponent);
 		if (key->activeColor < 2)
+		{
 			key->activeColor = 1;
+			repaint();
+		}
+		lastKeyOver = key->keyNumber;
 	}
 }
 
@@ -425,20 +554,18 @@ bool ViewPianoComponent::keyPressed(const KeyPress& key)
 			if (keyboardState.isNoteOn(midiChannelSelected, inv))
 			{
 				pk = keys.getUnchecked(inv);
-				pk->activeColor = 0;
 				triggerKeyNoteOff(pk);
 
 				if ((inv + 1) >= keys.size())
 					continue;
 
 				pk = keys.getUnchecked(inv + 1);
-				pk->activeColor = 2;
 				triggerKeyNoteOn(pk, 0.75f);
 			}
 		}
 
-		if (lastNoteClicked < keys.size() - 1)
-			lastNoteClicked++;
+		if (lastKeyClicked < keys.size() - 1)
+			lastKeyClicked++;
 
 		repaint();
 	}
@@ -454,20 +581,18 @@ bool ViewPianoComponent::keyPressed(const KeyPress& key)
 			if (keyboardState.isNoteOn(midiChannelSelected, i))
 			{
 				pk = keys.getUnchecked(i);
-				pk->activeColor = 0;
 				triggerKeyNoteOff(pk);
 
 				if (i == 0)
 					continue;
 
 				pk = keys.getUnchecked(i-1);
-				pk->activeColor = 2;
 				triggerKeyNoteOn(pk, 0.75f);
 			}
 		}
 
-		if (lastNoteClicked > 0)
-			lastNoteClicked--;
+		if (lastKeyClicked > 0)
+			lastKeyClicked--;
 
 		repaint();
 	}
@@ -484,40 +609,19 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 	else if (shiftHeld && !modifiers.isShiftDown())
 	{
 		shiftHeld = false;
-		PianoKeyComponent* key;
-		for (int i = 0; i < keys.size(); i++)
-		{
-			key = keys.getUnchecked(i);
 
-			// MIDI
-			if (keyboardState.isNoteOn(midiChannelSelected, key->mappedMIDInote) &&
-				!(key->isMouseOver() && isMouseButtonDownAnywhere()))
-			{
-				keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
-			}
-			// GUI
-			if (!(key->isMouseOver() && isMouseButtonDownAnywhere()))
-				key->activeColor = 0;
-		}
+		isolate_last_note();
+		PianoKeyComponent* key = keys.getUnchecked(lastKeyClicked);
+		if (!(key->isMouseOver() && key->isMouseButtonDownAnywhere()))
+			triggerKeyNoteOff(keys.getUnchecked(lastKeyClicked));
+	
 		repaint();
 	}
     
     if (!altHeld && modifiers.isAltDown())
     {
         altHeld = true;
-
-		PianoKeyComponent* key;
-		for (int i = 0; i < keys.size(); i++)
-		{
-			key = keys.getUnchecked(i);
-
-			if (key->keyNumber != lastNoteClicked)
-			{
-				triggerKeyNoteOff(key);
-				key->activeColor = 0;
-			}
-
-		}
+		isolate_last_note();
 		repaint();
     }
     else if (altHeld && !modifiers.isAltDown())
@@ -572,8 +676,8 @@ void ViewPianoComponent::resized()
 	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
-		w = keyWidth * *key->orderWidthRatio;
-		h = keyHeight * *key->orderHeightRatio;
+		w = keyWidth * key->orderWidthRatio;
+		h = keyHeight * key->orderHeightRatio;
 		key->setSize(w, h);
 		grid.place_key(key);
 	}
@@ -592,23 +696,23 @@ void ViewPianoComponent::visibilityChanged()
 void ViewPianoComponent::triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn)
 {
     keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
+	key->activeColor = 2;
 }
 
 void ViewPianoComponent::triggerKeyNoteOff(PianoKeyComponent* key)
 {
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
+	key->activeColor = 0;
 }
 
 void ViewPianoComponent::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
 	PianoKeyComponent* key = keys.getUnchecked(midiNote);
 	key->externalMidiState = 1;
-	//buffer.addEvent(MidiMessage::noteOn(midiChannel, midiNote, velocity), 0);
 }
 
 void ViewPianoComponent::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
 	PianoKeyComponent* key = keys.getUnchecked(midiNote);
 	key->externalMidiState = 0;
-	//buffer.addEvent(MidiMessage::noteOff(midiChannel, midiNote, velocity), 0);
 }

@@ -13,16 +13,17 @@
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor (p), view(new Viewport("Piano Viewport")), piano(new ViewPianoComponent()),
-	  scaleEdit(new ScaleEditPopup())
+    : AudioProcessorEditor(&p), processor (p), view(new Viewport("Piano Viewport")), scaleEdit(new ScaleEditPopup())
 {
 	setName("Super Virtual Piano");
 
 	scaleEdit.get()->setName("Scale Edit Popup");
-	scaleEdit.get()->setAlwaysOnTop(true);
+	//scaleEdit.get()->setAlwaysOnTop(true);
 	scaleEdit.get()->addChangeListener(this);
 	scaleEdit.get()->setSize(640, 48);
 
+	piano.reset(new ViewPianoComponent(appCmdMgr));
+	piano.get()->setName("The Piano");
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);

@@ -50,6 +50,7 @@ private:
     // access the processor object that created it.
     SuperVirtualKeyboardAudioProcessor& processor;
 	MidiKeyboardState externalMidi;
+	ApplicationCommandManager appCmdMgr;
 
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<ViewPianoComponent> piano;

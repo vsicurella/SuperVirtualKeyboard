@@ -22,7 +22,6 @@ public:
     //==============================================================================
     SuperVirtualKeyboardAudioProcessor();
     ~SuperVirtualKeyboardAudioProcessor();
-
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
