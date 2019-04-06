@@ -13,32 +13,26 @@
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor (p), view(new Viewport("Piano Viewport")), scaleEdit(new ScaleEditPopup())
+    : AudioProcessorEditor(&p), processor (p), piano(new ViewPianoComponent(appCmdMgr)), view(new Viewport("Piano Viewport")), scaleEdit(new ScaleEditPopup())
 {
 	setName("Super Virtual Piano");
-
-	scaleEdit.get()->setName("Scale Edit Popup");
-	//scaleEdit.get()->setAlwaysOnTop(true);
-	scaleEdit.get()->addChangeListener(this);
-	scaleEdit.get()->setSize(640, 48);
-
-	piano.reset(new ViewPianoComponent(appCmdMgr));
-	piano.get()->setName("The Piano");
-	addAndMakeVisible(view.get());
-	view.get()->setViewedComponent(piano.get());
-	view.get()->setTopLeftPosition(1, 49);
-	
-	piano.get()->setSize(1000, 250);
-
-	addAndMakeVisible(scaleEdit.get());
-	addChildComponent(scaleEdit.get());
-
 	setResizable(true, true);
-	setSize(1000, 250);
 	setResizeLimits(640, 100, 10e4, 10e4);
 	setBroughtToFrontOnMouseClick(true);
 
+	scaleEdit.get()->setName("Scale Edit Popup");
+	scaleEdit.get()->addChangeListener(this);
+	scaleEdit.get()->setSize(640, 48);
+	addAndMakeVisible(scaleEdit.get());
+
+	piano.get()->setName("The Piano");
+
+	addAndMakeVisible(view.get());
+	view.get()->setViewedComponent(piano.get());
+	view.get()->setTopLeftPosition(1, 49);
 	view.get()->setViewPositionProportionately(0.6, 0);
+
+	setSize(1000, 250);
 
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
@@ -61,17 +55,16 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 {
 	Point<int> pt = view.get()->getViewPosition();
 
-	if (getHeight() < piano.get()->get_min_height())
-		setSize(getWidth(), piano.get()->get_min_height());
-
-	if (getWidth() > piano.get()->getWidth())
-		setSize(piano.get()->getWidth(), getHeight());
-
 	AudioProcessorEditor::resized();
 
 	scaleEdit->setSize(getWidth(), 48);
 	view.get()->setSize(getWidth(), getHeight() - 48);
 	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
+
+	if (view.get()->getMaximumVisibleWidth() > piano.get()->getWidth())
+	{
+		piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
+	}
 
 	view.get()->setViewPosition(pt);
 }

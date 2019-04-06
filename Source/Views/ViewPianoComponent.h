@@ -48,6 +48,7 @@ public:
 		int order; // front most keys are 0, "black" keys are 1, etc
 		float orderWidthRatio;
 		float orderHeightRatio;
+		float velocity = 0;
 
 		Colour color;
 		int activeColor = 0;
@@ -140,8 +141,6 @@ public:
 
 	//===============================================================================================
 
-	float get_min_height();
-
 	MidiKeyboardState* get_keyboard_state();
 
 	Point<int> get_position_of_key(int midiNoteIn);
@@ -153,7 +152,7 @@ public:
 
 	//===============================================================================================
 
-	void apply_layout(std::vector<int> layoutIn, bool samePeriod = true);
+	void apply_layout(ModeLayout layoutIn);
 
 	void apply_steps_layout(juce::String strIn);
 
@@ -168,6 +167,12 @@ public:
 	void all_notes_off();
 
 	void isolate_last_note();
+
+	bool check_keys_modal();
+
+	void transpose_keys_modal(int modalStepsIn);
+
+	void transpose_keys(int modalStepsIn);
 
 	//===============================================================================================
 	
@@ -237,6 +242,8 @@ private:
 	// Data
 	OwnedArray<PianoKeyComponent> keys;
 	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
+	Array<PianoKeyComponent*> keysOn;
+	std::unique_ptr<ModeLayout> modeDisplayed;
 
 	// Parameters
 	std::vector<int> scaleLayout;
@@ -261,9 +268,9 @@ private:
     // Properties
 
 	int modeSize;
-	int modeKeysSize;
 	int modeOrder;
-    
+	int modalKeysSize;
+
     int keyWidth = 50;
     int keyHeight = 200;
     float defaultKeyWHRatio = 0.25;

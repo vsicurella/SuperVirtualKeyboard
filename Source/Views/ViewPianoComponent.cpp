@@ -27,7 +27,7 @@ ViewPianoComponent::PianoKeyComponent::PianoKeyComponent(String nameIn, int keyN
 void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     // idk why getBounds() doesn't work properly. maybe it's set in the parent bounds
-    Rectangle<int> fillBounds = Rectangle<int>(0, 0, getWidth(), getHeight());
+    Rectangle<int> fillBounds = Rectangle<int>(0, 0, getWidth() - 1, getHeight());
 	color = findColour(activeColor);
     
     if (activeColor == 2)
@@ -37,7 +37,7 @@ void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool should
     }
 
 	if (externalMidiState > 0)
-		color = color.interpolatedWith(Colours::lightblue, 0.5);
+		color = color.interpolatedWith(Colours::lightblue, 0.75);
 
     
     g.setColour(color);
@@ -154,13 +154,12 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 	notesToShow = 128;
 	rows = 1;
 
-	modeKeysSize = 0;
 	removeMouseListener(this);
 
 	appCmdMgr = &cmdMgrIn;
 	menu.reset(new PianoMenuBar(appCmdMgr));
 	menu.get()->setName("Piano Menu");
-	addAndMakeVisible(menu.get());
+	//addAndMakeVisible(menu.get());
 	
 
 	// Create children (piano keys)        
@@ -175,6 +174,7 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 	setRepaintsOnMouseActivity(true);
 	toBack();
 	
+	setSize(1000, 250);
 	setOpaque(true);
 
 	// Apply default layout
@@ -182,11 +182,6 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 }
 
 //===============================================================================================
-
-float ViewPianoComponent::get_min_height()
-{
-	return minWindowHeight;
-}
 
 MidiKeyboardState* ViewPianoComponent::get_keyboard_state()
 {
@@ -217,7 +212,6 @@ ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position
 ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position(const MouseEvent& e)
 {
 	PianoKeyComponent* keyOut = nullptr;
-
 	Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
 
 	if (e.eventComponent->getName().startsWith("Key") &&
@@ -241,33 +235,28 @@ float ViewPianoComponent::get_velocity(PianoKeyComponent* keyIn, const MouseEven
 
 //===============================================================================================
 
-void ViewPianoComponent::apply_layout(std::vector<int> layoutIn, bool samePeriod)
+void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 {
-	/* default 12-tone : 0 1 0 1 0 0 1 0 1 0 1 0 */
-	scaleLayout = layoutIn;
+	modeDisplayed.reset(new ModeLayout(layoutIn));
+	scaleLayout = layoutIn.get_order();
 	tuningSize = scaleLayout.size();
 
-	modeSize = 0;
-	modeOrder = 0;
+	modeSize = modeDisplayed.get()->scaleSize;
+	modeOrder = modeDisplayed.get()->get_highest_order();
+	modalKeysSize = modeDisplayed.get()->get_num_modal_notes();
 
-	// Figure out mode properties
-	for (int i = 0; i < tuningSize; i++)
-	{
-		if (scaleLayout.at(i) == 0)
-			modeSize++;
-
-		if (scaleLayout.at(i) > modeOrder)
-			modeOrder = scaleLayout.at(i);
-	}
+	keysOrder.resize(modeOrder + 1);
+	float modeDegree = -1;
 
 	// Setup keys for layout
-	modeKeysSize = 0;
 	PianoKeyComponent* key;
 	for (int i = 0; i < notesToShow; i++)
 	{
 		key = keys.getUnchecked(i);
 
 		key->order = scaleLayout.at(i % tuningSize);
+		keysOrder[key->order].push_back(key);
+
 		auto ratios = get_key_proportions(key);
 		key->orderWidthRatio = ratios.x;
 		key->orderHeightRatio = ratios.y;
@@ -276,29 +265,24 @@ void ViewPianoComponent::apply_layout(std::vector<int> layoutIn, bool samePeriod
 		key->setColour(1, get_key_color(key).contrasting(0.2));
 		key->setColour(2, Colours::yellow);
 
-		key->modeDegree = modeKeysSize + (key->order / (modeOrder + 1.0));
+		key->modeDegree = keysOrder[key->order].size() + (key->order / (modeOrder + 1.0));
 
 		if (key->order == 0)
 		{
-			modeKeysSize++;
+			key->modeDegree = ++modeDegree;
 			key->toBack();
 		}
 		else
 		{
-			key->modeDegree = key->modeDegree - 1;
+			key->modeDegree = modeDegree + (key->order / (modeOrder + 1.0f));
 			key->toFront(false);
 		}
 
 		key->setVisible(true);
-
-		if (key->order >= keysOrder.size())
-			keysOrder.resize(key->order + 1);
-
-		keysOrder.at(key->order).push_back(key);
 	}
 
 	// Update grid properties
-	grid.set_mode_keys(modeKeysSize, modeOrder);
+	grid.set_mode_keys(keysOrder[0].size(), modeOrder);
 
 	// Calculate properties
 	displayIsReady = true;
@@ -307,16 +291,19 @@ void ViewPianoComponent::apply_layout(std::vector<int> layoutIn, bool samePeriod
 
 void ViewPianoComponent::apply_steps_layout(juce::String strIn)
 {
-	apply_layout(ModeLayout::steps_to_order(ModeLayout::parse_steps(strIn)));
+	ModeLayout layout = ModeLayout(strIn);
+	apply_layout(layout);
 }
 
 void ViewPianoComponent::apply_steps_layout(std::vector<int> stepsIn)
 {
-	apply_layout(ModeLayout::steps_to_order(stepsIn));
+	ModeLayout layout = ModeLayout(stepsIn);
+	apply_layout(layout);
 }
 
 //===============================================================================================
 
+// The function that determines default key proportions and chooses custom ones if set
 Point<float> ViewPianoComponent::get_key_proportions(PianoKeyComponent* keyIn)
 {
 	Point<float>  out;
@@ -372,6 +359,70 @@ void ViewPianoComponent::isolate_last_note()
 		repaint();
 	}
 }
+
+bool ViewPianoComponent::check_keys_modal()
+{
+	PianoKeyComponent* key;
+	bool modal = true;
+
+	for (int i = 0; i < keysOn.size(); i++)
+	{
+		key = keysOn[i];
+		modal *= (floor(key->modeDegree) == key->modeDegree);
+	}
+
+	return modal;
+}
+
+void ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
+{
+	PianoKeyComponent* key;
+	int newDeg = -1;
+	float velocity;
+
+	for (int i = 0; i < keysOn.size(); i++)
+	{
+		key = keysOn[i];
+		velocity = key->velocity;
+		triggerKeyNoteOff(key);
+		
+		for (int i = 0; i < keysOrder[0].size(); i++)
+		{
+			if (key->modeDegree == keysOrder[0].at(i)->modeDegree)
+			{
+				newDeg = i + modalStepsIn;
+			}
+		}
+
+		if (newDeg < 0 || newDeg > keysOrder[0].size())
+			continue;
+
+		key = keysOrder[0][newDeg];
+		triggerKeyNoteOn(key, velocity);
+	}
+}
+
+void ViewPianoComponent::transpose_keys(int stepsIn)
+{
+	PianoKeyComponent* key;
+	int newKey;
+	float velocity;
+
+	for (int i = 0; i < keysOn.size(); i++)
+	{
+		key = keysOn[i];
+		velocity = key->velocity;
+		triggerKeyNoteOff(key);
+
+		newKey = key->keyNumber + stepsIn;
+		if (newKey < 0 || newKey > 127)
+			continue;
+
+		key = keys.getUnchecked(newKey);
+		triggerKeyNoteOn(key, velocity);
+	}
+}
+
 
 
 //===============================================================================================
@@ -479,7 +530,7 @@ void ViewPianoComponent::mouseDrag(const MouseEvent& e)
 	{
 		if (key->keyNumber != lastKeyClicked)
 		{
-			PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked % keys.size());
+			PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked);
 			if (!shiftHeld)
 			{
 				triggerKeyNoteOff(oldKey);
@@ -611,7 +662,9 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 		shiftHeld = false;
 
 		isolate_last_note();
+
 		PianoKeyComponent* key = keys.getUnchecked(lastKeyClicked);
+
 		if (!(key->isMouseOver() && key->isMouseButtonDownAnywhere()))
 			triggerKeyNoteOff(keys.getUnchecked(lastKeyClicked));
 	
@@ -663,12 +716,9 @@ void ViewPianoComponent::resized()
 	keyWidth = keyHeight * defaultKeyWHRatio;
 
 	// Adjust Parent bounds and grid
-    pianoWidth = modeKeysSize * keyWidth;
+    pianoWidth = modalKeysSize * keyWidth;
 	setSize(pianoWidth, getHeight());
-	grid.setBounds(Rectangle<int>(0, 0, pianoWidth - 1, getHeight()));
-    
-	// Min bound for window height
-	minWindowHeight = pianoWidth / modeKeysSize * defaultKeyWHRatio;
+	grid.setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 	// Resize keys
 	PianoKeyComponent* key;
@@ -695,14 +745,26 @@ void ViewPianoComponent::visibilityChanged()
 
 void ViewPianoComponent::triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn)
 {
-    keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
-	key->activeColor = 2;
+	if (velocityIn > 0)
+	{
+		keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
+		key->activeColor = 2;
+		key->velocity = velocityIn;
+		keysOn.add(key);
+	}
 }
 
 void ViewPianoComponent::triggerKeyNoteOff(PianoKeyComponent* key)
 {
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
+	
 	key->activeColor = 0;
+	key->velocity = 0;
+
+	if (key->isMouseOver())
+		key->activeColor = 1;
+	
+	keysOn.removeAllInstancesOf(key);
 }
 
 void ViewPianoComponent::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)

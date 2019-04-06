@@ -10,8 +10,6 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-
 //#include "../Structures/Scale.h"
 
 /*
@@ -21,7 +19,6 @@
 
 struct ModeLayout
 {
-
 	ModeLayout()
 	{
 		scaleSize = 1;
@@ -37,7 +34,17 @@ struct ModeLayout
 		modeSize = steps.size();
 	}
 
-	~ModeLayout();
+	ModeLayout(std::vector<int> stepsIn)
+	{
+		steps = stepsIn;
+		order = steps_to_order(steps);
+		
+		strSteps = steps_to_string(stepsIn);
+		scaleSize = order.size();
+		modeSize = steps.size();
+	}
+
+	~ModeLayout() {}
 
 	//Scale* scale;
 
@@ -152,6 +159,11 @@ struct ModeLayout
 		return scaleSize;
 	}
 
+	int get_num_modal_notes()
+	{
+		return floor(128.0f / scaleSize * modeSize);
+	}
+
 	int get_mode_size()
 	{
 		return steps.size();
@@ -203,5 +215,48 @@ struct ModeLayout
 		}
 
 		return orderOut;
+	}
+
+	int get_highest_order()
+	{
+		int o = 0;
+
+		for (int i = 0; i < scaleSize; i++)
+		{
+			if (order[i] > o)
+				o = order[i];
+		}
+
+		return o;
+	}
+
+	std::string toString()
+	{
+		std::string out;
+
+		for (int i = 0; i < steps.size(); i++)
+		{
+			out += steps[i];
+
+			if (i < steps.size() - 1)
+				out += ' ';
+		}
+
+		return out;
+	}
+
+	static std::string steps_to_string(std::vector<int> stepsIn)
+	{
+		std::string out;
+
+		for (int i = 0; i < stepsIn.size(); i++)
+		{
+			out += stepsIn[i];
+
+			if (i < stepsIn.size() - 1)
+				out += ' ';
+		}
+
+		return out;
 	}
 };
