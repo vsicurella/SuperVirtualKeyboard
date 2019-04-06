@@ -71,11 +71,11 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	std::vector<int> layout = ModeLayout::parse_steps(scaleEdit.get()->get_input());
+	ModeLayout layout = ModeLayout(scaleEdit.get()->get_input().toStdString());
 
-	if (layout.size() > 0)
+	if (layout.scaleSize > 0)
 	{
-		piano.get()->apply_steps_layout(layout);
+		piano.get()->apply_layout(layout);
 		repaint();
 	}
 

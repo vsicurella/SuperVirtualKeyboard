@@ -32,20 +32,18 @@ class FractionalGrid
 	float colSize;
 	float rowSize;
 
+protected:
+
 	bool needsToUpdate = true;
 
 public:
 
-	FractionalGrid()
-	{
-		columnGap = 1;
-		rowGap = 1;
-	}
+	FractionalGrid() {}
 
-	~FractionalGrid() {};
+	~FractionalGrid() {}
 
-	int columnGap;
-	int rowGap;
+	int columnGap = 1;
+	int rowGap = 1;
 
 	float set_columns(float colIn)
 	{

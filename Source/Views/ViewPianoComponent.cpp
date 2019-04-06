@@ -49,31 +49,17 @@ void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool should
 ViewPianoComponent::PianoKeyGrid::PianoKeyGrid()
 {
 	order = 1;
-	modeSize = 7;
+	modeSize = 1;
+	layout;
 }
 
-int ViewPianoComponent::PianoKeyGrid::set_order(int orderIn, float* orderWidthRatio, float* orderHeightRatio)
+ViewPianoComponent::PianoKeyGrid::PianoKeyGrid(ModeLayout* layoutIn)
 {
-	order = orderIn;
-	return order;
-}
+	layout = layoutIn;
+	order = layout->get_highest_order();
+	modeSize = layout->modeSize;
 
-int ViewPianoComponent::PianoKeyGrid::set_mode_keys(int modeSizeIn)
-{
-	modeSize = modeSizeIn;
-	set_columns(modeSizeIn);
-	return modeSize;
-}
-
-void ViewPianoComponent::PianoKeyGrid::set_mode_keys(int modeSizeIn, int highestOrder)
-{
-	order = highestOrder;
-	set_mode_keys(modeSizeIn);
-}
-
-void ViewPianoComponent::PianoKeyGrid::set_order_layout(std::vector<int> layoutIn)
-{
-	orderLayout = layoutIn;
+	set_grid(layout->get_num_modal_notes(), 1);
 }
 
 void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
@@ -168,6 +154,7 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 		String keyName = "Key " + String(i);
 		PianoKeyComponent* key = new PianoKeyComponent(keyName, i);
 		addChildComponent(keys.add(key));
+		keysPtr.push_back(key);
 	}
 
 	addMouseListener(this, true);
@@ -179,6 +166,7 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 
 	// Apply default layout
 	apply_steps_layout(defaultMOS);
+	//apply_steps_layout("3 3 1 3 3 3 1");
 }
 
 //===============================================================================================
@@ -241,12 +229,11 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 	scaleLayout = layoutIn.get_order();
 	tuningSize = scaleLayout.size();
 
-	modeSize = modeDisplayed.get()->scaleSize;
+	modeSize = modeDisplayed.get()->modeSize;
 	modeOrder = modeDisplayed.get()->get_highest_order();
 	modalKeysSize = modeDisplayed.get()->get_num_modal_notes();
 
 	keysOrder.resize(modeOrder + 1);
-	float modeDegree = -1;
 
 	// Setup keys for layout
 	PianoKeyComponent* key;
@@ -262,19 +249,17 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 		key->orderHeightRatio = ratios.y;
 
 		key->setColour(0, get_key_color(key));
-		key->setColour(1, get_key_color(key).contrasting(0.2));
+		key->setColour(1, get_key_color(key).contrasting(0.25));
 		key->setColour(2, Colours::yellow);
 
-		key->modeDegree = keysOrder[key->order].size() + (key->order / (modeOrder + 1.0));
+		key->modeDegree = modeDisplayed.get()->modeDegrees.at(i % tuningSize) + modeSize * (i / tuningSize);
 
 		if (key->order == 0)
 		{
-			key->modeDegree = ++modeDegree;
 			key->toBack();
 		}
 		else
 		{
-			key->modeDegree = modeDegree + (key->order / (modeOrder + 1.0f));
 			key->toFront(false);
 		}
 
@@ -282,7 +267,7 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 	}
 
 	// Update grid properties
-	grid.set_mode_keys(keysOrder[0].size(), modeOrder);
+	grid = PianoKeyGrid(modeDisplayed.get());
 
 	// Calculate properties
 	displayIsReady = true;
@@ -291,7 +276,7 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 
 void ViewPianoComponent::apply_steps_layout(juce::String strIn)
 {
-	ModeLayout layout = ModeLayout(strIn);
+	ModeLayout layout = ModeLayout(strIn.toStdString());
 	apply_layout(layout);
 }
 
@@ -368,59 +353,120 @@ bool ViewPianoComponent::check_keys_modal()
 	for (int i = 0; i < keysOn.size(); i++)
 	{
 		key = keysOn[i];
-		modal *= (floor(key->modeDegree) == key->modeDegree);
+		modal *= (int) key->modeDegree == (int) ceil(key->modeDegree);
 	}
 
 	return modal;
 }
 
+ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key_modal(PianoKeyComponent* key, int stepsIn)
+{
+	PianoKeyComponent* keyOut = nullptr;
+	int newKey = -1;
+
+	for (int i = 0; i < keysOrder[0].size(); i++)
+	{
+		if (key->modeDegree == keysOrder[0][i]->modeDegree)
+		{
+			newKey = i;
+			break;
+		}
+	}
+
+	newKey += stepsIn;
+
+	if (newKey >= 0 && newKey < keysOrder[0].size())
+		keyOut = keysOrder[0][newKey];
+
+	return keyOut;
+}
+
+ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key(PianoKeyComponent* key, int stepsIn)
+{
+	PianoKeyComponent* keyOut = nullptr;
+	int newKey;
+
+	newKey = key->keyNumber + stepsIn;
+
+	if (newKey >= 0 && newKey <= 127)
+	{
+		keyOut = keys.getUnchecked(newKey);
+	}
+
+	return keyOut;
+}
+
+
 void ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
 {
+	Array<PianoKeyComponent*> oldKeys = Array<PianoKeyComponent*>(keysOn);
+	Array<PianoKeyComponent*> newKeys;
 	PianoKeyComponent* key;
+	PianoKeyComponent* newKey;
 	int newDeg = -1;
-	float velocity;
 
-	for (int i = 0; i < keysOn.size(); i++)
+	for (int i = 0; i < oldKeys.size(); i++)
 	{
-		key = keysOn[i];
-		velocity = key->velocity;
-		triggerKeyNoteOff(key);
+		key = oldKeys[i];
 		
-		for (int i = 0; i < keysOrder[0].size(); i++)
+		// Find index of key in the keyOrder[0] array, and get new index
+		for (int j = 0; j < keysOrder[0].size(); j++)
 		{
-			if (key->modeDegree == keysOrder[0].at(i)->modeDegree)
+			if (key->modeDegree == keysOrder[0].at(j)->modeDegree)
 			{
-				newDeg = i + modalStepsIn;
+				newDeg = j + modalStepsIn;
 			}
 		}
 
-		if (newDeg < 0 || newDeg > keysOrder[0].size())
+		if (newDeg < 0 || newDeg >= keysOrder[0].size())
 			continue;
 
-		key = keysOrder[0][newDeg];
-		triggerKeyNoteOn(key, velocity);
+		newKey = keysOrder[0][newDeg];
+		newKey->velocity = key->velocity;
+
+		if (lastKeyClicked == key->keyNumber)
+			lastKeyClicked = newKey->keyNumber;
+
+		newKeys.add(newKey);
 	}
+
+	for (int i = 0; i < oldKeys.size(); i++)
+		triggerKeyNoteOff(oldKeys[i]);
+
+	for (int i = 0; i < newKeys.size(); i++)
+		triggerKeyNoteOn(newKeys.getUnchecked(i), newKeys.getUnchecked(i)->velocity);
 }
 
 void ViewPianoComponent::transpose_keys(int stepsIn)
 {
+	Array<PianoKeyComponent*> oldKeys = Array<PianoKeyComponent*>(keysOn);
+	Array<PianoKeyComponent*> newKeys;
 	PianoKeyComponent* key;
-	int newKey;
-	float velocity;
+	PianoKeyComponent* newKey;
+	int newKeyInd;
 
-	for (int i = 0; i < keysOn.size(); i++)
+
+	for (int i = 0; i < oldKeys.size(); i++)
 	{
-		key = keysOn[i];
-		velocity = key->velocity;
-		triggerKeyNoteOff(key);
+		key = oldKeys[i];
+		newKeyInd = key->keyNumber + stepsIn;
 
-		newKey = key->keyNumber + stepsIn;
-		if (newKey < 0 || newKey > 127)
+		if (newKeyInd < 0 || newKeyInd > 127)
 			continue;
 
-		key = keys.getUnchecked(newKey);
-		triggerKeyNoteOn(key, velocity);
+		if (lastKeyClicked == key->keyNumber)
+			lastKeyClicked = newKeyInd;
+
+		newKey = keys.getUnchecked(newKeyInd);
+		newKey->velocity = key->velocity;
+		newKeys.add(newKey);
 	}
+
+	for (int i = 0; i < oldKeys.size(); i++)
+		triggerKeyNoteOff(oldKeys[i]);
+
+	for (int i = 0; i < newKeys.size(); i++)
+		triggerKeyNoteOn(newKeys.getUnchecked(i), newKeys.getUnchecked(i)->velocity);
 }
 
 
@@ -587,6 +633,16 @@ bool ViewPianoComponent::keyStateChanged(bool isKeyDown)
 		downHeld = false;
 	}
 
+	if (!KeyPress::isKeyCurrentlyDown(KeyPress::leftKey) && leftHeld)
+	{
+		leftHeld = false;
+	}
+
+	if (!KeyPress::isKeyCurrentlyDown(KeyPress::rightKey) && rightHeld)
+	{
+		rightHeld = false;
+	}
+
 	return isKeyDown;
 }
 bool ViewPianoComponent::keyPressed(const KeyPress& key)
@@ -595,57 +651,44 @@ bool ViewPianoComponent::keyPressed(const KeyPress& key)
 	{
 		upHeld = true;
 
-		PianoKeyComponent* pk;
-		int inv;
-
-		for (int i = 0; i < keys.size(); i++)
+		if (shiftHeld)
 		{
-			inv = keys.size() - i - 1;
-
-			if (keyboardState.isNoteOn(midiChannelSelected, inv))
-			{
-				pk = keys.getUnchecked(inv);
-				triggerKeyNoteOff(pk);
-
-				if ((inv + 1) >= keys.size())
-					continue;
-
-				pk = keys.getUnchecked(inv + 1);
-				triggerKeyNoteOn(pk, 0.75f);
-			}
+			transpose_keys(1);
+			repaint();
 		}
-
-		if (lastKeyClicked < keys.size() - 1)
-			lastKeyClicked++;
-
-		repaint();
 	}
 
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::downKey) && !downHeld)
 	{
 		downHeld = true;
 
-		PianoKeyComponent* pk;
-
-		for (int i = 0; i < keys.size(); i++)
+		if (shiftHeld)
 		{
-			if (keyboardState.isNoteOn(midiChannelSelected, i))
-			{
-				pk = keys.getUnchecked(i);
-				triggerKeyNoteOff(pk);
-
-				if (i == 0)
-					continue;
-
-				pk = keys.getUnchecked(i-1);
-				triggerKeyNoteOn(pk, 0.75f);
-			}
+			transpose_keys(-1);
+			repaint();
 		}
+	}
 
-		if (lastKeyClicked > 0)
-			lastKeyClicked--;
+	if (KeyPress::isKeyCurrentlyDown(KeyPress::leftKey) && !leftHeld)
+	{
+		leftHeld = true;
 
-		repaint();
+		if (shiftHeld && check_keys_modal())
+		{
+			transpose_keys_modal(-1);
+			repaint();
+		}
+	}
+
+	if (KeyPress::isKeyCurrentlyDown(KeyPress::rightKey) && !rightHeld)
+	{
+		rightHeld = true;
+
+		if (shiftHeld && check_keys_modal())
+		{
+			transpose_keys_modal(1);
+			repaint();
+		}
 	}
 
 	return false;

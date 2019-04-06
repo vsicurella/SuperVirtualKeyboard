@@ -10,6 +10,9 @@
 
 #pragma once
 
+#include <vector>
+#include <string>
+
 //#include "../Structures/Scale.h"
 
 /*
@@ -19,48 +22,22 @@
 
 struct ModeLayout
 {
-	ModeLayout()
-	{
-		scaleSize = 1;
-	}
-
-	ModeLayout(String stepsIn)
-	{
-		strSteps = stepsIn;
-		steps = parse_steps(stepsIn);
-		order = steps_to_order(steps);
-
-		scaleSize = order.size();
-		modeSize = steps.size();
-	}
-
-	ModeLayout(std::vector<int> stepsIn)
-	{
-		steps = stepsIn;
-		order = steps_to_order(steps);
-		
-		strSteps = steps_to_string(stepsIn);
-		scaleSize = order.size();
-		modeSize = steps.size();
-	}
-
-	~ModeLayout() {}
-
 	//Scale* scale;
 
 	int scaleSize;
 	int modeSize;
 
-	String strSteps;
-	String mos;
+	std::string strSteps;
+	std::string mos;
 
 	std::vector<int> order;
 	std::vector<int> steps;
+	std::vector<float> modeDegrees;
 
 	/*
 		Simply parses a string reprsenting step sizes and returns a vector
 	*/
-	static std::vector<int> parse_steps(String stepsIn)
+	static std::vector<int> parse_steps(std::string stepsIn)
 	{
 		std::vector<int> stepsOut;
 
@@ -79,10 +56,11 @@ struct ModeLayout
 				digits++;
 				c = stepsIn[i + digits];
 			}
-
+			
 			if (digits > 0)
-			{
-				step = stepsIn.substring(i, i + digits).getIntValue();
+			{	
+				std::string::size_type sz;
+				step = std::stoi(stepsIn.substr(i, i + digits), &sz);
 				stepsOut.push_back(step);
 				i += digits + 1;
 			}
@@ -101,11 +79,10 @@ struct ModeLayout
 	static std::vector<int> steps_to_order(std::vector<int> stepsIn)
 	{
 		std::vector<int> orderOut;
-		std::vector<int> steps = stepsIn;
 
-		for (int i = 0; i < steps.size(); i++)
+		for (int i = 0; i < stepsIn.size(); i++)
 		{
-			for (int j = 0; j < steps.at(i); j++)
+			for (int j = 0; j < stepsIn.at(i); j++)
 				orderOut.push_back(j);
 		}
 
@@ -117,7 +94,7 @@ struct ModeLayout
 	Takes in step vector as a string
 	Returns an order vector
 	*/
-	static std::vector<int> steps_to_order(String strStepsIn)
+	static std::vector<int> steps_to_order(std::string strStepsIn)
 	{
 		return steps_to_order(parse_steps(strStepsIn));
 	}
@@ -153,6 +130,33 @@ struct ModeLayout
 		stepsOut.shrink_to_fit();
 		return stepsOut;
 	}
+
+	/*
+	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
+	Returns a vector of mode degrees {0, 0.5, 1, 1.5, 2, 3, 3.5,...}
+	*/
+	static std::vector<float> steps_to_degrees(std::vector<int> stepsIn)
+	{
+		std::vector<float> degreesOut;
+		float deg = -1;
+
+		for (int i = 0; i < stepsIn.size(); i++)
+		{
+			degreesOut.push_back(++deg);
+
+			if (stepsIn.at(i) > 1)
+			{
+				for (int j = 1; j < stepsIn.at(i); j++)
+				{
+					degreesOut.push_back(deg + (float)j / stepsIn.at(i));
+				}
+			}
+		}
+
+		degreesOut.shrink_to_fit();
+		return degreesOut;
+	}
+
 
 	int get_num_notes()
 	{
@@ -259,4 +263,39 @@ struct ModeLayout
 
 		return out;
 	}
+
+	ModeLayout()
+	{
+		scaleSize = 1;
+		strSteps = "1";
+		steps = parse_steps(strSteps);
+		order = steps_to_order(steps);
+		modeDegrees = steps_to_degrees(steps);
+
+		modeSize = steps.size();
+	}
+
+	ModeLayout(std::string stepsIn)
+	{
+		strSteps = stepsIn;
+		steps = parse_steps(stepsIn);
+		order = steps_to_order(steps);
+		modeDegrees = steps_to_degrees(steps);
+
+		scaleSize = order.size();
+		modeSize = steps.size();
+	}
+
+	ModeLayout(std::vector<int> stepsIn)
+	{
+		steps = stepsIn;
+		order = steps_to_order(steps);
+		modeDegrees = steps_to_degrees(steps);
+
+		strSteps = steps_to_string(stepsIn);
+		scaleSize = order.size();
+		modeSize = steps.size();
+	}
+
+	~ModeLayout() {}
 };

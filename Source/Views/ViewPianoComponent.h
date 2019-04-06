@@ -65,6 +65,8 @@ public:
 		int order = 1;
 		int modeSize = 7;
 
+		ModeLayout* layout;
+
 		std::vector<int> orderLayout = { 0, 1, 0, 1, 0,    0, 1, 0, 1, 0, 1, 0 };
 		std::vector<int> MOSLayout = { 2,    2,    1,    2,    2,    2,    1 };
 		std::vector<int> gridLayout = { 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0 };
@@ -72,15 +74,9 @@ public:
 
 		PianoKeyGrid();
 
+		PianoKeyGrid(ModeLayout* layoutIn);
+
 		~PianoKeyGrid() {};
-
-		int set_order(int orderIn, float* orderWidthRatio, float* orderHeightRatio);
-
-		int set_mode_keys(int modeSizeIn);
-
-		void set_mode_keys(int modeSizeIn, int highestOrder);
-
-		void set_order_layout(std::vector<int> layoutIn);
 
 		void place_key(PianoKeyComponent* key);
 
@@ -170,6 +166,10 @@ public:
 
 	bool check_keys_modal();
 
+	PianoKeyComponent* transpose_key_modal(PianoKeyComponent* key, int stepsIn);
+
+	PianoKeyComponent* transpose_key(PianoKeyComponent* key, int stepsIn);
+
 	void transpose_keys_modal(int modalStepsIn);
 
 	void transpose_keys(int modalStepsIn);
@@ -241,6 +241,8 @@ private:
 
 	// Data
 	OwnedArray<PianoKeyComponent> keys;
+	std::vector<PianoKeyComponent*> keysPtr;// debug
+
 	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
 	Array<PianoKeyComponent*> keysOn;
 	std::unique_ptr<ModeLayout> modeDisplayed;
@@ -285,6 +287,8 @@ private:
     bool ctrlHeld = false;
 	bool upHeld = false;
 	bool downHeld = false;
+	bool leftHeld = false;
+	bool rightHeld = false;
         
     bool displayIsReady = false;
     	
