@@ -244,7 +244,7 @@ private:
 	std::vector<PianoKeyComponent*> keysPtr;// debug
 
 	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
-	Array<PianoKeyComponent*> keysOn;
+	std::vector<PianoKeyComponent*> keysOn;
 	std::unique_ptr<ModeLayout> modeDisplayed;
 
 	// Parameters

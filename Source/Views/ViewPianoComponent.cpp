@@ -399,15 +399,17 @@ ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key(PianoKe
 
 void ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
 {
-	Array<PianoKeyComponent*> oldKeys = Array<PianoKeyComponent*>(keysOn);
-	Array<PianoKeyComponent*> newKeys;
+	std::vector<PianoKeyComponent*> oldKeys = std::vector<PianoKeyComponent*>(keysOn);
+	std::vector<PianoKeyComponent*> newKeys;
 	PianoKeyComponent* key;
 	PianoKeyComponent* newKey;
 	int newDeg = -1;
+	float velocity;
 
 	for (int i = 0; i < oldKeys.size(); i++)
 	{
 		key = oldKeys[i];
+		velocity = key->velocity;
 		
 		// Find index of key in the keyOrder[0] array, and get new index
 		for (int j = 0; j < keysOrder[0].size(); j++)
@@ -422,33 +424,35 @@ void ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
 			continue;
 
 		newKey = keysOrder[0][newDeg];
-		newKey->velocity = key->velocity;
+		newKey->velocity = velocity;
 
 		if (lastKeyClicked == key->keyNumber)
 			lastKeyClicked = newKey->keyNumber;
 
-		newKeys.add(newKey);
+		newKeys.push_back(newKey);
 	}
 
 	for (int i = 0; i < oldKeys.size(); i++)
 		triggerKeyNoteOff(oldKeys[i]);
 
 	for (int i = 0; i < newKeys.size(); i++)
-		triggerKeyNoteOn(newKeys.getUnchecked(i), newKeys.getUnchecked(i)->velocity);
+		triggerKeyNoteOn(newKeys[i], newKeys[i]->velocity);
 }
 
 void ViewPianoComponent::transpose_keys(int stepsIn)
 {
-	Array<PianoKeyComponent*> oldKeys = Array<PianoKeyComponent*>(keysOn);
-	Array<PianoKeyComponent*> newKeys;
+	std::vector<PianoKeyComponent*> oldKeys = std::vector<PianoKeyComponent*>(keysOn);
+	std::vector<PianoKeyComponent*> newKeys;
 	PianoKeyComponent* key;
 	PianoKeyComponent* newKey;
 	int newKeyInd;
+	float velocity;
 
 
 	for (int i = 0; i < oldKeys.size(); i++)
 	{
 		key = oldKeys[i];
+		velocity = key->velocity;
 		newKeyInd = key->keyNumber + stepsIn;
 
 		if (newKeyInd < 0 || newKeyInd > 127)
@@ -458,15 +462,15 @@ void ViewPianoComponent::transpose_keys(int stepsIn)
 			lastKeyClicked = newKeyInd;
 
 		newKey = keys.getUnchecked(newKeyInd);
-		newKey->velocity = key->velocity;
-		newKeys.add(newKey);
+		newKey->velocity = velocity;
+		newKeys.push_back(newKey);
 	}
 
 	for (int i = 0; i < oldKeys.size(); i++)
 		triggerKeyNoteOff(oldKeys[i]);
 
 	for (int i = 0; i < newKeys.size(); i++)
-		triggerKeyNoteOn(newKeys.getUnchecked(i), newKeys.getUnchecked(i)->velocity);
+		triggerKeyNoteOn(newKeys[i], newKeys[i]->velocity);
 }
 
 
@@ -793,7 +797,7 @@ void ViewPianoComponent::triggerKeyNoteOn(PianoKeyComponent* key, float velocity
 		keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
 		key->activeColor = 2;
 		key->velocity = velocityIn;
-		keysOn.add(key);
+		keysOn.push_back(key);
 	}
 }
 
@@ -802,12 +806,27 @@ void ViewPianoComponent::triggerKeyNoteOff(PianoKeyComponent* key)
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
 	
 	key->activeColor = 0;
-	key->velocity = 0;
 
 	if (key->isMouseOver())
 		key->activeColor = 1;
 	
-	keysOn.removeAllInstancesOf(key);
+	int ind = -1;
+	// find key in vector, swap with end, and pop off
+	for (int i = 0; i < keysOn.size(); i++)
+	{
+		if (key->keyNumber == keysOn[i]->keyNumber)
+		{
+			ind = i;
+			break;
+		}
+	}
+	if (ind > -1)
+	{
+		PianoKeyComponent* temp = keysOn[keysOn.size() - 1];
+		keysOn[keysOn.size() - 1] = keysOn[ind];
+		keysOn[ind] = temp;
+		keysOn.pop_back();
+	}
 }
 
 void ViewPianoComponent::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
