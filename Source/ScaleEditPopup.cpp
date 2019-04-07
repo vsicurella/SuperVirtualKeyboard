@@ -32,9 +32,11 @@ ScaleEditPopup::ScaleEditPopup ()
     //[Constructor_pre] You can add your own custom stuff here..
 	presets.reset(new HashMap<String, std::vector<int>>());
 
-	presets.get()->set("Sensi[5] 8", std::vector<int>({ 2, 1, 2, 2, 1 }));
+	presets.get()->set("Mavila[5] 7", std::vector<int>({ 1, 2, 1, 2, 1 }));
+	presets.get()->set("Father[5] 8", std::vector<int>({ 2, 1, 2, 2, 1 }));
 	presets.get()->set("Mavila[7] 9", std::vector<int>({ 1, 1, 2, 1, 1, 1, 2 }));
 	presets.get()->set("Dicot[7] 10", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1}));
+	presets.get()->set("Machine[6] 11", std::vector<int>({ 2, 2, 2, 2, 2, 1 }));
 	presets.get()->set("Orgone[7] 11", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2}));
 	presets.get()->set("Diatonic[7] 12", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
 	presets.get()->set("Father[8] 13", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }));
@@ -62,7 +64,7 @@ ScaleEditPopup::ScaleEditPopup ()
     textEditor->setScrollbarsShown (true);
     textEditor->setCaretVisible (true);
     textEditor->setPopupMenuEnabled (true);
-    textEditor->setText (String());
+    textEditor->setText (TRANS("2 2 1 2 2 2 1"));
 
     instructions.reset (new Label ("Instructions",
                                    TRANS("Enter your scale like this:\n"
@@ -82,7 +84,7 @@ ScaleEditPopup::ScaleEditPopup ()
     addAndMakeVisible (scalePresets.get());
     scalePresets->setEditableText (false);
     scalePresets->setJustificationType (Justification::centredLeft);
-    scalePresets->setTextWhenNothingSelected (TRANS("Presets"));
+    scalePresets->setTextWhenNothingSelected (TRANS("Pick a mode..."));
     scalePresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     scalePresets->addListener (this);
 
@@ -259,8 +261,8 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="new text editor" id="8c559f3dc17dcbb0" memberName="textEditor"
               virtualName="" explicitFocusOrder="0" pos="28.296% 8 150 24"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
+              initialText="2 2 1 2 2 2 1" multiline="0" retKeyStartsLine="0"
+              readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="Instructions" id="4c079e580647d111" memberName="instructions"
          virtualName="" explicitFocusOrder="0" pos="1.715% 0 175 40" edTextCol="ff000000"
          edBkgCol="0" labelText="Enter your scale like this:&#10;2 2 1 2 2 2 1"
@@ -272,7 +274,7 @@ BEGIN_JUCER_METADATA
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Preset Box" id="91d2066d9e23de1c" memberName="scalePresets"
             virtualName="" explicitFocusOrder="0" pos="72.026% 8 150 24"
-            editable="0" layout="33" items="" textWhenNonSelected="Presets"
+            editable="0" layout="33" items="" textWhenNonSelected="Pick a mode..."
             textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 

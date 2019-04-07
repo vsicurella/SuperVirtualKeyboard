@@ -24,6 +24,7 @@ struct ModeLayout
 {
 	//Scale* scale;
 
+	std::string modeName;
 	int scaleSize;
 	int modeSize;
 
@@ -33,6 +34,15 @@ struct ModeLayout
 	std::vector<int> order;
 	std::vector<int> steps;
 	std::vector<float> modeDegrees;
+
+	/*
+		Sets the name of the mode
+	*/
+	std::string set_name(std::string nameIn)
+	{
+		modeName = nameIn;
+		return modeName;
+	}
 
 	/*
 		Simply parses a string reprsenting step sizes and returns a vector

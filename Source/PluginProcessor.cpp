@@ -21,7 +21,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+	undoManager(new UndoManager())
 #endif
 {
 	// Create default piano layout

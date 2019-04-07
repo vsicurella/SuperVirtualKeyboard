@@ -39,7 +39,6 @@ public:
 	struct PianoKeyComponent : public Button
 	{
 		// Parameters
-		int* keyboardSize;
 		int keyNumber;
 		float modeDegree;
 
@@ -66,6 +65,8 @@ public:
 		PianoKeyComponent(String nameIn, int keyNumIn);
 
 		void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+
+		String toString();
 	};
 
 	struct PianoKeyGrid : public FractionalGrid
@@ -144,13 +145,13 @@ public:
 
 	void isolate_last_note();
 
-	bool check_keys_modal();
+	bool check_keys_modal(int& orderDetected);
 
 	PianoKeyComponent* transpose_key_modal(PianoKeyComponent* key, int stepsIn);
 
 	PianoKeyComponent* transpose_key(PianoKeyComponent* key, int stepsIn);
 
-	void transpose_keys_modal(int modalStepsIn);
+	bool transpose_keys_modal(int modalStepsIn);
 
 	void transpose_keys(int modalStepsIn);
 

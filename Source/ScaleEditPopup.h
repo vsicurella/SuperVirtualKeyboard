@@ -64,21 +64,6 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	std::unique_ptr < HashMap<String, std::vector<int>>> presets;
 	bool enterDown = false;
-
-	/*
-	Sensi[5] 8 Mavila[7] 9
-		Future 10edo
-		Orgone[7] 11	Diatonic[7] 12
-		Father[8] 13
-		Orwell[9] 13 Titanium[9] 14	  Mavila[9] 16 Diatonic[7] 17
-		Maqamic[7] 17 	Maqamic[10] 17 Machine[11] 17
-		Diatonic[7] 19
-		Orwell[9] 22 Diatonic[7] 24
-		Diatonic[7] 31", std::vector<int>({ 5, 5, 3, 5, 5, 5, 3 }));
-		presets.get()->set("BP Lambda", std::vector<int>({ , 2, 1, 2, 2, 2, 1 }));
-	presets.get()->set("BP Dur II", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
-	*/
-
     //[/UserVariables]
 
     //==============================================================================

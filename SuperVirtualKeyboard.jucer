@@ -5,10 +5,6 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
-    <FILE id="R98ufw" name="ScaleEditPopup.cpp" compile="1" resource="0"
-          file="Source/ScaleEditPopup.cpp"/>
-    <FILE id="PP0SKn" name="ScaleEditPopup.h" compile="0" resource="0"
-          file="Source/ScaleEditPopup.h"/>
     <GROUP id="{7DC7E22D-B838-790E-97EC-8DC818168910}" name="FileIO">
       <FILE id="YJoaKA" name="KbmReader.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/KbmReader.h"/>
       <FILE id="U2iKT4" name="KbmWriter.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/KbmWriter.h"/>
@@ -31,6 +27,12 @@
     <GROUP id="{A7D2C7CC-19E6-C0EB-2D98-E236A874958F}" name="Windows">
       <FILE id="nUMOtt" name="PianoWindow.h" compile="0" resource="0" file="../ScaleVisualizer/Source/Windows/PianoWindow.h"/>
     </GROUP>
+    <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
+    <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
+    <FILE id="R98ufw" name="ScaleEditPopup.cpp" compile="1" resource="0"
+          file="Source/ScaleEditPopup.cpp"/>
+    <FILE id="PP0SKn" name="ScaleEditPopup.h" compile="0" resource="0"
+          file="Source/ScaleEditPopup.h"/>
     <FILE id="wsU16t" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"
           file="Source/PluginProcessor.cpp"/>
