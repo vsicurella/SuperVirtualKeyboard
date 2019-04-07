@@ -24,6 +24,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        )
 #endif
 {
+	// Create default piano layout
+	modeLayout.reset(new ModeLayout("2 2 1 2 2 2 1"));
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -209,6 +211,27 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+//==============================================================================
+void SuperVirtualKeyboardAudioProcessor::setViewportPositionProportions(Point<int> pointIn)
+{
+	viewportPos = pointIn;
+}
+
+Point<int> SuperVirtualKeyboardAudioProcessor::getViewportPositionProportions()
+{
+	return viewportPos;
+}
+
+void SuperVirtualKeyboardAudioProcessor::setModeLayout(ModeLayout modeLayoutIn)
+{
+	modeLayout.reset(new ModeLayout(modeLayoutIn));
+}
+
+ModeLayout* SuperVirtualKeyboardAudioProcessor::getModeLayout()
+{
+	return modeLayout.get();
 }
 
 //==============================================================================

@@ -32,8 +32,8 @@ void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool should
     
     if (activeColor == 2)
     {
-        color = findColour(0).interpolatedWith(findColour(2), 0.5);
-        fillBounds.reduce(1, 1);
+        color = findColour(0).interpolatedWith(findColour(2), 0.618);
+        fillBounds.reduce(1, 0);
     }
 
 	if (externalMidiState > 0)
@@ -62,6 +62,68 @@ ViewPianoComponent::PianoKeyGrid::PianoKeyGrid(ModeLayout* layoutIn)
 	set_grid(layout->get_num_modal_notes(), 1);
 }
 
+void ViewPianoComponent::PianoKeyGrid::set_ordered_key_view(ViewPianoComponent::PianoKeyOrderPlacement placementType)
+{
+	orderedKeyRatios.clear();
+
+	switch (placementType)
+	{
+	case ViewPianoComponent::PianoKeyOrderPlacement::nestedCenter:
+		break;
+	case ViewPianoComponent::PianoKeyOrderPlacement::adjacent:
+		break;
+	default: // aka nestedRight
+
+		float localOrder;
+		float height;
+		float heightMod;
+		float xp = 0.618;
+
+
+		for (int i = 0; i < modeSize; i++)
+		{
+			localOrder = layout->get_steps()[i];
+
+			if (localOrder < 2)
+				orderedKeyRatios.push_back(1);
+			else
+			{
+				for (int j = 0; j < localOrder; j++)
+				{
+					if (j == 0)
+						height = 1;
+					else
+						height = (0.5 + 0.2 * localOrder / 6.0) * (pow(localOrder - j, xp) / pow(localOrder-1, xp));
+					
+					orderedKeyRatios.push_back(height);
+				}
+			}
+		}
+	}
+}
+
+void ViewPianoComponent::PianoKeyGrid::resize_ordered_key(PianoKeyComponent* key)
+{
+	if (orderedKeyRatios.size() < 1)
+		set_ordered_key_view(ViewPianoComponent::PianoKeyOrderPlacement::nestedRight);
+
+	key->orderHeightRatio = orderedKeyRatios[key->keyNumber % layout->scaleSize];
+	key->orderWidthRatio = 1.0f - (key->order > 0) * 1.25f * key->order / 8.0f;
+
+}
+
+void ViewPianoComponent::PianoKeyGrid::resize_ordered_keys(OwnedArray<PianoKeyComponent>* keys)
+{
+	PianoKeyComponent* key;
+
+	for (int i = 0; i < keys->size(); i++)
+	{
+		key = keys->getUnchecked(i);
+		resize_ordered_key(key);
+	}
+}
+
+
 void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
 {
 	if (needs_to_update())
@@ -70,16 +132,17 @@ void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
 	Point<int> pt;
 
 	float colToPlace = ceil(key->modeDegree);
-	int offset = (key->order > 0) * (int)(key->getWidth() / 2.0) * (key->orderWidthRatio + 1);
-
+	int offset = (key->order > 0) * (int)(column_size() / 2.0);
+	offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
+	
 	if (key->order > 0)
 	{
 		colToPlace = ceil(colToPlace);
 	}
 
-	pt = Point<int>((int)(colToPlace * (column_size() + columnGap) - offset), 0 + rowGap);
+	pt = Point<int>((int)((colToPlace + 1) * (column_size() + columnGap) - offset), 0 + rowGap);
 
-	key->setTopLeftPosition(pt);
+	key->setTopRightPosition(pt.x, pt.y);
 }
 
 void ViewPianoComponent::PianoKeyGrid::place_key_layout(OwnedArray<PianoKeyComponent>* keys)
@@ -132,7 +195,7 @@ void ViewPianoComponent::PianoMenuBar::resized()
 
 //===============================================================================================
 
-ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
+ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandManager& cmdMgrIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -163,10 +226,7 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn)
 	
 	setSize(1000, 250);
 	setOpaque(true);
-
-	// Apply default layout
-	apply_steps_layout(defaultMOS);
-	//apply_steps_layout("3 3 1 3 3 3 1");
+	apply_layout(layoutIn);
 }
 
 //===============================================================================================
@@ -221,21 +281,30 @@ float ViewPianoComponent::get_velocity(PianoKeyComponent* keyIn, const MouseEven
 	return velocity;
 }
 
+int ViewPianoComponent::get_min_height()
+{
+	// not sure if this is the right approach to window sizing
+	return 10;
+}
+
+
 //===============================================================================================
 
-void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
+void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 {
-	modeDisplayed.reset(new ModeLayout(layoutIn));
-	scaleLayout = layoutIn.get_order();
+	modeLayout = layoutIn;
+	grid = PianoKeyGrid(modeLayout);
+
+	// for convenience
+	scaleLayout = modeLayout->get_order();
 	tuningSize = scaleLayout.size();
+	modeSize = modeLayout->modeSize;
+	modeOrder = modeLayout->get_highest_order();
+	modalKeysSize = modeLayout->get_num_modal_notes();
 
-	modeSize = modeDisplayed.get()->modeSize;
-	modeOrder = modeDisplayed.get()->get_highest_order();
-	modalKeysSize = modeDisplayed.get()->get_num_modal_notes();
-
-	keysOrder.resize(modeOrder + 1);
 
 	// Setup keys for layout
+	keysOrder.resize(modeOrder + 1);
 	PianoKeyComponent* key;
 	for (int i = 0; i < notesToShow; i++)
 	{
@@ -244,15 +313,13 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 		key->order = scaleLayout.at(i % tuningSize);
 		keysOrder[key->order].push_back(key);
 
-		auto ratios = get_key_proportions(key);
-		key->orderWidthRatio = ratios.x;
-		key->orderHeightRatio = ratios.y;
+		grid.resize_ordered_key(key);
 
 		key->setColour(0, get_key_color(key));
 		key->setColour(1, get_key_color(key).contrasting(0.25));
-		key->setColour(2, Colours::yellow);
+		key->setColour(2, Colours::yellow.darker());
 
-		key->modeDegree = modeDisplayed.get()->modeDegrees.at(i % tuningSize) + modeSize * (i / tuningSize);
+		key->modeDegree = modeLayout->modeDegrees.at(i % tuningSize) + modeSize * (i / tuningSize);
 
 		if (key->order == 0)
 		{
@@ -266,46 +333,12 @@ void ViewPianoComponent::apply_layout(ModeLayout layoutIn)
 		key->setVisible(true);
 	}
 
-	// Update grid properties
-	grid = PianoKeyGrid(modeDisplayed.get());
-
 	// Calculate properties
 	displayIsReady = true;
 	resized();
 }
 
-void ViewPianoComponent::apply_steps_layout(juce::String strIn)
-{
-	ModeLayout layout = ModeLayout(strIn.toStdString());
-	apply_layout(layout);
-}
-
-void ViewPianoComponent::apply_steps_layout(std::vector<int> stepsIn)
-{
-	ModeLayout layout = ModeLayout(stepsIn);
-	apply_layout(layout);
-}
-
 //===============================================================================================
-
-// The function that determines default key proportions and chooses custom ones if set
-Point<float> ViewPianoComponent::get_key_proportions(PianoKeyComponent* keyIn)
-{
-	Point<float>  out;
-	float defaultRatio = 1.0f - (keyIn->order > 0) * 0.8 * (2, 1.0f / (modeOrder - keyIn->order + 2));
-
-	if (keyIn->widthMod > 0)
-		out.x = keyIn->widthMod;
-	else
-		out.x = defaultRatio;
-
-	if (keyIn->heightMod > 0)
-		out.y = keyIn->heightMod;
-	else
-		out.y = defaultRatio;
-
-	return out;
-}
 
 Colour ViewPianoComponent::get_key_color(PianoKeyComponent* keyIn)
 {
@@ -601,7 +634,7 @@ void ViewPianoComponent::mouseUp(const MouseEvent& e)
 	{
 		if (!shiftHeld)
 		{
-			isolate_last_note();
+			triggerKeyNoteOff(key);
 			key->activeColor = 1;
 			repaint();
 		}

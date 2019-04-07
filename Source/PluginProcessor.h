@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "Structures/ModeLayout.h"
 #include "PluginEditor.h"
 
 //==============================================================================
@@ -60,12 +61,23 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+	//==============================================================================
+	
+	void setViewportPositionProportions(Point<int> pointIn);
+	Point<int> getViewportPositionProportions();
+
+	void setModeLayout(ModeLayout modeLayoutIn);
+	ModeLayout* getModeLayout();
+
 
 private:
     //==============================================================================
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
+
+	std::unique_ptr<ModeLayout> modeLayout;
+	Point<int> viewportPos;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

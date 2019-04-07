@@ -26,6 +26,14 @@ class ViewPianoComponent : public Component,
 	public MidiKeyboardStateListener // Only for displaying external MIDI input
 {
 public:
+
+	enum PianoKeyOrderPlacement
+	{
+		nestedRight = 1,
+		nestedCenter,
+		adjacent
+	};
+
 	// Might want to implement the Button class more in the future 
 	// if it seems better for passing MIDI data around
 	struct PianoKeyComponent : public Button
@@ -67,16 +75,19 @@ public:
 
 		ModeLayout* layout;
 
-		std::vector<int> orderLayout = { 0, 1, 0, 1, 0,    0, 1, 0, 1, 0, 1, 0 };
-		std::vector<int> MOSLayout = { 2,    2,    1,    2,    2,    2,    1 };
-		std::vector<int> gridLayout = { 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0 };
-		// grid col per key { 0, 1, 2, 3, 4,  6, 7, 8, 9, 10, 11, 12 };
+		std::vector<float> orderedKeyRatios;
 
 		PianoKeyGrid();
 
 		PianoKeyGrid(ModeLayout* layoutIn);
 
 		~PianoKeyGrid() {};
+
+		void set_ordered_key_view(PianoKeyOrderPlacement placementType);
+
+		void resize_ordered_key(PianoKeyComponent* key);
+
+		void resize_ordered_keys(OwnedArray<PianoKeyComponent>* keys);
 
 		void place_key(PianoKeyComponent* key);
 
@@ -106,34 +117,8 @@ public:
 
 	//===============================================================================================
 
-	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn);
+	ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandManager& cmdMgrIn);
 	~ViewPianoComponent() {};
-
-	enum CommandIDs
-	{
-		setPianoHorizontal = 1,
-		setPianoVerticalL,
-		setPianoVerticalR,
-		sendScaleToPiano,
-		pianoPlayMode,
-		pianoEditMode,
-		setKeyMidiNote,
-		setKeyColor,
-		setMidiNoteOffset
-	};
-
-	enum PianoMode
-	{
-		playMode = 1,
-		editMode
-	};
-
-	enum PianoOrientation
-	{
-		horizontal = 1,
-		verticalLeft,
-		verticalRight
-	};
 
 	//===============================================================================================
 
@@ -142,23 +127,18 @@ public:
 	Point<int> get_position_of_key(int midiNoteIn);
 
 	PianoKeyComponent* get_key_from_position(Point<int> posIn);
+
 	PianoKeyComponent* get_key_from_position(const MouseEvent& e);
 
 	float get_velocity(PianoKeyComponent* keyIn, const MouseEvent& e);
 
-	//===============================================================================================
-
-	void apply_layout(ModeLayout layoutIn);
-
-	void apply_steps_layout(juce::String strIn);
-
-	void apply_steps_layout(std::vector<int> stepsIn);
+	int get_min_height();
 
 	//===============================================================================================
-
-	Point<float> get_key_proportions(PianoKeyComponent* keyIn);
 
 	Colour get_key_color(PianoKeyComponent* keyIn);
+
+	void apply_layout(ModeLayout* layoutIn);
 
 	void all_notes_off();
 
@@ -229,6 +209,33 @@ public:
 
 private:
 	// Functionality
+
+	enum CommandIDs
+	{
+		setPianoHorizontal = 1,
+		setPianoVerticalL,
+		setPianoVerticalR,
+		sendScaleToPiano,
+		pianoPlayMode,
+		pianoEditMode,
+		setKeyMidiNote,
+		setKeyColor,
+		setMidiNoteOffset
+	};
+
+	enum PianoMode
+	{
+		playMode = 1,
+		editMode
+	};
+
+	enum PianoOrientation
+	{
+		horizontal = 1,
+		verticalLeft,
+		verticalRight
+	};
+
 	ApplicationCommandManager* appCmdMgr;
 	PianoKeyGrid grid;
 	MidiKeyboardState keyboardState;
@@ -245,7 +252,7 @@ private:
 
 	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
 	std::vector<PianoKeyComponent*> keysOn;
-	std::unique_ptr<ModeLayout> modeDisplayed;
+	ModeLayout* modeLayout;
 
 	// Parameters
 	std::vector<int> scaleLayout;

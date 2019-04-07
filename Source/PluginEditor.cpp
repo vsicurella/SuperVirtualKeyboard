@@ -13,7 +13,10 @@
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor (p), piano(new ViewPianoComponent(appCmdMgr)), view(new Viewport("Piano Viewport")), scaleEdit(new ScaleEditPopup())
+    : AudioProcessorEditor(&p), processor (p), 
+	piano(new ViewPianoComponent(processor.getModeLayout(), appCmdMgr)), 
+	view(new Viewport("Piano Viewport")), 
+	scaleEdit(new ScaleEditPopup())
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -30,10 +33,10 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);
-	view.get()->setViewPositionProportionately(0.6, 0);
 
 	setSize(1000, 250);
 
+	view.get()->setViewPositionProportionately(0.6, 0);
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
 
@@ -53,27 +56,24 @@ void SuperVirtualKeyboardAudioProcessorEditor::paint(Graphics& g)
 
 void SuperVirtualKeyboardAudioProcessorEditor::resized()
 {
-	Point<int> pt = view.get()->getViewPosition();
+	//Point<int> pt = view.get()->getViewPosition();
 
 	AudioProcessorEditor::resized();
 
 	scaleEdit->setSize(getWidth(), 48);
 	view.get()->setSize(getWidth(), getHeight() - 48);
-	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
+	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight() - 10);
 
-	if (view.get()->getMaximumVisibleWidth() > piano.get()->getWidth())
-	{
-		piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
-	}
-
-	view.get()->setViewPosition(pt);
+	//view.get()->setViewPosition(pt);
+	view.get()->setViewPositionProportionately(0.618, 0);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	ModeLayout layout = ModeLayout(scaleEdit.get()->get_input().toStdString());
+	processor.setModeLayout(ModeLayout(scaleEdit.get()->get_input().toStdString()));
+	ModeLayout* layout = processor.getModeLayout();
 
-	if (layout.scaleSize > 0)
+	if (layout->scaleSize > 0)
 	{
 		piano.get()->apply_layout(layout);
 		repaint();
@@ -98,5 +98,19 @@ void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInp
 void SuperVirtualKeyboardAudioProcessorEditor::focusGained(FocusChangeType changeType)
 {
 	setWantsKeyboardFocus(true);
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
+{
+	processor.setViewportPositionProportions(view.get()->getViewPosition());
+	setVisible(false);
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::visibilityChanged()
+{
+	if (isVisible())
+	{
+		view.get()->setViewPosition(processor.getViewportPositionProportions());
+	}
 }
 

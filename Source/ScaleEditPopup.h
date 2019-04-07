@@ -35,7 +35,6 @@
 */
 class ScaleEditPopup  : public Component,
                         public ChangeBroadcaster,
-                        public Label::Listener,
                         public Button::Listener,
                         public ComboBox::Listener
 {
@@ -54,7 +53,6 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void labelTextChanged (Label* labelThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     bool keyPressed (const KeyPress& key) override;

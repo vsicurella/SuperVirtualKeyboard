@@ -34,7 +34,7 @@ ScaleEditPopup::ScaleEditPopup ()
 
 	presets.get()->set("Sensi[5] 8", std::vector<int>({ 2, 1, 2, 2, 1 }));
 	presets.get()->set("Mavila[7] 9", std::vector<int>({ 1, 1, 2, 1, 1, 1, 2 }));
-	presets.get()->set("Future 10edo", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1}));
+	presets.get()->set("Dicot[7] 10", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1}));
 	presets.get()->set("Orgone[7] 11", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2}));
 	presets.get()->set("Diatonic[7] 12", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
 	presets.get()->set("Father[8] 13", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }));
@@ -64,26 +64,19 @@ ScaleEditPopup::ScaleEditPopup ()
     textEditor->setPopupMenuEnabled (true);
     textEditor->setText (String());
 
-    textEditor->setBounds (264, 8, 150, 24);
-
     instructions.reset (new Label ("Instructions",
                                    TRANS("Enter your scale like this:\n"
                                    "2 2 1 2 2 2 1")));
     addAndMakeVisible (instructions.get());
     instructions->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     instructions->setJustificationType (Justification::centred);
-    instructions->setEditable (true, true, false);
+    instructions->setEditable (false, false, false);
     instructions->setColour (TextEditor::textColourId, Colours::black);
     instructions->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-    instructions->addListener (this);
-
-    instructions->setBounds (16, 0, 175, 40);
 
     sendScale.reset (new TextButton ("Send Scale"));
     addAndMakeVisible (sendScale.get());
     sendScale->addListener (this);
-
-    sendScale->setBounds (504, 8, 88, 24);
 
     scalePresets.reset (new ComboBox ("Preset Box"));
     addAndMakeVisible (scalePresets.get());
@@ -92,8 +85,6 @@ ScaleEditPopup::ScaleEditPopup ()
     scalePresets->setTextWhenNothingSelected (TRANS("Presets"));
     scalePresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     scalePresets->addListener (this);
-
-    scalePresets->setBounds (672, 8, 150, 24);
 
 
     //[UserPreSize]
@@ -150,23 +141,12 @@ void ScaleEditPopup::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    textEditor->setBounds (proportionOfWidth (0.2830f), 8, 150, 24);
+    instructions->setBounds (proportionOfWidth (0.0172f), 0, 175, 40);
+    sendScale->setBounds (proportionOfWidth (0.5402f), 8, 88, 24);
+    scalePresets->setBounds (proportionOfWidth (0.7203f), 8, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
-}
-
-void ScaleEditPopup::labelTextChanged (Label* labelThatHasChanged)
-{
-    //[UserlabelTextChanged_Pre]
-    //[/UserlabelTextChanged_Pre]
-
-    if (labelThatHasChanged == instructions.get())
-    {
-        //[UserLabelCode_instructions] -- add your label text handling code here..
-        //[/UserLabelCode_instructions]
-    }
-
-    //[UserlabelTextChanged_Post]
-    //[/UserlabelTextChanged_Post]
 }
 
 void ScaleEditPopup::buttonClicked (Button* buttonThatWasClicked)
@@ -278,21 +258,22 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="new text editor" id="8c559f3dc17dcbb0" memberName="textEditor"
-              virtualName="" explicitFocusOrder="0" pos="264 8 150 24" initialText=""
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="28.296% 8 150 24"
+              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
+              scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="Instructions" id="4c079e580647d111" memberName="instructions"
-         virtualName="" explicitFocusOrder="0" pos="16 0 175 40" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="1.715% 0 175 40" edTextCol="ff000000"
          edBkgCol="0" labelText="Enter your scale like this:&#10;2 2 1 2 2 2 1"
-         editableSingleClick="1" editableDoubleClick="1" focusDiscardsChanges="0"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="1.5e1" kerning="0" bold="0"
          italic="0" justification="36"/>
   <TEXTBUTTON name="Send Scale" id="3a2872f3357f900b" memberName="sendScale"
-              virtualName="" explicitFocusOrder="0" pos="504 8 88 24" buttonText="Send Scale"
+              virtualName="" explicitFocusOrder="0" pos="54.019% 8 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Preset Box" id="91d2066d9e23de1c" memberName="scalePresets"
-            virtualName="" explicitFocusOrder="0" pos="672 8 150 24" editable="0"
-            layout="33" items="" textWhenNonSelected="Presets" textWhenNoItems="(no choices)"/>
+            virtualName="" explicitFocusOrder="0" pos="72.026% 8 150 24"
+            editable="0" layout="33" items="" textWhenNonSelected="Presets"
+            textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -42,8 +42,8 @@ public:
 	void timerCallback() override;
 	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
 	void focusGained(FocusChangeType changeType) override;
-
-
+	void userTriedToCloseWindow() override;
+	void visibilityChanged() override;
 
 private:
     // This reference is provided as a quick way for your editor to
