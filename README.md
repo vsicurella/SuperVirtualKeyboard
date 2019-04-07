@@ -1,5 +1,5 @@
 # SuperVirtualKeyboard
-Derivative of ScaleVisualizer, and requires some files from it.
+Derivative of ScaleVisualizer.
 
 Hey there, I will definitely be cleaning this up later.
 
