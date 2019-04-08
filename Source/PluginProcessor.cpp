@@ -26,7 +26,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 #endif
 {
 	// Create default piano layout
-	modeLayout.reset(new ModeLayout(pluginState->modeLayoutNode, "2 2 1 2 2 2 1"));
+	modeLayout.reset(new ModeLayout("2 2 1 2 2 2 1"));
+	modeLayout.get()->set_valuetree_node(pluginState->modeLayoutNode);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -206,12 +207,23 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+	
+	/*
+	MemoryOutputStream memOut;
+	processorNode.writeToStream(memOut);
+	destData.append(memOut.getData(), memOut.getDataSize());
+	*/
 }
 
 void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+	
+	/*
+	MemoryInputStream memIn(data, sizeInBytes, false);
+	processorNode.readFromStream(memIn);
+	*/
 }
 
 //==============================================================================

@@ -96,6 +96,8 @@ struct SuperVirtualKeyboardPluginState
 	{
 	}
 
+	~SuperVirtualKeyboardPluginState() {}
+
 private:
 	UndoManager* undoManager;
 };
