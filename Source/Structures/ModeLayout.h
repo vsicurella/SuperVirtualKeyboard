@@ -192,29 +192,6 @@ struct ModeLayout
 		return steps;
 	}
 
-	/*
-		Get a vector representing a full MIDI layout of the steps of the mode
-	*/
-
-	std::vector<int> get_steps(int modeStartNote)
-	{
-		std::vector<int> stepsOut;
-
-		int size = ceil(128.0 / scaleSize * modeSize);
-
-		stepsOut.reserve(size);
-
-		int startStep = 60 % scaleSize;
-
-		// i don't think this will work if note 0 lands between steps
-		for (int i = 0; i < 128; i++)
-		{
-			stepsOut.at(i) = steps.at((i + startStep) % modeSize);
-		}
-
-		return stepsOut;
-	}
-
 	std::vector<int> get_order()
 	{
 		return order;
