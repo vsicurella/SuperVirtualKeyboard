@@ -256,9 +256,9 @@ private:
 	ModeLayout* modeLayout;
 
 	// Parameters
-	std::vector<int> scaleLayout;
-	std::vector<int> scaleOrder;
-	juce::String defaultMOS = "2 2 1 2 2 2 1";
+	Array<int> scaleLayout;
+	Array<int> scaleOrder;
+	String defaultMOS = "2 2 1 2 2 2 1";
 
 	int tuningSize;
 	int notesToShow;

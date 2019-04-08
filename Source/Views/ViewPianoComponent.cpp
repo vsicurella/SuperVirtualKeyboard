@@ -321,7 +321,7 @@ void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 	{
 		key = keys.getUnchecked(i);
 
-		key->order = scaleLayout.at(i % tuningSize);
+		key->order = scaleLayout[i % tuningSize];
 		keysOrder[key->order].push_back(key);
 
 		grid.resize_ordered_key(key);
@@ -330,7 +330,7 @@ void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 		key->setColour(1, get_key_color(key).contrasting(0.25));
 		key->setColour(2, Colours::yellow.darker());
 
-		key->modeDegree = modeLayout->modeDegrees.at(i % tuningSize) + modeSize * (i / tuningSize);
+		key->modeDegree = modeLayout->modeDegrees[(i % tuningSize)] + modeSize * (i / tuningSize);
 
 		if (key->order == 0)
 		{

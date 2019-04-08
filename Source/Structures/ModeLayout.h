@@ -28,21 +28,21 @@ struct ModeLayout
 
 	ValueTree modeLayoutNode;
 
-	std::string modeName;
+	String modeName;
 	int scaleSize;
 	int modeSize;
 
-	std::string strSteps;
-	std::string mos;
+	String strSteps;
+	String mos;
 
-	std::vector<int> order;
-	std::vector<int> steps;
-	std::vector<float> modeDegrees;
+	Array<int> order;
+	Array<int> steps;
+	Array<float> modeDegrees;
 
 	/*
 		Sets the name of the mode
 	*/
-	std::string set_name(std::string nameIn)
+	String set_name(String nameIn)
 	{
 		modeName = nameIn;
 		return modeName;
@@ -51,9 +51,9 @@ struct ModeLayout
 	/*
 		Simply parses a string reprsenting step sizes and returns a vector
 	*/
-	static std::vector<int> parse_steps(std::string stepsIn)
+	static Array<int> parse_steps(String stepsIn)
 	{
-		std::vector<int> stepsOut;
+		Array<int> stepsOut;
 
 		char c;
 		int step;
@@ -73,16 +73,15 @@ struct ModeLayout
 			
 			if (digits > 0)
 			{	
-				std::string::size_type sz;
-				step = std::stoi(stepsIn.substr(i, i + digits), &sz);
-				stepsOut.push_back(step);
+				step = stepsIn.substring(i, i + digits).getIntValue();
+				stepsOut.add(step);
 				i += digits + 1;
 			}
 			else
 				i++;
 		}
 
-		stepsOut.shrink_to_fit();
+		stepsOut.minimiseStorageOverheads();
 		return stepsOut;
 	}
 
@@ -90,17 +89,17 @@ struct ModeLayout
 	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
 	Returns a vector of key orders {0, 1, 0, 1, 0, 0, 1,...}
 	*/
-	static std::vector<int> steps_to_order(std::vector<int> stepsIn)
+	static Array<int> steps_to_order(Array<int> stepsIn)
 	{
-		std::vector<int> orderOut;
+		Array<int> orderOut;
 
 		for (int i = 0; i < stepsIn.size(); i++)
 		{
-			for (int j = 0; j < stepsIn.at(i); j++)
-				orderOut.push_back(j);
+			for (int j = 0; j < stepsIn[i]; j++)
+				orderOut.add(j);
 		}
 
-		orderOut.shrink_to_fit();
+		orderOut.minimiseStorageOverheads();
 		return orderOut;
 	}
 
@@ -108,7 +107,7 @@ struct ModeLayout
 	Takes in step vector as a string
 	Returns an order vector
 	*/
-	static std::vector<int> steps_to_order(std::string strStepsIn)
+	static Array<int> steps_to_order(String strStepsIn)
 	{
 		return steps_to_order(parse_steps(strStepsIn));
 	}
@@ -117,9 +116,9 @@ struct ModeLayout
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "2, 2, 1, 2,..."
 	*/
-	static std::vector<int> order_to_steps(std::vector<int> layoutIn)
+	static Array<int> order_to_steps(Array<int> layoutIn)
 	{
-		std::vector<int> stepsOut;
+		Array<int> stepsOut;
 
 		int i = 0;
 		int j = 0;
@@ -127,21 +126,21 @@ struct ModeLayout
 
 		while (i < layoutIn.size())
 		{
-			if (layoutIn.at(i) == 0)
+			if (layoutIn[i] == 0)
 			{
 				j = i + 1;
 				step = 1;
 
-				while (layoutIn.at(j) != 0 && j < layoutIn.size())
+				while (layoutIn[j] != 0 && j < layoutIn.size())
 				{
 					j++;
 					step++;
 				}
 			}
 			i = j;
-			stepsOut.push_back(step);
+			stepsOut.add(step);
 		}
-		stepsOut.shrink_to_fit();
+		stepsOut.minimiseStorageOverheads();
 		return stepsOut;
 	}
 
@@ -149,25 +148,25 @@ struct ModeLayout
 	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
 	Returns a vector of mode degrees {0, 0.5, 1, 1.5, 2, 3, 3.5,...}
 	*/
-	static std::vector<float> steps_to_degrees(std::vector<int> stepsIn)
+	static Array<float> steps_to_degrees(Array<int> stepsIn)
 	{
-		std::vector<float> degreesOut;
+		Array<float> degreesOut;
 		float deg = -1;
 
 		for (int i = 0; i < stepsIn.size(); i++)
 		{
-			degreesOut.push_back(++deg);
+			degreesOut.add(++deg);
 
-			if (stepsIn.at(i) > 1)
+			if (stepsIn[i] > 1)
 			{
-				for (int j = 1; j < stepsIn.at(i); j++)
+				for (int j = 1; j < stepsIn[i]; j++)
 				{
-					degreesOut.push_back(deg + (float)j / stepsIn.at(i));
+					degreesOut.add(deg + (float)j / stepsIn[i]);
 				}
 			}
 		}
 
-		degreesOut.shrink_to_fit();
+		degreesOut.minimiseStorageOverheads();
 		return degreesOut;
 	}
 
@@ -187,26 +186,25 @@ struct ModeLayout
 		return steps.size();
 	}
 
-	std::vector<int> get_steps()
+	Array<int> get_steps()
 	{
 		return steps;
 	}
 
-	std::vector<int> get_order()
+	Array<int> get_order()
 	{
 		return order;
 	}
 
-	std::vector<int> get_order(int modeStartNote)
+	Array<int> get_order(int modeStartNote)
 	{
-		std::vector<int> orderOut;
-		orderOut.reserve(128);
+		Array<int> orderOut;
 
 		int offset = modeStartNote % scaleSize;
 
 		for (int i = 0; i < 128; i++)
 		{
-			orderOut.at(i) = order.at((i + offset) % scaleSize);
+			orderOut.add(order[(i + offset) % scaleSize]);
 		}
 
 		return orderOut;
@@ -240,7 +238,7 @@ struct ModeLayout
 		return out;
 	}
 
-	static std::string steps_to_string(std::vector<int> stepsIn)
+	static String steps_to_string(Array<int> stepsIn)
 	{
 		std::string out;
 
@@ -260,9 +258,9 @@ struct ModeLayout
 		modeLayoutNode.setProperty(IDs::scaleSize, var(scaleSize), nullptr);
 		modeLayoutNode.setProperty(IDs::modeSize, var(modeSize), nullptr);
 		modeLayoutNode.setProperty(IDs::stepString, var(strSteps), nullptr);
-		/*modeLayoutNode.setProperty(IDs::stepArray, var(IDs::vector_to_juce_array(steps)), nullptr);
-		modeLayoutNode.setProperty(IDs::keyboardOrderArray, var(IDs::vector_to_juce_array(order)), nullptr);
-		modeLayoutNode.setProperty(IDs::keyboardModeDegrees, var(IDs::vector_to_juce_array(modeDegrees)), nullptr);*/
+		//modeLayoutNode.setProperty(IDs::stepArray, var(steps), nullptr);
+		//modeLayoutNode.setProperty(IDs::keyboardOrderArray, var(order), nullptr);
+		//modeLayoutNode.setProperty(IDs::keyboardModeDegrees, var(modeDegrees), nullptr);
 	}
 
 	void set_valuetree_node(ValueTree nodeIn)
@@ -282,7 +280,7 @@ struct ModeLayout
 		modeSize = steps.size();
 	}
 
-	ModeLayout(std::string stepsIn)
+	ModeLayout(String stepsIn)
 	{
 		strSteps = stepsIn;
 		steps = parse_steps(stepsIn);
@@ -296,7 +294,7 @@ struct ModeLayout
 			update_node();
 	}
 
-	ModeLayout(std::vector<int> stepsIn)
+	ModeLayout(Array<int> stepsIn)
 	{
 		steps = stepsIn;
 		order = steps_to_order(steps);
