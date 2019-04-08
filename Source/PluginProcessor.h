@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Structures/ModeLayout.h"
 #include "PluginEditor.h"
+#include "PluginState.h"
 
 //==============================================================================
 /**
@@ -73,14 +74,16 @@ public:
 private:
     //==============================================================================
 
+	std::unique_ptr<UndoManager> undoManager;
+	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
+	ValueTree processorNode;
+	std::unique_ptr<ModeLayout> modeLayout;
+
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
-	std::unique_ptr<UndoManager> undoManager;
 
-	std::unique_ptr<ModeLayout> modeLayout;
+
 	Point<int> viewportPos;
-
-	// Application Data
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

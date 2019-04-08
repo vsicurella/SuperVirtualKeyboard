@@ -13,6 +13,8 @@
 #include <vector>
 #include <string>
 
+#include "../PluginState.h"
+
 //#include "../Structures/Scale.h"
 
 /*
@@ -23,6 +25,8 @@
 struct ModeLayout
 {
 	//Scale* scale;
+
+	ValueTree modeLayoutNode;
 
 	std::string modeName;
 	int scaleSize;
@@ -274,6 +278,16 @@ struct ModeLayout
 		return out;
 	}
 
+	void update_node()
+	{
+		modeLayoutNode.setProperty(IDs::scaleSize, var(scaleSize), nullptr);
+		modeLayoutNode.setProperty(IDs::modeSize, var(modeSize), nullptr);
+		modeLayoutNode.setProperty(IDs::stepString, var(strSteps), nullptr);
+		modeLayoutNode.setProperty(IDs::stepArray, var(IDs::vector_to_juce_array(steps)), nullptr);
+		modeLayoutNode.setProperty(IDs::keyboardOrderArray, var(IDs::vector_to_juce_array(order)), nullptr);
+		modeLayoutNode.setProperty(IDs::keyboardModeDegrees, var(IDs::vector_to_juce_array(modeDegrees)), nullptr);
+	}
+
 	ModeLayout()
 	{
 		scaleSize = 1;
@@ -294,6 +308,9 @@ struct ModeLayout
 
 		scaleSize = order.size();
 		modeSize = steps.size();
+
+		if (modeLayoutNode.isValid())
+			update_node;
 	}
 
 	ModeLayout(std::vector<int> stepsIn)
@@ -305,6 +322,21 @@ struct ModeLayout
 		strSteps = steps_to_string(stepsIn);
 		scaleSize = order.size();
 		modeSize = steps.size();
+
+		if (modeLayoutNode.isValid())
+			update_node;
+	}
+
+	ModeLayout(ValueTree nodeIn, std::string stepsIn)
+		: modeLayoutNode(nodeIn)
+	{
+		ModeLayout(stepsIn);
+	}
+
+	ModeLayout(ValueTree nodeIn, std::vector<int> stepsIn)
+		: modeLayoutNode(nodeIn)
+	{
+		ModeLayout(stepsIn);
 	}
 
 	~ModeLayout() {}

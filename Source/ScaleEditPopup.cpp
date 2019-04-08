@@ -38,20 +38,20 @@ ScaleEditPopup::ScaleEditPopup ()
 	presets.get()->set("Dicot[7] 10", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1}));
 	presets.get()->set("Machine[6] 11", std::vector<int>({ 2, 2, 2, 2, 2, 1 }));
 	presets.get()->set("Orgone[7] 11", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2}));
-	presets.get()->set("Diatonic[7] 12", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
+	presets.get()->set("Meantone[7] 12", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
 	presets.get()->set("Father[8] 13", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }));
 	presets.get()->set("Orwell[9] 13", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }));
 	presets.get()->set("Titanium[9] 14", std::vector<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }));
 	presets.get()->set("Porcupine[8] 15", std::vector<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }));
 	presets.get()->set("Mavila[9] 16", std::vector<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }));
-	presets.get()->set("Diatonic[7] 17", std::vector<int>({ 3, 3, 1, 3, 3, 3, 1 }));
+	presets.get()->set("Meantone[7] 17", std::vector<int>({ 3, 3, 1, 3, 3, 3, 1 }));
 	presets.get()->set("Maqamic[7] 17", std::vector<int>({ 3, 2, 3, 2, 3, 2, 2 }));
 	presets.get()->set("Maqamic[10] 17", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }));
 	presets.get()->set("Machine[11] 17", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }));
-	presets.get()->set("Diatonic[7] 19", std::vector<int>({ 3, 3, 2, 3, 3, 3, 2 }));
+	presets.get()->set("Meantone[7] 19", std::vector<int>({ 3, 3, 2, 3, 3, 3, 2 }));
 	presets.get()->set("Orwell[9] 22", std::vector<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }));
-	presets.get()->set("Diatonic[7] 24", std::vector<int>({ 4, 4, 2, 4, 4, 4, 2 }));
-	presets.get()->set("Diatonic[7] 31", std::vector<int>({ 5, 5, 3, 5, 5, 5, 3 }));
+	presets.get()->set("Meantone[7] 24", std::vector<int>({ 4, 4, 2, 4, 4, 4, 2 }));
+	presets.get()->set("Meantone[7] 31", std::vector<int>({ 5, 5, 3, 5, 5, 5, 3 }));
 	presets.get()->set("BP Lambda", std::vector<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }));
 	presets.get()->set("BP Dur II", std::vector<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }));
     //[/Constructor_pre]

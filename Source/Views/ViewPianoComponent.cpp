@@ -232,7 +232,7 @@ ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandM
 	}
 
 	addMouseListener(this, true);
-	setRepaintsOnMouseActivity(true);
+	//setRepaintsOnMouseActivity(true);
 	toBack();
 	
 	setSize(1000, 250);

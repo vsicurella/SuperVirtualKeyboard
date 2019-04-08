@@ -22,11 +22,11 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        ),
-	undoManager(new UndoManager())
+	undoManager(new UndoManager()), pluginState(new SuperVirtualKeyboardPluginState(undoManager.get()))
 #endif
 {
 	// Create default piano layout
-	modeLayout.reset(new ModeLayout("2 2 1 2 2 2 1"));
+	modeLayout.reset(new ModeLayout(pluginState->modeLayoutNode, "2 2 1 2 2 2 1"));
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()

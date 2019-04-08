@@ -66,6 +66,16 @@ namespace IDs
 	static Identifier pianoKeyColorPressed("Key Color Pressed");
 	static Identifier pianoKeyColorExternal("Key Color MIDI Input");
 
+	template <class T>
+	static Array<T> vector_to_juce_array(std::vector<T> vectorIn)
+	{
+		Array<T> arrayOut;
+
+		for (auto item : vectorIn)
+			arrayOut.add(item);
+
+		return arrayOut;
+	}
 }
 
 struct SuperVirtualKeyboardPluginState
@@ -84,8 +94,6 @@ struct SuperVirtualKeyboardPluginState
 			pianoNode(IDs::pianoNode),
 			pianoKeyNode(IDs::pianoKeyNode)
 	{
-		// Processor
-		
 	}
 
 private:
