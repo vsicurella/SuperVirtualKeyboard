@@ -12,11 +12,11 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor (p), 
-	piano(new ViewPianoComponent(processor.getModeLayout(), appCmdMgr)), 
-	view(new Viewport("Piano Viewport")), 
-	scaleEdit(new ScaleEditPopup())
+SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
+	: AudioProcessorEditor(&p), processor(p),
+	piano(new ViewPianoComponent(processor.getModeLayout(), appCmdMgr)),
+	view(new Viewport("Piano Viewport")),
+	scaleEdit(new ScaleEditPopup(processor.get_presets(), processor.get_presets_sorted()))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -70,16 +70,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	processor.setModeLayout(ModeLayout(scaleEdit.get()->get_input().toStdString()));
-	ModeLayout* layout = processor.getModeLayout();
-
-	if (layout->scaleSize > 0)
+	if (scaleEdit.get()->presetSelected)
 	{
-		piano.get()->apply_layout(layout);
-		repaint();
+		piano.get()->apply_layout(scaleEdit.get()->presetSelected);
 	}
-
-	resized();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()

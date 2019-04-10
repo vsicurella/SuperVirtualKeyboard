@@ -24,63 +24,30 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+
+struct ModeLayoutComparator
+{
+	static int compareElements(const ModeLayout& m1, const ModeLayout& m2)
+	{
+		String s1 = m1.modeName;
+		String s2 = m2.modeName;
+
+		if (s1 < s2)
+			return -1;
+		else if (s1 > s2)
+			return 1;
+		else
+			return 0;
+	}
+};
 //[/MiscUserDefs]
 
 //==============================================================================
-ScaleEditPopup::ScaleEditPopup ()
+ScaleEditPopup::ScaleEditPopup (Array<ModeLayout>* presetsArrayIn,  ValueTree& presetsSortedIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	presets.reset(new HashMap<String, std::vector<int>>());
-
-	presets.get()->set("Mavila[5] 7", std::vector<int>({ 1, 2, 1, 2, 1 }));
-	presets.get()->set("Father[5] 8", std::vector<int>({ 2, 1, 2, 2, 1 }));
-	presets.get()->set("Mavila[7] 9", std::vector<int>({ 1, 1, 2, 1, 1, 1, 2 }));
-	presets.get()->set("Dicot[7] 10", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1}));
-	presets.get()->set("Machine[6] 11", std::vector<int>({ 2, 2, 2, 2, 2, 1 }));
-	presets.get()->set("Orgone[7] 11", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2}));
-	presets.get()->set("Audmented[6] 12", std::vector<int>({ 3, 1, 3, 1, 3, 1 }));
-	presets.get()->set("Meantone[7] 12", std::vector<int>({ 2, 2, 1, 2, 2, 2, 1 }));
-	presets.get()->set("Diminished[8] 12", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }));
-	presets.get()->set("Father[8] 13", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }));
-	presets.get()->set("Orwell[9] 13", std::vector<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }));
-	presets.get()->set("Hedgehog[8] 14", std::vector<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }));
-	presets.get()->set("Titanium[9] 14", std::vector<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }));
-	presets.get()->set("Blackwood[5] 15", std::vector<int>({ 3, 3, 3, 3, 3 }));
-	presets.get()->set("Orgone[7] 15", std::vector<int>({ 3, 1, 3, 1, 3, 1, 3 }));
-	presets.get()->set("Porcupine[8] 15", std::vector<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }));
-	presets.get()->set("Orgone[11] 15", std::vector<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1}));
-	presets.get()->set("Gorgo[6] 16", std::vector<int>({ 3, 3, 1, 3, 3, 3 }));
-	presets.get()->set("Mavila[9] 16", std::vector<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }));
-	presets.get()->set("Lemba[10] 16", std::vector<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }));
-	presets.get()->set("Meantone[7] 17", std::vector<int>({ 3, 3, 1, 3, 3, 3, 1 }));
-	presets.get()->set("Maqamic[7] 17", std::vector<int>({ 3, 2, 3, 2, 3, 2, 2 }));
-	presets.get()->set("Maqamic[10] 17", std::vector<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }));
-	presets.get()->set("Machine[11] 17", std::vector<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }));
-	presets.get()->set("Bicycle[6] 18", std::vector<int>({ 4, 4, 1, 4, 4, 1 }));
-	presets.get()->set("Father[8] 18", std::vector<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }));
-	presets.get()->set("Meantone[7] 19", std::vector<int>({ 3, 3, 2, 3, 3, 3, 2 }));
-	presets.get()->set("Keemun[8] 19", std::vector<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }));
-	presets.get()->set("Negri[9] 19", std::vector<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }));
-	presets.get()->set("Mavila[7] 20", std::vector<int>({ 5, 2, 2, 5, 2, 2, 2 }));
-	presets.get()->set("Blackwood[10] 20", std::vector<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }));
-	presets.get()->set("Miracle[9] 21", std::vector<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }));
-	presets.get()->set("Superpyth[7] 22", std::vector<int>({ 4, 4, 1, 4, 4, 4, 1}));
-	presets.get()->set("Hedgehog[8] 22", std::vector<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }));
-	presets.get()->set("Orwell[9] 22", std::vector<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }));
-	presets.get()->set("Mavila[9] 23", std::vector<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }));
-	presets.get()->set("Sephiroth[10] 23", std::vector<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }));
-	presets.get()->set("Godzilla[5] 24", std::vector<int>({ 5, 5, 4, 5, 5 }));
-	presets.get()->set("Triforce[6] 24", std::vector<int>({ 5, 3, 5, 3, 5, 3  }));
-	presets.get()->set("Dastgah-e Sehgah / Maqam Nairuz [7] 24", std::vector<int>({ 4, 3, 3, 4, 3, 3, 4 }));
-	presets.get()->set("Meantone[7] 24", std::vector<int>({ 4, 4, 2, 4, 4, 4, 2 }));
-	presets.get()->set("Mohajira[7] 24", std::vector<int>({ 4, 3, 4, 3, 4, 3, 3 }));
-	presets.get()->set("Meantone[7] 26", std::vector<int>({ 4, 4, 3, 4, 4, 4, 3 }));
-	presets.get()->set("Orgone[11] 26", std::vector<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }));
-	presets.get()->set("Injera[12] 26", std::vector<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3}));
-	presets.get()->set("Meantone[7] 31", std::vector<int>({ 5, 5, 3, 5, 5, 5, 3 }));
-	presets.get()->set("Orwell[9] 31", std::vector<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3, }));
-	presets.get()->set("BP Lambda", std::vector<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }));
-	presets.get()->set("BP Dur II", std::vector<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }));
+	presets = presetsArrayIn;
+	presetsSorted = presetsSortedIn;
     //[/Constructor_pre]
 
     textEditor.reset (new TextEditor ("new text editor"));
@@ -115,26 +82,13 @@ ScaleEditPopup::ScaleEditPopup ()
     scalePresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     scalePresets->addListener (this);
 
-
-    //[UserPreSize]
-	StringArray presetNames;
-	for (HashMap<String, std::vector<int>>::Iterator key (*presets.get()); key.next();)
-	{
-		presetNames.add(key.getKey());
-	}
-	presetNames.sortNatural();
-
-	int i = 0;
-	for (auto str : presetNames)
-	{
-		scalePresets.get()->addItem(str, ++i);
-	}
     //[/UserPreSize]
 
     setSize (600, 400);
 
 
     //[Constructor] You can add your own custom stuff here..
+	populate_preset_menu();
     //[/Constructor]
 }
 
@@ -202,8 +156,33 @@ void ScaleEditPopup::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == scalePresets.get())
     {
         //[UserComboBoxCode_scalePresets] -- add your combo box handling code here..
-		std::vector<int> scale = get_scale(scalePresets.get()->getText());
-		textEditor.get()->setText(build_scale_string(scale));
+		ModeLayout* mode;
+		ModeLayoutComparator mc;
+		if (scaleToMode.containsKey(comboBoxThatHasChanged->getText()))
+		{	
+			int ind = presets->indexOfSorted(mc, scaleToMode.getValue(comboBoxThatHasChanged->getText(), ""));
+			if (ind >= 0)
+				mode = &presets->getUnchecked(ind);
+		}
+		else if (modeToMode.containsKey(comboBoxThatHasChanged->getText()))
+		{
+			int ind = presets->indexOfSorted(mc, modeToMode.getValue(comboBoxThatHasChanged->getText(), ""));
+			if (ind >= 0)
+				mode = &presets->getUnchecked(ind);
+		}
+		else if (familyToMode.containsKey(comboBoxThatHasChanged->getText()))
+		{
+			int ind = presets->indexOfSorted(mc, familyToMode.getValue(comboBoxThatHasChanged->getText(), ""));
+			if (ind >= 0)
+				mode = &presets->getUnchecked(ind);
+		}
+		
+		if (mode)
+		{
+			presetSelected = mode;
+			textEditor.get()->setText(mode->strSteps);
+		}
+
 		sendChangeMessage();
         //[/UserComboBoxCode_scalePresets]
     }
@@ -243,10 +222,39 @@ String ScaleEditPopup::get_preset_name()
 {
 	return scalePresets.get()->getText();
 }
-std::vector<int> ScaleEditPopup::get_scale(String hashKeyIn)
+
+void ScaleEditPopup::populate_preset_menu()
 {
-	return presets.get()->operator[](hashKeyIn);
+	scalePresets.get()->clear();
+	sortByScale.reset(new PopupMenu());
+	sortByMode.reset(new PopupMenu());
+	sortByFamily.reset(new PopupMenu());
+
+	ValueTree child;
+
+	for (int i = 0; i < presets->size(); i++)
+	{
+		child = presetsSorted.getChild(SortType::scaleSize).getChild(i);
+		scaleToMode.set(child.getProperty(IDs::scaleSize).toString() + " " + child.getProperty(IDs::modeLayoutNode).toString().dropLastCharacters(2),
+			child.getProperty(IDs::modeName));
+		sortByScale.get()->addItem(i+1, scaleToMode.getAllKeys()[i]);
+
+		child = presetsSorted.getChild(SortType::modeSize).getChild(i);
+		modeToMode.set(child.getProperty(IDs::modeSize).toString() + " " + child.getProperty(IDs::temperamentFamily).toString() + " " + child.getProperty(IDs::scaleSize).toString(),
+			child.getProperty(IDs::modeName));
+		sortByMode.get()->addItem(i+1, modeToMode.getAllKeys()[i]);
+
+		child = presetsSorted.getChild(SortType::family).getChild(i);
+		familyToMode.set(child.getProperty(IDs::modeName).toString(),
+			child.getProperty(IDs::modeName));
+		sortByFamily.get()->addItem(i+1, familyToMode.getAllKeys()[i]);
+	}
+
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByScale.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByMode.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByFamily.get());
 }
+
 String ScaleEditPopup::get_input()
 {
 	return textEditor->getText();

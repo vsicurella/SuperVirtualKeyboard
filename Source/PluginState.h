@@ -22,13 +22,20 @@ namespace IDs
 	static Identifier processorNode("Processor Node");
 	static Identifier selectedModeName("Selecetd Mode Name");
 	static Identifier externalMidiState("MIDI Input State");
+	static Identifier presetsSorted("Sorted Presets");
+	static Identifier scaleSort("Sort by Scale");
+	static Identifier modeSort("Sort by Mode");
+	static Identifier familySort("Sort by Family");
+
 
 	// ModeLayout
 	static Identifier modeLayoutNode("ModeLayout Node");
+	static Identifier modeName("Full Mode Name");
 	static Identifier scaleSize("Scale Size");
 	static Identifier modeSize("Mode Size");
 	static Identifier stepString("Steps (String)");
 	static Identifier MOSClass("MOS Class");
+	static Identifier temperamentFamily("Temperament Family");
 	static Identifier stepArray("Steps (Array)");
 	static Identifier keyboardOrderArray("Order Array");
 	static Identifier keyboardModeDegrees("Mode Degree Array");
@@ -77,6 +84,14 @@ namespace IDs
 		return arrayOut;
 	}
 }
+
+enum SortType
+{
+	scaleSize,
+	modeSize,
+	family,
+	alphabetical
+};
 
 struct SuperVirtualKeyboardPluginState
 {

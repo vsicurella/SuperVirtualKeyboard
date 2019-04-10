@@ -69,7 +69,9 @@ public:
 
 	void setModeLayout(ModeLayout modeLayoutIn);
 	ModeLayout* getModeLayout();
-
+	void createPresets();
+	Array<ModeLayout>* get_presets();
+	ValueTree get_presets_sorted();
 
 private:
     //==============================================================================
@@ -84,6 +86,12 @@ private:
 
 
 	Point<int> viewportPos;
+
+	std::unique_ptr<Array<ModeLayout>> presets;
+	ValueTree presetsSorted;
+
+
+	
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

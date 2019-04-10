@@ -25,7 +25,6 @@
 struct ModeLayout
 {
 	//Scale* scale;
-
 	ValueTree modeLayoutNode;
 
 	String modeName;
@@ -33,11 +32,17 @@ struct ModeLayout
 	int modeSize;
 
 	String strSteps;
+	String family;
 	String mos;
 
 	Array<int> order;
 	Array<int> steps;
 	Array<float> modeDegrees;
+
+	enum Properties
+	{
+		fullModeName
+	};
 
 	/*
 		Sets the name of the mode
@@ -253,11 +258,22 @@ struct ModeLayout
 		return out;
 	}
 
+	String get_full_name()
+	{
+		String fullName;
+
+		fullName << family << "[" << modeSize << "] " << scaleSize;
+
+		return fullName;
+	}
+
 	void update_node()
 	{
 		modeLayoutNode.setProperty(IDs::scaleSize, var(scaleSize), nullptr);
 		modeLayoutNode.setProperty(IDs::modeSize, var(modeSize), nullptr);
 		modeLayoutNode.setProperty(IDs::stepString, var(strSteps), nullptr);
+		modeLayoutNode.setProperty(IDs::modeName, var(get_full_name()), nullptr);
+		modeLayoutNode.setProperty(IDs::temperamentFamily, var(family), nullptr);
 		//modeLayoutNode.setProperty(IDs::stepArray, var(steps), nullptr);
 		//modeLayoutNode.setProperty(IDs::keyboardOrderArray, var(order), nullptr);
 		//modeLayoutNode.setProperty(IDs::keyboardModeDegrees, var(modeDegrees), nullptr);
@@ -299,6 +315,36 @@ struct ModeLayout
 		steps = stepsIn;
 		order = steps_to_order(steps);
 		modeDegrees = steps_to_degrees(steps);
+
+		strSteps = steps_to_string(stepsIn);
+		scaleSize = order.size();
+		modeSize = steps.size();
+
+		if (modeLayoutNode.isValid())
+			update_node();
+	}
+
+	ModeLayout(String stepsIn, String familyIn)
+	{
+		strSteps = stepsIn;
+		steps = parse_steps(stepsIn);
+		order = steps_to_order(steps);
+		modeDegrees = steps_to_degrees(steps);
+		family = familyIn;
+
+		scaleSize = order.size();
+		modeSize = steps.size();
+
+		if (modeLayoutNode.isValid())
+			update_node();
+	}
+
+	ModeLayout(Array<int> stepsIn, String familyIn)
+	{
+		steps = stepsIn;
+		order = steps_to_order(steps);
+		modeDegrees = steps_to_degrees(steps);
+		family = familyIn;
 
 		strSteps = steps_to_string(stepsIn);
 		scaleSize = order.size();

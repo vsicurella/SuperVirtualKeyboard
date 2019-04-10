@@ -21,6 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "PluginState.h"
+#include "Structures/ModeLayout.h"
 //[/Headers]
 
 
@@ -40,13 +42,14 @@ class ScaleEditPopup  : public Component,
 {
 public:
     //==============================================================================
-    ScaleEditPopup ();
+    ScaleEditPopup (Array<ModeLayout>* presetsArrayIn,  ValueTree& presetsSortedIn);
     ~ScaleEditPopup();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	ModeLayout* presetSelected;
 	String get_preset_name();
-	std::vector<int> get_scale(String hashKeyIn);
+	void populate_preset_menu();
 	String get_input();
 	String build_scale_string(std::vector<int> scaleIn); // pretty dumb
     //[/UserMethods]
@@ -62,7 +65,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	std::unique_ptr < HashMap<String, std::vector<int>>> presets;
 	bool enterDown = false;
     //[/UserVariables]
 
@@ -70,8 +72,18 @@ private:
     std::unique_ptr<TextEditor> textEditor;
     std::unique_ptr<Label> instructions;
     std::unique_ptr<TextButton> sendScale;
-    std::unique_ptr<ComboBox> scalePresets;
 
+    std::unique_ptr<ComboBox> scalePresets;
+	std::unique_ptr<PopupMenu> sortByScale;
+	std::unique_ptr<PopupMenu> sortByMode;
+	std::unique_ptr<PopupMenu> sortByFamily;
+
+	Array<ModeLayout>* presets;
+	ValueTree presetsSorted;
+
+	StringPairArray scaleToMode;
+	StringPairArray modeToMode;
+	StringPairArray familyToMode;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScaleEditPopup)
