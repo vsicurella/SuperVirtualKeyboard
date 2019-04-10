@@ -158,6 +158,7 @@ void ScaleEditPopup::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_scalePresets] -- add your combo box handling code here..
 		ModeLayout* mode;
 		ModeLayoutComparator mc;
+
 		if (scaleToMode.containsKey(comboBoxThatHasChanged->getText()))
 		{	
 			int ind = presets->indexOfSorted(mc, scaleToMode.getValue(comboBoxThatHasChanged->getText(), ""));
@@ -214,8 +215,6 @@ bool ScaleEditPopup::keyStateChanged (bool isKeyDown)
     //[/UserCode_keyStateChanged]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 String ScaleEditPopup::get_preset_name()
@@ -223,36 +222,48 @@ String ScaleEditPopup::get_preset_name()
 	return scalePresets.get()->getText();
 }
 
+ModeLayout* ScaleEditPopup::get_preset(String fullModeNameIn)
+{
+	ModeLayout* out = nullptr;
+
+	for (int i = 0; i < presets->size(); i++)
+	{
+		out = &presets->getUnchecked(i);
+
+		if (out->get_full_name() == fullModeNameIn)
+			return out;
+	}
+	
+	return out;
+}
+
 void ScaleEditPopup::populate_preset_menu()
 {
 	scalePresets.get()->clear();
-	sortByScale.reset(new PopupMenu());
-	sortByMode.reset(new PopupMenu());
-	sortByFamily.reset(new PopupMenu());
+	menuSortByScale.reset(new PopupMenu());
+	menuSortByMode.reset(new PopupMenu());
+	menuSortByFamily.reset(new PopupMenu());
 
 	ValueTree child;
 
 	for (int i = 0; i < presets->size(); i++)
 	{
 		child = presetsSorted.getChild(SortType::scaleSize).getChild(i);
-		scaleToMode.set(child.getProperty(IDs::scaleSize).toString() + " " + child.getProperty(IDs::modeLayoutNode).toString().dropLastCharacters(2),
-			child.getProperty(IDs::modeName));
-		sortByScale.get()->addItem(i+1, scaleToMode.getAllKeys()[i]);
+		scaleToMode.set(child.getPropertyAsValue(IDs::modeScaleName, nullptr).toString(), child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
+		menuSortByScale.get()->addItem(i+1, scaleToMode.getAllKeys()[i]);
 
 		child = presetsSorted.getChild(SortType::modeSize).getChild(i);
-		modeToMode.set(child.getProperty(IDs::modeSize).toString() + " " + child.getProperty(IDs::temperamentFamily).toString() + " " + child.getProperty(IDs::scaleSize).toString(),
-			child.getProperty(IDs::modeName));
-		sortByMode.get()->addItem(i+1, modeToMode.getAllKeys()[i]);
+		modeToMode.set(child.getPropertyAsValue(IDs::modeModeName, nullptr).toString(), child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
+
+		menuSortByMode.get()->addItem(i+1, modeToMode.getAllKeys()[i]);
 
 		child = presetsSorted.getChild(SortType::family).getChild(i);
-		familyToMode.set(child.getProperty(IDs::modeName).toString(),
-			child.getProperty(IDs::modeName));
-		sortByFamily.get()->addItem(i+1, familyToMode.getAllKeys()[i]);
+		menuSortByFamily.get()->addItem(i+1, child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
 	}
 
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByScale.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByMode.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *sortByFamily.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByScale.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByMode.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByFamily.get());
 }
 
 String ScaleEditPopup::get_input()

@@ -26,9 +26,9 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 #endif
 {
 	createPresets();
-	// Create default piano layout
-	modeLayout.reset(new ModeLayout("2 2 1 2 2 2 1"));
-	modeLayout.get()->set_valuetree_node(pluginState->modeLayoutNode);
+	// Create default piano layout and initialize ModeLayout ValueTree
+	presetSelected = &presets->getUnchecked(7);
+	presetSelected->set_valuetree_node(pluginState->modeLayoutNode);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -238,14 +238,14 @@ Point<int> SuperVirtualKeyboardAudioProcessor::getViewportPositionProportions()
 	return viewportPos;
 }
 
-void SuperVirtualKeyboardAudioProcessor::setModeLayout(ModeLayout modeLayoutIn)
+void SuperVirtualKeyboardAudioProcessor::setModeLayout(ModeLayout* modeLayoutIn)
 {
-	modeLayout.reset(new ModeLayout(modeLayoutIn));
+	presetSelected = modeLayoutIn;
 }
 
 ModeLayout* SuperVirtualKeyboardAudioProcessor::getModeLayout()
 {
-	return modeLayout.get();
+	return presetSelected;
 }
 
 struct ModeScaleSorter

@@ -30,12 +30,14 @@ namespace IDs
 
 	// ModeLayout
 	static Identifier modeLayoutNode("ModeLayout Node");
-	static Identifier modeName("Full Mode Name");
 	static Identifier scaleSize("Scale Size");
 	static Identifier modeSize("Mode Size");
 	static Identifier stepString("Steps (String)");
 	static Identifier MOSClass("MOS Class");
 	static Identifier temperamentFamily("Temperament Family");
+	static Identifier modeFullName("Full Mode Name");
+	static Identifier modeScaleName("Mode Name by Scale Size");
+	static Identifier modeModeName("Mode Name by Mode Size");
 	static Identifier stepArray("Steps (Array)");
 	static Identifier keyboardOrderArray("Order Array");
 	static Identifier keyboardModeDegrees("Mode Degree Array");

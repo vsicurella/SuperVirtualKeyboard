@@ -67,7 +67,7 @@ public:
 	void setViewportPositionProportions(Point<int> pointIn);
 	Point<int> getViewportPositionProportions();
 
-	void setModeLayout(ModeLayout modeLayoutIn);
+	void setModeLayout(ModeLayout* modeLayoutIn);
 	ModeLayout* getModeLayout();
 	void createPresets();
 	Array<ModeLayout>* get_presets();
@@ -79,16 +79,15 @@ private:
 	std::unique_ptr<UndoManager> undoManager;
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
 	ValueTree processorNode;
-	std::unique_ptr<ModeLayout> modeLayout;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
-
 
 	Point<int> viewportPos;
 
 	std::unique_ptr<Array<ModeLayout>> presets;
 	ValueTree presetsSorted;
+	ModeLayout* presetSelected;
 
 
 	

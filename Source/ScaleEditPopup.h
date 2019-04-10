@@ -49,6 +49,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	ModeLayout* presetSelected;
 	String get_preset_name();
+	ModeLayout* get_preset(String fullModeNameIn);
 	void populate_preset_menu();
 	String get_input();
 	String build_scale_string(std::vector<int> scaleIn); // pretty dumb
@@ -74,9 +75,9 @@ private:
     std::unique_ptr<TextButton> sendScale;
 
     std::unique_ptr<ComboBox> scalePresets;
-	std::unique_ptr<PopupMenu> sortByScale;
-	std::unique_ptr<PopupMenu> sortByMode;
-	std::unique_ptr<PopupMenu> sortByFamily;
+	std::unique_ptr<PopupMenu> menuSortByScale;
+	std::unique_ptr<PopupMenu> menuSortByMode;
+	std::unique_ptr<PopupMenu> menuSortByFamily;
 
 	Array<ModeLayout>* presets;
 	ValueTree presetsSorted;
