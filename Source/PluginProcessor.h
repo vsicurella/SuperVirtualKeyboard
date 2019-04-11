@@ -67,11 +67,18 @@ public:
 	void setViewportPositionProportions(Point<int> pointIn);
 	Point<int> getViewportPositionProportions();
 
-	void setModeLayout(ModeLayout* modeLayoutIn);
-	ModeLayout* getModeLayout();
+	void set_preset(int presetIndexIn);
+	ModeLayout* get_preset_selected();
 	void createPresets();
 	OwnedArray<ModeLayout>* get_presets();
 	Array<Array<ModeLayout*>>* get_presets_sorted();
+    
+    SuperVirtualKeyboardPluginState* get_plugin_state()
+    {
+        return pluginState.get();
+    }
+    
+    
 
 private:
     //==============================================================================

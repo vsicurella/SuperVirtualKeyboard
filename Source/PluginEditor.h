@@ -44,6 +44,11 @@ public:
 	void focusGained(FocusChangeType changeType) override;
 	void userTriedToCloseWindow() override;
 	void visibilityChanged() override;
+    
+    //==============================================================================
+
+    void update_node_data();
+    void restore_node_data();
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -51,6 +56,7 @@ private:
     SuperVirtualKeyboardAudioProcessor& processor;
 	MidiKeyboardState externalMidi;
 	ApplicationCommandManager appCmdMgr;
+    ValueTree keyboardWindowNode;
 
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<ViewPianoComponent> piano;

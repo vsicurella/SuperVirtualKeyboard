@@ -238,12 +238,12 @@ Point<int> SuperVirtualKeyboardAudioProcessor::getViewportPositionProportions()
 	return viewportPos;
 }
 
-void SuperVirtualKeyboardAudioProcessor::setModeLayout(ModeLayout* modeLayoutIn)
+void SuperVirtualKeyboardAudioProcessor::set_preset(int presetIndexIn)
 {
-	presetSelected = modeLayoutIn;
+    presetSelected = presets.getUnchecked(presetIndexIn);
 }
 
-ModeLayout* SuperVirtualKeyboardAudioProcessor::getModeLayout()
+ModeLayout* SuperVirtualKeyboardAudioProcessor::get_preset_selected()
 {
 	return presetSelected;
 }

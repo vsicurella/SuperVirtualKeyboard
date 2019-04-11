@@ -112,7 +112,7 @@ public:
 
 		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
 
-		void PianoMenuBar::resized() override;
+		//void PianoMenuBar::resized() override;
 
 	};
 
@@ -289,7 +289,7 @@ private:
     float minWindowHeight;
 
 	// Key locks
-
+    bool rightMouseHeld = false;
 	bool shiftHeld = false;
     bool altHeld = false;
     bool ctrlHeld = false;

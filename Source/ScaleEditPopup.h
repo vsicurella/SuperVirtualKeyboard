@@ -48,11 +48,20 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	ModeLayout* presetSelected;
+    bool isUserPreset = false;
+    
 	String get_preset_name();
-	ModeLayout* get_preset(String fullModeNameIn);
+	ModeLayout* get_preset(String anyNameIn);
+    
+    int get_preset_id(String anyNameIn);
+    
+    int get_selected_preset_id();
+    void set_selected_preset(ModeLayout* presetIn);
+    void set_selected_preset(int comboBoxIdIn);
+    void set_text_boxes(String presetName, String steps);
+
 	void populate_preset_menu();
 	String get_input();
-	String build_scale_string(std::vector<int> scaleIn); // pretty dumb
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -67,24 +76,23 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	bool enterDown = false;
+    
+    OwnedArray<ModeLayout>* presets;
+    Array<Array<ModeLayout*>>* presetsSorted;
+    
+    HashMap<String, int> menuToPresetIndex;
+    std::unique_ptr<PopupMenu> menuSortByScale;
+    std::unique_ptr<PopupMenu> menuSortByMode;
+    std::unique_ptr<PopupMenu> menuSortByFamily;
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<TextEditor> textEditor;
     std::unique_ptr<Label> instructions;
     std::unique_ptr<TextButton> sendScale;
-
     std::unique_ptr<ComboBox> scalePresets;
-	std::unique_ptr<PopupMenu> menuSortByScale;
-	std::unique_ptr<PopupMenu> menuSortByMode;
-	std::unique_ptr<PopupMenu> menuSortByFamily;
 
-	OwnedArray<ModeLayout>* presets;
-	Array<Array<ModeLayout*>>* presetsSorted;
-
-	StringPairArray scaleToMode;
-	StringPairArray modeToMode;
-	StringPairArray familyToMode;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScaleEditPopup)

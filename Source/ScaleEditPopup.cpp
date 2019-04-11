@@ -24,26 +24,10 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-
-struct ModeLayoutComparator
-{
-	static int compareElements(const ModeLayout& m1, const ModeLayout& m2)
-	{
-		String s1 = m1.modeName;
-		String s2 = m2.modeName;
-
-		if (s1 < s2)
-			return -1;
-		else if (s1 > s2)
-			return 1;
-		else
-			return 0;
-	}
-};
 //[/MiscUserDefs]
 
 //==============================================================================
-ScaleEditPopup::ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn,  Array<Array<ModeLayout*>>* presetsSortedIn)
+ScaleEditPopup::ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	presets = presetsArrayIn;
@@ -82,6 +66,8 @@ ScaleEditPopup::ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn,  Array<A
     scalePresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     scalePresets->addListener (this);
 
+
+    //[UserPreSize]
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -124,10 +110,10 @@ void ScaleEditPopup::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    textEditor->setBounds (proportionOfWidth (0.2830f), 8, 150, 24);
-    instructions->setBounds (proportionOfWidth (0.0172f), 0, 175, 40);
+    textEditor->setBounds (proportionOfWidth (0.2829f), 8, 150, 24);
+    instructions->setBounds (proportionOfWidth (0.0171f), 0, 175, 40);
     sendScale->setBounds (proportionOfWidth (0.5402f), 8, 88, 24);
-    scalePresets->setBounds (proportionOfWidth (0.7203f), 8, 150, 24);
+    scalePresets->setBounds (proportionOfWidth (0.7207f), 8, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -141,6 +127,7 @@ void ScaleEditPopup::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_sendScale] -- add your button handler code here..
 		presetSelected = presets->add(new ModeLayout(textEditor->getText()));
+        isUserPreset = true;
 		sendChangeMessage();
         //[/UserButtonCode_sendScale]
     }
@@ -157,16 +144,17 @@ void ScaleEditPopup::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == scalePresets.get())
     {
         //[UserComboBoxCode_scalePresets] -- add your combo box handling code here..
-		ModeLayout* mode;
-
-		mode = get_preset(comboBoxThatHasChanged->getText());
 		
+        int presetIndex = menuToPresetIndex[comboBoxThatHasChanged->getText()];
+        ModeLayout* mode = presets->getUnchecked(presetIndex);
+
 		if (mode)
 		{
 			presetSelected = mode;
-			textEditor.get()->setText(presetSelected->strSteps.toStdString());
+			textEditor.get()->setText(presetSelected->strSteps);
 		}
-
+        
+        isUserPreset = false;
 		sendChangeMessage();
         //[/UserComboBoxCode_scalePresets]
     }
@@ -198,6 +186,8 @@ bool ScaleEditPopup::keyStateChanged (bool isKeyDown)
     //[/UserCode_keyStateChanged]
 }
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 String ScaleEditPopup::get_preset_name()
@@ -205,7 +195,7 @@ String ScaleEditPopup::get_preset_name()
 	return scalePresets.get()->getText();
 }
 
-ModeLayout* ScaleEditPopup::get_preset(String fullModeNameIn)
+ModeLayout* ScaleEditPopup::get_preset(String anyNameIn)
 {
 	ModeLayout* out = nullptr;
 
@@ -213,24 +203,54 @@ ModeLayout* ScaleEditPopup::get_preset(String fullModeNameIn)
 	{
 		out = presets->getUnchecked(i);
 
-		if (out->get_full_name() == fullModeNameIn ||
-			out->get_name_scale_size() == fullModeNameIn ||
-			out->get_name_mode_size() == fullModeNameIn )
+		if (out->get_full_name() == anyNameIn ||
+			out->get_name_scale_size() == anyNameIn ||
+			out->get_name_mode_size() == anyNameIn )
 			return out;
 	}
-	
+
 	return out;
+}
+
+int ScaleEditPopup::get_preset_id(String anyNameIn)
+{
+    return menuToPresetIndex[anyNameIn];
+}
+
+int ScaleEditPopup::get_selected_preset_id()
+{
+    scalePresets.get()->getSelectedId();
+}
+
+void ScaleEditPopup::set_selected_preset(ModeLayout* presetIn)
+{
+    scalePresets.get()->setSelectedId(get_preset_id(presetIn->get_full_name()));
+}
+
+void ScaleEditPopup::set_selected_preset(int comboBoxIdIn)
+{
+    scalePresets.get()->setSelectedId(comboBoxIdIn);
+}
+
+void ScaleEditPopup::set_text_boxes(String presetName, String steps)
+{
+    textEditor.get()->setText(steps);
+    scalePresets.get()->setText(presetName);
 }
 
 void ScaleEditPopup::populate_preset_menu()
 {
 	scalePresets.get()->clear();
+    menuToPresetIndex.clear();
+    
 	menuSortByScale.reset(new PopupMenu());
 	menuSortByMode.reset(new PopupMenu());
 	menuSortByFamily.reset(new PopupMenu());
+    
 	ModeLayout* mode;
 	String name;
 	String p_name;
+    int presetIndex;
 	int size = 0;
 	int p_size = 0;
 	int c = 1;
@@ -239,7 +259,8 @@ void ScaleEditPopup::populate_preset_menu()
 	{
 		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
 		name = mode->get_name_scale_size();
-		
+        presetIndex = presets->indexOf(mode);
+
 		size = mode->scaleSize;
 		if (i > 0 && p_size != size)
 		{
@@ -248,11 +269,13 @@ void ScaleEditPopup::populate_preset_menu()
 		}
 
 		menuSortByScale.get()->addItem(c++, name);
+        menuToPresetIndex.set(name, presetIndex);
 	}
 	for (int i = 0; i < presets->size(); i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::modeSize).getUnchecked(i);
 		name = mode->get_name_mode_size();
+        presetIndex = presets->indexOf(mode);
 
 		size = mode->modeSize;
 		if (i > 0 && p_size != size)
@@ -262,12 +285,14 @@ void ScaleEditPopup::populate_preset_menu()
 		}
 
 		menuSortByMode.get()->addItem(c++, name);
+        menuToPresetIndex.set(name, presetIndex);
 	}
 
 	for (int i = 0; i < presets->size(); i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::family)[i];
 		name = mode->get_full_name();
+        presetIndex = presets->indexOf(mode);
 
 		if (i > 0 && p_name != mode->family)
 		{
@@ -276,6 +301,7 @@ void ScaleEditPopup::populate_preset_menu()
 		}
 
 		menuSortByFamily.get()->addItem(c++, name);
+        menuToPresetIndex.set(name, presetIndex);
 	}
 
 
@@ -289,19 +315,6 @@ String ScaleEditPopup::get_input()
 	return textEditor->getText();
 }
 
-String ScaleEditPopup::build_scale_string(std::vector<int> scaleIn)
-{
-	String out;
-
-	for (int i = 0; i < scaleIn.size(); i++)
-	{
-		out += String(scaleIn.at(i));
-
-		if (i < scaleIn.size() - 1)
-			out += " ";
-	}
-	return out;
-}
 //[/MiscUserCode]
 
 
@@ -315,7 +328,7 @@ String ScaleEditPopup::build_scale_string(std::vector<int> scaleIn)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ScaleEditPopup" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams=""
+                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="OwnedArray&lt;ModeLayout&gt;* presetsArrayIn, Array&lt;Array&lt;ModeLayout*&gt;&gt;* presetsSortedIn"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <METHODS>
@@ -324,20 +337,20 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="new text editor" id="8c559f3dc17dcbb0" memberName="textEditor"
-              virtualName="" explicitFocusOrder="0" pos="28.296% 8 150 24"
+              virtualName="" explicitFocusOrder="0" pos="28.293% 8 150 24"
               initialText="2 2 1 2 2 2 1" multiline="0" retKeyStartsLine="0"
               readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="Instructions" id="4c079e580647d111" memberName="instructions"
-         virtualName="" explicitFocusOrder="0" pos="1.715% 0 175 40" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="1.707% 0 175 40" edTextCol="ff000000"
          edBkgCol="0" labelText="Enter your scale like this:&#10;2 2 1 2 2 2 1"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="1.5e1" kerning="0" bold="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
          italic="0" justification="36"/>
   <TEXTBUTTON name="Send Scale" id="3a2872f3357f900b" memberName="sendScale"
-              virtualName="" explicitFocusOrder="0" pos="54.019% 8 88 24" buttonText="Send Scale"
+              virtualName="" explicitFocusOrder="0" pos="54.024% 8 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Preset Box" id="91d2066d9e23de1c" memberName="scalePresets"
-            virtualName="" explicitFocusOrder="0" pos="72.026% 8 150 24"
+            virtualName="" explicitFocusOrder="0" pos="72.073% 8 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="Pick a mode..."
             textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>

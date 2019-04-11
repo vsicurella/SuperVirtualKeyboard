@@ -198,12 +198,12 @@ PopupMenu ViewPianoComponent::PianoMenuBar::getMenuForIndex(int topLevelMenuInde
 {
 	return PopupMenu();
 }
-
+/*
 void ViewPianoComponent::PianoMenuBar::resized()
 {
 	setSize(getParentWidth(), 80);
 }
-
+*/
 //===============================================================================================
 
 ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandManager& cmdMgrIn)
@@ -751,11 +751,22 @@ bool ViewPianoComponent::keyPressed(const KeyPress& key)
 
 void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 {
+    
+    if (!rightMouseHeld && modifiers.isRightButtonDown())
+    {
+        rightMouseHeld = true;
+    }
+    if (rightMouseHeld && !modifiers.isRightButtonDown())
+    {
+        rightMouseHeld = false;
+    }
+    
 	if (!shiftHeld && modifiers.isShiftDown())
 	{
 		shiftHeld = true;
 	}
-	else if (shiftHeld && !modifiers.isShiftDown())
+    
+	if (shiftHeld && !modifiers.isShiftDown())
 	{
 		shiftHeld = false;
 
@@ -775,6 +786,7 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 		isolate_last_note();
 		repaint();
     }
+    
     else if (altHeld && !modifiers.isAltDown())
     {
         altHeld = false;
@@ -784,6 +796,7 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
     {
         ctrlHeld = true;
     }
+    
     else if (ctrlHeld && !modifiers.isCtrlDown())
     {
         ctrlHeld = false;

@@ -20,7 +20,7 @@ namespace IDs
 	
 	// Processor
 	static Identifier processorNode("Processor Node");
-	static Identifier selectedModeName("Selecetd Mode Name");
+	static Identifier selectedModeName("Selected Mode Name");
 	static Identifier externalMidiState("MIDI Input State");
 	static Identifier presetsSorted("Sorted Presets");
 	static Identifier scaleSort("Sort by Scale");
@@ -47,6 +47,8 @@ namespace IDs
 	static Identifier windowBounds("Window Bounds");
 	static Identifier viewportPosition("Viewport Position");
 	static Identifier selectedPresetName("Selected Preset Name");
+    static Identifier selectedPresetIndex("Selected Preset Index");
+    static Identifier selectedPresetComboID("Selected Preset Combobox Index");
 	
 	// Piano Component
 	static Identifier pianoNode("Piano Node");
@@ -107,7 +109,6 @@ struct SuperVirtualKeyboardPluginState
 		:	undoManager(undoManagerIn),
 			processorNode(IDs::processorNode),
 			modeLayoutNode(IDs::modeLayoutNode),
-			keyboardWindowNode(IDs::keyboardWindowNode),
 			pianoNode(IDs::pianoNode),
 			pianoKeyNode(IDs::pianoKeyNode)
 	{
