@@ -304,7 +304,7 @@ int ViewPianoComponent::get_min_height()
 void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 {
 	modeLayout = layoutIn;
-	grid = PianoKeyGrid(modeLayout);
+ 	grid = PianoKeyGrid(modeLayout);
 
 	// for convenience
 	scaleLayout = modeLayout->get_order();

@@ -42,7 +42,7 @@ class ScaleEditPopup  : public Component,
 {
 public:
     //==============================================================================
-    ScaleEditPopup (Array<ModeLayout>* presetsArrayIn,  ValueTree& presetsSortedIn);
+    ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn);
     ~ScaleEditPopup();
 
     //==============================================================================
@@ -79,8 +79,8 @@ private:
 	std::unique_ptr<PopupMenu> menuSortByMode;
 	std::unique_ptr<PopupMenu> menuSortByFamily;
 
-	Array<ModeLayout>* presets;
-	ValueTree presetsSorted;
+	OwnedArray<ModeLayout>* presets;
+	Array<Array<ModeLayout*>>* presetsSorted;
 
 	StringPairArray scaleToMode;
 	StringPairArray modeToMode;

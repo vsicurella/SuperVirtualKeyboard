@@ -23,8 +23,8 @@
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ChangeListener,
-		public MidiInputCallback,
-		public Timer
+													public MidiInputCallback,
+													public Timer
 {
 public:
     SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor&);

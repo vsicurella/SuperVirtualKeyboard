@@ -43,7 +43,7 @@ struct ModeLayoutComparator
 //[/MiscUserDefs]
 
 //==============================================================================
-ScaleEditPopup::ScaleEditPopup (Array<ModeLayout>* presetsArrayIn,  ValueTree& presetsSortedIn)
+ScaleEditPopup::ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn,  Array<Array<ModeLayout*>>* presetsSortedIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	presets = presetsArrayIn;
@@ -140,6 +140,7 @@ void ScaleEditPopup::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == sendScale.get())
     {
         //[UserButtonCode_sendScale] -- add your button handler code here..
+		presetSelected = presets->add(new ModeLayout(textEditor->getText()));
 		sendChangeMessage();
         //[/UserButtonCode_sendScale]
     }
@@ -157,31 +158,13 @@ void ScaleEditPopup::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_scalePresets] -- add your combo box handling code here..
 		ModeLayout* mode;
-		ModeLayoutComparator mc;
 
-		if (scaleToMode.containsKey(comboBoxThatHasChanged->getText()))
-		{	
-			int ind = presets->indexOfSorted(mc, scaleToMode.getValue(comboBoxThatHasChanged->getText(), ""));
-			if (ind >= 0)
-				mode = &presets->getUnchecked(ind);
-		}
-		else if (modeToMode.containsKey(comboBoxThatHasChanged->getText()))
-		{
-			int ind = presets->indexOfSorted(mc, modeToMode.getValue(comboBoxThatHasChanged->getText(), ""));
-			if (ind >= 0)
-				mode = &presets->getUnchecked(ind);
-		}
-		else if (familyToMode.containsKey(comboBoxThatHasChanged->getText()))
-		{
-			int ind = presets->indexOfSorted(mc, familyToMode.getValue(comboBoxThatHasChanged->getText(), ""));
-			if (ind >= 0)
-				mode = &presets->getUnchecked(ind);
-		}
+		mode = get_preset(comboBoxThatHasChanged->getText());
 		
 		if (mode)
 		{
 			presetSelected = mode;
-			textEditor.get()->setText(mode->strSteps);
+			textEditor.get()->setText(presetSelected->strSteps.toStdString());
 		}
 
 		sendChangeMessage();
@@ -228,9 +211,11 @@ ModeLayout* ScaleEditPopup::get_preset(String fullModeNameIn)
 
 	for (int i = 0; i < presets->size(); i++)
 	{
-		out = &presets->getUnchecked(i);
+		out = presets->getUnchecked(i);
 
-		if (out->get_full_name() == fullModeNameIn)
+		if (out->get_full_name() == fullModeNameIn ||
+			out->get_name_scale_size() == fullModeNameIn ||
+			out->get_name_mode_size() == fullModeNameIn )
 			return out;
 	}
 	
@@ -243,27 +228,60 @@ void ScaleEditPopup::populate_preset_menu()
 	menuSortByScale.reset(new PopupMenu());
 	menuSortByMode.reset(new PopupMenu());
 	menuSortByFamily.reset(new PopupMenu());
-
-	ValueTree child;
+	ModeLayout* mode;
+	String name;
+	String p_name;
+	int size = 0;
+	int p_size = 0;
+	int c = 1;
 
 	for (int i = 0; i < presets->size(); i++)
 	{
-		child = presetsSorted.getChild(SortType::scaleSize).getChild(i);
-		scaleToMode.set(child.getPropertyAsValue(IDs::modeScaleName, nullptr).toString(), child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
-		menuSortByScale.get()->addItem(i+1, scaleToMode.getAllKeys()[i]);
+		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
+		name = mode->get_name_scale_size();
+		
+		size = mode->scaleSize;
+		if (i > 0 && p_size != size)
+		{
+			menuSortByScale.get()->addSeparator();
+			p_size = size;
+		}
 
-		child = presetsSorted.getChild(SortType::modeSize).getChild(i);
-		modeToMode.set(child.getPropertyAsValue(IDs::modeModeName, nullptr).toString(), child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
+		menuSortByScale.get()->addItem(c++, name);
+	}
+	for (int i = 0; i < presets->size(); i++)
+	{
+		mode = presetsSorted->getUnchecked(SortType::modeSize).getUnchecked(i);
+		name = mode->get_name_mode_size();
 
-		menuSortByMode.get()->addItem(i+1, modeToMode.getAllKeys()[i]);
+		size = mode->modeSize;
+		if (i > 0 && p_size != size)
+		{
+			menuSortByMode.get()->addSeparator();
+			p_size = size;
+		}
 
-		child = presetsSorted.getChild(SortType::family).getChild(i);
-		menuSortByFamily.get()->addItem(i+1, child.getPropertyAsValue(IDs::modeFullName, nullptr).toString());
+		menuSortByMode.get()->addItem(c++, name);
 	}
 
+	for (int i = 0; i < presets->size(); i++)
+	{
+		mode = presetsSorted->getUnchecked(SortType::family)[i];
+		name = mode->get_full_name();
+
+		if (i > 0 && p_name != mode->family)
+		{
+			menuSortByFamily.get()->addSeparator();
+			p_name = mode->family;
+		}
+
+		menuSortByFamily.get()->addItem(c++, name);
+	}
+
+
 	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByScale.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByMode.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByFamily.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::modeSort.toString(), *menuSortByMode.get());
+	scalePresets->getRootMenu()->addSubMenu(IDs::familySort.toString(), *menuSortByFamily.get());
 }
 
 String ScaleEditPopup::get_input()

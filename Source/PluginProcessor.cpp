@@ -27,7 +27,7 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 {
 	createPresets();
 	// Create default piano layout and initialize ModeLayout ValueTree
-	presetSelected = &presets->getUnchecked(7);
+	presetSelected = presets.getUnchecked(7);
 	presetSelected->set_valuetree_node(pluginState->modeLayoutNode);
 }
 
@@ -250,10 +250,10 @@ ModeLayout* SuperVirtualKeyboardAudioProcessor::getModeLayout()
 
 struct ModeScaleSorter
 {
-	static int compareElements(const ValueTree& t1, const ValueTree& t2)
+	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
-		int sz1 = t1.getProperty(IDs::scaleSize);
-		int sz2 = t2.getProperty(IDs::scaleSize);
+		int sz1 = t1->scaleSize;
+		int sz2 = t2->scaleSize;
 
 		if (sz1 < sz2)
 			return -1;
@@ -266,10 +266,10 @@ struct ModeScaleSorter
 
 struct ModeModeSorter
 {
-	static int compareElements(const ValueTree& t1, const ValueTree& t2)
+	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
-		int sz1 = t1.getProperty(IDs::modeSize);
-		int sz2 = t2.getProperty(IDs::modeSize);
+		int sz1 = t1->modeSize;
+		int sz2 = t2->modeSize;
 
 		if (sz1 < sz2)
 			return -1;
@@ -281,10 +281,10 @@ struct ModeModeSorter
 };
 struct ModeFamilySorter
 {
-	static int compareElements(const ValueTree& t1, const ValueTree& t2)
+	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
-		String sz1 = t1.getProperty(IDs::temperamentFamily);
-		String sz2 = t2.getProperty(IDs::temperamentFamily);
+		String sz1 = t1->family;
+		String sz2 = t2->family;
 
 		if (sz1 < sz2)
 			return -1;
@@ -295,102 +295,98 @@ struct ModeFamilySorter
 	}
 };
 
-Array<ModeLayout>* SuperVirtualKeyboardAudioProcessor::get_presets()
+OwnedArray<ModeLayout>* SuperVirtualKeyboardAudioProcessor::get_presets()
 {
-	return presets.get();
+	return &presets;
 }
 
-ValueTree SuperVirtualKeyboardAudioProcessor::get_presets_sorted()
+Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorted()
 {
-	return presetsSorted;
+	return &presetsSorted;
 }
 
 
 
 void SuperVirtualKeyboardAudioProcessor::createPresets()
 {
-	presets.reset(new Array<ModeLayout>());
-	presets.get()->add(ModeLayout( Array<int>({ 1, 2, 1, 2, 1 }), "Mavila"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 2, 2, 1 }), "Father"));
-	presets.get()->add(ModeLayout( Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila"));
-	presets.get()->add(ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1 }), "Dicot"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 1 }), "Machine"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2 }), "Orgone"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1 }), "Augmented"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 2, 1 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }), "Diminished"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }), "Father"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Orwell"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine"));
-	presets.get()->add(ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic"));
-	presets.get()->add(ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 1 }), "Bicycle"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }), "Father"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri"));
-	presets.get()->add(ModeLayout( Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 4, 1 }), "Superpyth"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }), "Hedgehog"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }),"Orwell"));
-	presets.get()->add(ModeLayout( Array<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }), "Mavila"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }), "Sephiroth"));
-	presets.get()->add(ModeLayout( Array<int>({ 5, 5, 4, 5, 5 }), "Godzilla"));
-	presets.get()->add(ModeLayout( Array<int>({ 5, 3, 5, 3, 5, 3 }), "Triforce"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 3, 3, 4, 3, 3, 4 }), "Dastgah-e Sehgah / Maqam Nairuz"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 4, 2, 4, 4, 4, 2 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 3 }), "Mohajira"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }),"Injera"));
-	presets.get()->add(ModeLayout( Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone"));
-	presets.get()->add(ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3, }), "Orwell"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }),"BP Lambda"));
-	presets.get()->add(ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II"));
+	presets.clear();
+	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1 }), "Mavila"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 2, 1 }), "Father"));
+	presets.add(new ModeLayout( Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila"));
+	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1 }), "Dicot"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 1 }), "Machine"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2 }), "Orgone"));
+	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1 }), "Augmented"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 2, 1 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }), "Diminished"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }), "Father"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Orwell"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood"));
+	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine"));
+	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic"));
+	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine"));
+	presets.add(new ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 1 }), "Bicycle"));
+	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }), "Father"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri"));
+	presets.add(new ModeLayout( Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila"));
+	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood"));
+	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle"));
+	presets.add(new ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 4, 1 }), "Superpyth"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }), "Hedgehog"));
+	presets.add(new ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }),"Orwell"));
+	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }), "Mavila"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }), "Sephiroth"));
+	presets.add(new ModeLayout( Array<int>({ 5, 5, 4, 5, 5 }), "Godzilla"));
+	presets.add(new ModeLayout( Array<int>({ 5, 3, 5, 3, 5, 3 }), "Triforce"));
+	presets.add(new ModeLayout( Array<int>({ 4, 3, 3, 4, 3, 3, 4 }), "Dastgah-e Sehgah / Maqam Nairuz"));
+	presets.add(new ModeLayout( Array<int>({ 4, 4, 2, 4, 4, 4, 2 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 3 }), "Mohajira"));
+	presets.add(new ModeLayout( Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone"));
+	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }),"Injera"));
+	presets.add(new ModeLayout( Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone"));
+	presets.add(new ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3, }), "Orwell"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }),"BP Lambda"));
+	presets.add(new ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II"));
+	
+	// Connect to ValueTree structure
+	for (int i = 0; i < presets.size(); i++)
+	{
+		presets[i]->set_valuetree_node(pluginState->modeLayoutNode, true);
+	}
 
-	presetsSorted = ValueTree(IDs::presetsSorted);
-
-	// Sort default presets, scale size
-	presetsSorted.addChild(ValueTree(IDs::scaleSort), SortType::scaleSize, nullptr);
-	presetsSorted.addChild(ValueTree(IDs::modeSort), SortType::modeSize, nullptr);
-	presetsSorted.addChild(ValueTree(IDs::modeSort), SortType::family, nullptr);
+	presetsSorted.clear();
+	presetsSorted.resize(3);
 
 	ModeScaleSorter scaleSort;
 	ModeModeSorter modeSort;
 	ModeFamilySorter famSort;
 
-	ValueTree sorting = ValueTree(IDs::presetsSorted);
-	for (int i = 0; i < presets.get()->size(); i++)
+	Array<ModeLayout*> sorting;
+	for (int i = 0; i < presets.size(); i++)
 	{
-		sorting.addChild(presets.get()->getUnchecked(i).modeLayoutNode, i, nullptr);
+		sorting.add(presets.getUnchecked(i));
 	}
 
-	sorting.sort(scaleSort, nullptr, false);
+	sorting.sort(scaleSort, false);
+	presetsSorted.getReference(SortType::scaleSize).addArray(sorting);
 
-	for (auto child : sorting)
-		presetsSorted.getChild(SortType::scaleSize).addChild(child, -1, nullptr);
+	sorting.sort(modeSort, false);
+	presetsSorted.getReference(SortType::modeSize).addArray(sorting);
 
-	sorting.sort(modeSort, nullptr, false);
-
-	for (auto child : sorting)
-		presetsSorted.getChild(SortType::modeSize).addChild(child, -1, nullptr);
-
-	sorting.sort(famSort, nullptr, false);
-
-	for (auto child : sorting)
-		presetsSorted.getChild(SortType::family).addChild(child, -1, nullptr);
+	sorting.sort(famSort, false);
+	presetsSorted.getReference(SortType::family).addArray(sorting);
 }
 
 

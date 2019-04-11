@@ -70,8 +70,8 @@ public:
 	void setModeLayout(ModeLayout* modeLayoutIn);
 	ModeLayout* getModeLayout();
 	void createPresets();
-	Array<ModeLayout>* get_presets();
-	ValueTree get_presets_sorted();
+	OwnedArray<ModeLayout>* get_presets();
+	Array<Array<ModeLayout*>>* get_presets_sorted();
 
 private:
     //==============================================================================
@@ -85,8 +85,8 @@ private:
 
 	Point<int> viewportPos;
 
-	std::unique_ptr<Array<ModeLayout>> presets;
-	ValueTree presetsSorted;
+	OwnedArray<ModeLayout> presets;
+	Array<Array<ModeLayout*>> presetsSorted;
 	ModeLayout* presetSelected;
 
 

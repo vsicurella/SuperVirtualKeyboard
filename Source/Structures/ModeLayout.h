@@ -245,11 +245,11 @@ struct ModeLayout
 
 	static String steps_to_string(Array<int> stepsIn)
 	{
-		std::string out;
+		String out;
 
 		for (int i = 0; i < stepsIn.size(); i++)
 		{
-			out += stepsIn[i];
+			out += String(stepsIn[i]);
 
 			if (i < stepsIn.size() - 1)
 				out += ' ';
@@ -260,7 +260,7 @@ struct ModeLayout
 
 	String get_full_name()
 	{
-		return family + "[ " + String(modeSize) + "] " + String(scaleSize);
+		return family + "[" + String(modeSize) + "] " + String(scaleSize);
 	}
 
 	String get_name_scale_size()
@@ -289,7 +289,7 @@ struct ModeLayout
 
 	void set_valuetree_node(ValueTree nodeIn, bool update=false)
 	{
-		modeLayoutNode = nodeIn;
+		modeLayoutNode = ValueTree(nodeIn);
 		if (update)
 			update_node();
 	}
