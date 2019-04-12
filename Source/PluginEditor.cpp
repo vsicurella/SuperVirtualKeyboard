@@ -44,7 +44,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
         update_node_data();
     restore_node_data();
     
-	startTimer(1);
+	startTimerHz(20);
 }
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
@@ -55,7 +55,7 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 
 void SuperVirtualKeyboardAudioProcessorEditor::paint(Graphics& g)
 {
-	piano.get()->repaint();
+	
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::resized()
