@@ -14,7 +14,7 @@
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-	piano(new ViewPianoComponent(processor.get_preset_selected(), appCmdMgr)),
+	piano(new ViewPianoComponent(appCmdMgr, nullptr)),
 	view(new Viewport("Piano Viewport")),
 	scaleEdit(new ScaleEditPopup(processor.get_presets(), processor.get_presets_sorted()))
 {
@@ -22,7 +22,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	setResizable(true, true);
 	setResizeLimits(640, 100, 10e4, 10e4);
 	setBroughtToFrontOnMouseClick(true);
-
+	
 	scaleEdit.get()->setName("Scale Edit Popup");
 	scaleEdit.get()->addChangeListener(this);
 	scaleEdit.get()->setSize(640, 48);
@@ -41,9 +41,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	externalMidi.addListener(piano.get());
     
     if (!keyboardWindowNode.isValid())
-        update_node_data();
+        init_node_data();
     restore_node_data();
-    
+	  
 	startTimerHz(20);
 }
 
@@ -130,7 +130,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::visibilityChanged()
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::update_node_data()
+void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
 {
     keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
 
@@ -141,6 +141,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_node_data()
     keyboardWindowNode.setProperty(IDs::selectedPresetName, processor.get_preset_selected()->get_full_name(), nullptr);
     keyboardWindowNode.setProperty(IDs::selectedPresetIndex, 8, nullptr);
     keyboardWindowNode.setProperty(IDs::selectedPresetComboID, 8, nullptr);
+
+	processor.connect_editor_node(keyboardWindowNode);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()

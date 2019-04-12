@@ -118,8 +118,14 @@ public:
 
 	//===============================================================================================
 
-	ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandManager& cmdMgrIn);
+	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn);
 	~ViewPianoComponent() {};
+
+	//===============================================================================================
+
+	void init_data_node();
+
+	void restore_data_node();
 
 	//===============================================================================================
 
@@ -248,6 +254,8 @@ private:
 	int lastKeyClicked = 0;
 
 	// Data
+	ValueTree pianoNode;
+	UndoManager* undo;
 	OwnedArray<PianoKeyComponent> keys;
 	std::vector<PianoKeyComponent*> keysPtr;// debug
 

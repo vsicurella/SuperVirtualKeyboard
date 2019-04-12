@@ -206,7 +206,7 @@ void ViewPianoComponent::PianoMenuBar::resized()
 */
 //===============================================================================================
 
-ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandManager& cmdMgrIn)
+ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -216,6 +216,7 @@ ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandM
 
 	removeMouseListener(this);
 
+	undo = undoIn;
 	appCmdMgr = &cmdMgrIn;
 	menu.reset(new PianoMenuBar(appCmdMgr));
 	menu.get()->setName("Piano Menu");
@@ -237,7 +238,37 @@ ViewPianoComponent::ViewPianoComponent(ModeLayout* layoutIn, ApplicationCommandM
 	
 	setSize(1000, 250);
 	setOpaque(true);
-	apply_layout(layoutIn);
+
+	if (pianoNode.isValid())
+		restore_data_node();
+	else
+		init_data_node();
+}
+
+//===============================================================================================
+
+void ViewPianoComponent::init_data_node()
+{
+	pianoNode = ValueTree(IDs::pianoNode);
+
+	pianoNode.setProperty(IDs::pianoUIMode, pianoModeSelected, undo);
+	pianoNode.setProperty(IDs::pianoOrientation, pianoOrientationSelected, undo);
+	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelSelected, undo);
+	pianoNode.setProperty(IDs::pianoMidiNoteOffset, midiNoteOffset, undo);
+	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
+}
+
+void ViewPianoComponent::restore_data_node()
+{
+	pianoModeSelected = pianoNode[IDs::pianoUIMode];
+	// update UI things
+	pianoOrientationSelected = pianoNode[IDs::pianoOrientation];
+
+	midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
+
+	midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
+
+	mpeOn = pianoNode[IDs::pianoMPEToggle];
 }
 
 //===============================================================================================

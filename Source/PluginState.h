@@ -113,7 +113,8 @@ struct SuperVirtualKeyboardPluginState
 	SuperVirtualKeyboardPluginState(UndoManager* undoManagerIn)
 		:	undoManager(undoManagerIn),
 			processorNode(IDs::processorNode),
-			modeLayoutNode(IDs::modeLayoutNode)
+			modeLayoutNode(IDs::modeLayoutNode),
+			pianoKeyNode(IDs::pianoKeyNode)
 	{
 	}
 

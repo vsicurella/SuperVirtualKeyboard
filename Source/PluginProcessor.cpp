@@ -238,6 +238,14 @@ ModeLayout* SuperVirtualKeyboardAudioProcessor::get_preset_selected()
 	return presetSelected;
 }
 
+void SuperVirtualKeyboardAudioProcessor::connect_editor_node(ValueTree pluginEditorNodeIn)
+{
+	pluginState->pianoNode = pluginEditorNodeIn.getChildWithName(IDs::pianoNode);
+	pluginState->keyboardWindowNode = pluginEditorNodeIn;
+	processorNode.addChild(pluginEditorNodeIn, -1, undoManager.get());
+}
+
+
 struct ModeScaleSorter
 {
 	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
