@@ -48,7 +48,6 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	ModeLayout* presetSelected;
-    bool isUserPreset = false;
     
 	String get_preset_name();
 	ModeLayout* get_preset(String anyNameIn);

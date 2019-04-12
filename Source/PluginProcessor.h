@@ -63,41 +63,31 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 	//==============================================================================
-	
-	void setViewportPositionProportions(Point<int> pointIn);
-	Point<int> getViewportPositionProportions();
 
+	void createPresets();
 	void set_preset(int presetIndexIn);
 	ModeLayout* get_preset_selected();
-	void createPresets();
 	OwnedArray<ModeLayout>* get_presets();
 	Array<Array<ModeLayout*>>* get_presets_sorted();
-    
-    SuperVirtualKeyboardPluginState* get_plugin_state()
-    {
-        return pluginState.get();
-    }
-    
-    
 
+	//==============================================================================
+
+	SuperVirtualKeyboardPluginState* get_plugin_state();
+    
 private:
     //==============================================================================
 
-	std::unique_ptr<UndoManager> undoManager;
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
+	std::unique_ptr<UndoManager> undoManager;
+
 	ValueTree processorNode;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
 
-	Point<int> viewportPos;
-
 	OwnedArray<ModeLayout> presets;
 	Array<Array<ModeLayout*>> presetsSorted;
 	ModeLayout* presetSelected;
-
-
-	
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

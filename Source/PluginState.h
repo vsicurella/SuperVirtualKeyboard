@@ -19,63 +19,68 @@ namespace IDs
 	static Identifier itemName("Name");
 	
 	// Processor
-	static Identifier processorNode("Processor Node");
-	static Identifier selectedModeName("Selected Mode Name");
-	static Identifier externalMidiState("MIDI Input State");
-	static Identifier presetsSorted("Sorted Presets");
-	static Identifier scaleSort("Sort by Scale");
-	static Identifier modeSort("Sort by Mode");
-	static Identifier familySort("Sort by Family");
+	static Identifier processorNode("ProcessorNode");
+	static Identifier selectedModeName("SelectedModeName");
+	static Identifier externalMidiState("MidiInputState");
+	static Identifier presetsSorted("SortedPresets");
+	static Identifier scaleSort("SortedScale");
+	static Identifier modeSort("SortedMode");
+	static Identifier familySort("SortedFamily");
 
 
 	// ModeLayout
-	static Identifier modeLayoutNode("ModeLayout Node");
-	static Identifier scaleSize("Scale Size");
-	static Identifier modeSize("Mode Size");
-	static Identifier stepString("Steps (String)");
-	static Identifier MOSClass("MOS Class");
-	static Identifier temperamentFamily("Temperament Family");
-	static Identifier modeFullName("Full Mode Name");
-	static Identifier modeScaleName("Mode Name by Scale Size");
-	static Identifier modeModeName("Mode Name by Mode Size");
-	static Identifier stepArray("Steps (Array)");
-	static Identifier keyboardOrderArray("Order Array");
-	static Identifier keyboardModeDegrees("Mode Degree Array");
+	static Identifier modeLayoutNode("ModeLayoutNode");
+	static Identifier scaleSize("ScaleSize");
+	static Identifier modeSize("ModeSize");
+	static Identifier stepString("StepsString");
+	static Identifier MOSClass("MosClass");
+	static Identifier temperamentFamily("Family");
+	static Identifier modeFullName("ModeName");
+	static Identifier modeScaleName("NameScaleSize");
+	static Identifier modeModeName("NameModeSize");
+	static Identifier stepArray("StepsArray");
+	static Identifier keyboardOrderArray("OrderArray");
+	static Identifier keyboardModeDegrees("ModeDegreeArray");
+	static Identifier stepValue("StepsValue");
+	static Identifier orderValue("OrderValue");
+	static Identifier degreeValue("DegreeValue");
+
 
 	// Keyboard Window
-	static Identifier keyboardWindowNode("Keyboard Window Node");
-	static Identifier windowBounds("Window Bounds");
-	static Identifier viewportPosition("Viewport Position");
-	static Identifier selectedPresetName("Selected Preset Name");
-    static Identifier selectedPresetIndex("Selected Preset Index");
-    static Identifier selectedPresetComboID("Selected Preset Combobox Index");
+	static Identifier keyboardWindowNode("KeyboardWindowNode");
+	static Identifier windowBoundsW("WindowW");
+	static Identifier windowBoundsH("WindowH");
+	static Identifier viewportPosition("ViewportPosition");
+	static Identifier selectedPresetName("SelectedPresetName");
+    static Identifier selectedPresetIndex("SelectedPresetIndex");
+    static Identifier selectedPresetComboID("SelectedPresetComboboxIndex");
 	
 	// Piano Component
-	static Identifier pianoNode("Piano Node");
-	static Identifier pianoUIMode("Piano UI Mode");
-	static Identifier pianoOrientation("Piano Orientation");
-	static Identifier pianoKeyboardState("Piano Keyboard State");
-	static Identifier pianoMidiChannel("Selected MIDI Channel");
-	static Identifier pianoMidiNoteOffset("MIDI Node Offset");
-	static Identifier pianoMPEToggle("MPE Toggle");
-	static Identifier pianoKeyOrderPlacement("Placement of Ordered Keys");
-	static Identifier pianoKeyOrderRatios("Key Size Ratios by Order");
-	static Identifier pianoKeyOrderColors("Key Colors by Order");
+	static Identifier pianoNode("PianoNode");
+	static Identifier pianoUIMode("PianoUIMode");
+	static Identifier pianoOrientation("PianoOrientation");
+	static Identifier pianoKeyboardState("PianoKeyboardState");
+	static Identifier pianoMidiChannel("SelectedMidiChannel");
+	static Identifier pianoMidiNoteOffset("MidiNodeOffset");
+	static Identifier pianoMPEToggle("MpeToggle");
+	static Identifier pianoKeyOrderPlacement("OrderedKeysPlacement");
+	static Identifier pianoKeyOrderRatios("KeySizeRatios");
+	static Identifier pianoKeyOrderColors("KeyColors");
 
 	// Piano Key Component
-	static Identifier pianoKeyNode("Piano Key Node");
-	static Identifier pianokeyNumber("Key Number");
-	static Identifier pianoKeyModeDegree("Key Mode Degree");
-	static Identifier pianoKeyOrder("Key Order");
-	static Identifier pianokeyMidiNote("Mapped MIDI Note");
-	static Identifier pianoKeyWidthMod("Key Width Modifier");
-	static Identifier pianoKeyHeightMod("Key Height Modifier");
-	static Identifier pianoKeyXOffset("Key X Offset");
-	static Identifier pianoKeyYOffset("Key Y Offset");
-	static Identifier pianoKeyColorDefault("Key Color Default");
-	static Identifier pianoKeyColorHighlighted("Key Color Highlighted");
-	static Identifier pianoKeyColorPressed("Key Color Pressed");
-	static Identifier pianoKeyColorExternal("Key Color MIDI Input");
+	static Identifier pianoKeyNode("PianoKeyNode");
+	static Identifier pianokeyNumber("KeyNumber");
+	static Identifier pianoKeyModeDegree("KeyModeDegree");
+	static Identifier pianoKeyOrder("KeyOrder");
+	static Identifier pianokeyMidiNote("MappedMidiNote");
+	static Identifier pianoKeyWidthMod("KeyWidthModifier");
+	static Identifier pianoKeyHeightMod("KeyHeightModifier");
+	static Identifier pianoKeyXOffset("KeyXOffset");
+	static Identifier pianoKeyYOffset("KeyYOffset");
+	static Identifier pianoKeyColorDefault("KeyColorDefault");
+	static Identifier pianoKeyColorHighlighted("KeyColorHighlighted");
+	static Identifier pianoKeyColorPressed("KeyColorPressed");
+	static Identifier pianoKeyColorExternal("KeyColorMidiInput");
 
 	template <class T>
 	static Array<T> vector_to_juce_array(std::vector<T> vectorIn)
@@ -108,9 +113,7 @@ struct SuperVirtualKeyboardPluginState
 	SuperVirtualKeyboardPluginState(UndoManager* undoManagerIn)
 		:	undoManager(undoManagerIn),
 			processorNode(IDs::processorNode),
-			modeLayoutNode(IDs::modeLayoutNode),
-			pianoNode(IDs::pianoNode),
-			pianoKeyNode(IDs::pianoKeyNode)
+			modeLayoutNode(IDs::modeLayoutNode)
 	{
 	}
 

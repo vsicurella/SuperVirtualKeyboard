@@ -25,10 +25,9 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	undoManager(new UndoManager()), pluginState(new SuperVirtualKeyboardPluginState(undoManager.get()))
 #endif
 {
+	processorNode = ValueTree(IDs::processorNode);
 	createPresets();
-	// Create default piano layout and initialize ModeLayout ValueTree
-	presetSelected = presets.getUnchecked(7);
-	presetSelected->set_valuetree_node(pluginState->modeLayoutNode);
+	presetSelected = presets.getUnchecked(8);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -228,15 +227,6 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 }
 
 //==============================================================================
-void SuperVirtualKeyboardAudioProcessor::setViewportPositionProportions(Point<int> pointIn)
-{
-	viewportPos = pointIn;
-}
-
-Point<int> SuperVirtualKeyboardAudioProcessor::getViewportPositionProportions()
-{
-	return viewportPos;
-}
 
 void SuperVirtualKeyboardAudioProcessor::set_preset(int presetIndexIn)
 {
@@ -305,11 +295,17 @@ Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorte
 	return &presetsSorted;
 }
 
+SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
+{
+	return pluginState.get();;
+}
+
 
 
 void SuperVirtualKeyboardAudioProcessor::createPresets()
 {
 	presets.clear();
+	presets.add(new ModeLayout(Array<int>({ 1 }), "Custom"));
 	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1 }), "Mavila"));
 	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 2, 1 }), "Father"));
 	presets.add(new ModeLayout( Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila"));
@@ -363,7 +359,7 @@ void SuperVirtualKeyboardAudioProcessor::createPresets()
 	// Connect to ValueTree structure
 	for (int i = 0; i < presets.size(); i++)
 	{
-		presets[i]->set_valuetree_node(pluginState->modeLayoutNode, true);
+		processorNode.addChild(presets.getUnchecked(i)->modeLayoutNode, i, nullptr);
 	}
 
 	presetsSorted.clear();
@@ -374,7 +370,7 @@ void SuperVirtualKeyboardAudioProcessor::createPresets()
 	ModeFamilySorter famSort;
 
 	Array<ModeLayout*> sorting;
-	for (int i = 0; i < presets.size(); i++)
+	for (int i = 1; i < presets.size(); i++)
 	{
 		sorting.add(presets.getUnchecked(i));
 	}

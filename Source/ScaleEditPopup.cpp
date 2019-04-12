@@ -109,7 +109,6 @@ void ScaleEditPopup::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
-
     textEditor->setBounds (proportionOfWidth (0.2829f), 8, 150, 24);
     instructions->setBounds (proportionOfWidth (0.0171f), 0, 175, 40);
     sendScale->setBounds (proportionOfWidth (0.5402f), 8, 88, 24);
@@ -126,8 +125,8 @@ void ScaleEditPopup::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == sendScale.get())
     {
         //[UserButtonCode_sendScale] -- add your button handler code here..
-		presetSelected = presets->add(new ModeLayout(textEditor->getText()));
-        isUserPreset = true;
+		presetSelected = presets->set(0, new ModeLayout(textEditor->getText(), "Custom"), true);
+		scalePresets->setText("Custom Scale");
 		sendChangeMessage();
         //[/UserButtonCode_sendScale]
     }
@@ -153,8 +152,7 @@ void ScaleEditPopup::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 			presetSelected = mode;
 			textEditor.get()->setText(presetSelected->strSteps);
 		}
-        
-        isUserPreset = false;
+
 		sendChangeMessage();
         //[/UserComboBoxCode_scalePresets]
     }
@@ -171,7 +169,7 @@ bool ScaleEditPopup::keyPressed (const KeyPress& key)
 		enterDown = true;
 		sendChangeMessage();
 	}
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
+    return true;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
     //[/UserCode_keyPressed]
 }
 
@@ -182,13 +180,16 @@ bool ScaleEditPopup::keyStateChanged (bool isKeyDown)
 	{
 		enterDown = false;
 	}
-    return false;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
+    return true;  // Return true if your handler uses this key event, or false to allow it to be passed-on.
     //[/UserCode_keyStateChanged]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+String ScaleEditPopup::get_input()
+{
+	return textEditor->getText();
+}
 
 String ScaleEditPopup::get_preset_name()
 {
@@ -219,7 +220,7 @@ int ScaleEditPopup::get_preset_id(String anyNameIn)
 
 int ScaleEditPopup::get_selected_preset_id()
 {
-    scalePresets.get()->getSelectedId();
+    return scalePresets.get()->getSelectedId();
 }
 
 void ScaleEditPopup::set_selected_preset(ModeLayout* presetIn)
@@ -255,7 +256,7 @@ void ScaleEditPopup::populate_preset_menu()
 	int p_size = 0;
 	int c = 1;
 
-	for (int i = 0; i < presets->size(); i++)
+	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
 		name = mode->get_name_scale_size();
@@ -271,7 +272,8 @@ void ScaleEditPopup::populate_preset_menu()
 		menuSortByScale.get()->addItem(c++, name);
         menuToPresetIndex.set(name, presetIndex);
 	}
-	for (int i = 0; i < presets->size(); i++)
+
+	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::modeSize).getUnchecked(i);
 		name = mode->get_name_mode_size();
@@ -288,7 +290,7 @@ void ScaleEditPopup::populate_preset_menu()
         menuToPresetIndex.set(name, presetIndex);
 	}
 
-	for (int i = 0; i < presets->size(); i++)
+	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::family)[i];
 		name = mode->get_full_name();
@@ -304,15 +306,9 @@ void ScaleEditPopup::populate_preset_menu()
         menuToPresetIndex.set(name, presetIndex);
 	}
 
-
-	scalePresets->getRootMenu()->addSubMenu(IDs::scaleSort.toString(), *menuSortByScale.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::modeSort.toString(), *menuSortByMode.get());
-	scalePresets->getRootMenu()->addSubMenu(IDs::familySort.toString(), *menuSortByFamily.get());
-}
-
-String ScaleEditPopup::get_input()
-{
-	return textEditor->getText();
+	scalePresets->getRootMenu()->addSubMenu("by Scale Size", *menuSortByScale.get());
+	scalePresets->getRootMenu()->addSubMenu("by Mode Size", *menuSortByMode.get());
+	scalePresets->getRootMenu()->addSubMenu("by Family", *menuSortByFamily.get());
 }
 
 //[/MiscUserCode]
