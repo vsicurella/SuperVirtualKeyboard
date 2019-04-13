@@ -38,6 +38,8 @@ public:
 	// if it seems better for passing MIDI data around
 	struct PianoKeyComponent : public Button
 	{
+		ValueTree pianoKeyNode;
+		
 		// Parameters
 		int keyNumber;
 		float modeDegree;
@@ -66,7 +68,7 @@ public:
 
 		void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
-		String toString();
+		void restore_from_node();
 	};
 
 	struct PianoKeyGrid : public FractionalGrid

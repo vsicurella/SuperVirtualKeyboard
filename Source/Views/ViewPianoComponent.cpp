@@ -44,15 +44,13 @@ void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool should
     g.fillRect(fillBounds);
 }
 
-String ViewPianoComponent::PianoKeyComponent::toString()
+void ViewPianoComponent::PianoKeyComponent::restore_from_node()
 {
-	String out = "";
-
-	out << keyNumber << "|" << modeDegree << "|" << order << "|" << mappedMIDInote << "|"
-		<< widthMod << "|" << heightMod << "|" << xOffset << "|" << yOffset << "|"
-		<< findColour(0).toString() << findColour(1).toString() << findColour(2).toString();
-
-	return out;
+	mappedMIDInote = pianoKeyNode[IDs::pianokeyMidiNote];
+	widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
+	heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
+	xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
+	yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
 }
 
 //===============================================================================================
@@ -256,6 +254,22 @@ void ViewPianoComponent::init_data_node()
 	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelSelected, undo);
 	pianoNode.setProperty(IDs::pianoMidiNoteOffset, midiNoteOffset, undo);
 	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
+
+	PianoKeyComponent* key;
+	for (int i = 0; i < keys.size(); i++)
+	{
+		key = keys.getUnchecked(i);
+		key->pianoKeyNode = ValueTree(IDs::pianoKeyNode);
+
+		key->pianoKeyNode.setProperty(IDs::pianokeyNumber, i, nullptr);
+		key->pianoKeyNode.setProperty(IDs::pianokeyMidiNote, key->mappedMIDInote, nullptr);
+		key->pianoKeyNode.setProperty(IDs::pianoKeyWidthMod, key->widthMod, nullptr);
+		key->pianoKeyNode.setProperty(IDs::pianoKeyHeightMod, key->heightMod, nullptr);
+		key->pianoKeyNode.setProperty(IDs::pianoKeyXOffset, key->xOffset, nullptr);
+		key->pianoKeyNode.setProperty(IDs::pianoKeyYOffset, key->yOffset, nullptr);
+
+		pianoNode.addChild(key->pianoKeyNode, i, nullptr);
+	}
 }
 
 void ViewPianoComponent::restore_data_node()
@@ -269,6 +283,13 @@ void ViewPianoComponent::restore_data_node()
 	midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
 
 	mpeOn = pianoNode[IDs::pianoMPEToggle];
+
+	PianoKeyComponent* key;
+	for (int i = 0; i < keys.size(); i++)
+	{
+		key = keys.getUnchecked(i);
+		key->restore_from_node();
+	}
 }
 
 //===============================================================================================
@@ -847,7 +868,7 @@ void ViewPianoComponent::paint(Graphics& g)
 	{
 		g.setColour(Colours::white);
 		g.setFont(14.0f);
-		g.drawText("ViewPianoComponent", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
+		//g.drawText("ViewPianoComponent", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
 	}
 }
 

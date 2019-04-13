@@ -47,7 +47,7 @@ public:
     
     //==============================================================================
 
-    void update_node_data();
+    void init_node_data();
     void restore_node_data();
 
 private:
