@@ -173,7 +173,15 @@ ViewPianoComponent::PianoMenuBar::PianoMenuBar(ApplicationCommandManager* cmdMgr
 	addAndMakeVisible(menu.get());
 	setApplicationCommandManagerToWatch(cmdMgrIn);
 
-	setSize(1000, 80);
+	presetBox.reset(new ComboBox("Preset Box"));
+	addAndMakeVisible(presetBox.get());
+	presetBox->setEditableText(false);
+	presetBox->setJustificationType(Justification::centredLeft);
+	presetBox->setTextWhenNothingSelected(TRANS("Pick a mode..."));
+	presetBox->setTextWhenNoChoicesAvailable(TRANS("(no choices)"));
+	//presetBox->addListener(getParentComponent());
+
+	setSize(getParentWidth(), 80);
 }
 
 ViewPianoComponent::PianoMenuBar::~PianoMenuBar()
@@ -196,15 +204,21 @@ PopupMenu ViewPianoComponent::PianoMenuBar::getMenuForIndex(int topLevelMenuInde
 {
 	return PopupMenu();
 }
-/*
+
+void ViewPianoComponent::PianoMenuBar::paint(Graphics& g)
+{
+	
+}
+
 void ViewPianoComponent::PianoMenuBar::resized()
 {
 	setSize(getParentWidth(), 80);
+	presetBox->setBounds(proportionOfWidth(0.7207f), 8, 150, 24);
 }
-*/
+
 //===============================================================================================
 
-ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn)
+ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -237,17 +251,19 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, Undo
 	setSize(1000, 250);
 	setOpaque(true);
 
-	if (pianoNode.isValid())
-		restore_data_node();
+	if (pianoNodeIn.isValid())
+		restore_data_node(pianoNodeIn);
 	else
-		init_data_node();
+		init_data_node(pianoNodeIn);
+	
 }
 
 //===============================================================================================
 
-void ViewPianoComponent::init_data_node()
+void ViewPianoComponent::init_data_node(ValueTree& pianoNodeIn)
 {
-	pianoNode = ValueTree(IDs::pianoNode);
+	pianoNodeIn = ValueTree(IDs::pianoNode);
+	pianoNode = pianoNodeIn;
 
 	pianoNode.setProperty(IDs::pianoUIMode, pianoModeSelected, undo);
 	pianoNode.setProperty(IDs::pianoOrientation, pianoOrientationSelected, undo);
@@ -272,8 +288,10 @@ void ViewPianoComponent::init_data_node()
 	}
 }
 
-void ViewPianoComponent::restore_data_node()
+void ViewPianoComponent::restore_data_node(ValueTree& pianoNodeIn)
 {
+	pianoNode = pianoNodeIn;
+
 	pianoModeSelected = pianoNode[IDs::pianoUIMode];
 	// update UI things
 	pianoOrientationSelected = pianoNode[IDs::pianoOrientation];

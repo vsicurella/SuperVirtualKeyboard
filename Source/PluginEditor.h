@@ -54,9 +54,11 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SuperVirtualKeyboardAudioProcessor& processor;
+	SuperVirtualKeyboardPluginState* pluginState;
 	MidiKeyboardState externalMidi;
 	ApplicationCommandManager appCmdMgr;
     ValueTree keyboardWindowNode;
+
 
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<ViewPianoComponent> piano;

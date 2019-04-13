@@ -22,11 +22,7 @@ namespace IDs
 	static Identifier processorNode("ProcessorNode");
 	static Identifier selectedModeName("SelectedModeName");
 	static Identifier externalMidiState("MidiInputState");
-	static Identifier presetsSorted("SortedPresets");
-	static Identifier scaleSort("SortedScale");
-	static Identifier modeSort("SortedMode");
-	static Identifier familySort("SortedFamily");
-
+	static Identifier presetsNode("Presets");
 
 	// ModeLayout
 	static Identifier modeLayoutNode("ModeLayoutNode");
@@ -105,6 +101,7 @@ enum SortType
 struct SuperVirtualKeyboardPluginState
 {
 	ValueTree processorNode;
+	ValueTree presetsNode;
 	ValueTree modeLayoutNode;
 	ValueTree keyboardWindowNode;
 	ValueTree pianoNode;
@@ -113,6 +110,7 @@ struct SuperVirtualKeyboardPluginState
 	SuperVirtualKeyboardPluginState(UndoManager* undoManagerIn)
 		:	undoManager(undoManagerIn),
 			processorNode(IDs::processorNode),
+			presetsNode(IDs::presetsNode),
 			modeLayoutNode(IDs::modeLayoutNode),
 			pianoKeyNode(IDs::pianoKeyNode)
 	{

@@ -26,6 +26,7 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 #endif
 {
 	processorNode = ValueTree(IDs::processorNode);
+	processorNode.addChild(pluginState->presetsNode, -1, nullptr);
 	createPresets();
 	presetSelected = presets.getUnchecked(8);
 }
@@ -248,48 +249,93 @@ void SuperVirtualKeyboardAudioProcessor::connect_editor_node(ValueTree pluginEdi
 
 struct ModeScaleSorter
 {
+	// Scale first, then mode, then family
+
 	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
 		int sz1 = t1->scaleSize;
 		int sz2 = t2->scaleSize;
 
-		if (sz1 < sz2)
-			return -1;
-		else if (sz1 > sz2)
-			return 1;
+		int m1 = t1->modeSize;
+		int m2 = t2->modeSize;
+
+		String f1 = t1->family;
+		String f2 = t2->family;
+
+		if (sz1 < sz2) return -1;
+		else if (sz1 > sz2) return 1;
 		else
-			return 0;
+		{
+			if (m1 < m2) return -1;
+			else if (m1 > m2) return 1;
+			else
+			{
+				if (f1 < f2) return  -1;
+				else if (f1 > f2) return 1;
+				else return 0;
+			}
+		}
 	}
 };
 
 struct ModeModeSorter
 {
+	// Mode first, then scale, then family
+
 	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
-		int sz1 = t1->modeSize;
-		int sz2 = t2->modeSize;
+		int sz1 = t1->scaleSize;
+		int sz2 = t2->scaleSize;
 
-		if (sz1 < sz2)
-			return -1;
-		else if (sz1 > sz2)
-			return 1;
+		int m1 = t1->modeSize;
+		int m2 = t2->modeSize;
+
+		String f1 = t1->family;
+		String f2 = t2->family;
+
+		if (m1 < m2) return -1;
+		else if (m1 > m2) return 1;
 		else
-			return 0;
+		{
+			if (sz1 < sz2) return -1;
+			else if (sz1 > sz2) return 1;
+			else
+			{
+				if (f1 < f2) return  -1;
+				else if (f1 > f2) return 1;
+				else return 0;
+			}
+		}
 	}
 };
 struct ModeFamilySorter
 {
+	// Family first, then scale, then mode
+
 	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
 	{
-		String sz1 = t1->family;
-		String sz2 = t2->family;
+		int sz1 = t1->scaleSize;
+		int sz2 = t2->scaleSize;
 
-		if (sz1 < sz2)
-			return -1;
-		else if (sz1 > sz2)
-			return 1;
+		int m1 = t1->modeSize;
+		int m2 = t2->modeSize;
+
+		String f1 = t1->family;
+		String f2 = t2->family;
+
+		if (f1 < f2) return -1;
+		else if (f1 > f2) return 1;
 		else
-			return 0;
+		{
+			if (sz1 < sz2) return -1;
+			else if (sz1 > sz2) return 1;
+			else
+			{
+				if (m1 < m2) return  -1;
+				else if (m1 > m2) return 1;
+				else return 0;
+			}
+		}
 	}
 };
 
@@ -367,7 +413,7 @@ void SuperVirtualKeyboardAudioProcessor::createPresets()
 	// Connect to ValueTree structure
 	for (int i = 0; i < presets.size(); i++)
 	{
-		processorNode.addChild(presets.getUnchecked(i)->modeLayoutNode, i, nullptr);
+		processorNode.getChildWithName(IDs::presetsNode).addChild(presets.getUnchecked(i)->modeLayoutNode, i, nullptr);
 	}
 
 	presetsSorted.clear();

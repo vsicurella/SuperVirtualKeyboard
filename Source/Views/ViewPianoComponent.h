@@ -102,32 +102,33 @@ public:
 		public MenuBarModel
 	{
 		std::unique_ptr<MenuBarComponent> menu;
-
 		StringArray options;
+
+		std::unique_ptr<ComboBox> presetBox;
+		std::unique_ptr<TextEditor> scaleEnterBox;
 
 		PianoMenuBar(ApplicationCommandManager* cmdMgrIn);
 		~PianoMenuBar();
 
 		StringArray getMenuBarNames() override;
-
 		void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
-
 		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
 
-		//void PianoMenuBar::resized() override;
+		void paint(Graphics& g) override;
+		void PianoMenuBar::resized() override;
 
 	};
 
 	//===============================================================================================
 
-	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn);
+	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn);
 	~ViewPianoComponent() {};
 
 	//===============================================================================================
 
-	void init_data_node();
+	void init_data_node(ValueTree& pianoNodeIn);
 
-	void restore_data_node();
+	void restore_data_node(ValueTree& pianoNodeIn);
 
 	//===============================================================================================
 
