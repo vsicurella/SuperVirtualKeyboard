@@ -1,7 +1,5 @@
 ﻿# SuperVirtualKeyboard
 
-SUPER VIRTUAL KEYBOARD
-
 LATEST VERSION: Pre Alpha :(
 
 SUMMARY:
