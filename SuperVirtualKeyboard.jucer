@@ -5,38 +5,31 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
-    <GROUP id="{7DC7E22D-B838-790E-97EC-8DC818168910}" name="FileIO">
-      <FILE id="YJoaKA" name="KbmReader.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/KbmReader.h"/>
-      <FILE id="U2iKT4" name="KbmWriter.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/KbmWriter.h"/>
-      <FILE id="IDV99R" name="RPPNamesWriter.h" compile="0" resource="0"
-            file="../ScaleVisualizer/Source/FileIO/RPPNamesWriter.h"/>
-      <FILE id="WkLehg" name="ScalaReader.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/ScalaReader.h"/>
-      <FILE id="p6GeNu" name="ScalaWriter.h" compile="0" resource="0" file="../ScaleVisualizer/Source/FileIO/ScalaWriter.h"/>
-    </GROUP>
+    <GROUP id="{E90BF42D-566A-9A47-65C1-2C4D276A5399}" name="New Group"/>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
       <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"
             file="Source/Structures/FractionalGrid.h"/>
       <FILE id="ZNc2fR" name="ModeLayout.h" compile="0" resource="0" file="Source/Structures/ModeLayout.h"/>
     </GROUP>
-    <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="Views">
-      <FILE id="Ox8uc2" name="ViewPianoComponent.cpp" compile="1" resource="0"
-            file="Source/Views/ViewPianoComponent.cpp"/>
-      <FILE id="QG30fI" name="ViewPianoComponent.h" compile="0" resource="0"
-            file="Source/Views/ViewPianoComponent.h"/>
+    <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
+      <FILE id="aP536B" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/UI/PluginEditor.cpp"/>
+      <FILE id="E04sU2" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
+      <FILE id="ffTKmf" name="VirtualKeyboard.cpp" compile="1" resource="0"
+            file="Source/UI/VirtualKeyboard.cpp"/>
+      <FILE id="AN9rho" name="VirtualKeyboard.h" compile="0" resource="0"
+            file="Source/UI/VirtualKeyboard.h"/>
+      <FILE id="VSP7ge" name="KeyboardMenuBar.cpp" compile="1" resource="0"
+            file="Source/UI/KeyboardMenuBar.cpp"/>
+      <FILE id="GBz5d1" name="KeyboardMenuBar.h" compile="0" resource="0"
+            file="Source/UI/KeyboardMenuBar.h"/>
     </GROUP>
     <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
     <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
-    <FILE id="R98ufw" name="ScaleEditPopup.cpp" compile="1" resource="0"
-          file="Source/ScaleEditPopup.cpp"/>
-    <FILE id="PP0SKn" name="ScaleEditPopup.h" compile="0" resource="0"
-          file="Source/ScaleEditPopup.h"/>
-    <FILE id="wsU16t" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"
           file="Source/PluginProcessor.cpp"/>
     <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
           file="Source/PluginProcessor.h"/>
-    <FILE id="vXiy4r" name="PluginEditor.cpp" compile="1" resource="0"
-          file="Source/PluginEditor.cpp"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">

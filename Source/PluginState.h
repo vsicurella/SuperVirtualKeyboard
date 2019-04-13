@@ -78,6 +78,20 @@ namespace IDs
 	static Identifier pianoKeyColorPressed("KeyColorPressed");
 	static Identifier pianoKeyColorExternal("KeyColorMidiInput");
 
+	enum CommandIDs
+	{
+		loadCustomLayout = 1,
+		saveCustomLayout,
+		saveReaperMap,
+		setKeyColor,
+		setMidiNoteOffset,
+		pianoPlayMode,
+		pianoEditMode,
+		setPianoHorizontal,
+		setPianoVerticalL,
+		setPianoVerticalR,
+	};
+
 	template <class T>
 	static Array<T> vector_to_juce_array(std::vector<T> vectorIn)
 	{
@@ -89,6 +103,7 @@ namespace IDs
 		return arrayOut;
 	}
 }
+
 
 enum SortType
 {

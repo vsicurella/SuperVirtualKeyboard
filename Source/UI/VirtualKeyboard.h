@@ -21,7 +21,7 @@
 /*
 */
 
-class ViewPianoComponent : public Component,
+class VirtualKeyboard : public Component,
 	public ApplicationCommandTarget,
 	public MidiKeyboardStateListener // Only for displaying external MIDI input
 {
@@ -36,7 +36,7 @@ public:
 
 	// Might want to implement the Button class more in the future 
 	// if it seems better for passing MIDI data around
-	struct PianoKeyComponent : public Button
+	struct PianoKey : public Button
 	{
 		ValueTree pianoKeyNode;
 		
@@ -64,7 +64,7 @@ public:
 
 		// Methods
 
-		PianoKeyComponent(String nameIn, int keyNumIn);
+		PianoKey(String nameIn, int keyNumIn);
 
 		void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
@@ -88,41 +88,20 @@ public:
 
 		void set_ordered_key_view(PianoKeyOrderPlacement placementType);
 
-		void resize_ordered_key(PianoKeyComponent* key);
+		void resize_ordered_key(PianoKey* key);
 
-		void resize_ordered_keys(OwnedArray<PianoKeyComponent>* keys);
+		void resize_ordered_keys(OwnedArray<PianoKey>* keys);
 
-		void place_key(PianoKeyComponent* key);
+		void place_key(PianoKey* key);
 
-		void place_key_layout(OwnedArray<PianoKeyComponent>* keys);
-
-	};
-
-	struct PianoMenuBar : public Component,
-		public MenuBarModel
-	{
-		std::unique_ptr<MenuBarComponent> menu;
-		StringArray options;
-
-		std::unique_ptr<ComboBox> presetBox;
-		std::unique_ptr<TextEditor> scaleEnterBox;
-
-		PianoMenuBar(ApplicationCommandManager* cmdMgrIn);
-		~PianoMenuBar();
-
-		StringArray getMenuBarNames() override;
-		void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
-		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
-
-		void paint(Graphics& g) override;
-		void PianoMenuBar::resized() override;
+		void place_key_layout(OwnedArray<PianoKey>* keys);
 
 	};
 
 	//===============================================================================================
 
-	ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn);
-	~ViewPianoComponent() {};
+	VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn);
+	~VirtualKeyboard() {};
 
 	//===============================================================================================
 
@@ -136,17 +115,17 @@ public:
 
 	Point<int> get_position_of_key(int midiNoteIn);
 
-	PianoKeyComponent* get_key_from_position(Point<int> posIn);
+	PianoKey* get_key_from_position(Point<int> posIn);
 
-	PianoKeyComponent* get_key_from_position(const MouseEvent& e);
+	PianoKey* get_key_from_position(const MouseEvent& e);
 
-	float get_velocity(PianoKeyComponent* keyIn, const MouseEvent& e);
+	float get_velocity(PianoKey* keyIn, const MouseEvent& e);
 
 	int get_min_height();
 
 	//===============================================================================================
 
-	Colour get_key_color(PianoKeyComponent* keyIn);
+	Colour get_key_color(PianoKey* keyIn);
 
 	void apply_layout(ModeLayout* layoutIn);
 
@@ -156,9 +135,9 @@ public:
 
 	bool check_keys_modal(int& orderDetected);
 
-	PianoKeyComponent* transpose_key_modal(PianoKeyComponent* key, int stepsIn);
+	PianoKey* transpose_key_modal(PianoKey* key, int stepsIn);
 
-	PianoKeyComponent* transpose_key(PianoKeyComponent* key, int stepsIn);
+	PianoKey* transpose_key(PianoKey* key, int stepsIn);
 
 	bool transpose_keys_modal(int modalStepsIn);
 
@@ -206,9 +185,9 @@ public:
 
 	//===============================================================================================
 
-	void triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn);
+	void triggerKeyNoteOn(PianoKey* key, float velocityIn);
 
-	void triggerKeyNoteOff(PianoKeyComponent* key);
+	void triggerKeyNoteOff(PianoKey* key);
 
 	void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
 
@@ -219,19 +198,6 @@ public:
 
 private:
 	// Functionality
-
-	enum CommandIDs
-	{
-		setPianoHorizontal = 1,
-		setPianoVerticalL,
-		setPianoVerticalR,
-		sendScaleToPiano,
-		pianoPlayMode,
-		pianoEditMode,
-		setKeyMidiNote,
-		setKeyColor,
-		setMidiNoteOffset
-	};
 
 	enum PianoMode
 	{
@@ -251,19 +217,17 @@ private:
 	MidiKeyboardState keyboardState;
 	MidiBuffer buffer;
 
-	std::unique_ptr<PianoMenuBar> menu;
-
 	int lastKeyOver = 0;
 	int lastKeyClicked = 0;
 
 	// Data
 	ValueTree pianoNode;
 	UndoManager* undo;
-	OwnedArray<PianoKeyComponent> keys;
-	std::vector<PianoKeyComponent*> keysPtr;// debug
+	OwnedArray<PianoKey> keys;
+	std::vector<PianoKey*> keysPtr;// debug
 
-	std::vector<std::vector<PianoKeyComponent*>> keysOrder;
-	std::vector<PianoKeyComponent*> keysOn;
+	std::vector<std::vector<PianoKey*>> keysOrder;
+	std::vector<PianoKey*> keysOn;
 	ModeLayout* modeLayout;
 
 	// Parameters
@@ -311,5 +275,5 @@ private:
         
     bool displayIsReady = false;
     	
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ViewPianoComponent)
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VirtualKeyboard)
 };

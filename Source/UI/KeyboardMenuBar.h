@@ -21,8 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "PluginState.h"
-#include "Structures/ModeLayout.h"
+#include "../PluginState.h"
+#include "../Structures/ModeLayout.h"
 //[/Headers]
 
 
@@ -35,25 +35,25 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class ScaleEditPopup  : public Component,
-                        public ChangeBroadcaster,
-                        public Button::Listener,
-                        public ComboBox::Listener
+class KeyboardMenuBar  : public Component,
+                         public ChangeBroadcaster,
+                         public Button::Listener,
+                         public ComboBox::Listener
 {
 public:
     //==============================================================================
-    ScaleEditPopup (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn);
-    ~ScaleEditPopup();
+    KeyboardMenuBar (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn, ApplicationCommandManager* managerIn);
+    ~KeyboardMenuBar();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	ModeLayout* presetSelected;
-    
+
 	String get_preset_name();
 	ModeLayout* get_preset(String anyNameIn);
-    
+
     int get_preset_id(String anyNameIn);
-    
+
     int get_selected_preset_id();
     void set_selected_preset(ModeLayout* presetIn);
     void set_selected_preset(int comboBoxIdIn);
@@ -67,6 +67,8 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void mouseEnter (const MouseEvent& e) override;
+    void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel) override;
     bool keyPressed (const KeyPress& key) override;
     bool keyStateChanged (bool isKeyDown) override;
 
@@ -74,27 +76,55 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	bool enterDown = false;
-    
+
+	struct KeyboardMenu : public Component,
+						public MenuBarModel
+	{
+		StringArray options;
+
+		std::unique_ptr<MenuBarComponent> menuParent;
+
+		ApplicationCommandManager* appCmdMgr;
+
+		KeyboardMenu(ApplicationCommandManager* managerIn);
+		~KeyboardMenu();
+
+		StringArray getMenuBarNames() override;
+		void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
+		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
+		void resized() override;
+
+		MenuBarComponent* get_menu();
+	};
+
+	std::unique_ptr<KeyboardMenu> pianoMenu;
+	ApplicationCommandManager* appCmdMgr;
+
+	// Preset Menus
+
     OwnedArray<ModeLayout>* presets;
     Array<Array<ModeLayout*>>* presetsSorted;
-    
+
     HashMap<String, int> menuToPresetIndex;
     std::unique_ptr<PopupMenu> menuSortByScale;
     std::unique_ptr<PopupMenu> menuSortByMode;
     std::unique_ptr<PopupMenu> menuSortByFamily;
 
+	// Key Locks
+
+	bool enterDown = false;
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<TextEditor> textEditor;
-    std::unique_ptr<Label> instructions;
     std::unique_ptr<TextButton> sendScale;
     std::unique_ptr<ComboBox> scalePresets;
+    std::unique_ptr<TextButton> keyboardModeBtn;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScaleEditPopup)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardMenuBar)
 };
 
 //[EndFile] You can add extra defines here...

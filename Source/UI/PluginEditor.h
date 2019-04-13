@@ -11,11 +11,11 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 
-#include "ScaleEditPopup.h"
-#include "Structures/ModeLayout.h"
-#include "Views/ViewPianoComponent.h"
+#include "KeyboardMenuBar.h"
+#include "../Structures/ModeLayout.h"
+#include "VirtualKeyboard.h"
 
 
 //==============================================================================
@@ -61,8 +61,8 @@ private:
 
 
 	std::unique_ptr<Viewport> view;
-	std::unique_ptr<ViewPianoComponent> piano;
-	std::unique_ptr<ScaleEditPopup> scaleEdit;
+	std::unique_ptr<VirtualKeyboard> piano;
+	std::unique_ptr<KeyboardMenuBar> scaleEdit;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };

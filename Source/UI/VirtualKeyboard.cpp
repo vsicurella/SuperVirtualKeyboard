@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-	ViewPianoComponent.h
+	VirtualKeyboard.h
 	Created: 14 Mar 2019 4:50:31pm
 	Author:  Vincenzo
 
@@ -10,12 +10,12 @@
 
 #pragma once
 
-#include "ViewPianoComponent.h"
+#include "VirtualKeyboard.h"
 
 
 //==============================================================================
 
-ViewPianoComponent::PianoKeyComponent::PianoKeyComponent(String nameIn, int keyNumIn)
+VirtualKeyboard::PianoKey::PianoKey(String nameIn, int keyNumIn)
 	: Button(nameIn)
 {
 	keyNumber = keyNumIn;
@@ -24,7 +24,7 @@ ViewPianoComponent::PianoKeyComponent::PianoKeyComponent(String nameIn, int keyN
 	setOpaque(true);
 }
 
-void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+void VirtualKeyboard::PianoKey::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     // idk why getBounds() doesn't work properly. maybe it's set in the parent bounds
     Rectangle<int> fillBounds = Rectangle<int>(0, 0, getWidth() - 1, getHeight());
@@ -44,7 +44,7 @@ void ViewPianoComponent::PianoKeyComponent::paintButton(Graphics& g, bool should
     g.fillRect(fillBounds);
 }
 
-void ViewPianoComponent::PianoKeyComponent::restore_from_node()
+void VirtualKeyboard::PianoKey::restore_from_node()
 {
 	mappedMIDInote = pianoKeyNode[IDs::pianokeyMidiNote];
 	widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
@@ -55,14 +55,14 @@ void ViewPianoComponent::PianoKeyComponent::restore_from_node()
 
 //===============================================================================================
 
-ViewPianoComponent::PianoKeyGrid::PianoKeyGrid()
+VirtualKeyboard::PianoKeyGrid::PianoKeyGrid()
 {
 	order = 1;
 	modeSize = 1;
 	layout;
 }
 
-ViewPianoComponent::PianoKeyGrid::PianoKeyGrid(ModeLayout* layoutIn)
+VirtualKeyboard::PianoKeyGrid::PianoKeyGrid(ModeLayout* layoutIn)
 {
 	layout = layoutIn;
 	order = layout->get_highest_order();
@@ -71,15 +71,15 @@ ViewPianoComponent::PianoKeyGrid::PianoKeyGrid(ModeLayout* layoutIn)
 	set_grid(layout->get_num_modal_notes(), 1);
 }
 
-void ViewPianoComponent::PianoKeyGrid::set_ordered_key_view(ViewPianoComponent::PianoKeyOrderPlacement placementType)
+void VirtualKeyboard::PianoKeyGrid::set_ordered_key_view(VirtualKeyboard::PianoKeyOrderPlacement placementType)
 {
 	orderedKeyRatios.clear();
 
 	switch (placementType)
 	{
-	case ViewPianoComponent::PianoKeyOrderPlacement::nestedCenter:
+	case VirtualKeyboard::PianoKeyOrderPlacement::nestedCenter:
 		break;
-	case ViewPianoComponent::PianoKeyOrderPlacement::adjacent:
+	case VirtualKeyboard::PianoKeyOrderPlacement::adjacent:
 		break;
 	default: // aka nestedRight
 
@@ -111,19 +111,19 @@ void ViewPianoComponent::PianoKeyGrid::set_ordered_key_view(ViewPianoComponent::
 	}
 }
 
-void ViewPianoComponent::PianoKeyGrid::resize_ordered_key(PianoKeyComponent* key)
+void VirtualKeyboard::PianoKeyGrid::resize_ordered_key(PianoKey* key)
 {
 	if (orderedKeyRatios.size() < 1)
-		set_ordered_key_view(ViewPianoComponent::PianoKeyOrderPlacement::nestedRight);
+		set_ordered_key_view(VirtualKeyboard::PianoKeyOrderPlacement::nestedRight);
 
 	key->orderHeightRatio = orderedKeyRatios[key->keyNumber % layout->scaleSize];
 	key->orderWidthRatio = 1.0f - (key->order > 0) * 1.25f * key->order / 8.0f;
 
 }
 
-void ViewPianoComponent::PianoKeyGrid::resize_ordered_keys(OwnedArray<PianoKeyComponent>* keys)
+void VirtualKeyboard::PianoKeyGrid::resize_ordered_keys(OwnedArray<PianoKey>* keys)
 {
-	PianoKeyComponent* key;
+	PianoKey* key;
 
 	for (int i = 0; i < keys->size(); i++)
 	{
@@ -133,7 +133,7 @@ void ViewPianoComponent::PianoKeyGrid::resize_ordered_keys(OwnedArray<PianoKeyCo
 }
 
 
-void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
+void VirtualKeyboard::PianoKeyGrid::place_key(PianoKey* key)
 {
 	if (needs_to_update())
 		update_grid();
@@ -154,7 +154,7 @@ void ViewPianoComponent::PianoKeyGrid::place_key(PianoKeyComponent* key)
 	key->setTopRightPosition(pt.x, pt.y);
 }
 
-void ViewPianoComponent::PianoKeyGrid::place_key_layout(OwnedArray<PianoKeyComponent>* keys)
+void VirtualKeyboard::PianoKeyGrid::place_key_layout(OwnedArray<PianoKey>* keys)
 {
 	if (needs_to_update())
 		update_grid();
@@ -167,58 +167,9 @@ void ViewPianoComponent::PianoKeyGrid::place_key_layout(OwnedArray<PianoKeyCompo
 
 //===============================================================================================
 
-ViewPianoComponent::PianoMenuBar::PianoMenuBar(ApplicationCommandManager* cmdMgrIn)
-{
-	menu.reset(new MenuBarComponent(this));
-	addAndMakeVisible(menu.get());
-	setApplicationCommandManagerToWatch(cmdMgrIn);
-
-	presetBox.reset(new ComboBox("Preset Box"));
-	addAndMakeVisible(presetBox.get());
-	presetBox->setEditableText(false);
-	presetBox->setJustificationType(Justification::centredLeft);
-	presetBox->setTextWhenNothingSelected(TRANS("Pick a mode..."));
-	presetBox->setTextWhenNoChoicesAvailable(TRANS("(no choices)"));
-	//presetBox->addListener(getParentComponent());
-
-	setSize(getParentWidth(), 80);
-}
-
-ViewPianoComponent::PianoMenuBar::~PianoMenuBar()
-{
-
-}
-
-
-StringArray ViewPianoComponent::PianoMenuBar::getMenuBarNames()
-{
-	return {"File", "Mode", "Orientation"};
-}
-
-void ViewPianoComponent::PianoMenuBar::menuItemSelected(int menuItemID, int topLevelMenuIndex)
-{
-
-}
-
-PopupMenu ViewPianoComponent::PianoMenuBar::getMenuForIndex(int topLevelMenuIndex, const String &menuName)
-{
-	return PopupMenu();
-}
-
-void ViewPianoComponent::PianoMenuBar::paint(Graphics& g)
-{
-	
-}
-
-void ViewPianoComponent::PianoMenuBar::resized()
-{
-	setSize(getParentWidth(), 80);
-	presetBox->setBounds(proportionOfWidth(0.7207f), 8, 150, 24);
-}
-
 //===============================================================================================
 
-ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn)
+VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -230,16 +181,12 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, Valu
 
 	undo = undoIn;
 	appCmdMgr = &cmdMgrIn;
-	menu.reset(new PianoMenuBar(appCmdMgr));
-	menu.get()->setName("Piano Menu");
-	//addAndMakeVisible(menu.get());
-	
 
 	// Create children (piano keys)        
 	for (int i = 0; i < notesToShow; i++)
 	{
 		String keyName = "Key " + String(i);
-		PianoKeyComponent* key = new PianoKeyComponent(keyName, i);
+		PianoKey* key = new PianoKey(keyName, i);
 		addChildComponent(keys.add(key));
 		keysPtr.push_back(key);
 	}
@@ -260,7 +207,7 @@ ViewPianoComponent::ViewPianoComponent(ApplicationCommandManager& cmdMgrIn, Valu
 
 //===============================================================================================
 
-void ViewPianoComponent::init_data_node(ValueTree& pianoNodeIn)
+void VirtualKeyboard::init_data_node(ValueTree& pianoNodeIn)
 {
 	pianoNodeIn = ValueTree(IDs::pianoNode);
 	pianoNode = pianoNodeIn;
@@ -271,7 +218,7 @@ void ViewPianoComponent::init_data_node(ValueTree& pianoNodeIn)
 	pianoNode.setProperty(IDs::pianoMidiNoteOffset, midiNoteOffset, undo);
 	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
 
-	PianoKeyComponent* key;
+	PianoKey* key;
 	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
@@ -288,7 +235,7 @@ void ViewPianoComponent::init_data_node(ValueTree& pianoNodeIn)
 	}
 }
 
-void ViewPianoComponent::restore_data_node(ValueTree& pianoNodeIn)
+void VirtualKeyboard::restore_data_node(ValueTree& pianoNodeIn)
 {
 	pianoNode = pianoNodeIn;
 
@@ -302,7 +249,7 @@ void ViewPianoComponent::restore_data_node(ValueTree& pianoNodeIn)
 
 	mpeOn = pianoNode[IDs::pianoMPEToggle];
 
-	PianoKeyComponent* key;
+	PianoKey* key;
 	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
@@ -312,47 +259,47 @@ void ViewPianoComponent::restore_data_node(ValueTree& pianoNodeIn)
 
 //===============================================================================================
 
-MidiKeyboardState* ViewPianoComponent::get_keyboard_state()
+MidiKeyboardState* VirtualKeyboard::get_keyboard_state()
 {
 	return &keyboardState;
 }
 
-Point<int> ViewPianoComponent::get_position_of_key(int midiNoteIn)
+Point<int> VirtualKeyboard::get_position_of_key(int midiNoteIn)
 {
-	PianoKeyComponent* key = keys.getUnchecked(midiNoteIn % keys.size());
+	PianoKey* key = keys.getUnchecked(midiNoteIn % keys.size());
 	return key->getPosition();
 }
 
-ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position(Point<int> posIn)
+VirtualKeyboard::PianoKey* VirtualKeyboard::get_key_from_position(Point<int> posIn)
 {
-	PianoKeyComponent* keyOut = nullptr;
+	PianoKey* keyOut = nullptr;
 	
 	if (reallyContains(posIn, true))
 	{
 		Component* c = getComponentAt(posIn);
 		
 		if (c->getName().startsWith("Key"))
-			keyOut = dynamic_cast<PianoKeyComponent*>(c);	
+			keyOut = dynamic_cast<PianoKey*>(c);	
 	}
 
 	return keyOut;
 }
 
-ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::get_key_from_position(const MouseEvent& e)
+VirtualKeyboard::PianoKey* VirtualKeyboard::get_key_from_position(const MouseEvent& e)
 {
-	PianoKeyComponent* keyOut = nullptr;
+	PianoKey* keyOut = nullptr;
 	Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
 
 	if (e.eventComponent->getName().startsWith("Key") &&
 		reallyContains(mousePosition, true))
 	{
-		keyOut = dynamic_cast<PianoKeyComponent*>(getComponentAt(mousePosition));
+		keyOut = dynamic_cast<PianoKey*>(getComponentAt(mousePosition));
 	}
 
 	return keyOut;
 }
 
-float ViewPianoComponent::get_velocity(PianoKeyComponent* keyIn, const MouseEvent& e)
+float VirtualKeyboard::get_velocity(PianoKey* keyIn, const MouseEvent& e)
 {
 	Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
 	Point<int> mouseInKey = mousePosition.withX(mousePosition.x - e.eventComponent->getX());
@@ -362,7 +309,7 @@ float ViewPianoComponent::get_velocity(PianoKeyComponent* keyIn, const MouseEven
 	return velocity;
 }
 
-int ViewPianoComponent::get_min_height()
+int VirtualKeyboard::get_min_height()
 {
 	// not sure if this is the right approach to window sizing
 	return 10;
@@ -371,7 +318,7 @@ int ViewPianoComponent::get_min_height()
 
 //===============================================================================================
 
-void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
+void VirtualKeyboard::apply_layout(ModeLayout* layoutIn)
 {
 	modeLayout = layoutIn;
  	grid = PianoKeyGrid(modeLayout);
@@ -386,7 +333,7 @@ void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 
 	// Setup keys for layout
 	keysOrder.resize(modeOrder + 1);
-	PianoKeyComponent* key;
+	PianoKey* key;
 	for (int i = 0; i < notesToShow; i++)
 	{
 		key = keys.getUnchecked(i);
@@ -421,15 +368,15 @@ void ViewPianoComponent::apply_layout(ModeLayout* layoutIn)
 
 //===============================================================================================
 
-Colour ViewPianoComponent::get_key_color(PianoKeyComponent* keyIn)
+Colour VirtualKeyboard::get_key_color(PianoKey* keyIn)
 {
 	// implement custom colors
 	return keyOrderColors.at(keyIn->order % keyOrderColors.size());
 }
 
-void ViewPianoComponent::all_notes_off()
+void VirtualKeyboard::all_notes_off()
 {
-	PianoKeyComponent* key;
+	PianoKey* key;
 
 	for (int i = 0; i < keys.size(); i++)
 	{
@@ -439,12 +386,12 @@ void ViewPianoComponent::all_notes_off()
 	repaint();
 }
 
-void ViewPianoComponent::isolate_last_note()
+void VirtualKeyboard::isolate_last_note()
 {
 	if (lastKeyClicked >= 0 && lastKeyClicked < 128)
 	{
-		PianoKeyComponent* last = keys.getUnchecked(lastKeyClicked);
-		PianoKeyComponent* key;
+		PianoKey* last = keys.getUnchecked(lastKeyClicked);
+		PianoKey* key;
 
 		for (int i = 0; i < keys.size(); i++)
 		{
@@ -459,7 +406,7 @@ void ViewPianoComponent::isolate_last_note()
 	}
 }
 
-bool ViewPianoComponent::check_keys_modal(int& orderDetected)
+bool VirtualKeyboard::check_keys_modal(int& orderDetected)
 {
 	orderDetected = keysOn[0]->order;
 
@@ -472,9 +419,9 @@ bool ViewPianoComponent::check_keys_modal(int& orderDetected)
 	return true;
 }
 
-ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key_modal(PianoKeyComponent* key, int stepsIn)
+VirtualKeyboard::PianoKey* VirtualKeyboard::transpose_key_modal(PianoKey* key, int stepsIn)
 {
-	PianoKeyComponent* keyOut = nullptr;
+	PianoKey* keyOut = nullptr;
 	int newKey = -1;
 	int theOrder = key->order;
 
@@ -495,9 +442,9 @@ ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key_modal(P
 	return keyOut;
 }
 
-ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key(PianoKeyComponent* key, int stepsIn)
+VirtualKeyboard::PianoKey* VirtualKeyboard::transpose_key(PianoKey* key, int stepsIn)
 {
-	PianoKeyComponent* keyOut = nullptr;
+	PianoKey* keyOut = nullptr;
 	int newKey;
 
 	newKey = key->keyNumber + stepsIn;
@@ -511,15 +458,15 @@ ViewPianoComponent::PianoKeyComponent* ViewPianoComponent::transpose_key(PianoKe
 }
 
 
-bool ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
+bool VirtualKeyboard::transpose_keys_modal(int modalStepsIn)
 {
 	int theOrder;
 	if (check_keys_modal(theOrder))
 	{
-		std::vector<PianoKeyComponent*> oldKeys = std::vector<PianoKeyComponent*>(keysOn);
-		std::vector<PianoKeyComponent*> newKeys;
-		PianoKeyComponent* key;
-		PianoKeyComponent* newKey;
+		std::vector<PianoKey*> oldKeys = std::vector<PianoKey*>(keysOn);
+		std::vector<PianoKey*> newKeys;
+		PianoKey* key;
+		PianoKey* newKey;
 		int newDeg = -1;
 		float velocity;
 
@@ -560,12 +507,12 @@ bool ViewPianoComponent::transpose_keys_modal(int modalStepsIn)
 	return false;
 }
 
-void ViewPianoComponent::transpose_keys(int stepsIn)
+void VirtualKeyboard::transpose_keys(int stepsIn)
 {
-	std::vector<PianoKeyComponent*> oldKeys = std::vector<PianoKeyComponent*>(keysOn);
-	std::vector<PianoKeyComponent*> newKeys;
-	PianoKeyComponent* key;
-	PianoKeyComponent* newKey;
+	std::vector<PianoKey*> oldKeys = std::vector<PianoKey*>(keysOn);
+	std::vector<PianoKey*> newKeys;
+	PianoKey* key;
+	PianoKey* newKey;
 	int newKeyInd;
 	float velocity;
 
@@ -598,37 +545,36 @@ void ViewPianoComponent::transpose_keys(int stepsIn)
 
 //===============================================================================================
 
-ApplicationCommandTarget* ViewPianoComponent::getNextCommandTarget()
+ApplicationCommandTarget* VirtualKeyboard::getNextCommandTarget()
 {
 	return findFirstTargetParentComponent();
 }
 
-void ViewPianoComponent::getAllCommands(Array< CommandID > &c)
+void VirtualKeyboard::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
-		CommandIDs::setPianoHorizontal,
-		CommandIDs::setPianoVerticalL,
-		CommandIDs::setPianoVerticalR,
-		CommandIDs::sendScaleToPiano };
+		IDs::CommandIDs::setPianoHorizontal,
+		IDs::CommandIDs::setPianoVerticalL,
+		IDs::CommandIDs::setPianoVerticalR };
 
 	c.addArray(commands);
 }
 
-void ViewPianoComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+void VirtualKeyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
 {
 	switch (commandID)
 	{
-	case CommandIDs::setPianoHorizontal:
+	case IDs::CommandIDs::setPianoHorizontal:
 		result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
 		result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
 		result.addDefaultKeypress('w', ModifierKeys::shiftModifier);
 		break;
-	case CommandIDs::setPianoVerticalL:
+	case IDs::CommandIDs::setPianoVerticalL:
 		result.setInfo("Vertical Left Layout", "Draws the piano with the left facing orientation", "Piano", 0);
 		result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
 		result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
 		break;
-	case CommandIDs::setPianoVerticalR:
+	case IDs::CommandIDs::setPianoVerticalR:
 		result.setInfo("Vertical Right Layout", "Draws the piano with the right facing orientation", "Piano", 0);
 		result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
 		result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
@@ -638,17 +584,17 @@ void ViewPianoComponent::getCommandInfo(CommandID commandID, ApplicationCommandI
 	}
 }
 
-bool ViewPianoComponent::perform(const InvocationInfo &info)
+bool VirtualKeyboard::perform(const InvocationInfo &info)
 {
 	switch (info.commandID)
 	{
-	case CommandIDs::setPianoHorizontal:
+	case IDs::CommandIDs::setPianoHorizontal:
 		// TBI
 		break;
-	case CommandIDs::setPianoVerticalL:
+	case IDs::CommandIDs::setPianoVerticalL:
 		// TBI
 		break;
-	case CommandIDs::setPianoVerticalR:
+	case IDs::CommandIDs::setPianoVerticalR:
 		// TBI
 		break;
 	default:
@@ -660,17 +606,17 @@ bool ViewPianoComponent::perform(const InvocationInfo &info)
 //===============================================================================================
 
 
-void ViewPianoComponent::mouseExit(const MouseEvent& e)
+void VirtualKeyboard::mouseExit(const MouseEvent& e)
 {
-	PianoKeyComponent* key = keys.getUnchecked(lastKeyOver);
+	PianoKey* key = keys.getUnchecked(lastKeyOver);
 
 	if (!shiftHeld || key->activeColor < 2)
 		key->activeColor = 0;
 }
 
-void ViewPianoComponent::mouseDown(const MouseEvent& e)
+void VirtualKeyboard::mouseDown(const MouseEvent& e)
 {
-	PianoKeyComponent* key = get_key_from_position(e);
+	PianoKey* key = get_key_from_position(e);
 	if (key)
 	{		
         if (shiftHeld && !altHeld && key->activeColor == 2)
@@ -683,7 +629,7 @@ void ViewPianoComponent::mouseDown(const MouseEvent& e)
         {
 			if (altHeld)
 			{
-				PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked);
+				PianoKey* oldKey = keys.getUnchecked(lastKeyClicked);
 				triggerKeyNoteOff(oldKey);
 			}
 
@@ -693,15 +639,15 @@ void ViewPianoComponent::mouseDown(const MouseEvent& e)
 	}
 }
 
-void ViewPianoComponent::mouseDrag(const MouseEvent& e)
+void VirtualKeyboard::mouseDrag(const MouseEvent& e)
 {
-	PianoKeyComponent* key = get_key_from_position(e);
+	PianoKey* key = get_key_from_position(e);
 
 	if (key)
 	{
 		if (key->keyNumber != lastKeyClicked)
 		{
-			PianoKeyComponent* oldKey = keys.getUnchecked(lastKeyClicked);
+			PianoKey* oldKey = keys.getUnchecked(lastKeyClicked);
 			if (!shiftHeld)
 			{
 				triggerKeyNoteOff(oldKey);
@@ -714,9 +660,9 @@ void ViewPianoComponent::mouseDrag(const MouseEvent& e)
 	}
 }
 
-void ViewPianoComponent::mouseUp(const MouseEvent& e)
+void VirtualKeyboard::mouseUp(const MouseEvent& e)
 {
-	PianoKeyComponent* key = get_key_from_position(e);
+	PianoKey* key = get_key_from_position(e);
 
 	if (key)
 	{
@@ -729,9 +675,9 @@ void ViewPianoComponent::mouseUp(const MouseEvent& e)
 	}
 }
 
-void ViewPianoComponent::mouseMove(const MouseEvent& e)
+void VirtualKeyboard::mouseMove(const MouseEvent& e)
 {
-	PianoKeyComponent* key = get_key_from_position(e);
+	PianoKey* key = get_key_from_position(e);
 
 	if (key)
 	{
@@ -746,7 +692,7 @@ void ViewPianoComponent::mouseMove(const MouseEvent& e)
 
 //===============================================================================================
 
-bool ViewPianoComponent::keyStateChanged(bool isKeyDown)
+bool VirtualKeyboard::keyStateChanged(bool isKeyDown)
 {
 	if (!KeyPress::isKeyCurrentlyDown(KeyPress::upKey) && upHeld)
 	{
@@ -770,7 +716,7 @@ bool ViewPianoComponent::keyStateChanged(bool isKeyDown)
 
 	return isKeyDown;
 }
-bool ViewPianoComponent::keyPressed(const KeyPress& key)
+bool VirtualKeyboard::keyPressed(const KeyPress& key)
 {
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::upKey) && !upHeld)
 	{
@@ -819,7 +765,7 @@ bool ViewPianoComponent::keyPressed(const KeyPress& key)
 	return false;
 }
 
-void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
+void VirtualKeyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 {
     
     if (!rightMouseHeld && modifiers.isRightButtonDown())
@@ -842,7 +788,7 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 
 		isolate_last_note();
 
-		PianoKeyComponent* key = keys.getUnchecked(lastKeyClicked);
+		PianoKey* key = keys.getUnchecked(lastKeyClicked);
 
 		if (!(key->isMouseOver() && key->isMouseButtonDownAnywhere()))
 			triggerKeyNoteOff(keys.getUnchecked(lastKeyClicked));
@@ -876,7 +822,7 @@ void ViewPianoComponent::modifierKeysChanged(const ModifierKeys& modifiers)
 //===============================================================================================
 
 
-void ViewPianoComponent::paint(Graphics& g)
+void VirtualKeyboard::paint(Graphics& g)
 {
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 	g.setColour(Colours::grey);
@@ -890,7 +836,7 @@ void ViewPianoComponent::paint(Graphics& g)
 	}
 }
 
-void ViewPianoComponent::resized()
+void VirtualKeyboard::resized()
 {
 	// Calculate key sizes
 	keyHeight = getHeight() - 1;
@@ -902,7 +848,7 @@ void ViewPianoComponent::resized()
 	grid.setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 	// Resize keys
-	PianoKeyComponent* key;
+	PianoKey* key;
 	int w, h;
 	for (int i = 0; i < keys.size(); i++)
 	{
@@ -914,7 +860,7 @@ void ViewPianoComponent::resized()
 	}
 }
 
-void ViewPianoComponent::visibilityChanged()
+void VirtualKeyboard::visibilityChanged()
 {
 	if (isShowing())
 		setWantsKeyboardFocus(true);
@@ -924,7 +870,7 @@ void ViewPianoComponent::visibilityChanged()
 
 //===============================================================================================
 
-void ViewPianoComponent::triggerKeyNoteOn(PianoKeyComponent* key, float velocityIn)
+void VirtualKeyboard::triggerKeyNoteOn(PianoKey* key, float velocityIn)
 {
 	if (velocityIn > 0)
 	{
@@ -935,7 +881,7 @@ void ViewPianoComponent::triggerKeyNoteOn(PianoKeyComponent* key, float velocity
 	}
 }
 
-void ViewPianoComponent::triggerKeyNoteOff(PianoKeyComponent* key)
+void VirtualKeyboard::triggerKeyNoteOff(PianoKey* key)
 {
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
 	
@@ -956,21 +902,21 @@ void ViewPianoComponent::triggerKeyNoteOff(PianoKeyComponent* key)
 	}
 	if (ind > -1)
 	{
-		PianoKeyComponent* temp = keysOn[keysOn.size() - 1];
+		PianoKey* temp = keysOn[keysOn.size() - 1];
 		keysOn[keysOn.size() - 1] = keysOn[ind];
 		keysOn[ind] = temp;
 		keysOn.pop_back();
 	}
 }
 
-void ViewPianoComponent::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
+void VirtualKeyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-	PianoKeyComponent* key = keys.getUnchecked(midiNote);
+	PianoKey* key = keys.getUnchecked(midiNote);
 	key->externalMidiState = 1;
 }
 
-void ViewPianoComponent::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
+void VirtualKeyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-	PianoKeyComponent* key = keys.getUnchecked(midiNote);
+	PianoKey* key = keys.getUnchecked(midiNote);
 	key->externalMidiState = 0;
 }

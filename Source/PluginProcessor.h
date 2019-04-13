@@ -11,8 +11,8 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "UI/PluginEditor.h"
 #include "Structures/ModeLayout.h"
-#include "PluginEditor.h"
 #include "PluginState.h"
 
 //==============================================================================

@@ -9,14 +9,14 @@
 */
 
 #include "PluginEditor.h"
-#include "PluginProcessor.h"
+#include "../PluginProcessor.h"
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-	piano(new ViewPianoComponent(appCmdMgr, processor.get_plugin_state()->pianoNode, nullptr)),
+	piano(new VirtualKeyboard(appCmdMgr, processor.get_plugin_state()->pianoNode, nullptr)),
 	view(new Viewport("Piano Viewport")),
-	scaleEdit(new ScaleEditPopup(processor.get_presets(), processor.get_presets_sorted()))
+	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), &appCmdMgr))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -45,7 +45,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     if (!pluginState->keyboardWindowNode.isValid())
         init_node_data();
     restore_node_data();
-	  
+
+	appCmdMgr.registerAllCommandsForTarget(piano.get());
+	
 	startTimerHz(20);
 }
 
@@ -64,8 +66,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 {
 	AudioProcessorEditor::resized();
 
-	scaleEdit->setSize(getWidth(), 48);
-	view.get()->setSize(getWidth(), getHeight() - 48);
+	scaleEdit->setBounds(0, 6, getWidth(), 36);
+	view.get()->setBounds(0, scaleEdit->getBottom(), getWidth(), getHeight() - scaleEdit->getHeight() - view.get()->getScrollBarThickness());
 	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
 
 	view.get()->setViewPositionProportionately(0.618, 0);
@@ -97,8 +99,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 		else
 			processor.set_preset(keyboardWindowNode[IDs::selectedPresetIndex]);
 	}
-	DBG(keyboardWindowNode.toXmlString());
-
+	//DBG(keyboardWindowNode.toXmlString());
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
