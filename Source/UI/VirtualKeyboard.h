@@ -100,7 +100,7 @@ public:
 
 	//===============================================================================================
 
-	VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn);
+	VirtualKeyboard(ApplicationCommandManager* cmdMgrIn, UndoManager* undoIn);
 	~VirtualKeyboard() {};
 
 	//===============================================================================================

@@ -1,6 +1,6 @@
 ﻿# SuperVirtualKeyboard
 
-LATEST VERSION: Pre Alpha :(
+LATEST VERSION: Alpha 2019-04-13
 
 SUMMARY:
 
@@ -13,7 +13,7 @@ FEATURES:
 
  - Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
 
- - Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to retrigger held notes.
+ - Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and /-not yet-/ "Space" to retrigger held notes.
 
  - Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
    At this time, modal transposition is only possible if all held notes belong to the same mode (all white, all black, etc.)
@@ -35,5 +35,6 @@ BUGS:
 
  - Midi device doesn't get reconfigured when device settings change
  - Window resizing is bad funky
+ - Clicking on a held note should turn it off, but it doesn't work on Mac
  - Top piano notes don't get drawn
  - Definitely some more...

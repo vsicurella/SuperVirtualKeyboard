@@ -22,6 +22,7 @@
 /**
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
+													public ApplicationCommandTarget,
 													public ChangeListener,
 													public MidiInputCallback,
 													public Timer
@@ -50,14 +51,29 @@ public:
     void init_node_data();
     void restore_node_data();
 
+	//==============================================================================
+
+
+	ApplicationCommandTarget* getNextCommandTarget();
+
+	void getAllCommands(Array< CommandID > &commands);
+
+	void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result);
+
+	bool perform(const InvocationInfo &info);
+
+	//==============================================================================
+
+
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SuperVirtualKeyboardAudioProcessor& processor;
 	SuperVirtualKeyboardPluginState* pluginState;
 	MidiKeyboardState externalMidi;
-	ApplicationCommandManager appCmdMgr;
     ValueTree keyboardWindowNode;
+
+	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
 
 
 	std::unique_ptr<Viewport> view;

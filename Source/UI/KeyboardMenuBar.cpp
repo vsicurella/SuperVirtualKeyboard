@@ -66,7 +66,7 @@ KeyboardMenuBar::KeyboardMenuBar (OwnedArray<ModeLayout>* presetsArrayIn, Array<
 
 
     //[UserPreSize]
-	pianoMenu.reset();
+	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
 	addAndMakeVisible(pianoMenu.get());
     //[/UserPreSize]
 
@@ -108,7 +108,7 @@ void KeyboardMenuBar::paint (Graphics& g)
 void KeyboardMenuBar::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-	//pianoMenu->setBounds(1, 5, proportionOfWidth(0.5f) - 40, 24);
+	pianoMenu->setBounds(1, 5, proportionOfWidth(0.5f), 24);
     //[/UserPreResize]
 
     textEditor->setBounds ((proportionOfWidth (0.9925f) - 40) + roundToInt (40 * -6.6500f) - 150, 6 + 0, 150, 24);
@@ -343,7 +343,7 @@ KeyboardMenuBar::KeyboardMenu::KeyboardMenu(ApplicationCommandManager* managerIn
 
 	menuParent.reset(new MenuBarComponent(this));
 	addAndMakeVisible(menuParent.get());
-	
+
 	appCmdMgr = managerIn;
 	setApplicationCommandManagerToWatch(appCmdMgr);
 
@@ -367,7 +367,6 @@ void KeyboardMenuBar::KeyboardMenu::menuItemSelected(int menuItemID, int topLeve
 PopupMenu KeyboardMenuBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex, const String &menuName)
 {
 	PopupMenu menu;
-
 	if (topLevelMenuIndex == 0)
 	{
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::loadCustomLayout, "Load layout");
@@ -393,7 +392,7 @@ PopupMenu KeyboardMenuBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex, 
 
 void KeyboardMenuBar::KeyboardMenu::resized()
 {
-	menuParent->setBounds(0, 0,	getParentWidth() / 2, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight());  
+	menuParent->setBounds(0, 0,	350, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight());
 }
 
 MenuBarComponent* KeyboardMenuBar::KeyboardMenu::get_menu()
@@ -439,9 +438,8 @@ BEGIN_JUCER_METADATA
             posRelativeY="9f75aa2c0ca39fa4" editable="0" layout="33" items=""
             textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Keyboard Mode Button" id="9f75aa2c0ca39fa4" memberName="keyboardModeBtn"
-              virtualName="" explicitFocusOrder="0" pos="99.246%r 6 40 24"
-              bgColOff="ff5c7fa4" buttonText="Edit" connectedEdges="0" needsCallback="1"
-              radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="99.25%r 6 40 24" bgColOff="ff5c7fa4"
+              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -14,9 +14,10 @@
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-	piano(new VirtualKeyboard(appCmdMgr, nullptr)),
+	appCmdMgr(new ApplicationCommandManager()),
+	piano(new VirtualKeyboard(appCmdMgr.get(), nullptr)),
 	view(new Viewport("Piano Viewport")),
-	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), &appCmdMgr))
+	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), appCmdMgr.get()))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -44,9 +45,11 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     {
         init_node_data();
     }
+
     restore_node_data();
 
-	appCmdMgr.registerAllCommandsForTarget(piano.get());
+	appCmdMgr->registerAllCommandsForTarget(piano.get());
+	appCmdMgr->registerAllCommandsForTarget(this);
     
     setSize(1000, 250);
 	
@@ -170,4 +173,65 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()
     scaleEdit.get()->set_text_boxes(keyboardWindowNode[IDs::selectedPresetName].toString(), processor.get_preset_selected()->strSteps);
     
     piano->restore_data_node(pluginState->pianoNode);
+}
+
+//==============================================================================
+
+
+ApplicationCommandTarget* SuperVirtualKeyboardAudioProcessorEditor::getNextCommandTarget()
+{
+	return findFirstTargetParentComponent();
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID > &c)
+{
+	Array<CommandID> commands{
+		IDs::CommandIDs::saveCustomLayout,
+		IDs::CommandIDs::loadCustomLayout,
+		IDs::CommandIDs::saveReaperMap };
+
+	c.addArray(commands);
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+{
+	switch (commandID)
+	{
+	case IDs::CommandIDs::saveCustomLayout:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
+		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::loadCustomLayout:
+		result.setInfo("Midi Note Offset", "Shift the layout so that your center is on a different MIDI note.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
+		//result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::saveReaperMap:
+		result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	default:
+		break;
+	}
+}
+
+bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &info)
+{
+	switch (info.commandID)
+	{
+	case IDs::CommandIDs::saveCustomLayout:
+		// TBI
+		break;
+	case IDs::CommandIDs::loadCustomLayout:
+		// TBI
+		break;
+	case IDs::CommandIDs::saveReaperMap:
+		// TBI
+		break;
+	default:
+		return false;
+	}
+	return true;
 }

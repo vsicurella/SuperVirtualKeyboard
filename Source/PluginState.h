@@ -80,8 +80,8 @@ namespace IDs
 
 	enum CommandIDs
 	{
-		loadCustomLayout = 1,
-		saveCustomLayout,
+		saveCustomLayout = 1,
+		loadCustomLayout,
 		saveReaperMap,
 		setKeyColor,
 		setMidiNoteOffset,

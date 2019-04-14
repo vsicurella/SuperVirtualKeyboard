@@ -170,7 +170,7 @@ void VirtualKeyboard::PianoKeyGrid::place_key_layout(OwnedArray<PianoKey>* keys)
 
 //===============================================================================================
 
-VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn)
+VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager* cmdMgrIn, UndoManager* undoIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -181,7 +181,7 @@ VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, UndoManage
 	removeMouseListener(this);
 
 	undo = undoIn;
-	appCmdMgr = &cmdMgrIn;
+	appCmdMgr = cmdMgrIn;
 
 	// Create children (piano keys)        
 	for (int i = 0; i < notesToShow; i++)
@@ -553,6 +553,10 @@ ApplicationCommandTarget* VirtualKeyboard::getNextCommandTarget()
 void VirtualKeyboard::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
+		IDs::CommandIDs::setKeyColor,
+		IDs::CommandIDs::setMidiNoteOffset,
+		IDs::CommandIDs::pianoPlayMode,
+		IDs::CommandIDs::pianoEditMode,
 		IDs::CommandIDs::setPianoHorizontal,
 		IDs::CommandIDs::setPianoVerticalL,
 		IDs::CommandIDs::setPianoVerticalR };
@@ -564,6 +568,26 @@ void VirtualKeyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 {
 	switch (commandID)
 	{
+	case IDs::CommandIDs::setKeyColor:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+		result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
+		result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::setMidiNoteOffset:
+		result.setInfo("Midi Note Offset", "Shift the layout so that your center is on a different MIDI note.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
+		//result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::pianoPlayMode:
+		result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::pianoEditMode:
+		result.setInfo("Piano Edit Mode", "Adjust the size and proportions of the keyboard to your preferences.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
 	case IDs::CommandIDs::setPianoHorizontal:
 		result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
 		result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
@@ -588,6 +612,14 @@ bool VirtualKeyboard::perform(const InvocationInfo &info)
 {
 	switch (info.commandID)
 	{
+	case IDs::CommandIDs::setKeyColor:
+		break;
+	case IDs::CommandIDs::setMidiNoteOffset:
+		break;
+	case IDs::CommandIDs::pianoPlayMode:
+		break;
+	case IDs::CommandIDs::pianoEditMode:
+		break;
 	case IDs::CommandIDs::setPianoHorizontal:
 		// TBI
 		break;
