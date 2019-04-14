@@ -44,8 +44,9 @@ void VirtualKeyboard::PianoKey::paintButton(Graphics& g, bool shouldDrawButtonAs
     g.fillRect(fillBounds);
 }
 
-void VirtualKeyboard::PianoKey::restore_from_node()
+void VirtualKeyboard::PianoKey::restore_from_node(ValueTree parentNodeIn)
 {
+    pianoKeyNode = parentNodeIn.getChild(keyNumber);
 	mappedMIDInote = pianoKeyNode[IDs::pianokeyMidiNote];
 	widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
 	heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
@@ -169,7 +170,7 @@ void VirtualKeyboard::PianoKeyGrid::place_key_layout(OwnedArray<PianoKey>* keys)
 
 //===============================================================================================
 
-VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn)
+VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn)
 {
 	// Default values
 	tuningSize = 12;
@@ -196,21 +197,14 @@ VirtualKeyboard::VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, ValueTree&
 	toBack();
 	
 	setSize(1000, 250);
-	setOpaque(true);
-
-	if (pianoNodeIn.isValid())
-		restore_data_node(pianoNodeIn);
-	else
-		init_data_node(pianoNodeIn);
-	
+	setOpaque(true);	
 }
 
 //===============================================================================================
 
-void VirtualKeyboard::init_data_node(ValueTree& pianoNodeIn)
+void VirtualKeyboard::init_data_node()
 {
-	pianoNodeIn = ValueTree(IDs::pianoNode);
-	pianoNode = pianoNodeIn;
+    pianoNode = ValueTree(IDs::pianoNode);
 
 	pianoNode.setProperty(IDs::pianoUIMode, pianoModeSelected, undo);
 	pianoNode.setProperty(IDs::pianoOrientation, pianoOrientationSelected, undo);
@@ -235,7 +229,7 @@ void VirtualKeyboard::init_data_node(ValueTree& pianoNodeIn)
 	}
 }
 
-void VirtualKeyboard::restore_data_node(ValueTree& pianoNodeIn)
+void VirtualKeyboard::restore_data_node(ValueTree pianoNodeIn)
 {
 	pianoNode = pianoNodeIn;
 
@@ -244,6 +238,7 @@ void VirtualKeyboard::restore_data_node(ValueTree& pianoNodeIn)
 	pianoOrientationSelected = pianoNode[IDs::pianoOrientation];
 
 	midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
+    jassert(midiChannelSelected);
 
 	midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
 
@@ -253,8 +248,13 @@ void VirtualKeyboard::restore_data_node(ValueTree& pianoNodeIn)
 	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
-		key->restore_from_node();
+		key->restore_from_node(pianoNode);
 	}
+}
+
+ValueTree VirtualKeyboard::get_node()
+{
+    return pianoNode;
 }
 
 //===============================================================================================
@@ -838,6 +838,8 @@ void VirtualKeyboard::paint(Graphics& g)
 
 void VirtualKeyboard::resized()
 {
+    if (displayIsReady)
+    {
 	// Calculate key sizes
 	keyHeight = getHeight() - 1;
 	keyWidth = keyHeight * defaultKeyWHRatio;
@@ -858,6 +860,7 @@ void VirtualKeyboard::resized()
 		key->setSize(w, h);
 		grid.place_key(key);
 	}
+    }
 }
 
 void VirtualKeyboard::visibilityChanged()

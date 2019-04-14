@@ -68,7 +68,7 @@ public:
 
 		void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 
-		void restore_from_node();
+		void restore_from_node(ValueTree parentNodeIn);
 	};
 
 	struct PianoKeyGrid : public FractionalGrid
@@ -100,14 +100,16 @@ public:
 
 	//===============================================================================================
 
-	VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, ValueTree& pianoNodeIn, UndoManager* undoIn);
+	VirtualKeyboard(ApplicationCommandManager& cmdMgrIn, UndoManager* undoIn);
 	~VirtualKeyboard() {};
 
 	//===============================================================================================
 
-	void init_data_node(ValueTree& pianoNodeIn);
+	void init_data_node();
 
-	void restore_data_node(ValueTree& pianoNodeIn);
+	void restore_data_node(ValueTree pianoNodeIn);
+    
+    ValueTree get_node();
 
 	//===============================================================================================
 

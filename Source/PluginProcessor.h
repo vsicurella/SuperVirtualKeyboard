@@ -75,6 +75,8 @@ public:
 	void connect_editor_node(ValueTree pluginEditorNodeIn);
 	SuperVirtualKeyboardPluginState* get_plugin_state();
     
+    void restart();
+    
 private:
     //==============================================================================
 

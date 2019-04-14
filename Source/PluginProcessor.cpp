@@ -199,7 +199,7 @@ bool SuperVirtualKeyboardAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SuperVirtualKeyboardAudioProcessor::createEditor()
 {
-	return new SuperVirtualKeyboardAudioProcessorEditor(*this);
+    return new SuperVirtualKeyboardAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -351,9 +351,13 @@ Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorte
 
 SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
 {
-	return pluginState.get();;
+	return pluginState.get();
 }
 
+void restart()
+{
+    
+}
 
 
 void SuperVirtualKeyboardAudioProcessor::createPresets()
