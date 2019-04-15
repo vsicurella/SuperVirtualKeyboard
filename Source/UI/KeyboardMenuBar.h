@@ -42,7 +42,7 @@ class KeyboardMenuBar  : public Component,
 {
 public:
     //==============================================================================
-    KeyboardMenuBar (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn, ApplicationCommandManager* managerIn);
+    KeyboardMenuBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn);
     ~KeyboardMenuBar();
 
     //==============================================================================

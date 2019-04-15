@@ -82,7 +82,7 @@ private:
     ValueTree keyboardWindowNode;
 	ValueTree presetCurrentNode;
 
-	ApplicationCommandManager* appCmdMgr;
+	ApplicationCommandManager appCmdMgr;
 
 
 	std::unique_ptr<Viewport> view;

@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-KeyboardMenuBar::KeyboardMenuBar (OwnedArray<ModeLayout>* presetsArrayIn, Array<Array<ModeLayout*>>* presetsSortedIn, ApplicationCommandManager* managerIn)
+KeyboardMenuBar::KeyboardMenuBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	presets = presetsArrayIn;
@@ -136,7 +136,7 @@ void KeyboardMenuBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == keyboardModeBtn.get())
     {
         //[UserButtonCode_keyboardModeBtn] -- add your button handler code here..
-		
+
         //[/UserButtonCode_keyboardModeBtn]
     }
 
@@ -417,7 +417,7 @@ MenuBarComponent* KeyboardMenuBar::KeyboardMenu::get_menu()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="KeyboardMenuBar" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="OwnedArray&lt;ModeLayout&gt;* presetsArrayIn, Array&lt;Array&lt;ModeLayout*&gt;&gt;* presetsSortedIn, ApplicationCommandManager* managerIn"
+                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <METHODS>
@@ -440,8 +440,9 @@ BEGIN_JUCER_METADATA
             posRelativeY="9f75aa2c0ca39fa4" editable="0" layout="33" items=""
             textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Keyboard Mode Button" id="9f75aa2c0ca39fa4" memberName="keyboardModeBtn"
-              virtualName="" explicitFocusOrder="0" pos="99.25%r 6 40 24" bgColOff="ff5c7fa4"
-              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="99.246%r 6 40 24"
+              bgColOff="ff5c7fa4" buttonText="Edit" connectedEdges="0" needsCallback="1"
+              radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

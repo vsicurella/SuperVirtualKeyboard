@@ -14,10 +14,10 @@
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-	appCmdMgr(processor.get_app_cmd_mgr()),
-	piano(new VirtualKeyboard(appCmdMgr, nullptr)),
+	pluginState(processor.get_plugin_state()),
+	piano(new VirtualKeyboard(&appCmdMgr, nullptr)),
 	view(new Viewport("Piano Viewport")),
-	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), appCmdMgr))
+	scaleEdit(new KeyboardMenuBar(pluginState, &appCmdMgr))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -35,8 +35,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);
 
-	pluginState = processor.get_plugin_state();
-
 	view.get()->setViewPositionProportionately(0.6, 0);
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
@@ -48,8 +46,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
     restore_node_data(pluginState->keyboardWindowNode);
 
-	appCmdMgr->registerAllCommandsForTarget(piano.get());
-	appCmdMgr->registerAllCommandsForTarget(this);
+	appCmdMgr.registerAllCommandsForTarget(piano.get());
+	appCmdMgr.registerAllCommandsForTarget(this);
     
     setSize(1000, 250);
 	
@@ -98,9 +96,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 		keyboardWindowNode.setProperty(IDs::selectedPresetComboID, scaleEdit.get()->get_selected_preset_id(), nullptr);
 
 		if (scaleEdit.get()->presetSelected->family == "Custom")
-			processor.set_current_preset(0);
+			processor.set_current_mode(0);
 		else
-			processor.set_current_preset(keyboardWindowNode[IDs::selectedPresetIndex]);
+			processor.set_current_mode(keyboardWindowNode[IDs::selectedPresetIndex]);
         
         piano.get()->apply_layout(newPreset);
 	}
@@ -154,23 +152,18 @@ void SuperVirtualKeyboardAudioProcessorEditor::visibilityChanged()
 
 void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
 {
-	pluginState->keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
-	keyboardWindowNode = pluginState->keyboardWindowNode;
-	presetCurrentNode = pluginState->presetCurrentNode;
+	keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
 
 	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
-
-    keyboardWindowNode.setProperty(IDs::selectedPresetName, presetCurrentNode.getChild(0)[IDs::modeFullName], nullptr);
-    keyboardWindowNode.setProperty(IDs::selectedPresetIndex, pluginState->processorNode[IDs::selectedPresetIndex], nullptr);
-    keyboardWindowNode.setProperty(IDs::selectedPresetComboID, 8, nullptr);
-
-	processor.connect_editor_node(keyboardWindowNode);
     
     piano->init_data_node();
     pluginState->pianoNode = piano->get_node();
     keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
+
+	pluginState->keyboardWindowNode = keyboardWindowNode;
+	pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
@@ -180,8 +173,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
 
 	load_preset(pluginState->presetCurrentNode);
-
-    piano->restore_data_node(pluginState->pianoNode);
 }
 
 //==============================================================================

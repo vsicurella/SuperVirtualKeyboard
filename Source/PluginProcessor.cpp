@@ -22,18 +22,10 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        ),
-	undoManager(new UndoManager()), pluginState(new SuperVirtualKeyboardPluginState(undoManager.get()))
+	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
 {
-	// Set up preset library
-	processorNode = ValueTree(IDs::processorNode);
-	processorNode.addChild(pluginState->presetsNode, -1, nullptr);
-	createPresets();
-
-	// Set up current preset node
-	presetCurrentNode = pluginState->presetCurrentNode;
-	processorNode.addChild(presetCurrentNode, -1, undoManager.get());
-	set_current_preset(8);
+	pluginState->set_current_mode(8);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -216,7 +208,7 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
     // as intermediaries to make it easy to save and load complex data.
 	
 	MemoryOutputStream memOut;
-	processorNode.writeToStream(memOut);
+	pluginState->pluginStateNode.writeToStream(memOut);
 	destData.append(memOut.getData(), memOut.getDataSize());
 	
 }
@@ -227,284 +219,16 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
     // whose contents will have been created by the getStateInformation() call.
 	
 	MemoryInputStream memIn(data, sizeInBytes, false);
-	processorNode.readFromStream(memIn);
+	pluginState->pluginStateNode.readFromStream(memIn);
 	
 }
 
 //==============================================================================
-
-OwnedArray<ModeLayout>* SuperVirtualKeyboardAudioProcessor::get_presets()
-{
-	return &presets;
-}
-
-Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorted()
-{
-	return &presetsSorted;
-}
 
 SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
 {
 	return pluginState.get();
 }
-
-ApplicationCommandManager* SuperVirtualKeyboardAudioProcessor::get_app_cmd_mgr()
-{
-	return &appCmdMgr;
-}
-
-//==============================================================================
-
-
-ValueTree SuperVirtualKeyboardAudioProcessor::get_current_preset()
-{
-	return presetCurrentNode;
-}
-
-int SuperVirtualKeyboardAudioProcessor::get_current_preset_index()
-{
-	ModeLayout* mode;
-
-	for (int i = 0; i < presets.size(); i++)
-	{
-		mode = presets.getUnchecked(i);
-
-		if (presetCurrentNode[IDs::modeFullName] == mode->get_full_name())
-			return i;
-	}
-
-	return -1;
-}
-
-ModeLayout* SuperVirtualKeyboardAudioProcessor::get_current_preset_mode()
-{
-	int index = get_current_preset_index();
-
-	if (index >= 0)
-		return presets.getUnchecked(index);
-
-	return nullptr;
-}
-
-void SuperVirtualKeyboardAudioProcessor::set_current_preset(int presetIndexIn)
-{
-	ModeLayout* mode = presets.getUnchecked(presetIndexIn);
-	
-	if (mode->modeLayoutNode.isValid())
-	{
-		processorNode.setProperty(IDs::selectedPresetIndex, presetIndexIn, undoManager.get());
-		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.addChild(mode->modeLayoutNode.createCopy(), 0, undoManager.get());
-	}
-}
-
-void SuperVirtualKeyboardAudioProcessor::set_current_preset(ModeLayout* modeIn)
-{
-	if (modeIn->modeLayoutNode.isValid())
-	{
-		processorNode.setProperty(IDs::selectedPresetIndex, 0, undoManager.get());
-		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.addChild(modeIn->modeLayoutNode.createCopy(), 0, undoManager.get());
-	}
-}
-
-void SuperVirtualKeyboardAudioProcessor::set_current_preset(ValueTree nodeIn)
-{
-	if (nodeIn.isValid() && (nodeIn.hasType(IDs::currentLayoutPreset)))
-	{
-		processorNode.setProperty(IDs::selectedPresetIndex, 0, undoManager.get());
-		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.addChild(nodeIn.createCopy(), 0, undoManager.get());
-	}
-}
-
-//==============================================================================
-
-
-void SuperVirtualKeyboardAudioProcessor::connect_editor_node(ValueTree pluginEditorNodeIn)
-{
-	pluginState->pianoNode = pluginEditorNodeIn.getChildWithName(IDs::pianoNode);
-	pluginState->keyboardWindowNode = pluginEditorNodeIn;
-	processorNode.addChild(pluginEditorNodeIn, -1, undoManager.get());
-}
-
-
-struct ModeScaleSorter
-{
-	// Scale first, then mode, then family
-
-	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
-	{
-		int sz1 = t1->scaleSize;
-		int sz2 = t2->scaleSize;
-
-		int m1 = t1->modeSize;
-		int m2 = t2->modeSize;
-
-		String f1 = t1->family;
-		String f2 = t2->family;
-
-		if (sz1 < sz2) return -1;
-		else if (sz1 > sz2) return 1;
-		else
-		{
-			if (m1 < m2) return -1;
-			else if (m1 > m2) return 1;
-			else
-			{
-				if (f1 < f2) return  -1;
-				else if (f1 > f2) return 1;
-				else return 0;
-			}
-		}
-	}
-};
-
-struct ModeModeSorter
-{
-	// Mode first, then scale, then family
-
-	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
-	{
-		int sz1 = t1->scaleSize;
-		int sz2 = t2->scaleSize;
-
-		int m1 = t1->modeSize;
-		int m2 = t2->modeSize;
-
-		String f1 = t1->family;
-		String f2 = t2->family;
-
-		if (m1 < m2) return -1;
-		else if (m1 > m2) return 1;
-		else
-		{
-			if (sz1 < sz2) return -1;
-			else if (sz1 > sz2) return 1;
-			else
-			{
-				if (f1 < f2) return  -1;
-				else if (f1 > f2) return 1;
-				else return 0;
-			}
-		}
-	}
-};
-struct ModeFamilySorter
-{
-	// Family first, then scale, then mode
-
-	static int compareElements(const ModeLayout* t1, const ModeLayout* t2)
-	{
-		int sz1 = t1->scaleSize;
-		int sz2 = t2->scaleSize;
-
-		int m1 = t1->modeSize;
-		int m2 = t2->modeSize;
-
-		String f1 = t1->family;
-		String f2 = t2->family;
-
-		if (f1 < f2) return -1;
-		else if (f1 > f2) return 1;
-		else
-		{
-			if (sz1 < sz2) return -1;
-			else if (sz1 > sz2) return 1;
-			else
-			{
-				if (m1 < m2) return  -1;
-				else if (m1 > m2) return 1;
-				else return 0;
-			}
-		}
-	}
-};
-
-void SuperVirtualKeyboardAudioProcessor::createPresets()
-{
-	presets.clear();
-	presets.add(new ModeLayout(Array<int>({ 1 }), "Custom"));
-	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1 }), "Mavila"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 2, 1 }), "Father"));
-	presets.add(new ModeLayout( Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila"));
-	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1 }), "Dicot"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 1 }), "Machine"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2 }), "Orgone"));
-	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1 }), "Augmented"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 2, 1 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }), "Diminished"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }), "Father"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Orwell"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood"));
-	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine"));
-	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic"));
-	presets.add(new ModeLayout( Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine"));
-	presets.add(new ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 1 }), "Bicycle"));
-	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }), "Father"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri"));
-	presets.add(new ModeLayout( Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila"));
-	presets.add(new ModeLayout( Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood"));
-	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle"));
-	presets.add(new ModeLayout( Array<int>({ 4, 4, 1, 4, 4, 4, 1 }), "Superpyth"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }), "Hedgehog"));
-	presets.add(new ModeLayout( Array<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }),"Orwell"));
-	presets.add(new ModeLayout( Array<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }), "Mavila"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }), "Sephiroth"));
-	presets.add(new ModeLayout( Array<int>({ 5, 5, 4, 5, 5 }), "Godzilla"));
-	presets.add(new ModeLayout( Array<int>({ 5, 3, 5, 3, 5, 3 }), "Triforce"));
-	presets.add(new ModeLayout( Array<int>({ 4, 3, 3, 4, 3, 3, 4 }), "Dastgah-e Sehgah / Maqam Nairuz"));
-	presets.add(new ModeLayout( Array<int>({ 4, 4, 2, 4, 4, 4, 2 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 3 }), "Mohajira"));
-	presets.add(new ModeLayout( Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone"));
-	presets.add(new ModeLayout( Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }),"Injera"));
-	presets.add(new ModeLayout( Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone"));
-	presets.add(new ModeLayout( Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3, }), "Orwell"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }),"BP Lambda"));
-	presets.add(new ModeLayout( Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II"));
-	
-	// Connect to ValueTree structure
-	for (int i = 0; i < presets.size(); i++)
-	{
-		processorNode.getChildWithName(IDs::presetsNode).addChild(presets.getUnchecked(i)->modeLayoutNode, i, nullptr);
-	}
-
-	presetsSorted.clear();
-	presetsSorted.resize(3);
-
-	ModeScaleSorter scaleSort;
-	ModeModeSorter modeSort;
-	ModeFamilySorter famSort;
-
-	Array<ModeLayout*> sorting;
-	for (int i = 1; i < presets.size(); i++)
-	{
-		sorting.add(presets.getUnchecked(i));
-	}
-
-	sorting.sort(scaleSort, false);
-	presetsSorted.getReference(SortType::scaleSize).addArray(sorting);
-
-	sorting.sort(modeSort, false);
-	presetsSorted.getReference(SortType::modeSize).addArray(sorting);
-
-	sorting.sort(famSort, false);
-	presetsSorted.getReference(SortType::family).addArray(sorting);
-}
-
-
 
 //==============================================================================
 // This creates new instances of the plugin..

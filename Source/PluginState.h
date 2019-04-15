@@ -10,24 +10,20 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "Structures/ModeLayout.h"
 
 // IDENTIFIERS
 
 namespace IDs
-{
-	// Generic IDs
-	static Identifier itemName("Name");
-	
-	// Processor
-	static Identifier processorNode("ProcessorNode");
-	static Identifier selectedModeName("SelectedModeName");
-	static Identifier externalMidiState("MidiInputState");
-	static Identifier presetsNode("Presets");
-	static Identifier currentLayoutPreset("Current Layout Preset");
-	static Identifier layoutPreset("Piano Layout Preset");
+{	
+	// Plugin State & Presets
+	static Identifier pluginStateNode("PluginState");
+	static Identifier modeLibraryNode("ModeLibrary");
+	static Identifier presetNode("Preset");
+	static Identifier modePresetNode("ModeLayoutNode");
+	static Identifier indexOfMode("IndexOfMode");
 
 	// ModeLayout
-	static Identifier modePresetNode("ModeLayoutNode");
 	static Identifier scaleSize("ScaleSize");
 	static Identifier modeSize("ModeSize");
 	static Identifier stepString("StepsString");
@@ -40,21 +36,12 @@ namespace IDs
 	static Identifier keyboardOrderArray("OrderArray");
 	static Identifier keyboardModeDegrees("ModeDegreeArray");
 	static Identifier modeArrayValue("Value");
-	/*
-	static Identifier stepValue("StepsValue");
-	static Identifier orderValue("OrderValue");
-	static Identifier degreeValue("DegreeValue");
-	*/
-
 
 	// Keyboard Window
 	static Identifier keyboardWindowNode("KeyboardWindowNode");
 	static Identifier windowBoundsW("WindowW");
 	static Identifier windowBoundsH("WindowH");
 	static Identifier viewportPosition("ViewportPosition");
-	static Identifier selectedPresetName("SelectedPresetName");
-    static Identifier selectedPresetIndex("SelectedPresetIndex");
-    static Identifier selectedPresetComboID("SelectedPresetComboboxIndex");
 	
 	// Piano Component
 	static Identifier pianoNode("PianoNode");
@@ -96,47 +83,64 @@ namespace IDs
 		setPianoVerticalL,
 		setPianoVerticalR,
 	};
-
-	template <class T>
-	static Array<T> vector_to_juce_array(std::vector<T> vectorIn)
-	{
-		Array<T> arrayOut;
-
-		for (auto item : vectorIn)
-			arrayOut.add(item);
-
-		return arrayOut;
-	}
 }
-
 
 enum SortType
 {
 	scaleSize,
 	modeSize,
-	family,
-	alphabetical
+	family
 };
 
 struct SuperVirtualKeyboardPluginState
 {
-	// Storage
-	ValueTree processorNode;
-	ValueTree presetsNode;
-	ValueTree presetCurrentNode;
+	ValueTree pluginStateNode;
+	ValueTree modeLibraryNode;
+	ValueTree presetCurrentNode; // Always updated when some preset is selected
 	ValueTree keyboardWindowNode;
 	ValueTree pianoNode;
 
-	SuperVirtualKeyboardPluginState(UndoManager* undoManagerIn)
-		:	undoManager(undoManagerIn),
-			processorNode(IDs::processorNode),
-			presetsNode(IDs::presetsNode),
-			presetCurrentNode(IDs::currentLayoutPreset)
+	SuperVirtualKeyboardPluginState() :
+			pluginStateNode(IDs::pluginStateNode),
+			modeLibraryNode(IDs::modeLibraryNode),
+			presetCurrentNode(IDs::presetNode),
+			undoManager(new UndoManager())
+
 	{
+		createPresets();
+		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+		pluginStateNode.addChild(presetCurrentNode, 1, nullptr);
 	}
 
 	~SuperVirtualKeyboardPluginState() {}
 
+	//==============================================================================
+
+	OwnedArray<ModeLayout>* get_presets();
+	Array<Array<ModeLayout*>>* get_presets_sorted();
+	UndoManager* get_undo_mgr();
+
+	ValueTree get_current_preset();
+	int get_current_preset_index();
+	ModeLayout* get_current_mode();
+
+	void set_current_mode(int presetIndexIn);
+	void set_current_mode(ModeLayout* modeIn);
+
+	void set_current_key_settings(ValueTree pianoNodeIn);
+
+	//==============================================================================
+
+
 private:
-	UndoManager* undoManager;
+
+	void createPresets();
+
+	//==============================================================================
+
+	std::unique_ptr<UndoManager> undoManager;
+	OwnedArray<ModeLayout> presets;
+	Array<Array<ModeLayout*>> presetsSorted;
+
+	ModeLayout* modeCurrent;
 };
