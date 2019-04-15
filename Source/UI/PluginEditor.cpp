@@ -14,7 +14,7 @@
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-	appCmdMgr(new ApplicationCommandManager()),
+	appCmdMgr(processor.get_app_cmd_mgr()),
 	piano(new VirtualKeyboard(appCmdMgr.get(), nullptr)),
 	view(new Viewport("Piano Viewport")),
 	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), appCmdMgr.get()))
@@ -58,6 +58,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
+//	appCmdMgr->clearCommands();
 }
 
 //==============================================================================
@@ -98,14 +99,26 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 		keyboardWindowNode.setProperty(IDs::selectedPresetComboID, scaleEdit.get()->get_selected_preset_id(), nullptr);
 
 		if (scaleEdit.get()->presetSelected->family == "Custom")
-			processor.set_preset(0);
+			processor.set_current_preset(0);
 		else
-			processor.set_preset(keyboardWindowNode[IDs::selectedPresetIndex]);
+			processor.set_current_preset(keyboardWindowNode[IDs::selectedPresetIndex]);
         
         piano.get()->apply_layout(newPreset);
 	}
     std::cout << keyboardWindowNode.toXmlString() << std::endl;
 }
+
+bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
+{
+	if (key == KeyPress::returnKey)
+	{
+
+		return true;
+	}
+
+	return false;
+}
+
 
 void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 {
@@ -144,20 +157,21 @@ void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
 {
 	pluginState->keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
 	keyboardWindowNode = pluginState->keyboardWindowNode;
+	presetCurrentNode = pluginState->presetCurrentNode;
 
 	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 
-    keyboardWindowNode.setProperty(IDs::selectedPresetName, processor.get_preset_selected()->get_full_name(), nullptr);
-    keyboardWindowNode.setProperty(IDs::selectedPresetIndex, 8, nullptr);
+    keyboardWindowNode.setProperty(IDs::selectedPresetName, presetCurrentNode.getChild(0)[IDs::modeFullName], nullptr);
+    keyboardWindowNode.setProperty(IDs::selectedPresetIndex, pluginState->processorNode[IDs::selectedPresetIndex], nullptr);
     keyboardWindowNode.setProperty(IDs::selectedPresetComboID, 8, nullptr);
 
 	processor.connect_editor_node(keyboardWindowNode);
     
     piano->init_data_node();
     pluginState->pianoNode = piano->get_node();
-    keyboardWindowNode.addChild(pluginState->pianoNode, -1, nullptr);
+    keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()
@@ -166,14 +180,20 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()
 	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
 	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
 
-	scaleEdit.get()->set_selected_preset(processor.get_preset_selected());
-	int id = (int)keyboardWindowNode[IDs::selectedPresetComboID];
+	load_preset(pluginState->presetCurrentNode);
 
-    scaleEdit.get()->set_selected_preset(id);
-    scaleEdit.get()->set_text_boxes(keyboardWindowNode[IDs::selectedPresetName].toString(), processor.get_preset_selected()->strSteps);
-    
     piano->restore_data_node(pluginState->pianoNode);
 }
+
+//==============================================================================
+
+
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn)
+{
+
+	return false;
+}
+
 
 //==============================================================================
 
@@ -198,17 +218,17 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 	switch (commandID)
 	{
 	case IDs::CommandIDs::saveCustomLayout:
-		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+		result.setInfo("Save Layout", "Save your custom layout to a file.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
 	case IDs::CommandIDs::loadCustomLayout:
-		result.setInfo("Midi Note Offset", "Shift the layout so that your center is on a different MIDI note.", "Piano", 0);
+		result.setInfo("Load Layout", "Load a custom layout from a file.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
 		//result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
 		break;
 	case IDs::CommandIDs::saveReaperMap:
-		result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
+		result.setInfo("Save Reaper Note Names", "Save the current layout as a Reaper MIDI Note Name text file.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
 		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
 		break;

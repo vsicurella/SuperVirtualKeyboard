@@ -53,6 +53,9 @@ public:
 
 	//==============================================================================
 
+	bool load_preset(ValueTree presetIn);
+
+	//==============================================================================
 
 	ApplicationCommandTarget* getNextCommandTarget();
 
@@ -64,6 +67,11 @@ public:
 
 	//==============================================================================
 
+	bool keyPressed(const KeyPress& key) override;
+
+	//==============================================================================
+
+
 
 private:
     // This reference is provided as a quick way for your editor to
@@ -72,6 +80,7 @@ private:
 	SuperVirtualKeyboardPluginState* pluginState;
 	MidiKeyboardState externalMidi;
     ValueTree keyboardWindowNode;
+	ValueTree presetCurrentNode;
 
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
 

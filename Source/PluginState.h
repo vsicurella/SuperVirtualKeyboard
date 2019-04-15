@@ -23,23 +23,28 @@ namespace IDs
 	static Identifier selectedModeName("SelectedModeName");
 	static Identifier externalMidiState("MidiInputState");
 	static Identifier presetsNode("Presets");
+	static Identifier currentLayoutPreset("Current Layout Preset");
+	static Identifier layoutPreset("Piano Layout Preset");
 
 	// ModeLayout
-	static Identifier modeLayoutNode("ModeLayoutNode");
+	static Identifier modePresetNode("ModeLayoutNode");
 	static Identifier scaleSize("ScaleSize");
 	static Identifier modeSize("ModeSize");
 	static Identifier stepString("StepsString");
 	static Identifier MOSClass("MosClass");
-	static Identifier temperamentFamily("Family");
+	static Identifier family("Family");
 	static Identifier modeFullName("ModeName");
 	static Identifier modeScaleName("NameScaleSize");
 	static Identifier modeModeName("NameModeSize");
 	static Identifier stepArray("StepsArray");
 	static Identifier keyboardOrderArray("OrderArray");
 	static Identifier keyboardModeDegrees("ModeDegreeArray");
+	static Identifier modeArrayValue("Value");
+	/*
 	static Identifier stepValue("StepsValue");
 	static Identifier orderValue("OrderValue");
 	static Identifier degreeValue("DegreeValue");
+	*/
 
 
 	// Keyboard Window
@@ -115,19 +120,18 @@ enum SortType
 
 struct SuperVirtualKeyboardPluginState
 {
+	// Storage
 	ValueTree processorNode;
 	ValueTree presetsNode;
-	ValueTree modeLayoutNode;
+	ValueTree presetCurrentNode;
 	ValueTree keyboardWindowNode;
 	ValueTree pianoNode;
-	ValueTree pianoKeyNode;
 
 	SuperVirtualKeyboardPluginState(UndoManager* undoManagerIn)
 		:	undoManager(undoManagerIn),
 			processorNode(IDs::processorNode),
 			presetsNode(IDs::presetsNode),
-			modeLayoutNode(IDs::modeLayoutNode),
-			pianoKeyNode(IDs::pianoKeyNode)
+			presetCurrentNode(IDs::currentLayoutPreset)
 	{
 	}
 

@@ -283,9 +283,22 @@ struct ModeLayout
 		modeLayoutNode.addChild(arrayTree, -1, nullptr);
 	}
 
-	void update_node()
+	template <class T>
+	void get_array_from_node(Array<T>& arrayIn, const ValueTree nodeIn, Identifier arrayID)
 	{
-		modeLayoutNode = ValueTree(IDs::modeLayoutNode);
+		if (nodeIn.hasType(arrayID))
+		{
+			for (int i = 0; i < nodeIn.getNumChildren(); i++)
+			{
+				arrayIn.add(nodeIn.getChild(i).getProperty("Value"));
+				DBG(arrayIn[i]);
+			}
+		}
+	}
+
+	void init_node()
+	{
+		modeLayoutNode = ValueTree(IDs::modePresetNode);
 
 		modeLayoutNode.setProperty(IDs::scaleSize, scaleSize, nullptr);
 		modeLayoutNode.setProperty(IDs::modeSize, modeSize, nullptr);
@@ -293,11 +306,33 @@ struct ModeLayout
 		modeLayoutNode.setProperty(IDs::modeFullName, get_full_name(), nullptr);
 		modeLayoutNode.setProperty(IDs::modeScaleName, get_name_scale_size(), nullptr);
 		modeLayoutNode.setProperty(IDs::modeModeName, get_name_mode_size(), nullptr);
-		modeLayoutNode.setProperty(IDs::temperamentFamily, family, nullptr);
+		modeLayoutNode.setProperty(IDs::family, family, nullptr);
 		
-		add_array_to_node(steps, IDs::stepArray, IDs::stepValue);
-		add_array_to_node(order, IDs::keyboardOrderArray, IDs::orderValue);
-		add_array_to_node(modeDegrees, IDs::keyboardModeDegrees, IDs::degreeValue);
+		add_array_to_node(steps, IDs::stepArray, IDs::modeArrayValue);
+		add_array_to_node(order, IDs::keyboardOrderArray, IDs::modeArrayValue);
+		add_array_to_node(modeDegrees, IDs::keyboardModeDegrees, IDs::modeArrayValue);
+	}
+
+	void restore_from_node(ValueTree nodeIn)
+	{
+		if (nodeIn.hasType(IDs::modePresetNode))
+		{
+			modeLayoutNode = nodeIn;
+
+			scaleSize = modeLayoutNode[IDs::scaleSize];
+			modeSize = modeLayoutNode[IDs::modeSize];
+			strSteps = modeLayoutNode[IDs::stepString];
+			family = modeLayoutNode[IDs::family];
+
+			steps.clear();
+			get_array_from_node(steps, modeLayoutNode, IDs::modeArrayValue);
+
+			order.clear();
+			get_array_from_node(order, modeLayoutNode, IDs::keyboardOrderArray);
+
+			modeDegrees.clear();
+			get_array_from_node(modeDegrees, modeLayoutNode, IDs::keyboardModeDegrees);
+		}
 	}
 
 	ModeLayout()
@@ -311,7 +346,7 @@ struct ModeLayout
 		family = "undefined";
 
 		modeSize = steps.size();
-		update_node();
+		init_node();
 	}
 
 	ModeLayout(String stepsIn)
@@ -326,7 +361,7 @@ struct ModeLayout
 		scaleSize = order.size();
 		modeSize = steps.size();
 
-		update_node();
+		init_node();
 	}
 
 	ModeLayout(Array<int> stepsIn)
@@ -341,7 +376,7 @@ struct ModeLayout
 		scaleSize = order.size();
 		modeSize = steps.size();
 
-		update_node();
+		init_node();
 	}
 
 	ModeLayout(String stepsIn, String familyIn)
@@ -355,7 +390,7 @@ struct ModeLayout
 		scaleSize = order.size();
 		modeSize = steps.size();
 
-		update_node();
+		init_node();
 	}
 
 	ModeLayout(Array<int> stepsIn, String familyIn)
@@ -369,7 +404,7 @@ struct ModeLayout
 		scaleSize = order.size();
 		modeSize = steps.size();
 
-		update_node();
+		init_node();
 	}
 
 	~ModeLayout() {}

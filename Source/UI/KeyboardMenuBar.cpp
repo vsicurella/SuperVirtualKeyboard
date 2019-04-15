@@ -68,6 +68,7 @@ KeyboardMenuBar::KeyboardMenuBar (OwnedArray<ModeLayout>* presetsArrayIn, Array<
     //[UserPreSize]
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
 	addAndMakeVisible(pianoMenu.get());
+	pianoMenu->toBack();
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -108,7 +109,7 @@ void KeyboardMenuBar::paint (Graphics& g)
 void KeyboardMenuBar::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-	pianoMenu->setBounds(1, 5, proportionOfWidth(0.5f), 24);
+	pianoMenu->setBounds(1, 5, proportionOfWidth(1.0f), 24);
     //[/UserPreResize]
 
     textEditor->setBounds ((proportionOfWidth (0.9925f) - 40) + roundToInt (40 * -6.6500f) - 150, 6 + 0, 150, 24);
@@ -135,6 +136,7 @@ void KeyboardMenuBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == keyboardModeBtn.get())
     {
         //[UserButtonCode_keyboardModeBtn] -- add your button handler code here..
+		
         //[/UserButtonCode_keyboardModeBtn]
     }
 

@@ -25,14 +25,20 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	undoManager(new UndoManager()), pluginState(new SuperVirtualKeyboardPluginState(undoManager.get()))
 #endif
 {
+	// Set up preset library
 	processorNode = ValueTree(IDs::processorNode);
 	processorNode.addChild(pluginState->presetsNode, -1, nullptr);
 	createPresets();
-	presetSelected = presets.getUnchecked(8);
+
+	// Set up current preset node
+	presetCurrentNode = pluginState->presetCurrentNode;
+	processorNode.addChild(presetCurrentNode, -1, undoManager.get());
+	set_current_preset(8);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
 {
+	
 }
 
 //==============================================================================
@@ -209,11 +215,10 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 	
-	/*
 	MemoryOutputStream memOut;
 	processorNode.writeToStream(memOut);
 	destData.append(memOut.getData(), memOut.getDataSize());
-	*/
+	
 }
 
 void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -221,23 +226,100 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
 	
-	/*
 	MemoryInputStream memIn(data, sizeInBytes, false);
 	processorNode.readFromStream(memIn);
-	*/
+	
 }
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessor::set_preset(int presetIndexIn)
+OwnedArray<ModeLayout>* SuperVirtualKeyboardAudioProcessor::get_presets()
 {
-    presetSelected = presets.getUnchecked(presetIndexIn);
+	return &presets;
 }
 
-ModeLayout* SuperVirtualKeyboardAudioProcessor::get_preset_selected()
+Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorted()
 {
-	return presetSelected;
+	return &presetsSorted;
 }
+
+SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
+{
+	return pluginState.get();
+}
+
+ApplicationCommandManager* SuperVirtualKeyboardAudioProcessor::get_app_cmd_mgr()
+{
+	return &appCmdMgr;
+}
+
+//==============================================================================
+
+
+ValueTree SuperVirtualKeyboardAudioProcessor::get_current_preset()
+{
+	return presetCurrentNode;
+}
+
+int SuperVirtualKeyboardAudioProcessor::get_current_preset_index()
+{
+	ModeLayout* mode;
+
+	for (int i = 0; i < presets.size(); i++)
+	{
+		mode = presets.getUnchecked(i);
+
+		if (presetCurrentNode[IDs::modeFullName] == mode->get_full_name())
+			return i;
+	}
+
+	return -1;
+}
+
+ModeLayout* SuperVirtualKeyboardAudioProcessor::get_current_preset_mode()
+{
+	int index = get_current_preset_index();
+
+	if (index >= 0)
+		return presets.getUnchecked(index);
+
+	return nullptr;
+}
+
+void SuperVirtualKeyboardAudioProcessor::set_current_preset(int presetIndexIn)
+{
+	ModeLayout* mode = presets.getUnchecked(presetIndexIn);
+	
+	if (mode->modeLayoutNode.isValid())
+	{
+		processorNode.setProperty(IDs::selectedPresetIndex, presetIndexIn, undoManager.get());
+		presetCurrentNode.removeChild(0, undoManager.get());
+		presetCurrentNode.addChild(mode->modeLayoutNode.createCopy(), 0, undoManager.get());
+	}
+}
+
+void SuperVirtualKeyboardAudioProcessor::set_current_preset(ModeLayout* modeIn)
+{
+	if (modeIn->modeLayoutNode.isValid())
+	{
+		processorNode.setProperty(IDs::selectedPresetIndex, 0, undoManager.get());
+		presetCurrentNode.removeChild(0, undoManager.get());
+		presetCurrentNode.addChild(modeIn->modeLayoutNode.createCopy(), 0, undoManager.get());
+	}
+}
+
+void SuperVirtualKeyboardAudioProcessor::set_current_preset(ValueTree nodeIn)
+{
+	if (nodeIn.isValid() && (nodeIn.hasType(IDs::currentLayoutPreset)))
+	{
+		processorNode.setProperty(IDs::selectedPresetIndex, 0, undoManager.get());
+		presetCurrentNode.removeChild(0, undoManager.get());
+		presetCurrentNode.addChild(nodeIn.createCopy(), 0, undoManager.get());
+	}
+}
+
+//==============================================================================
+
 
 void SuperVirtualKeyboardAudioProcessor::connect_editor_node(ValueTree pluginEditorNodeIn)
 {
@@ -338,27 +420,6 @@ struct ModeFamilySorter
 		}
 	}
 };
-
-OwnedArray<ModeLayout>* SuperVirtualKeyboardAudioProcessor::get_presets()
-{
-	return &presets;
-}
-
-Array<Array<ModeLayout*>>* SuperVirtualKeyboardAudioProcessor::get_presets_sorted()
-{
-	return &presetsSorted;
-}
-
-SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
-{
-	return pluginState.get();
-}
-
-void restart()
-{
-    
-}
-
 
 void SuperVirtualKeyboardAudioProcessor::createPresets()
 {

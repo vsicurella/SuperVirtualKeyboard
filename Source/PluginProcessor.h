@@ -64,33 +64,38 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 	//==============================================================================
 
-	void createPresets();
-	void set_preset(int presetIndexIn);
-	ModeLayout* get_preset_selected();
 	OwnedArray<ModeLayout>* get_presets();
 	Array<Array<ModeLayout*>>* get_presets_sorted();
+	void createPresets();
+
+	ValueTree get_current_preset();
+	int get_current_preset_index();
+	ModeLayout* get_current_preset_mode();
+
+	void set_current_preset(int presetIndexIn);
+	void set_current_preset(ModeLayout* modeIn);
+	void set_current_preset(ValueTree nodeIn);
 
 	//==============================================================================
 
 	void connect_editor_node(ValueTree pluginEditorNodeIn);
 	SuperVirtualKeyboardPluginState* get_plugin_state();
-    
-    void restart();
+	ApplicationCommandManager* get_app_cmd_mgr();
     
 private:
     //==============================================================================
 
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
 	std::unique_ptr<UndoManager> undoManager;
-
+	ApplicationCommandManager appCmdMgr;
 	ValueTree processorNode;
+	ValueTree presetCurrentNode;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
 
 	OwnedArray<ModeLayout> presets;
 	Array<Array<ModeLayout*>> presetsSorted;
-	ModeLayout* presetSelected;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };
