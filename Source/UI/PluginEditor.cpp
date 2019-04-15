@@ -15,9 +15,9 @@
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
 	appCmdMgr(processor.get_app_cmd_mgr()),
-	piano(new VirtualKeyboard(appCmdMgr.get(), nullptr)),
+	piano(new VirtualKeyboard(appCmdMgr, nullptr)),
 	view(new Viewport("Piano Viewport")),
-	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), appCmdMgr.get()))
+	scaleEdit(new KeyboardMenuBar(processor.get_presets(), processor.get_presets_sorted(), appCmdMgr))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
@@ -46,7 +46,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
         init_node_data();
     }
 
-    restore_node_data();
+    restore_node_data(pluginState->keyboardWindowNode);
 
 	appCmdMgr->registerAllCommandsForTarget(piano.get());
 	appCmdMgr->registerAllCommandsForTarget(this);
@@ -58,7 +58,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
-//	appCmdMgr->clearCommands();
 }
 
 //==============================================================================
@@ -174,9 +173,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
     keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()
+void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
 {
-    keyboardWindowNode = pluginState->keyboardWindowNode;
+    keyboardWindowNode = nodeIn;
 	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
 	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
 
@@ -188,9 +187,13 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data()
 //==============================================================================
 
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn)
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar=false)
 {
-
+    if (presetIn.hasType(IDs::modePresetNode))
+    {
+        
+    }
+    
 	return false;
 }
 

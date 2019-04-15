@@ -49,21 +49,21 @@ public:
     //==============================================================================
 
     void init_node_data();
-    void restore_node_data();
+    void restore_node_data(ValueTree nodeIn);
 
 	//==============================================================================
 
-	bool load_preset(ValueTree presetIn);
+	bool load_preset(ValueTree presetIn, bool updateKeyboardMenuBar);
 
 	//==============================================================================
 
-	ApplicationCommandTarget* getNextCommandTarget();
+	ApplicationCommandTarget* getNextCommandTarget() override;
 
-	void getAllCommands(Array< CommandID > &commands);
+	void getAllCommands(Array< CommandID > &commands) override;
 
-	void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result);
+	void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
 
-	bool perform(const InvocationInfo &info);
+	bool perform(const InvocationInfo &info) override;
 
 	//==============================================================================
 
@@ -82,7 +82,7 @@ private:
     ValueTree keyboardWindowNode;
 	ValueTree presetCurrentNode;
 
-	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
+	ApplicationCommandManager* appCmdMgr;
 
 
 	std::unique_ptr<Viewport> view;

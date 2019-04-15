@@ -87,7 +87,8 @@ private:
 
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
 	std::unique_ptr<UndoManager> undoManager;
-	ApplicationCommandManager appCmdMgr;
+    ApplicationCommandManager appCmdMgr;
+
 	ValueTree processorNode;
 	ValueTree presetCurrentNode;
 
