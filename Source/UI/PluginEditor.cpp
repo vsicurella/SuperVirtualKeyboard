@@ -38,8 +38,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
 
-	openFileChooser.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
-	saveFileChooser.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
+	openFileBox.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
+	saveFileBox.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
     
     if (!pluginState->keyboardWindowNode.isValid())
     {
@@ -89,9 +89,30 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 	update_children_to_preset();
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(File& presetIn)
+bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(File& fileOut)
 {
+	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
+	return xml->writeToFile(fileOut, "SuperVirtualKeyboardPreset");
+}
 	
+
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(File& fileIn)
+{
+	ValueTree presetIn;
+
+	if (fileIn.exists())
+	{
+		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
+		presetIn = ValueTree::fromXml(*xml.get());
+
+		if (presetIn.hasType(IDs::presetNode))
+		{
+			pluginState->presetCurrentNode.removeAllChildren(pluginState->get_undo_mgr());
+			pluginState->presetCurrentNode = presetIn;
+		}
+	}
+
+	return presetIn.hasType(IDs::presetNode);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
@@ -222,15 +243,27 @@ void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree&
 
 void SuperVirtualKeyboardAudioProcessorEditor::filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged)
 {
-	if (fileComponentThatHasChanged == openFileChooser.get())
+	if (fileComponentThatHasChanged == openFileBox.get())
 	{
-		load_preset(openFileChooser->getCurrentFile());
+		load_preset(openFileBox->getCurrentFile());
 	}
 
-	if (fileComponentThatHasChanged == saveFileChooser.get())
+	if (fileComponentThatHasChanged == saveFileBox.get())
 	{
 
 	}
+}
+
+File SuperVirtualKeyboardAudioProcessorEditor::fileDialog(String message, bool forSaving)
+{
+	FileChooser chooser(message, File::getSpecialLocation(File::userDocumentsDirectory), "*.svk");
+
+	if (forSaving)
+		chooser.browseForFileToSave(true);
+	else
+		chooser.browseForFileToOpen();
+
+	return chooser.getResult();
 }
 
 //==============================================================================
@@ -280,10 +313,10 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 	switch (info.commandID)
 	{
 	case IDs::CommandIDs::saveCustomLayout:
-		// TBI
+		save_preset(fileDialog("Save your preset..", true));
 		break;
 	case IDs::CommandIDs::loadCustomLayout:
-		// TBI
+		load_preset(fileDialog("Please select a preset to load...", false));
 		break;
 	case IDs::CommandIDs::saveReaperMap:
 		// TBI

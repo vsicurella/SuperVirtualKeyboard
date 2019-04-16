@@ -51,7 +51,8 @@ public:
     void init_node_data();
     void restore_node_data(ValueTree nodeIn);
 
-	bool load_preset(File& presetIn);
+	bool save_preset(File& fileOut);
+	bool load_preset(File& fileIn);
 
 	void update_children_to_preset();
 
@@ -75,6 +76,8 @@ public:
 
 	 void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged);
 
+	 File fileDialog(String message, bool forSaving);
+
 	 //==============================================================================
 
 	 ApplicationCommandTarget* getNextCommandTarget() override;
@@ -96,8 +99,8 @@ private:
 
 	ApplicationCommandManager appCmdMgr;
 
-	std::unique_ptr<FilenameComponent> openFileChooser;
-	std::unique_ptr<FilenameComponent> saveFileChooser;
+	std::unique_ptr<FilenameComponent> openFileBox;
+	std::unique_ptr<FilenameComponent> saveFileBox;
 	
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<VirtualKeyboard> piano;
