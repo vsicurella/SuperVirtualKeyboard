@@ -17,17 +17,16 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	pluginState(processor.get_plugin_state()),
 	piano(new VirtualKeyboard(&appCmdMgr, nullptr)),
 	view(new Viewport("Piano Viewport")),
-	scaleEdit(new KeyboardMenuBar(pluginState, &appCmdMgr))
+	keyboardEditorBar(new KeyboardEditorBar(pluginState, &appCmdMgr))
 {
 	setName("Super Virtual Piano");
 	setResizable(true, true);
 	setResizeLimits(640, 100, 10e4, 10e4);
 	setBroughtToFrontOnMouseClick(true);
 	
-	scaleEdit.get()->setName("Scale Edit Popup");
-	scaleEdit.get()->addChangeListener(this);
-	scaleEdit.get()->setSize(640, 48);
-	addAndMakeVisible(scaleEdit.get());
+	keyboardEditorBar.get()->setName("Scale Edit Popup");
+	keyboardEditorBar.get()->setSize(640, 48);
+	addAndMakeVisible(keyboardEditorBar.get());
     
 	piano.get()->setName("The Piano");
 
@@ -69,8 +68,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 {
 	AudioProcessorEditor::resized();
 
-	scaleEdit->setBounds(0, 6, getWidth(), 36);
-	view.get()->setBounds(0, scaleEdit->getBottom(), getWidth(), getHeight() - scaleEdit->getHeight() - view.get()->getScrollBarThickness());
+	keyboardEditorBar->setBounds(0, 6, getWidth(), 36);
+	view.get()->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight() - view.get()->getScrollBarThickness());
 	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
 
 	view.get()->setViewPositionProportionately(0.618, 0);
@@ -83,26 +82,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 		keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewArea().getX(), nullptr);
 	}
 	
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
-{
-    ModeLayout* newPreset = scaleEdit.get()->presetSelected;
-    
-	if (keyboardWindowNode.isValid() && newPreset)
-	{
-		keyboardWindowNode.setProperty(IDs::selectedPresetName, scaleEdit.get()->get_preset_name(), nullptr);
-		keyboardWindowNode.setProperty(IDs::selectedPresetIndex, scaleEdit.get()->get_preset_id(newPreset->get_full_name()), nullptr);
-		keyboardWindowNode.setProperty(IDs::selectedPresetComboID, scaleEdit.get()->get_selected_preset_id(), nullptr);
-
-		if (scaleEdit.get()->presetSelected->family == "Custom")
-			processor.set_current_mode(0);
-		else
-			processor.set_current_mode(keyboardWindowNode[IDs::selectedPresetIndex]);
-        
-        piano.get()->apply_layout(newPreset);
-	}
-    std::cout << keyboardWindowNode.toXmlString() << std::endl;
 }
 
 bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
@@ -178,7 +157,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 //==============================================================================
 
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar=false)
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar)
 {
     if (presetIn.hasType(IDs::modePresetNode))
     {

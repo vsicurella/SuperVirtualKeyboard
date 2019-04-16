@@ -13,7 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginProcessor.h"
 
-#include "KeyboardMenuBar.h"
+#include "KeyboardEditorBar.h"
 #include "../Structures/ModeLayout.h"
 #include "VirtualKeyboard.h"
 
@@ -23,7 +23,7 @@
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
-													public ChangeListener,
+													//public ValueTree::Listener,
 													public MidiInputCallback,
 													public Timer
 {
@@ -39,7 +39,6 @@ public:
 	//==============================================================================
 
 
-	void changeListenerCallback(ChangeBroadcaster*) override;
 	void timerCallback() override;
 	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
 	void focusGained(FocusChangeType changeType) override;
@@ -53,7 +52,7 @@ public:
 
 	//==============================================================================
 
-	bool load_preset(ValueTree presetIn, bool updateKeyboardMenuBar);
+	bool load_preset(ValueTree presetIn, bool updateKeyboardMenuBar = false);
 
 	//==============================================================================
 
@@ -80,14 +79,12 @@ private:
 	SuperVirtualKeyboardPluginState* pluginState;
 	MidiKeyboardState externalMidi;
     ValueTree keyboardWindowNode;
-	ValueTree presetCurrentNode;
 
 	ApplicationCommandManager appCmdMgr;
-
-
+	
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<VirtualKeyboard> piano;
-	std::unique_ptr<KeyboardMenuBar> scaleEdit;
+	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };

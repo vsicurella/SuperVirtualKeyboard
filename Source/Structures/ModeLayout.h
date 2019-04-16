@@ -10,12 +10,7 @@
 
 #pragma once
 
-#include <vector>
-#include <string>
-
-#include "../PluginState.h"
-
-//#include "../Structures/Scale.h"
+#include "../PluginIDs.h"
 
 /*
 	A class for representing the layout of a piano
@@ -26,7 +21,7 @@ struct ModeLayout
 {
 	//Scale* scale;
 	ValueTree modeLayoutNode;
-
+	
 	String modeName;
 	int scaleSize;
 	int modeSize;
@@ -276,7 +271,7 @@ struct ModeLayout
 		for (int i = 0; i < arrayIn.size(); i++)
 		{
 			ValueTree item = ValueTree(itemId);
-			item.setProperty("Value", arrayIn[i], nullptr);
+			item.setProperty(IDs::modeArrayValue, arrayIn[i], nullptr);
 			arrayTree.addChild(item, i, nullptr);
 		}
 
@@ -290,7 +285,7 @@ struct ModeLayout
 		{
 			for (int i = 0; i < nodeIn.getNumChildren(); i++)
 			{
-				arrayIn.add(nodeIn.getChild(i).getProperty("Value"));
+				arrayIn.add(nodeIn.getChild(i).getProperty(IDs::modeArrayValue));
 				DBG(arrayIn[i]);
 			}
 		}
@@ -308,9 +303,9 @@ struct ModeLayout
 		modeLayoutNode.setProperty(IDs::modeModeName, get_name_mode_size(), nullptr);
 		modeLayoutNode.setProperty(IDs::family, family, nullptr);
 		
-		add_array_to_node(steps, IDs::stepArray, IDs::modeArrayValue);
-		add_array_to_node(order, IDs::keyboardOrderArray, IDs::modeArrayValue);
-		add_array_to_node(modeDegrees, IDs::keyboardModeDegrees, IDs::modeArrayValue);
+		add_array_to_node(steps, IDs::stepArray, IDs::stepValue);
+		add_array_to_node(order, IDs::keyboardOrderArray, IDs::orderValue);
+		add_array_to_node(modeDegrees, IDs::keyboardModeDegrees, IDs::degreeValue);
 	}
 
 	void restore_from_node(ValueTree nodeIn)

@@ -5,7 +5,6 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
-    <GROUP id="{E90BF42D-566A-9A47-65C1-2C4D276A5399}" name="New Group"/>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
       <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"
             file="Source/Structures/FractionalGrid.h"/>
@@ -19,11 +18,12 @@
             file="Source/UI/VirtualKeyboard.cpp"/>
       <FILE id="AN9rho" name="VirtualKeyboard.h" compile="0" resource="0"
             file="Source/UI/VirtualKeyboard.h"/>
-      <FILE id="VSP7ge" name="KeyboardMenuBar.cpp" compile="1" resource="0"
-            file="Source/UI/KeyboardMenuBar.cpp"/>
-      <FILE id="GBz5d1" name="KeyboardMenuBar.h" compile="0" resource="0"
-            file="Source/UI/KeyboardMenuBar.h"/>
+      <FILE id="VSP7ge" name="KeyboardEditorBar.cpp" compile="1" resource="0"
+            file="Source/UI/KeyboardEditorBar.cpp"/>
+      <FILE id="GBz5d1" name="KeyboardEditorBar.h" compile="0" resource="0"
+            file="Source/UI/KeyboardEditorBar.h"/>
     </GROUP>
+    <FILE id="qf8oNW" name="PluginIDs.h" compile="0" resource="0" file="Source/PluginIDs.h"/>
     <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
     <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
     <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"

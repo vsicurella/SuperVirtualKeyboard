@@ -153,6 +153,7 @@ void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
 		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, presetIndexIn, undoManager.get());
 	}
+	DBG(presetCurrentNode.toXmlString());
 }
 
 void SuperVirtualKeyboardPluginState::set_current_mode(ModeLayout* modeIn)
@@ -160,10 +161,13 @@ void SuperVirtualKeyboardPluginState::set_current_mode(ModeLayout* modeIn)
 	if (modeIn)
 	{
 		modeCurrent = modeIn;
+		presets.set(0, modeCurrent, true);
 		presetCurrentNode.removeChild(0, undoManager.get());
 		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, 0, undoManager.get());
 	}
+
+	DBG(presetCurrentNode.toXmlString());
 }
 
 void SuperVirtualKeyboardPluginState::set_current_key_settings(ValueTree pianoNodeIn)

@@ -35,32 +35,25 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class KeyboardMenuBar  : public Component,
-                         public ChangeBroadcaster,
-                         public Button::Listener,
-                         public ComboBox::Listener
+class KeyboardEditorBar  : public Component,
+                           public Button::Listener,
+                           public ComboBox::Listener
 {
 public:
     //==============================================================================
-    KeyboardMenuBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn);
-    ~KeyboardMenuBar();
+    KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn);
+    ~KeyboardEditorBar();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	ModeLayout* presetSelected;
-
-	String get_preset_name();
-	ModeLayout* get_preset(String anyNameIn);
-
-    int get_preset_id(String anyNameIn);
-
-    int get_selected_preset_id();
-    void set_selected_preset(ModeLayout* presetIn);
-    void set_selected_preset(int comboBoxIdIn);
+    int get_mode_preset_index(String anyNameIn);
+    int get_mode_library_index();
     void set_text_boxes(String presetName, String steps);
 
+	void create_and_send_mode();
+
 	void populate_preset_menu();
-	String get_input();
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -81,9 +74,7 @@ private:
 						public MenuBarModel
 	{
 		StringArray options;
-
 		std::unique_ptr<MenuBarComponent> menuParent;
-
 		ApplicationCommandManager* appCmdMgr;
 
 		KeyboardMenu(ApplicationCommandManager* managerIn);
@@ -93,11 +84,10 @@ private:
 		void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
 		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
 		void resized() override;
-
-		MenuBarComponent* get_menu();
 	};
 
 	std::unique_ptr<KeyboardMenu> pianoMenu;
+	SuperVirtualKeyboardPluginState* pluginState;
 	ApplicationCommandManager* appCmdMgr;
 
 	// Preset Menus
@@ -117,14 +107,14 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TextEditor> textEditor;
-    std::unique_ptr<TextButton> sendScale;
-    std::unique_ptr<ComboBox> scalePresets;
+    std::unique_ptr<TextEditor> modeTextEditor;
+    std::unique_ptr<TextButton> sendScaleBtn;
+    std::unique_ptr<ComboBox> modeLibraryBox;
     std::unique_ptr<TextButton> keyboardModeBtn;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardMenuBar)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardEditorBar)
 };
 
 //[EndFile] You can add extra defines here...
