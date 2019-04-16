@@ -1,6 +1,6 @@
 ﻿# SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-13
+LATEST VERSION: Alpha 2019-04-13 (Contact me for build)
 
 SUMMARY:
 
