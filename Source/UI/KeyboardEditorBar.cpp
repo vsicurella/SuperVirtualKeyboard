@@ -129,7 +129,7 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == sendScaleBtn.get())
     {
         //[UserButtonCode_sendScaleBtn] -- add your button handler code here..
-		
+
 		// check to see if mode matches a preset
 		create_and_send_mode();
         //[/UserButtonCode_sendScaleBtn]
@@ -415,9 +415,8 @@ BEGIN_JUCER_METADATA
             posRelativeY="9f75aa2c0ca39fa4" editable="0" layout="33" items=""
             textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Keyboard Mode Button" id="9f75aa2c0ca39fa4" memberName="keyboardModeBtn"
-              virtualName="" explicitFocusOrder="0" pos="99.246%r 6 40 24"
-              bgColOff="ff5c7fa4" buttonText="Edit" connectedEdges="0" needsCallback="1"
-              radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="99.25%r 6 40 24" bgColOff="ff5c7fa4"
+              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

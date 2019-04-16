@@ -135,6 +135,8 @@ public:
 
 	void isolate_last_note();
 
+	void retrigger_notes();
+
 	bool check_keys_modal(int& orderDetected);
 
 	PianoKey* transpose_key_modal(PianoKey* key, int stepsIn);
@@ -274,6 +276,7 @@ private:
 	bool downHeld = false;
 	bool leftHeld = false;
 	bool rightHeld = false;
+	bool spaceHeld = false;
         
     bool displayIsReady = false;
     	

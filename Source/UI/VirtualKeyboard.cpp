@@ -409,6 +409,7 @@ void VirtualKeyboard::isolate_last_note()
 	}
 }
 
+
 bool VirtualKeyboard::check_keys_modal(int& orderDetected)
 {
 	orderDetected = keysOn[0]->order;
@@ -544,7 +545,15 @@ void VirtualKeyboard::transpose_keys(int stepsIn)
 		triggerKeyNoteOn(newKeys[i], newKeys[i]->velocity);
 }
 
+void VirtualKeyboard::retrigger_notes()
+{
+	std::vector<PianoKey*> retrigger = std::vector<PianoKey*>(keysOn);
+	
+	all_notes_off();
 
+	for (int i = 0; i < retrigger.size(); i++)
+		triggerKeyNoteOn(retrigger.at(i), retrigger.at(i)->velocity);
+}
 
 //===============================================================================================
 
@@ -732,25 +741,36 @@ bool VirtualKeyboard::keyStateChanged(bool isKeyDown)
 	if (!KeyPress::isKeyCurrentlyDown(KeyPress::upKey) && upHeld)
 	{
 		upHeld = false;
+		return true;
 	}
 
 	if (!KeyPress::isKeyCurrentlyDown(KeyPress::downKey) && downHeld)
 	{
 		downHeld = false;
+		return true;
 	}
 
 	if (!KeyPress::isKeyCurrentlyDown(KeyPress::leftKey) && leftHeld)
 	{
 		leftHeld = false;
+		return true;
 	}
 
 	if (!KeyPress::isKeyCurrentlyDown(KeyPress::rightKey) && rightHeld)
 	{
 		rightHeld = false;
+		return true;
 	}
 
-	return isKeyDown;
+	if (!KeyPress::isKeyCurrentlyDown(KeyPress::spaceKey) && spaceHeld)
+	{
+		spaceHeld = false;
+		return true;
+	}
+
+	return false;
 }
+
 bool VirtualKeyboard::keyPressed(const KeyPress& key)
 {
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::upKey) && !upHeld)
@@ -762,6 +782,7 @@ bool VirtualKeyboard::keyPressed(const KeyPress& key)
 			transpose_keys(1);
 			repaint();
 		}
+		return true;
 	}
 
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::downKey) && !downHeld)
@@ -773,6 +794,7 @@ bool VirtualKeyboard::keyPressed(const KeyPress& key)
 			transpose_keys(-1);
 			repaint();
 		}
+		return true;
 	}
 
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::leftKey) && !leftHeld)
@@ -784,6 +806,7 @@ bool VirtualKeyboard::keyPressed(const KeyPress& key)
 			if (transpose_keys_modal(-1))
 				repaint();
 		}
+		return true;
 	}
 
 	if (KeyPress::isKeyCurrentlyDown(KeyPress::rightKey) && !rightHeld)
@@ -795,6 +818,18 @@ bool VirtualKeyboard::keyPressed(const KeyPress& key)
 			if (transpose_keys_modal(1))
 				repaint();
 		}
+		return true;
+	}
+
+	if (KeyPress::isKeyCurrentlyDown(KeyPress::spaceKey) && !spaceHeld)
+	{
+		spaceHeld = true;
+
+		if (shiftHeld)
+		{
+			retrigger_notes();
+		}
+		return true;
 	}
 
 	return false;
