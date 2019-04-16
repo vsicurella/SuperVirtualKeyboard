@@ -54,6 +54,7 @@ namespace IDs
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
 	static Identifier pianoMidiNoteOffset("MidiNodeOffset");
 	static Identifier pianoMPEToggle("MpeToggle");
+	static Identifier pianoWHRatio("WidthToHeightRatio");
 	static Identifier pianoKeyOrderPlacement("OrderedKeysPlacement");
 	static Identifier pianoKeyOrderRatios("KeySizeRatios");
 	static Identifier pianoKeyOrderColors("KeyColors");

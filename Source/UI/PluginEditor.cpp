@@ -42,7 +42,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     {
         init_node_data();
     }
-
+	pluginState->presetCurrentNode.addListener(this);
     restore_node_data(pluginState->keyboardWindowNode);
 
 	appCmdMgr.registerAllCommandsForTarget(piano.get());
@@ -55,6 +55,57 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
+}
+
+
+
+//==============================================================================
+
+void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
+{
+	keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
+
+	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
+	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
+	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
+
+	piano->init_data_node();
+	pluginState->pianoNode = piano->get_node();
+	keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
+
+	pluginState->keyboardWindowNode = keyboardWindowNode;
+	pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
+{
+	keyboardWindowNode = nodeIn;
+	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
+	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
+
+	update_children_to_preset();
+}
+
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar)
+{
+	if (presetIn.hasType(IDs::modePresetNode))
+	{
+
+	}
+
+	return false;
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
+{
+	ModeLayout* modeCurrent = pluginState->get_current_mode();
+
+	piano->apply_layout(modeCurrent);
+
+	keyboardEditorBar->set_mode_readout_text(modeCurrent->strSteps);
+
+	if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)
+		keyboardEditorBar->set_mode_library_text(modeCurrent->get_full_name());
 }
 
 //==============================================================================
@@ -84,17 +135,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 	
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
-{
-	if (key == KeyPress::returnKey)
-	{
-
-		return true;
-	}
-
-	return false;
-}
-
+//==============================================================================
 
 void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 {
@@ -108,6 +149,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInp
 {
 	externalMidi.processNextMidiEvent(message);
 }
+
+//==============================================================================
 
 void SuperVirtualKeyboardAudioProcessorEditor::focusGained(FocusChangeType changeType)
 {
@@ -127,44 +170,53 @@ void SuperVirtualKeyboardAudioProcessorEditor::visibilityChanged()
 	}
 }
 
-//==============================================================================
-
-void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
+bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
 {
-	keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
+	if (key == KeyPress::returnKey)
+	{
 
-	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
-    
-    piano->init_data_node();
-    pluginState->pianoNode = piano->get_node();
-    keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
+		return true;
+	}
 
-	pluginState->keyboardWindowNode = keyboardWindowNode;
-	pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
-{
-    keyboardWindowNode = nodeIn;
-	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
-	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
-
-	load_preset(pluginState->presetCurrentNode);
-}
-
-//==============================================================================
-
-
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar)
-{
-    if (presetIn.hasType(IDs::modePresetNode))
-    {
-        
-    }
-    
 	return false;
+}
+
+//==============================================================================
+
+void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
+{
+
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
+{
+	if (parentTree.hasType(IDs::presetNode))
+	{
+		if (childWhichHasBeenAdded.hasType(IDs::modePresetNode))
+		{
+			update_children_to_preset();
+
+			if (getWidth() > piano->getWidth())
+			{
+				//setSize(getWidth(), (piano->getWidth() / (pluginState->get_current_mode()->get_num_modal_notes() * (float)keyboardWindowNode[IDs::pianoWHRatio])));
+			}
+		}
+	}
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
+{
+
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex)
+{
+
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged)
+{
+
 }
 
 
@@ -228,3 +280,4 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 	}
 	return true;
 }
+

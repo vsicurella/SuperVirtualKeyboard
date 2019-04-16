@@ -45,6 +45,8 @@ struct SuperVirtualKeyboardPluginState
 	int get_current_preset_index();
 	ModeLayout* get_current_mode();
 
+	int is_mode_in_presets(ModeLayout* modeIn);
+
 	void set_current_mode(int presetIndexIn);
 	void set_current_mode(ModeLayout* modeIn);
 

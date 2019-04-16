@@ -211,6 +211,7 @@ void VirtualKeyboard::init_data_node()
 	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelSelected, undo);
 	pianoNode.setProperty(IDs::pianoMidiNoteOffset, midiNoteOffset, undo);
 	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
+	pianoNode.setProperty(IDs::pianoWHRatio, defaultKeyWHRatio, undo);
 
 	PianoKey* key;
 	for (int i = 0; i < keys.size(); i++)
@@ -243,6 +244,8 @@ void VirtualKeyboard::restore_data_node(ValueTree pianoNodeIn)
 	midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
 
 	mpeOn = pianoNode[IDs::pianoMPEToggle];
+
+	defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
 
 	PianoKey* key;
 	for (int i = 0; i < keys.size(); i++)
@@ -870,29 +873,29 @@ void VirtualKeyboard::paint(Graphics& g)
 
 void VirtualKeyboard::resized()
 {
-    if (displayIsReady)
-    {
-	// Calculate key sizes
-	keyHeight = getHeight() - 1;
-	keyWidth = keyHeight * defaultKeyWHRatio;
-
-	// Adjust Parent bounds and grid
-    pianoWidth = modalKeysSize * keyWidth;
-	setSize(pianoWidth, getHeight());
-	grid.setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
-
-	// Resize keys
-	PianoKey* key;
-	int w, h;
-	for (int i = 0; i < keys.size(); i++)
+	if (displayIsReady)
 	{
-		key = keys.getUnchecked(i);
-		w = keyWidth * key->orderWidthRatio;
-		h = keyHeight * key->orderHeightRatio;
-		key->setSize(w, h);
-		grid.place_key(key);
+		// Calculate key sizes
+		keyHeight = getHeight() - 1;
+		keyWidth = keyHeight * defaultKeyWHRatio;
+
+		// Adjust Parent bounds and grid
+		pianoWidth = modalKeysSize * keyWidth;
+		setSize(pianoWidth, getHeight());
+		grid.setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
+
+		// Resize keys
+		PianoKey* key;
+		int w, h;
+		for (int i = 0; i < keys.size(); i++)
+		{
+			key = keys.getUnchecked(i);
+			w = keyWidth * key->orderWidthRatio;
+			h = keyHeight * key->orderHeightRatio;
+			key->setSize(w, h);
+			grid.place_key(key);
+		}
 	}
-    }
 }
 
 void VirtualKeyboard::visibilityChanged()

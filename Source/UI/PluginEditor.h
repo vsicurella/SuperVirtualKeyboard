@@ -23,7 +23,7 @@
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
-													//public ValueTree::Listener,
+													public ValueTree::Listener,
 													public MidiInputCallback,
 													public Timer
 {
@@ -50,19 +50,9 @@ public:
     void init_node_data();
     void restore_node_data(ValueTree nodeIn);
 
-	//==============================================================================
-
 	bool load_preset(ValueTree presetIn, bool updateKeyboardMenuBar = false);
 
-	//==============================================================================
-
-	ApplicationCommandTarget* getNextCommandTarget() override;
-
-	void getAllCommands(Array< CommandID > &commands) override;
-
-	void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
-
-	bool perform(const InvocationInfo &info) override;
+	void update_children_to_preset();
 
 	//==============================================================================
 
@@ -70,6 +60,25 @@ public:
 
 	//==============================================================================
 
+	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
+
+	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
+
+	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved);
+
+	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex);
+
+	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged);
+
+	 //==============================================================================
+
+	 ApplicationCommandTarget* getNextCommandTarget() override;
+
+	 void getAllCommands(Array< CommandID > &commands) override;
+
+	 void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
+
+	 bool perform(const InvocationInfo &info) override;
 
 
 private:

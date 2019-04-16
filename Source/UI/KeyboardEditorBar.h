@@ -48,7 +48,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     int get_mode_preset_index(String anyNameIn);
     int get_mode_library_index();
-    void set_text_boxes(String presetName, String steps);
+    void set_mode_readout_text(String steps);
+	void set_mode_library_text(String presetName);
 
 	void create_and_send_mode();
 
@@ -80,10 +81,11 @@ private:
 		KeyboardMenu(ApplicationCommandManager* managerIn);
 		~KeyboardMenu();
 
+		void resized() override;
+
 		StringArray getMenuBarNames() override;
 		void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
 		PopupMenu getMenuForIndex(int topLevelMenuIndex, const String &menuName) override;
-		void resized() override;
 	};
 
 	std::unique_ptr<KeyboardMenu> pianoMenu;

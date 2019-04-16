@@ -129,6 +129,8 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == sendScaleBtn.get())
     {
         //[UserButtonCode_sendScaleBtn] -- add your button handler code here..
+		
+		// check to see if mode matches a preset
 		create_and_send_mode();
         //[/UserButtonCode_sendScaleBtn]
     }
@@ -214,16 +216,31 @@ int KeyboardEditorBar::get_mode_library_index()
     return modeLibraryBox->getSelectedId();
 }
 
-void KeyboardEditorBar::set_text_boxes(String presetName, String steps)
+void KeyboardEditorBar::set_mode_readout_text(String steps)
 {
-    modeTextEditor->setText(steps);
-	modeLibraryBox->setText(presetName);
+	modeTextEditor->setText(steps, false);
+}
+
+void KeyboardEditorBar::set_mode_library_text(String presetName)
+{
+	modeLibraryBox->setText(presetName, NotificationType::dontSendNotification);
 }
 
 void KeyboardEditorBar::create_and_send_mode()
 {
-	pluginState->set_current_mode(new ModeLayout(modeTextEditor->getText(), "Custom"));
+	ModeLayout mode = ModeLayout(modeTextEditor->getText(), "Custom");
+
+	// check to see if mode matches a preset
+	int index = pluginState->is_mode_in_presets(&mode);
+
+	if (index)
+		pluginState->set_current_mode(index);
+	else
+		pluginState->set_current_mode(new ModeLayout(modeTextEditor->getText(), "Custom"));
 }
+
+//==============================================================================
+
 
 
 KeyboardEditorBar::KeyboardMenu::KeyboardMenu(ApplicationCommandManager* managerIn)
@@ -242,6 +259,14 @@ KeyboardEditorBar::KeyboardMenu::KeyboardMenu(ApplicationCommandManager* manager
 KeyboardEditorBar::KeyboardMenu::~KeyboardMenu()
 {
 }
+
+
+void KeyboardEditorBar::KeyboardMenu::resized()
+{
+	menuParent->setBounds(0, 0, 350, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight());
+}
+//==============================================================================
+
 
 StringArray KeyboardEditorBar::KeyboardMenu::getMenuBarNames()
 {
@@ -277,11 +302,6 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 	}
 
 	return menu;
-}
-
-void KeyboardEditorBar::KeyboardMenu::resized()
-{
-	menuParent->setBounds(0, 0,	350, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight());
 }
 
 //==============================================================================

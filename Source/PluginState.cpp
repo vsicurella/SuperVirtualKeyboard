@@ -142,18 +142,31 @@ ModeLayout* SuperVirtualKeyboardPluginState::get_current_mode()
 	return modeCurrent;
 }
 
+int SuperVirtualKeyboardPluginState::is_mode_in_presets(ModeLayout* modeIn)
+{
+	int index = 0;
+
+	for (auto mode : presets)
+	{
+		if (modeIn->strSteps == mode->strSteps)
+			return index;
+		index++;
+	}
+
+	return 0;
+}
+
 void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
 {
 	ModeLayout* mode = presets.getUnchecked(presetIndexIn);
-
+	
 	if (mode)
 	{
 		modeCurrent = mode;
 		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, presetIndexIn, undoManager.get());
+		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 	}
-	DBG(presetCurrentNode.toXmlString());
 }
 
 void SuperVirtualKeyboardPluginState::set_current_mode(ModeLayout* modeIn)
@@ -163,11 +176,9 @@ void SuperVirtualKeyboardPluginState::set_current_mode(ModeLayout* modeIn)
 		modeCurrent = modeIn;
 		presets.set(0, modeCurrent, true);
 		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, 0, undoManager.get());
+		presetCurrentNode.addChild(modeCurrent->modeLayoutNode.createCopy(), 0, undoManager.get());
 	}
-
-	DBG(presetCurrentNode.toXmlString());
 }
 
 void SuperVirtualKeyboardPluginState::set_current_key_settings(ValueTree pianoNodeIn)
