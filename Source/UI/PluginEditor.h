@@ -24,6 +24,7 @@
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
 													public ValueTree::Listener,
+													public FilenameComponentListener,
 													public MidiInputCallback,
 													public Timer
 {
@@ -50,7 +51,7 @@ public:
     void init_node_data();
     void restore_node_data(ValueTree nodeIn);
 
-	bool load_preset(ValueTree presetIn, bool updateKeyboardMenuBar = false);
+	bool load_preset(File& presetIn);
 
 	void update_children_to_preset();
 
@@ -72,6 +73,10 @@ public:
 
 	 //==============================================================================
 
+	 void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged);
+
+	 //==============================================================================
+
 	 ApplicationCommandTarget* getNextCommandTarget() override;
 
 	 void getAllCommands(Array< CommandID > &commands) override;
@@ -90,6 +95,9 @@ private:
     ValueTree keyboardWindowNode;
 
 	ApplicationCommandManager appCmdMgr;
+
+	std::unique_ptr<FilenameComponent> openFileChooser;
+	std::unique_ptr<FilenameComponent> saveFileChooser;
 	
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<VirtualKeyboard> piano;

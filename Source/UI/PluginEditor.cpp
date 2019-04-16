@@ -37,6 +37,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	view.get()->setViewPositionProportionately(0.6, 0);
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
+
+	openFileChooser.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
+	saveFileChooser.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
     
     if (!pluginState->keyboardWindowNode.isValid())
     {
@@ -86,14 +89,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 	update_children_to_preset();
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(ValueTree presetIn, bool updateKeyboardMenuBar)
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(File& presetIn)
 {
-	if (presetIn.hasType(IDs::modePresetNode))
-	{
-
-	}
-
-	return false;
+	
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
@@ -104,7 +102,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 
 	keyboardEditorBar->set_mode_readout_text(modeCurrent->strSteps);
 
-	if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)
+	//if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)
 		keyboardEditorBar->set_mode_library_text(modeCurrent->get_full_name());
 }
 
@@ -219,6 +217,21 @@ void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree&
 
 }
 
+//==============================================================================
+
+
+void SuperVirtualKeyboardAudioProcessorEditor::filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged)
+{
+	if (fileComponentThatHasChanged == openFileChooser.get())
+	{
+		load_preset(openFileChooser->getCurrentFile());
+	}
+
+	if (fileComponentThatHasChanged == saveFileChooser.get())
+	{
+
+	}
+}
 
 //==============================================================================
 
