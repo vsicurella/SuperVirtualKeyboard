@@ -11,13 +11,23 @@
       <FILE id="ZNc2fR" name="ModeLayout.h" compile="0" resource="0" file="Source/Structures/ModeLayout.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
+      <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
+        <FILE id="lEPSUo" name="VirtualKeyboard.cpp" compile="1" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboard.cpp"/>
+        <FILE id="aVXZbp" name="VirtualKeyboard.h" compile="0" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboard.h"/>
+        <FILE id="VrS1Wy" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
+        <FILE id="C8YEWL" name="VirtualKeyboardGrid.h" compile="0" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboardGrid.h"/>
+        <FILE id="T2KdRe" name="VirtualKeyboardKey.cpp" compile="1" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboardKey.cpp"/>
+        <FILE id="ApOBl5" name="VirtualKeyboardKey.h" compile="0" resource="0"
+              file="Source/UI/VirtualKeyboard/VirtualKeyboardKey.h"/>
+      </GROUP>
       <FILE id="aP536B" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
       <FILE id="E04sU2" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
-      <FILE id="ffTKmf" name="VirtualKeyboard.cpp" compile="1" resource="0"
-            file="Source/UI/VirtualKeyboard.cpp"/>
-      <FILE id="AN9rho" name="VirtualKeyboard.h" compile="0" resource="0"
-            file="Source/UI/VirtualKeyboard.h"/>
       <FILE id="VSP7ge" name="KeyboardEditorBar.cpp" compile="1" resource="0"
             file="Source/UI/KeyboardEditorBar.cpp"/>
       <FILE id="GBz5d1" name="KeyboardEditorBar.h" compile="0" resource="0"

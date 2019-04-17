@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
+#include "../JuceLibraryCode/JuceHeader.h"
 
 // IDENTIFIERS
 
@@ -28,6 +28,7 @@ namespace IDs
 	static Identifier stepString("StepsString");
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
+    static Identifier modeUserName("UserModeName");
 	static Identifier modeFullName("ModeName");
 	static Identifier modeScaleName("NameScaleSize");
 	static Identifier modeModeName("NameModeSize");
@@ -61,10 +62,10 @@ namespace IDs
 
 	// Piano Key Component
 	static Identifier pianoKeyNode("PianoKeyNode");
-	static Identifier pianokeyNumber("KeyNumber");
+	static Identifier pianoKeyNumber("KeyNumber");
 	static Identifier pianoKeyModeDegree("KeyModeDegree");
 	static Identifier pianoKeyOrder("KeyOrder");
-	static Identifier pianokeyMidiNote("MappedMidiNote");
+	static Identifier pianoKeyMidiNote("MappedMidiNote");
 	static Identifier pianoKeyWidthMod("KeyWidthModifier");
 	static Identifier pianoKeyHeightMod("KeyHeightModifier");
 	static Identifier pianoKeyXOffset("KeyXOffset");

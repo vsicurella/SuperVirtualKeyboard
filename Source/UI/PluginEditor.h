@@ -15,8 +15,9 @@
 
 #include "KeyboardEditorBar.h"
 #include "../Structures/ModeLayout.h"
-#include "VirtualKeyboard.h"
+#include "VirtualKeyboard/Keyboard.h"
 
+using namespace VirtualKeyboard;
 
 //==============================================================================
 /**
@@ -51,8 +52,8 @@ public:
     void init_node_data();
     void restore_node_data(ValueTree nodeIn);
 
-	bool save_preset(File& fileOut);
-	bool load_preset(File& fileIn);
+	bool save_preset(const File& fileOut);
+	bool load_preset(const File& fileIn);
 
 	void update_children_to_preset();
 
@@ -62,19 +63,19 @@ public:
 
 	//==============================================================================
 
-	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
+	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
 
-	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
+	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
 
-	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved);
+	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override;
 
-	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex);
+	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override;
 
-	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged);
+	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
 
 	 //==============================================================================
 
-	 void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged);
+	 void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged) override;
 
 	 File fileDialog(String message, bool forSaving);
 
@@ -103,7 +104,7 @@ private:
 	std::unique_ptr<FilenameComponent> saveFileBox;
 	
 	std::unique_ptr<Viewport> view;
-	std::unique_ptr<VirtualKeyboard> piano;
+	std::unique_ptr<Keyboard> piano;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)

@@ -11,11 +11,13 @@
 #include "PluginEditor.h"
 #include "../PluginProcessor.h"
 
+using namespace VirtualKeyboard;
+
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
 	pluginState(processor.get_plugin_state()),
-	piano(new VirtualKeyboard(&appCmdMgr, nullptr)),
+	piano(new Keyboard(pluginState, &appCmdMgr)),
 	view(new Viewport("Piano Viewport")),
 	keyboardEditorBar(new KeyboardEditorBar(pluginState, &appCmdMgr))
 {
@@ -89,14 +91,14 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 	update_children_to_preset();
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(File& fileOut)
+bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(const File& fileOut)
 {
 	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
 	return xml->writeToFile(fileOut, "");
 }
 	
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(File& fileIn)
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 {
 	ValueTree presetIn;
 
@@ -122,7 +124,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	ModeLayout* modeCurrent = pluginState->get_current_mode();
 
-	piano->apply_layout(modeCurrent);
+	piano->apply_mode_layout(modeCurrent);
 
 	keyboardEditorBar->set_mode_readout_text(modeCurrent->strSteps);
 
@@ -248,7 +250,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::filenameComponentChanged(Filename
 {
 	if (fileComponentThatHasChanged == openFileBox.get())
 	{
-		load_preset(openFileBox->getCurrentFile());
+		
 	}
 
 	if (fileComponentThatHasChanged == saveFileBox.get())

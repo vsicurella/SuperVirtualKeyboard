@@ -35,11 +35,12 @@ struct ModeLayout
 	Array<float> modeDegrees;
 
 	/*
-		Sets the name of the mode
+		Sets user name of the mode
 	*/
-	String set_name(String nameIn)
+	String set_user_name(String nameIn)
 	{
 		modeName = nameIn;
+        modeLayoutNode.setProperty(IDs::modeUserName, modeName, nullptr);
 		return modeName;
 	}
 
@@ -316,6 +317,7 @@ struct ModeLayout
 		{
 			modeLayoutNode = nodeIn;
 
+            modeName = modeLayoutNode[IDs::modeUserName];
 			scaleSize = modeLayoutNode[IDs::scaleSize];
 			modeSize = modeLayoutNode[IDs::modeSize];
 			strSteps = modeLayoutNode[IDs::stepString];
