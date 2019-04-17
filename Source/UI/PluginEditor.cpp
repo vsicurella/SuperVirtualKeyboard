@@ -92,7 +92,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(File& fileOut)
 {
 	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
-	return xml->writeToFile(fileOut, "SuperVirtualKeyboardPreset");
+	return xml->writeToFile(fileOut, "");
 }
 	
 
@@ -103,13 +103,16 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(File& fileIn)
 	if (fileIn.exists())
 	{
 		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
-		presetIn = ValueTree::fromXml(*xml.get());
-
+		presetIn = ValueTree::fromXml(*(xml.get()));
+		DBG(presetIn.toXmlString());
 		if (presetIn.hasType(IDs::presetNode))
 		{
 			pluginState->presetCurrentNode.removeAllChildren(pluginState->get_undo_mgr());
 			pluginState->presetCurrentNode = presetIn;
+			pluginState->get_current_mode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
 		}
+
+		update_children_to_preset();
 	}
 
 	return presetIn.hasType(IDs::presetNode);

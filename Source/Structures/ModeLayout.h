@@ -281,11 +281,13 @@ struct ModeLayout
 	template <class T>
 	void get_array_from_node(Array<T>& arrayIn, const ValueTree nodeIn, Identifier arrayID)
 	{
-		if (nodeIn.hasType(arrayID))
+		ValueTree childArray = nodeIn.getChildWithName(arrayID);
+
+		if (childArray.isValid())
 		{
-			for (int i = 0; i < nodeIn.getNumChildren(); i++)
+			for (int i = 0; i < childArray.getNumChildren(); i++)
 			{
-				arrayIn.add(nodeIn.getChild(i).getProperty(IDs::modeArrayValue));
+				arrayIn.add(childArray.getChild(i).getProperty(IDs::modeArrayValue));
 				DBG(arrayIn[i]);
 			}
 		}
