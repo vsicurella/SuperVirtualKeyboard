@@ -9,7 +9,8 @@
  */
 
 #pragma once
-#include "Keyboard.h"
+#include "../JuceLibraryCode/JuceHeader.h"
+#include "../../PluginIDs.h"
 
 namespace VirtualKeyboard
 {

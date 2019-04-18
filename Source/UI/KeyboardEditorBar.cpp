@@ -325,7 +325,7 @@ void KeyboardEditorBar::populate_preset_menu()
 
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
-		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
+		mode = presetsSorted->getUnchecked(SortType::scaleSizeSort).getUnchecked(i);
 		name = mode->get_name_scale_size();
 		presetIndex = presets->indexOf(mode);
 
@@ -342,7 +342,7 @@ void KeyboardEditorBar::populate_preset_menu()
 
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
-		mode = presetsSorted->getUnchecked(SortType::modeSize).getUnchecked(i);
+		mode = presetsSorted->getUnchecked(SortType::modeSizeSort).getUnchecked(i);
 		name = mode->get_name_mode_size();
 		presetIndex = presets->indexOf(mode);
 
@@ -359,7 +359,7 @@ void KeyboardEditorBar::populate_preset_menu()
 
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
-		mode = presetsSorted->getUnchecked(SortType::family)[i];
+		mode = presetsSorted->getUnchecked(SortType::familySort)[i];
 		name = mode->get_full_name();
 		presetIndex = presets->indexOf(mode);
 

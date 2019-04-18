@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../../Structures/FractionalGrid.h"
+#include "../../Structures/ModeLayout.h"
 #include "VirtualKeyboardKey.h"
 
 namespace VirtualKeyboard
@@ -30,7 +31,7 @@ namespace VirtualKeyboard
         
         ~KeyboardGrid() {};
         
-        void set_ordered_key_view(KeyPlacement placementType);
+        void set_ordered_key_view(int placementType);
         
         void resize_ordered_key(Key* key);
         

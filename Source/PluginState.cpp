@@ -266,11 +266,11 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	}
 
 	sorting.sort(scaleSort, false);
-	presetsSorted.getReference(SortType::scaleSize).addArray(sorting);
+	presetsSorted.getReference(SortType::scaleSizeSort).addArray(sorting);
 
 	sorting.sort(modeSort, false);
-	presetsSorted.getReference(SortType::modeSize).addArray(sorting);
+	presetsSorted.getReference(SortType::modeSizeSort).addArray(sorting);
 
 	sorting.sort(famSort, false);
-	presetsSorted.getReference(SortType::family).addArray(sorting);
+	presetsSorted.getReference(SortType::familySort).addArray(sorting);
 }

@@ -28,15 +28,22 @@ KeyboardGrid::KeyboardGrid(ModeLayout* layoutIn)
     set_grid(layout->get_num_modal_notes(), 1);
 }
 
-void KeyboardGrid::set_ordered_key_view(KeyPlacement placementType)
+/*
+	Circular dependencies issues....
+	0 = nestedRight
+	1 = nestedCenter
+	2 = adjacent
+*/
+
+void KeyboardGrid::set_ordered_key_view(int placementType)
 {
     orderedKeyRatios.clear();
     
     switch (placementType)
     {
-        case KeyPlacement::nestedCenter:
+        case 1:
             break;
-        case KeyPlacement::adjacent:
+        case 2:
             break;
         default: // aka nestedRight
             
@@ -45,8 +52,7 @@ void KeyboardGrid::set_ordered_key_view(KeyPlacement placementType)
             float heightMod;
             float xp = 0.618;
             
-            
-            for (int i = 0; i < modeSize; i++)
+            for (int i = 0; i < layout->modeSize; i++)
             {
                 localOrder = layout->get_steps()[i];
                 
@@ -65,13 +71,15 @@ void KeyboardGrid::set_ordered_key_view(KeyPlacement placementType)
                     }
                 }
             }
+			jassert(orderedKeyRatios.size() == layout->scaleSize);
+			break;
     }
 }
 
 void KeyboardGrid::resize_ordered_key(Key* key)
 {
     if (orderedKeyRatios.size() < 1)
-        set_ordered_key_view(KeyPlacement::nestedRight);
+        set_ordered_key_view(0);
     
     key->orderHeightRatio = orderedKeyRatios[key->keyNumber % layout->scaleSize];
     key->orderWidthRatio = 1.0f - (key->order > 0) * 1.25f * key->order / 8.0f;

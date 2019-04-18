@@ -12,10 +12,8 @@
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
-        <FILE id="lEPSUo" name="VirtualKeyboard.cpp" compile="1" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboard.cpp"/>
-        <FILE id="aVXZbp" name="VirtualKeyboard.h" compile="0" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboard.h"/>
+        <FILE id="iSjBmx" name="Keyboard.cpp" compile="1" resource="0" file="Source/UI/VirtualKeyboard/Keyboard.cpp"/>
+        <FILE id="Om3FED" name="Keyboard.h" compile="0" resource="0" file="Source/UI/VirtualKeyboard/Keyboard.h"/>
         <FILE id="VrS1Wy" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
               file="Source/UI/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
         <FILE id="C8YEWL" name="VirtualKeyboardGrid.h" compile="0" resource="0"

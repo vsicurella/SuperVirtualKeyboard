@@ -47,6 +47,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     {
         init_node_data();
     }
+
 	pluginState->presetCurrentNode.addListener(this);
     restore_node_data(pluginState->keyboardWindowNode);
 
@@ -61,8 +62,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
 }
-
-
 
 //==============================================================================
 
@@ -113,7 +112,6 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 			pluginState->presetCurrentNode = presetIn;
 			pluginState->get_current_mode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
 		}
-
 		update_children_to_preset();
 	}
 

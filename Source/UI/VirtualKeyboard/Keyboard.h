@@ -28,20 +28,20 @@ namespace VirtualKeyboard
 {
     enum PianoMode
     {
-        playMode = 1,
+        playMode = 0,
         editMode
     };
     
     enum PianoOrientation
     {
-        horizontal = 1,
+        horizontal = 0,
         verticalLeft,
         verticalRight
     };
     
     enum KeyPlacement
     {
-        nestedRight = 1,
+        nestedRight = 0,
         nestedCenter,
         adjacent
     };

@@ -268,10 +268,11 @@ struct ModeLayout
 	void add_array_to_node(const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
 	{
 		ValueTree arrayTree = ValueTree(arrayID);
-		
+		ValueTree item;
+
 		for (int i = 0; i < arrayIn.size(); i++)
 		{
-			ValueTree item = ValueTree(itemId);
+			item = ValueTree(itemId);
 			item.setProperty(IDs::modeArrayValue, arrayIn[i], nullptr);
 			arrayTree.addChild(item, i, nullptr);
 		}
@@ -324,7 +325,7 @@ struct ModeLayout
 			family = modeLayoutNode[IDs::family];
 
 			steps.clear();
-			get_array_from_node(steps, modeLayoutNode, IDs::modeArrayValue);
+			get_array_from_node(steps, modeLayoutNode, IDs::stepArray);
 
 			order.clear();
 			get_array_from_node(order, modeLayoutNode, IDs::keyboardOrderArray);

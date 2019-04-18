@@ -92,7 +92,7 @@ namespace IDs
 
 enum SortType
 {
-	scaleSize,
-	modeSize,
-	family
+	scaleSizeSort,
+	modeSizeSort,
+	familySort
 };

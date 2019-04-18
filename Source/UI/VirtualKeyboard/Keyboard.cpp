@@ -189,7 +189,8 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
 
 		key->order = scaleLayout[i % tuningSize];
 		keysOrder[key->order].push_back(key);
-
+		
+		grid.set_ordered_key_view(0);
 		grid.resize_ordered_key(key);
 
 		key->setColour(0, get_key_color(key));

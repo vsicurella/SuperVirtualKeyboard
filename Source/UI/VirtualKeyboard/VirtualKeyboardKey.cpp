@@ -44,7 +44,7 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 void Key::restore_from_node(ValueTree parentNodeIn)
 {
     pianoKeyNode = parentNodeIn.getChild(keyNumber);
-    mappedMIDInote = pianoKeyNode[IDs::pianokeyMidiNote];
+    mappedMIDInote = pianoKeyNode[IDs::pianoKeyMidiNote];
     widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
     heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
     xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
