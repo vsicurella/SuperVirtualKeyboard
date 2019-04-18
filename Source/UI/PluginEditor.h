@@ -17,6 +17,8 @@
 #include "../Structures/ModeLayout.h"
 #include "VirtualKeyboard/Keyboard.h"
 
+#include "../File IO/ReaperWriter.h"
+
 using namespace VirtualKeyboard;
 
 //==============================================================================

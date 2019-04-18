@@ -21,12 +21,12 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	view(new Viewport("Piano Viewport")),
 	keyboardEditorBar(new KeyboardEditorBar(pluginState, &appCmdMgr))
 {
-	setName("Super Virtual Piano");
+	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setResizeLimits(640, 100, 10e4, 10e4);
 	setBroughtToFrontOnMouseClick(true);
 	
-	keyboardEditorBar.get()->setName("Scale Edit Popup");
+	keyboardEditorBar.get()->setName("Keyboard Editor Bar");
 	keyboardEditorBar.get()->setSize(640, 48);
 	addAndMakeVisible(keyboardEditorBar.get());
     
@@ -53,6 +53,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	appCmdMgr.registerAllCommandsForTarget(piano.get());
 	appCmdMgr.registerAllCommandsForTarget(this);
+    
+    ReaperWriter rpp = ReaperWriter(pluginState->get_current_mode());
     
     setSize(1000, 250);
 	

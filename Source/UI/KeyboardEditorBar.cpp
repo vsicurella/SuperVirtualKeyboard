@@ -283,8 +283,8 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 	PopupMenu menu;
 	if (topLevelMenuIndex == 0)
 	{
+        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::saveCustomLayout, "Save layout");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::loadCustomLayout, "Load layout");
-		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::saveCustomLayout, "Save layout");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::saveReaperMap, "Export to Reaper MIDI note names file");
 	}
 	else if (topLevelMenuIndex == 1)
