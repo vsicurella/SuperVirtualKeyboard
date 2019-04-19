@@ -173,7 +173,7 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
  	grid = KeyboardGrid(modeLayout);
 
 	// for convenience
-	scaleLayout = modeLayout->get_order();
+	scaleLayout = modeLayout->get_order_array_offset();
 	tuningSize = scaleLayout.size();
 	modeSize = modeLayout->modeSize;
 	modeOrder = modeLayout->get_highest_order();
@@ -214,6 +214,35 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
 	// Calculate properties
 	displayIsReady = true;
 	resized();
+}
+
+void VirtualKeyboard::Keyboard::reapply_mode()
+{
+    scaleLayout = modeLayout->get_order_array_offset();
+    
+    keysOrder.clear();
+    
+    Key* key;
+    for (int i = 0; i < keys.size(); i++)
+    {
+        key = keys.getUnchecked(i);
+        
+        key->order = scaleLayout[i % tuningSize];
+        keysOrder[key->order].push_back(key);
+        
+        grid.resize_ordered_key(key);
+        
+        key->setColour(0, get_key_color(key));
+        key->setColour(1, get_key_color(key).contrasting(0.25));
+        key->setColour(2, Colours::yellow.darker());
+        
+        key->modeDegree = modeLayout->modeDegrees[(i % tuningSize)] + modeSize * (i / tuningSize);
+        
+        if (key->order == 0)
+            key->toBack();
+        else
+            key->toFront(false);        
+    }
 }
 
 //===============================================================================================

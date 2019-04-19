@@ -103,15 +103,17 @@ void ReaperWriter::setup_default_symbols()
 
 bool ReaperWriter::write_file()
 {
+    
+    if (!fileOut.exists())
+        return false;
+    
 	std::unique_ptr<FileOutputStream> outStream(fileOut.createOutputStream());
 
-	if (outStream->openedOk())
-	{
-		outStream->setPosition(0);
-		outStream->truncate();
-	}
-	else
+	if (!outStream->openedOk())
 		return false;
+    
+    outStream->setPosition(0);
+    outStream->truncate();
 
 	// Header
 	outStream->writeText("# MIDI note / CC name map\n", false, false, nullptr);

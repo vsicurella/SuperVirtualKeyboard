@@ -17,6 +17,8 @@
 	based on a given mode. The mode can be applied to different scales.
 */
 
+// THOUGHTS - wondering if i should make this entire implementation with circular arrays...
+
 struct ModeLayout
 {
 	//Scale* scale;
@@ -31,10 +33,11 @@ struct ModeLayout
 	String strSteps;
 	String family;
 	String mos;
-
+    
 	Array<int> order;
 	Array<int> steps;
 	Array<float> modeDegrees;
+    
 
 	/*
 		Sets user name of the mode
@@ -188,11 +191,32 @@ struct ModeLayout
 	{
 		return steps;
 	}
+    
+    int get_step(int indexIn)
+    {
+        int index = (((indexIn + offset) % modeSize + modeSize) % modeSize);
+        jassert(index >= 0 && index < modeSize);
+        return steps[index];
+    }
 
 	Array<int> get_order()
 	{
 		return order;
 	}
+    
+    Array<int> get_order_array_offset()
+    {
+        Array<int> orderOut;
+        
+        for (int i = 0; i < modeSize; i++)
+        {
+            for (int j = 0; j < get_step(i + offset); j++)
+                orderOut.add(j);
+        }
+        
+        orderOut.minimiseStorageOverheads();
+        return orderOut;
+    }
 
 	Array<int> get_order(int modeStartNote)
 	{
@@ -221,9 +245,10 @@ struct ModeLayout
 		return o;
 	}
 
-	void set_offset(int offsetIn)
+	void update_mode_offset(int offsetIn)
 	{
 		offset = offsetIn;
+        
 	}
 
 	std::string toString()

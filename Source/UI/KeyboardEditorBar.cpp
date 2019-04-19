@@ -65,6 +65,22 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
     keyboardModeBtn->addListener (this);
     keyboardModeBtn->setColour (TextButton::buttonColourId, Colour (0xff5c7fa4));
 
+    offsetSld.reset (new Slider ("Offset Slider"));
+    addAndMakeVisible (offsetSld.get());
+    offsetSld->setRange (-60, 67, 1);
+    offsetSld->setSliderStyle (Slider::IncDecButtons);
+    offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    offsetSld->addListener (this);
+
+    offsetLabel.reset (new Label ("Offset Label",
+                                  TRANS("Offset:")));
+    addAndMakeVisible (offsetLabel.get());
+    offsetLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    offsetLabel->setJustificationType (Justification::centredLeft);
+    offsetLabel->setEditable (false, false, false);
+    offsetLabel->setColour (TextEditor::textColourId, Colours::black);
+    offsetLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
@@ -89,6 +105,8 @@ KeyboardEditorBar::~KeyboardEditorBar()
     sendScaleBtn = nullptr;
     modeLibraryBox = nullptr;
     keyboardModeBtn = nullptr;
+    offsetSld = nullptr;
+    offsetLabel = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -113,10 +131,12 @@ void KeyboardEditorBar::resized()
 	pianoMenu->setBounds(1, 5, proportionOfWidth(1.0f), 24);
     //[/UserPreResize]
 
-    modeTextEditor->setBounds ((proportionOfWidth (0.9925f) - 40) + roundToInt (40 * -6.6500f) - 150, 6 + 0, 150, 24);
-    sendScaleBtn->setBounds ((proportionOfWidth (0.9925f) - 40) + roundToInt (40 * -4.2000f) - 88, 6 + 0, 88, 24);
-    modeLibraryBox->setBounds ((proportionOfWidth (0.9925f) - 40) + roundToInt (40 * -0.2500f) - 150, 6 + 0, 150, 24);
-    keyboardModeBtn->setBounds (proportionOfWidth (0.9925f) - 40, 6, 40, 24);
+    modeTextEditor->setBounds ((proportionOfWidth (0.9927f) - 40) + roundToInt (40 * -9.7000f) - 150, 6 + 0, 150, 24);
+    sendScaleBtn->setBounds ((proportionOfWidth (0.9927f) - 40) + roundToInt (40 * -7.2000f) - 88, 6 + 0, 88, 24);
+    modeLibraryBox->setBounds ((proportionOfWidth (0.9927f) - 40) + roundToInt (40 * -0.3000f) - 150, 6 + 0, 150, 24);
+    keyboardModeBtn->setBounds (proportionOfWidth (0.9927f) - 40, 6, 40, 24);
+    offsetSld->setBounds ((proportionOfWidth (0.9927f) - 40) + roundToInt (40 * -5.9500f), 2, 69, 32);
+    offsetLabel->setBounds ((proportionOfWidth (0.9927f) - 40) + roundToInt (40 * -7.0750f), 6, 47, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -158,6 +178,23 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
+}
+
+void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == offsetSld.get())
+    {
+        //[UserSliderCode_offsetSld] -- add your slider handling code here..
+        pluginState->get_current_mode()->offset = (int) offsetSld->getValue();
+        pluginState->presetCurrentNode.getChild(0).setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->get_undo_mgr());
+        //[/UserSliderCode_offsetSld]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 void KeyboardEditorBar::mouseEnter (const MouseEvent& e)
@@ -403,20 +440,31 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Custom Mode Entry" id="8c559f3dc17dcbb0" memberName="modeTextEditor"
-              virtualName="" explicitFocusOrder="0" pos="-665%r 0 150 24" posRelativeX="9f75aa2c0ca39fa4"
+              virtualName="" explicitFocusOrder="0" pos="-970%r 0 150 24" posRelativeX="9f75aa2c0ca39fa4"
               posRelativeY="9f75aa2c0ca39fa4" initialText="2 2 1 2 2 2 1" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Send Scale Button" id="3a2872f3357f900b" memberName="sendScaleBtn"
-              virtualName="" explicitFocusOrder="0" pos="-420%r 0 88 24" posRelativeX="9f75aa2c0ca39fa4"
+              virtualName="" explicitFocusOrder="0" pos="-720%r 0 88 24" posRelativeX="9f75aa2c0ca39fa4"
               posRelativeY="9f75aa2c0ca39fa4" buttonText="Send Scale" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mode Library Box" id="91d2066d9e23de1c" memberName="modeLibraryBox"
-            virtualName="" explicitFocusOrder="0" pos="-25%r 0 150 24" posRelativeX="9f75aa2c0ca39fa4"
+            virtualName="" explicitFocusOrder="0" pos="-30%r 0 150 24" posRelativeX="9f75aa2c0ca39fa4"
             posRelativeY="9f75aa2c0ca39fa4" editable="0" layout="33" items=""
             textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Keyboard Mode Button" id="9f75aa2c0ca39fa4" memberName="keyboardModeBtn"
-              virtualName="" explicitFocusOrder="0" pos="99.25%r 6 40 24" bgColOff="ff5c7fa4"
-              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="99.268%r 6 40 24"
+              bgColOff="ff5c7fa4" buttonText="Edit" connectedEdges="0" needsCallback="1"
+              radioGroupId="0"/>
+  <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
+          virtualName="" explicitFocusOrder="0" pos="-595% 2 69 32" posRelativeX="9f75aa2c0ca39fa4"
+          min="-60.0" max="67.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
+         virtualName="" explicitFocusOrder="0" pos="-707.5% 6 47 24" posRelativeX="9f75aa2c0ca39fa4"
+         edTextCol="ff000000" edBkgCol="0" labelText="Offset:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

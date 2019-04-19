@@ -37,7 +37,8 @@
 */
 class KeyboardEditorBar  : public Component,
                            public Button::Listener,
-                           public ComboBox::Listener
+                           public ComboBox::Listener,
+                           public Slider::Listener
 {
 public:
     //==============================================================================
@@ -61,6 +62,7 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void mouseEnter (const MouseEvent& e) override;
     void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel) override;
     bool keyPressed (const KeyPress& key) override;
@@ -113,6 +115,8 @@ private:
     std::unique_ptr<TextButton> sendScaleBtn;
     std::unique_ptr<ComboBox> modeLibraryBox;
     std::unique_ptr<TextButton> keyboardModeBtn;
+    std::unique_ptr<Slider> offsetSld;
+    std::unique_ptr<Label> offsetLabel;
 
 
     //==============================================================================

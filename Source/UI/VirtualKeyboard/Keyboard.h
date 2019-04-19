@@ -85,6 +85,8 @@ namespace VirtualKeyboard
         
         void apply_mode_layout(ModeLayout* layoutIn);
         
+        void reapply_mode();
+        
         void all_notes_off();
         
         void isolate_last_note();
