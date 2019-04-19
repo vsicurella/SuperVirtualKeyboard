@@ -14,13 +14,15 @@
 
 class ReaperWriter
 {
-    
     ModeLayout* mode;
     //Scale* scale;
     
-    Array<char> orderSymbols;
-    
-    File file;
+    Array<String> orderSymbols;
+ 
+    File filePath;
+	File fileOut;
+
+	void setup_default_symbols();
     
 public:
     
@@ -28,14 +30,14 @@ public:
     ~ReaperWriter();
     
     void set_mode(ModeLayout* modeIn);
-    void set_symbol(int orderIndex, char symbolIn);
+    void set_symbol(int orderIndex, String symbolIn);
     bool set_path(String pathIn);
     
     String ask_for_location();
     
     ModeLayout* get_mode();
-    Array<char> get_symbols();
-    char get_symbol(int orderIndexIn);
+    Array<String> get_symbols();
+	String get_symbol(int orderIndexIn);
     String get_path();
     
     bool write_file();

@@ -26,6 +26,7 @@ namespace IDs
 	static Identifier scaleSize("ScaleSize");
 	static Identifier modeSize("ModeSize");
 	static Identifier stepString("StepsString");
+	static Identifier modeOffset("ModeOffset");
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
     static Identifier modeUserName("UserModeName");

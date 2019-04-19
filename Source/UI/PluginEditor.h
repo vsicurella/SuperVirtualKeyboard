@@ -59,6 +59,8 @@ public:
 
 	void update_children_to_preset();
 
+	bool write_reaper_file();
+
 	//==============================================================================
 
 	bool keyPressed(const KeyPress& key) override;

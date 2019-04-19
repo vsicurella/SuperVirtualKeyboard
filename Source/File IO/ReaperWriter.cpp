@@ -18,37 +18,41 @@ ReaperWriter::ReaperWriter(ModeLayout* modeIn)
     
     if ((SystemStats::getOperatingSystemType() & SystemStats::OperatingSystemType::MacOSX) != 0)
     {
-        file = File(File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile("REAPER").getChildFile("MIDINoteNames"));
+        filePath = File(File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile("REAPER").getChildFile("MIDINoteNames"));
     }
     else if ((SystemStats::getOperatingSystemType() & SystemStats::OperatingSystemType::Windows) != 0)
     {
-        file = File(File::getSpecialLocation(File::userHomeDirectory).getChildFile("AppData").getChildFile("Roaming").getChildFile("REAPER").getChildFile("MIDINoteNames"));
+        filePath = File(File::getSpecialLocation(File::userHomeDirectory).getChildFile("AppData").getChildFile("Roaming").getChildFile("REAPER").getChildFile("MIDINoteNames"));
     }
     
-    if (!file.isDirectory())
-       file = File::getSpecialLocation(File::userDocumentsDirectory);
+    if (!filePath.isDirectory())
+       filePath = File::getSpecialLocation(File::userDocumentsDirectory);
 
-    FileChooser chooser("Save as", file, "*.txt");
+    FileChooser chooser("Save as", filePath, "*.txt");
     chooser.browseForFileToSave(true);
-    file = chooser.getResult();
+    fileOut = chooser.getResult();
+
+	setup_default_symbols();
 }
 
-ReaperWriter::~ReaperWriter() {}
+ReaperWriter::~ReaperWriter()
+{
+}
 
 void ReaperWriter::set_mode(ModeLayout* modeIn)
 {
     mode = modeIn;
 }
 
-void ReaperWriter::set_symbol(int orderIndex, char symbolIn)
+void ReaperWriter::set_symbol(int orderIndex, String symbolIn)
 {
     orderSymbols.set(orderIndex % orderSymbols.size(), symbolIn);
 }
 
 bool ReaperWriter::set_path(String pathIn)
 {
-    file = File(pathIn);
-    return file.isDirectory();
+    fileOut = File(pathIn);
+    return fileOut.getParentDirectory().isDirectory();
 }
 
 String ReaperWriter::ask_for_location()
@@ -61,27 +65,72 @@ ModeLayout* ReaperWriter::get_mode()
     return mode;
 }
 
-Array<char> ReaperWriter::get_symbols()
+Array<String> ReaperWriter::get_symbols()
 {
     return orderSymbols;
 }
 
-char ReaperWriter::get_symbol(int orderIndexIn)
+String ReaperWriter::get_symbol(int orderIndexIn)
 {
     return orderSymbols[orderIndexIn];
 }
 
 String ReaperWriter::get_path()
 {
-    return file.getFullPathName();
+    return fileOut.getFullPathName();
+}
+
+void ReaperWriter::setup_default_symbols()
+{
+	orderSymbols.clear();
+
+	CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
+	String symbol;
+	int orderMax = mode->get_highest_order();
+
+	for (int i = 0; i < 8; i++)
+	{
+		symbol = "";
+
+		for (int o = 0; o < (8 - i); o++)
+		{
+			symbol += *block;
+		}
+
+		orderSymbols.add(symbol);
+	}
 }
 
 bool ReaperWriter::write_file()
 {
+	std::unique_ptr<FileOutputStream> outStream(fileOut.createOutputStream());
+
+	if (outStream->openedOk())
+	{
+		outStream->setPosition(0);
+		outStream->truncate();
+	}
+	else
+		return false;
+
+	// Header
+	outStream->writeText("# MIDI note / CC name map\n", false, false, nullptr);
+
+	int order;
+	int index;
     for (int i = 0; i < 128; i++)
     {
-        
+		index = 127 - i;
+		order = mode->order[index % mode->scaleSize];
+
+		if (order != 0)
+		{
+			outStream->writeText(String(index) + " ", false, false, nullptr);
+			outStream->writeText(orderSymbols[order-1], false, false, nullptr);
+			outStream->write("\n", 1);
+		}
     }
-    
-    return true;
+
+	outStream->flush();
+	return true;
 }

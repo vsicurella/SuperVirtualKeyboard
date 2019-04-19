@@ -26,6 +26,8 @@ struct ModeLayout
 	int scaleSize;
 	int modeSize;
 
+	int offset = 0;
+
 	String strSteps;
 	String family;
 	String mos;
@@ -219,6 +221,11 @@ struct ModeLayout
 		return o;
 	}
 
+	void set_offset(int offsetIn)
+	{
+		offset = offsetIn;
+	}
+
 	std::string toString()
 	{
 		std::string out;
@@ -302,6 +309,7 @@ struct ModeLayout
 		modeLayoutNode.setProperty(IDs::scaleSize, scaleSize, nullptr);
 		modeLayoutNode.setProperty(IDs::modeSize, modeSize, nullptr);
 		modeLayoutNode.setProperty(IDs::stepString, strSteps, nullptr);
+		modeLayoutNode.setProperty(IDs::modeOffset, offset, nullptr);
 		modeLayoutNode.setProperty(IDs::modeFullName, get_full_name(), nullptr);
 		modeLayoutNode.setProperty(IDs::modeScaleName, get_name_scale_size(), nullptr);
 		modeLayoutNode.setProperty(IDs::modeModeName, get_name_mode_size(), nullptr);
@@ -323,6 +331,7 @@ struct ModeLayout
 			modeSize = modeLayoutNode[IDs::modeSize];
 			strSteps = modeLayoutNode[IDs::stepString];
 			family = modeLayoutNode[IDs::family];
+			offset = modeLayoutNode[IDs::modeOffset];
 
 			steps.clear();
 			get_array_from_node(steps, modeLayoutNode, IDs::stepArray);

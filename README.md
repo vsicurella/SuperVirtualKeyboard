@@ -1,6 +1,6 @@
 ﻿# SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-13 (Contact me for build)
+LATEST VERSION: Alpha 2019-04-18 (Contact me for build)
 
 SUMMARY:
 
@@ -18,13 +18,13 @@ FEATURES:
  - Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
    At this time, modal transposition is only possible if all held notes belong to the same mode (all white, all black, etc.)
 
+ - Save your layout as a text file that Reaper can load as "MIDI Note Names" so that you can see the layout in Reaper's piano roll!
+
 TO DO:
 
  - Customize key sizes and positions
  - Add custom colors
- - Save custom layouts
  - Change keyboard orientation
- - Save as a Reaper MIDI Note Name file
  - Add note names
  - Shift keyboard by offset
  - Set transposition parameters

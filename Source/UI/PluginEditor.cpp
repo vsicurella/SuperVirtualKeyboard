@@ -53,9 +53,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	appCmdMgr.registerAllCommandsForTarget(piano.get());
 	appCmdMgr.registerAllCommandsForTarget(this);
-    
-    ReaperWriter rpp = ReaperWriter(pluginState->get_current_mode());
-    
+        
     setSize(1000, 250);
 	
 	startTimerHz(20);
@@ -95,6 +93,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 
 bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(const File& fileOut)
 {
+	if (!fileOut.exists())
+		return false;
+
 	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
 	return xml->writeToFile(fileOut, "");
 }
@@ -119,6 +120,12 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 	}
 
 	return presetIn.hasType(IDs::presetNode);
+}
+
+bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
+{
+	ReaperWriter rpp = ReaperWriter(pluginState->get_current_mode());
+	return rpp.write_file();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
@@ -325,7 +332,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 		load_preset(fileDialog("Please select a preset to load...", false));
 		break;
 	case IDs::CommandIDs::saveReaperMap:
-		// TBI
+		write_reaper_file();
 		break;
 	default:
 		return false;
