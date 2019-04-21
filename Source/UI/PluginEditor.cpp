@@ -217,7 +217,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
-    if (treeWhosePropertyHasChanged.hasType(IDs::modePresetNode) && property == IDs::modeOffset)
+    if (treeWhosePropertyHasChanged.hasType(IDs::presetNode) && property == IDs::modeOffset)
     {
         //piano->reapply_mode();
         piano->apply_mode_layout(pluginState->get_current_mode());

@@ -17,7 +17,10 @@ Key::Key(String nameIn, int keyNumIn)
 {
     keyNumber = keyNumIn;
     mappedMIDInote = keyNumber;
-    
+	
+	editMenu.reset(new PopupMenu());
+	colorSelector.reset(new ColourSelector(ColourSelector::ColourSelectorOptions::showColourspace));
+
     setOpaque(true);
 }
 
@@ -50,3 +53,16 @@ void Key::restore_from_node(ValueTree parentNodeIn)
     xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
     yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
 }
+//==============================================================================
+
+void Key::mouseDown(const MouseEvent& e)
+{
+	if (e.)
+}
+
+void Key::mouseUp(const MouseEvent& e)
+{
+
+}
+
+bool Key::keyStateChanged(bool isKeyDown) override;

@@ -173,7 +173,7 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
  	grid = KeyboardGrid(modeLayout);
 
 	// for convenience
-	scaleLayout = modeLayout->get_order_array_offset();
+	scaleLayout = modeLayout->get_order();
 	tuningSize = scaleLayout.size();
 	modeSize = modeLayout->modeSize;
 	modeOrder = modeLayout->get_highest_order();
@@ -197,7 +197,7 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
 		key->setColour(1, get_key_color(key).contrasting(0.25));
 		key->setColour(2, Colours::yellow.darker());
 
-		key->modeDegree = modeLayout->modeDegrees[(i % tuningSize)] + modeSize * (i / tuningSize);
+		key->modeDegree = modeLayout->degrees[(i % tuningSize)] + modeSize * (i / tuningSize);
 
 		if (key->order == 0)
 		{
@@ -236,7 +236,7 @@ void VirtualKeyboard::Keyboard::reapply_mode()
         key->setColour(1, get_key_color(key).contrasting(0.25));
         key->setColour(2, Colours::yellow.darker());
         
-        key->modeDegree = modeLayout->modeDegrees[(i % tuningSize)] + modeSize * (i / tuningSize);
+        key->modeDegree = modeLayout->degrees[(i % tuningSize)] + modeSize * (i / tuningSize);
         
         if (key->order == 0)
             key->toBack();

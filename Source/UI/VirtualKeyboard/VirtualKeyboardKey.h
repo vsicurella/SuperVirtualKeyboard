@@ -39,6 +39,9 @@ namespace VirtualKeyboard
         
         Colour color;
         int activeColor = 0;
+
+		std::unique_ptr<PopupMenu> editMenu;
+		std::unique_ptr<ColourSelector> colorSelector;
         
         // Methods
         
@@ -47,5 +50,11 @@ namespace VirtualKeyboard
         void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
         
         void restore_from_node(ValueTree parentNodeIn);
+
+		//==============================================================================
+
+		void mouseDown(const MouseEvent& e) override;
+		void mouseUp(const MouseEvent& e) override;
+
     };
 }
