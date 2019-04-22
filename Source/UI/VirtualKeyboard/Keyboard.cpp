@@ -44,8 +44,9 @@ void Keyboard::init_data_node()
 {
     pianoNode = ValueTree(IDs::pianoNode);
     
-    pianoNode.setProperty(IDs::pianoUIMode, pianoModeSelected, undo);
-    pianoNode.setProperty(IDs::pianoOrientation, pianoOrientationSelected, undo);
+    pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, undo);
+    pianoNode.setProperty(IDs::pianoOrientation, orientationSelected, undo);
+    pianoNode.setProperty(IDs::pianoKeyPlacement, keyPlacementSelected, undo);
     pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelSelected, undo);
     pianoNode.setProperty(IDs::pianoMidiNoteOffset, midiNoteOffset, undo);
     pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
@@ -63,7 +64,12 @@ void Keyboard::init_data_node()
         key->pianoKeyNode.setProperty(IDs::pianoKeyHeightMod, key->heightMod, nullptr);
         key->pianoKeyNode.setProperty(IDs::pianoKeyXOffset, key->xOffset, nullptr);
         key->pianoKeyNode.setProperty(IDs::pianoKeyYOffset, key->yOffset, nullptr);
-        
+        /*
+        key->pianoKeyNode.setProperty(IDs::pianoKeyColorDefault, key->findColour(0).toString(), nullptr);
+        key->pianoKeyNode.setProperty(IDs::pianoKeyColorHighlighted, key->findColour(1).toString(), nullptr);
+        key->pianoKeyNode.setProperty(IDs::pianoKeyColorPressed, key->findColour(2).toString(), nullptr);
+         */
+
         pianoNode.addChild(key->pianoKeyNode, i, nullptr);
     }
     
@@ -74,17 +80,12 @@ void Keyboard::restore_data_node(ValueTree pianoNodeIn)
 {
     pianoNode = pianoNodeIn;
     
-    pianoModeSelected = pianoNode[IDs::pianoUIMode];
-    // update UI things
-    pianoOrientationSelected = pianoNode[IDs::pianoOrientation];
-    
+    uiModeSelected = pianoNode[IDs::pianoUIMode];
+    orientationSelected = pianoNode[IDs::pianoOrientation];
+    keyPlacementSelected = pianoNode[IDs::pianoKeyPlacement];
     midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
-    jassert(midiChannelSelected);
-    
     midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
-    
     mpeOn = pianoNode[IDs::pianoMPEToggle];
-    
     defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
     
     Key* key;
@@ -164,6 +165,71 @@ int Keyboard::getWidthFromHeight(int heightIn)
 
 //===============================================================================================
 
+void Keyboard::setUIMode(UIMode uiModeIn)
+{
+    uiModeSelected = uiModeIn;
+}
+
+void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
+{
+    keyPlacementSelected = placementIn;
+    keyDegreeProportions.clear();
+    
+    switch (keyPlacementSelected)
+    {
+        case 1:
+            break;
+        case 2:
+            break;
+            
+        default: // aka nestedRight
+            
+            float localOrder;
+            float width;
+            float height;
+            float heightMod;
+            float xp = 0.618;
+            
+            for (int i = 0; i < mode->getModeSize(); i++)
+            {
+                localOrder = mode->getSteps()[i];
+                
+                if (localOrder < 2)
+                    keyDegreeProportions.add(Point<float>(1.0f, 1.0f));
+                else
+                {
+                    for (int j = 0; j < localOrder; j++)
+                    {
+                        if (j == 0)
+                        {
+                            height = 1;
+                            width = 1;
+                        }
+                        else
+                        {
+                            width = 1.0f - (1.0) / localOrder;
+                            height = (0.5 + 0.2 * localOrder / 6.0) * (pow(localOrder - j, xp) / pow(localOrder-1, xp));
+                        }
+                        Point<float> p(width, height);
+                        keyDegreeProportions.add(p);
+                    }
+                }
+            }
+            jassert(keyDegreeProportions.size() == mode->getScaleSize());
+            break;
+    }
+}
+
+void Keyboard::setKeyProportions(Key* keyIn)
+{
+    int degree = roundToInt(1.0f / (keyIn->getDegree() - (int) keyIn->getDegree()));
+    
+    keyIn->degreeWidthRatio = keyDegreeProportions[degree].getX();
+    keyIn->degreeHeightRatio = keyDegreeProportions[degree].getY();
+}
+
+//===============================================================================================
+
 void Keyboard::apply_mode_layout(Mode* modeIn)
 {
     mode = modeIn;
@@ -172,6 +238,8 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
     keysOrder.clear();
     keysOrder.resize(mode->getMaxStep());
     
+    setKeyPlacement(KeyPlacementType::nestedRight);
+    
     Key* key;
     for (int i = 0; i < keys.size(); i++)
     {
@@ -179,13 +247,13 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
         
         key->order = mode->getOrders()[i];
         keysOrder[key->order].push_back(key);
-        
+
         key->setColour(0, get_key_color(key));
         key->setColour(1, get_key_color(key).contrasting(0.25));
-        key->setColour(2, Colours::yellow.darker());
+        key->setColour(2, get_key_color(key).contrasting(0.75));
         
-        key->modeDegree = mode->getDegrees()[i];
-        grid->resizeKey(key);
+        key->degree = mode->getDegrees()[i];
+        setKeyProportions(key);
 
         key->setVisible(true);
     }
@@ -204,7 +272,6 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
 
 Colour Keyboard::get_key_color(Key* keyIn)
 {
-    // implement custom colors
     return keyOrderColors.at(keyIn->order % keyOrderColors.size());
 }
 
@@ -262,7 +329,7 @@ Key* Keyboard::transpose_key_modal(Key* key, int stepsIn)
     
     for (int i = 0; i < keysOrder[theOrder].size(); i++)
     {
-        if (key->modeDegree == keysOrder[theOrder][i]->modeDegree)
+        if (key->degree == keysOrder[theOrder][i]->degree)
         {
             newKey = i;
             break;
@@ -313,7 +380,7 @@ bool Keyboard::transpose_keys_modal(int modalStepsIn)
             // Find index of key in the order array, and get new index
             for (int j = 0; j < keysOrder[theOrder].size(); j++)
             {
-                if (key->modeDegree == keysOrder[theOrder].at(j)->modeDegree)
+                if (key->degree == keysOrder[theOrder].at(j)->degree)
                 {
                     newDeg = j + modalStepsIn;
                 }
@@ -397,7 +464,6 @@ void Keyboard::getAllCommands(Array< CommandID > &c)
 {
     Array<CommandID> commands{
         IDs::CommandIDs::setKeyColor,
-        IDs::CommandIDs::setMidiNoteOffset,
         IDs::CommandIDs::pianoPlayMode,
         IDs::CommandIDs::pianoEditMode,
         IDs::CommandIDs::setPianoHorizontal,
@@ -413,13 +479,7 @@ void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &resul
     {
         case IDs::CommandIDs::setKeyColor:
             result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-            result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
-            result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::setMidiNoteOffset:
-            result.setInfo("Midi Note Offset", "Shift the layout so that your center is on a different MIDI note.", "Piano", 0);
-            //result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
-            //result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+            //result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
             break;
         case IDs::CommandIDs::pianoPlayMode:
             result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
@@ -433,17 +493,17 @@ void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &resul
             break;
         case IDs::CommandIDs::setPianoHorizontal:
             result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
-            result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
+            result.setTicked(orientationSelected == Orientation::horizontal);
             result.addDefaultKeypress('w', ModifierKeys::shiftModifier);
             break;
         case IDs::CommandIDs::setPianoVerticalL:
             result.setInfo("Vertical Left Layout", "Draws the piano with the left facing orientation", "Piano", 0);
-            result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
+            result.setTicked(orientationSelected == Orientation::verticalLeft);
             result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
             break;
         case IDs::CommandIDs::setPianoVerticalR:
             result.setInfo("Vertical Right Layout", "Draws the piano with the right facing orientation", "Piano", 0);
-            result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+            result.setTicked(orientationSelected == Orientation::verticalRight);
             result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
             break;
         default:
@@ -456,8 +516,6 @@ bool Keyboard::perform(const InvocationInfo &info)
     switch (info.commandID)
     {
         case IDs::CommandIDs::setKeyColor:
-            break;
-        case IDs::CommandIDs::setMidiNoteOffset:
             break;
         case IDs::CommandIDs::pianoPlayMode:
             break;
@@ -756,9 +814,8 @@ void Keyboard::resized()
         for (int i = 0; i < keys.size(); i++)
         {
             key = keys.getUnchecked(i);
-            
-            w = keyWidth * key->orderWidthRatio;
-            h = keyHeight * key->orderHeightRatio;
+            w = keyWidth * key->degreeWidthRatio;
+            h = keyHeight * key->degreeHeightRatio;
             key->setSize(w, h);
             
             grid->placeKey(key);

@@ -24,11 +24,16 @@ Key::Key(String nameIn, int keyNumIn)
     setOpaque(true);
 }
 
+float Key::getDegree()
+{
+    return degree;
+}
+
 void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
 {
     // idk why getBounds() doesn't work properly. maybe it's set in the parent bounds
     Rectangle<int> fillBounds = Rectangle<int>(0, 0, getWidth() - 1, getHeight());
-    color = findColour(activeColor);
+    Colour color = findColour(activeColor);
     
     if (activeColor == 2)
     {
@@ -52,6 +57,12 @@ void Key::restore_from_node(ValueTree parentNodeIn)
     heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
     xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
     yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
+    
+    setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
+    setColour(1, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorHighlighted].toString()));
+    setColour(2, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorPressed].toString()));
+
+
 }
 //==============================================================================
 

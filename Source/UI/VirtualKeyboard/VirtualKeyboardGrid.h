@@ -16,13 +16,6 @@
 
 namespace VirtualKeyboard
 {
-    enum KeyPlacementType
-    {
-        nestedRight = 0,
-        nestedCenter,
-        adjacent
-    };
-    
     class KeyboardGrid : public FractionalGrid
     {
         Mode* mode;
@@ -32,9 +25,7 @@ namespace VirtualKeyboard
                 
         KeyboardGrid(Mode* modeIn);
         ~KeyboardGrid() {};
-        
-        void setPlacementType(KeyPlacementType placementType);
-        
+                
         void resizeKey(Key* key);
         void placeKey(Key* key);
     };

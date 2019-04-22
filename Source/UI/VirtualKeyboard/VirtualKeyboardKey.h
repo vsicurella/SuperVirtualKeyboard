@@ -20,7 +20,6 @@ namespace VirtualKeyboard
         
         // Parameters
         int keyNumber;
-        float modeDegree;
         
         float widthMod = -1;
         float heightMod = -1;
@@ -33,11 +32,13 @@ namespace VirtualKeyboard
         
         // Properties
         int order; // front most keys are 0, "black" keys are 1, etc
-        float orderWidthRatio;
-        float orderHeightRatio;
+        float degree;
+        
+        float degreeWidthRatio;
+        float degreeHeightRatio;
         float velocity = 0;
         
-        Colour color;
+        // more of a "status" flag
         int activeColor = 0;
 
 		std::unique_ptr<PopupMenu> editMenu;
@@ -46,6 +47,9 @@ namespace VirtualKeyboard
         // Methods
         
         Key(String nameIn, int keyNumIn);
+        
+        // returns the decimal part of the mode degree
+        float getDegree();
         
         void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
         

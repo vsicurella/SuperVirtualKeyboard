@@ -26,17 +26,24 @@
 
 namespace VirtualKeyboard
 {
-    enum PianoMode
+    enum UIMode
     {
         playMode = 0,
         editMode
     };
     
-    enum PianoOrientation
+    enum Orientation
     {
         horizontal = 0,
         verticalLeft,
         verticalRight
+    };
+    
+    enum KeyPlacementType
+    {
+        nestedRight = 0,
+        nestedCenter,
+        adjacent
     };
     
     class Keyboard :
@@ -44,6 +51,7 @@ namespace VirtualKeyboard
         public ApplicationCommandTarget,
         public MidiKeyboardStateListener // Only for displaying external MIDI input
     {
+        
     public:
         //===============================================================================================
         
@@ -72,6 +80,14 @@ namespace VirtualKeyboard
         
 		int getWidthFromHeight(int heightIn);
         
+        //===============================================================================================
+
+        void setUIMode(UIMode uiModeIn);
+        
+        void setKeyPlacement(KeyPlacementType placementIn);
+        
+        void setKeyProportions(Key* keyIn);
+
         //===============================================================================================
         
         Colour get_key_color(Key* keyIn);
@@ -168,14 +184,15 @@ namespace VirtualKeyboard
         Mode* mode;
         
         // Parameters
-        int pianoModeSelected = 1;
-        int pianoOrientationSelected = 1;
+        int uiModeSelected = 0;
+        int orientationSelected = 0;
+        int keyPlacementSelected = 0;
         
         int midiChannelSelected = 1;
         int midiNoteOffset = 0;
         bool mpeOn = false;
         
-        std::unique_ptr<std::vector<std::vector<int>>> keyOrdersRatios;
+        Array<Point<float>> keyDegreeProportions;
         std::vector<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
         
@@ -183,7 +200,6 @@ namespace VirtualKeyboard
         int keyWidth = 50;
         int keyHeight = 200;
         float defaultKeyWHRatio = 0.25;
-
 
 		int lastKeyOver = 0;
 		int lastKeyClicked = 0;

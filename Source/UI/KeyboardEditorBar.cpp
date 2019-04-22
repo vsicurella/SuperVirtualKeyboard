@@ -189,6 +189,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
         pluginState->get_current_mode()->setOffset((int) offsetSld->getValue());
+        //pluginState->presetCurrentNode = pluginState->get_current_mode()->modeNode;
         pluginState->presetCurrentNode.setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->get_undo_mgr());
         //[/UserSliderCode_offsetSld]
     }
