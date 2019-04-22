@@ -134,7 +134,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 	Mode* modeCurrent = pluginState->get_current_mode();
 
 	piano->apply_mode_layout(modeCurrent);
-
+	
 	keyboardEditorBar->set_mode_readout_text(modeCurrent->getStepsString());
 
 	//if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)

@@ -752,13 +752,13 @@ void Keyboard::resized()
 	if (displayIsReady)
 	{
 		// Calculate key sizes
-		keyHeight = getHeight() - 1;
+		keyHeight = getHeight();
 		keyWidth = keyHeight * defaultKeyWHRatio;
 
 		// Adjust Parent bounds and grid
 		pianoWidth = mode->getKeyboardOrdersSize(0) * keyWidth;
-		//setSize(pianoWidth, getHeight());
-		grid->setBounds(Rectangle<int>(0, 0, getWidth(), getHeight()));
+		setSize(pianoWidth, getHeight());
+		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 		// Resize keys
 	    Key* key;
