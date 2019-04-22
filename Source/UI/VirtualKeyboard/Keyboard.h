@@ -39,13 +39,6 @@ namespace VirtualKeyboard
         verticalRight
     };
     
-    enum KeyPlacement
-    {
-        nestedRight = 0,
-        nestedCenter,
-        adjacent
-    };
-    
     class Keyboard :
         public Component,
         public ApplicationCommandTarget,
@@ -77,8 +70,6 @@ namespace VirtualKeyboard
         
         float get_velocity(Key* keyIn, const MouseEvent& e);
         
-        int get_min_height();
-
 		int getWidthFromHeight(int heightIn);
         
         //===============================================================================================

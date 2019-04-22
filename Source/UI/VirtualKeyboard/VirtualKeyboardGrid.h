@@ -3,7 +3,7 @@
  
  VirtualKeyboardGrid.h
  Created: 17 Apr 2019 2:12:23pm
- Author:  Soundtoys Quality Assurance
+ Author:  Vincenzo
  
  ==============================================================================
  */
@@ -16,28 +16,26 @@
 
 namespace VirtualKeyboard
 {
-    struct KeyboardGrid : public FractionalGrid
+    enum KeyPlacementType
     {
-        int modeSize;
-        
-        Mode* mode;
-        
-        std::vector<float> orderedKeyRatios;
-                
-        KeyboardGrid(Mode* modeIn);
-        
-        ~KeyboardGrid() {};
-        
-        void set_ordered_key_view(int placementType);
-        
-        void resize_ordered_key(Key* key);
-        
-        void resize_ordered_keys(OwnedArray<Key>* keys);
-        
-        void place_key(Key* key);
-        
-        void place_key_layout(OwnedArray<Key>* keys);
-        
+        nestedRight = 0,
+        nestedCenter,
+        adjacent
     };
     
+    class KeyboardGrid : public FractionalGrid
+    {
+        Mode* mode;
+        std::vector<float> orderedKeyRatios;
+        
+    public:
+                
+        KeyboardGrid(Mode* modeIn);
+        ~KeyboardGrid() {};
+        
+        void setPlacementType(KeyPlacementType placementType);
+        
+        void resizeKey(Key* key);
+        void placeKey(Key* key);
+    };
 }

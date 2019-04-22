@@ -3,7 +3,7 @@
  
  VirtualKeyboardKey.h
  Created: 17 Apr 2019 2:11:53pm
- Author:  Soundtoys Quality Assurance
+ Author:  Vincenzo
  
  ==============================================================================
  */

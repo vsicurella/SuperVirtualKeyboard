@@ -452,18 +452,19 @@ BEGIN_JUCER_METADATA
             posRelativeY="9f75aa2c0ca39fa4" editable="0" layout="33" items=""
             textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Keyboard Mode Button" id="9f75aa2c0ca39fa4" memberName="keyboardModeBtn"
-              virtualName="" explicitFocusOrder="0" pos="99.25%r 6 40 24" bgColOff="ff5c7fa4"
-              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="99.268%r 6 40 24"
+              bgColOff="ff5c7fa4" buttonText="Edit" connectedEdges="0" needsCallback="1"
+              radioGroupId="0"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
           virtualName="" explicitFocusOrder="0" pos="-595% 2 69 32" posRelativeX="9f75aa2c0ca39fa4"
-          min="-6e1" max="6.7e1" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          min="-60.0" max="67.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
          virtualName="" explicitFocusOrder="0" pos="-707.5% 6 47 24" posRelativeX="9f75aa2c0ca39fa4"
          edTextCol="ff000000" edBkgCol="0" labelText="Offset:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -101,7 +101,7 @@ struct Mode
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "0, 0.5, 1, 1.5,..."
 	*/
-	static Array<float> Mode::orders_to_degrees(Array<int> stepsIn);
+	static Array<float> orders_to_degrees(Array<int> stepsIn);
 
 	/*
 	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}

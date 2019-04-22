@@ -3,7 +3,7 @@
 
     ReaperWriter.h
     Created: 18 Apr 2019 12:22:34pm
-    Author:  Soundtoys Quality Assurance
+    Author:  Vincenzo
 
   ==============================================================================
 */
