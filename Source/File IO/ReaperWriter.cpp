@@ -10,7 +10,7 @@
 
 #include "ReaperWriter.h"
 
-ReaperWriter::ReaperWriter(ModeLayout* modeIn)
+ReaperWriter::ReaperWriter(Mode* modeIn)
 {
     mode = modeIn;
     
@@ -39,7 +39,7 @@ ReaperWriter::~ReaperWriter()
 {
 }
 
-void ReaperWriter::set_mode(ModeLayout* modeIn)
+void ReaperWriter::set_mode(Mode* modeIn)
 {
     mode = modeIn;
 }
@@ -60,7 +60,7 @@ String ReaperWriter::ask_for_location()
     return "";
 }
 
-ModeLayout* ReaperWriter::get_mode()
+Mode* ReaperWriter::get_mode()
 {
     return mode;
 }
@@ -86,7 +86,7 @@ void ReaperWriter::setup_default_symbols()
 
 	CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
 	String symbol;
-	int orderMax = mode->get_highest_order();
+	int orderMax = mode->getMaxStep();
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -123,7 +123,7 @@ bool ReaperWriter::write_file()
     for (int i = 0; i < 128; i++)
     {
 		index = 127 - i;
-		order = mode->order[index % mode->scaleSize];
+		order = mode->getOrders()[index];
 
 		if (order != 0)
 		{

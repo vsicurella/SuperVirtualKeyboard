@@ -13,7 +13,7 @@
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../../PluginState.h"
 #include "../../PluginIDs.h"
-#include "../../Structures/ModeLayout.h"
+#include "../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
 
@@ -78,15 +78,15 @@ namespace VirtualKeyboard
         float get_velocity(Key* keyIn, const MouseEvent& e);
         
         int get_min_height();
+
+		int getWidthFromHeight(int heightIn);
         
         //===============================================================================================
         
         Colour get_key_color(Key* keyIn);
         
-        void apply_mode_layout(ModeLayout* layoutIn);
-        
-        void reapply_mode();
-        
+        void apply_mode_layout(Mode* layoutIn);
+                
         void all_notes_off();
         
         void isolate_last_note();
@@ -158,35 +158,25 @@ namespace VirtualKeyboard
         
     private:
         
+		// Application pointers
         SuperVirtualKeyboardPluginState* pluginState;
         ApplicationCommandManager* appCmdMgr;
-        UndoManager* undo;
+		UndoManager* undo;
         
-        KeyboardGrid grid;
+		// Functionality
+        std::unique_ptr<KeyboardGrid> grid;
         MidiKeyboardState keyboardState;
         MidiBuffer buffer;
-        
-        int lastKeyOver = 0;
-        int lastKeyClicked = 0;
         
         // Data
         ValueTree pianoNode;
         OwnedArray<Key> keys;
-        std::vector<Key*> keysPtr;// debug
         
         std::vector<std::vector<Key*>> keysOrder;
         std::vector<Key*> keysOn;
-        ModeLayout* modeLayout;
+        Mode* mode;
         
         // Parameters
-        Array<int> scaleLayout;
-        Array<int> scaleOrder;
-        String defaultMOS = "2 2 1 2 2 2 1";
-        
-        int tuningSize;
-        int notesToShow;
-        int rows;
-        
         int pianoModeSelected = 1;
         int pianoOrientationSelected = 1;
         
@@ -199,19 +189,18 @@ namespace VirtualKeyboard
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
         
         // Properties
-        
-        int modeSize;
-        int modeOrder;
-        int modalKeysSize;
-        
         int keyWidth = 50;
         int keyHeight = 200;
         float defaultKeyWHRatio = 0.25;
+
+
+		int lastKeyOver = 0;
+		int lastKeyClicked = 0;
         
         float pianoWidth;
         float minWindowHeight;
         
-        // Key locks
+        // Locks
         bool rightMouseHeld = false;
         bool shiftHeld = false;
         bool altHeld = false;

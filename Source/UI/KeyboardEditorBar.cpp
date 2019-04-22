@@ -188,7 +188,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-        pluginState->get_current_mode()->update_mode_offset((int) offsetSld->getValue());
+        pluginState->get_current_mode()->setOffset((int) offsetSld->getValue());
         pluginState->presetCurrentNode.setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->get_undo_mgr());
         //[/UserSliderCode_offsetSld]
     }
@@ -265,15 +265,15 @@ void KeyboardEditorBar::set_mode_library_text(String presetName)
 
 void KeyboardEditorBar::create_and_send_mode()
 {
-	ModeLayout mode = ModeLayout(modeTextEditor->getText(), "Custom");
+	std::unique_ptr<Mode> mode(new Mode(modeTextEditor->getText(), "Custom"));
 
 	// check to see if mode matches a preset
-	int index = pluginState->is_mode_in_presets(&mode);
+	int index = pluginState->is_mode_in_presets(mode.get());
 
 	if (index)
 		pluginState->set_current_mode(index);
 	else
-		pluginState->set_current_mode(new ModeLayout(modeTextEditor->getText(), "Custom"));
+		pluginState->set_current_mode(mode.get());
 }
 
 //==============================================================================
@@ -352,7 +352,7 @@ void KeyboardEditorBar::populate_preset_menu()
 	menuSortByMode.reset(new PopupMenu());
 	menuSortByFamily.reset(new PopupMenu());
 
-	ModeLayout* mode;
+	Mode* mode;
 	String name;
 	String p_name;
 	int presetIndex;
@@ -363,10 +363,10 @@ void KeyboardEditorBar::populate_preset_menu()
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::scaleSizeSort).getUnchecked(i);
-		name = mode->get_name_scale_size();
+		name = mode->getScaleDescription();
 		presetIndex = presets->indexOf(mode);
 
-		size = mode->scaleSize;
+		size = mode->getScaleSize();
 		if (i > 0 && p_size != size)
 		{
 			menuSortByScale.get()->addSeparator();
@@ -380,10 +380,10 @@ void KeyboardEditorBar::populate_preset_menu()
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::modeSizeSort).getUnchecked(i);
-		name = mode->get_name_mode_size();
+		name = mode->getModeDescription();
 		presetIndex = presets->indexOf(mode);
 
-		size = mode->modeSize;
+		size = mode->getModeSize();
 		if (i > 0 && p_size != size)
 		{
 			menuSortByMode.get()->addSeparator();
@@ -397,13 +397,13 @@ void KeyboardEditorBar::populate_preset_menu()
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
 		mode = presetsSorted->getUnchecked(SortType::familySort)[i];
-		name = mode->get_full_name();
+		name = mode->getDescription();
 		presetIndex = presets->indexOf(mode);
 
-		if (i > 0 && p_name != mode->family)
+		if (i > 0 && p_name != mode->getFamily())
 		{
 			menuSortByFamily.get()->addSeparator();
-			p_name = mode->family;
+			p_name = mode->getFamily();
 		}
 
 		menuSortByFamily.get()->addItem(c++, name);

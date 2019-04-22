@@ -57,7 +57,10 @@ void Key::restore_from_node(ValueTree parentNodeIn)
 
 void Key::mouseDown(const MouseEvent& e)
 {
-	if (e.)
+	if (e.mods.isRightButtonDown())
+	{
+		
+	}
 }
 
 void Key::mouseUp(const MouseEvent& e)
@@ -65,4 +68,7 @@ void Key::mouseUp(const MouseEvent& e)
 
 }
 
-bool Key::keyStateChanged(bool isKeyDown) override;
+bool Key::keyStateChanged(bool isKeyDown)
+{
+	return false;
+}

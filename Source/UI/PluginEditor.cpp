@@ -42,14 +42,19 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	openFileBox.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
 	saveFileBox.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
-    
+
+	pluginState->presetCurrentNode.addListener(this);
+
     if (!pluginState->keyboardWindowNode.isValid())
     {
         init_node_data();
     }
+	else
+	{
+		restore_node_data(pluginState->keyboardWindowNode);
+	}
 
-	pluginState->presetCurrentNode.addListener(this);
-    restore_node_data(pluginState->keyboardWindowNode);
+	update_children_to_preset();
 
 	appCmdMgr.registerAllCommandsForTarget(piano.get());
 	appCmdMgr.registerAllCommandsForTarget(this);
@@ -87,15 +92,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeI
 	keyboardWindowNode = nodeIn;
 	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
 	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
-
-	update_children_to_preset();
 }
 
 bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(const File& fileOut)
 {
-	if (!fileOut.exists())
-		return false;
-
 	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
 	return xml->writeToFile(fileOut, "");
 }
@@ -109,13 +109,14 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 	{
 		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
 		presetIn = ValueTree::fromXml(*(xml.get()));
-		DBG(presetIn.toXmlString());
+		
 		if (presetIn.hasType(IDs::presetNode))
 		{
 			pluginState->presetCurrentNode.removeAllChildren(pluginState->get_undo_mgr());
 			pluginState->presetCurrentNode = presetIn;
 			pluginState->get_current_mode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
 		}
+
 		update_children_to_preset();
 	}
 
@@ -130,14 +131,14 @@ bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
-	ModeLayout* modeCurrent = pluginState->get_current_mode();
+	Mode* modeCurrent = pluginState->get_current_mode();
 
 	piano->apply_mode_layout(modeCurrent);
 
-	keyboardEditorBar->set_mode_readout_text(modeCurrent->strSteps);
+	keyboardEditorBar->set_mode_readout_text(modeCurrent->getStepsString());
 
 	//if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)
-		keyboardEditorBar->set_mode_library_text(modeCurrent->get_full_name());
+		keyboardEditorBar->set_mode_library_text(modeCurrent->getDescription());
 }
 
 //==============================================================================
@@ -152,10 +153,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 	AudioProcessorEditor::resized();
 
 	keyboardEditorBar->setBounds(0, 6, getWidth(), 36);
-	view.get()->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight() - view.get()->getScrollBarThickness());
-	piano.get()->setSize(piano.get()->getWidth(), view.get()->getMaximumVisibleHeight());
+	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight() - view.get()->getScrollBarThickness());
+	piano->setBounds(0, 0, piano->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight());
 
-	view.get()->setViewPositionProportionately(0.618, 0);
+	view->setViewPositionProportionately(0.618, 0);
 	
 	// update node
 	if (keyboardWindowNode.isValid())

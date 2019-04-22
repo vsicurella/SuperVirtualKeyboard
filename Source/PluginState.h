@@ -11,7 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "PluginIDs.h"
-#include "Structures/ModeLayout.h"
+#include "Structures/Mode.h"
 
 struct SuperVirtualKeyboardPluginState
 {
@@ -37,18 +37,18 @@ struct SuperVirtualKeyboardPluginState
 
 	//==============================================================================
 
-	OwnedArray<ModeLayout>* get_presets();
-	Array<Array<ModeLayout*>>* get_presets_sorted();
+	OwnedArray<Mode>* get_presets();
+	Array<Array<Mode*>>* get_presets_sorted();
 	UndoManager* get_undo_mgr();
 
 	ValueTree get_current_preset();
 	int get_current_preset_index();
-	ModeLayout* get_current_mode();
+	Mode* get_current_mode();
 
-	int is_mode_in_presets(ModeLayout* modeIn);
+	int is_mode_in_presets(Mode* modeIn);
 
 	void set_current_mode(int presetIndexIn);
-	void set_current_mode(ModeLayout* modeIn);
+	void set_current_mode(Mode* modeIn);
 
 	void set_current_key_settings(ValueTree pianoNodeIn);
 
@@ -62,8 +62,8 @@ private:
 	//==============================================================================
 
 	std::unique_ptr<UndoManager> undoManager;
-	OwnedArray<ModeLayout> presets;
-	Array<Array<ModeLayout*>> presetsSorted;
+	OwnedArray<Mode> presets;
+	Array<Array<Mode*>> presetsSorted;
 
-	ModeLayout* modeCurrent;
+	Mode* modeCurrent;
 };

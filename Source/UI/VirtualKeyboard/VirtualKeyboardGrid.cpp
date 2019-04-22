@@ -12,20 +12,10 @@
 
 using namespace VirtualKeyboard;
 
-KeyboardGrid::KeyboardGrid()
+KeyboardGrid::KeyboardGrid(Mode* modeIn)
 {
-    order = 1;
-    modeSize = 1;
-    layout;
-}
-
-KeyboardGrid::KeyboardGrid(ModeLayout* layoutIn)
-{
-    layout = layoutIn;
-    order = layout->get_highest_order();
-    modeSize = layout->modeSize;
-    
-    set_grid(layout->get_num_modal_notes(), 1);
+	mode = modeIn;
+    set_grid(mode->getKeyboardOrdersSize(0), 1);
 }
 
 /*
@@ -52,9 +42,9 @@ void KeyboardGrid::set_ordered_key_view(int placementType)
             float heightMod;
             float xp = 0.618;
             
-            for (int i = 0; i < layout->modeSize; i++)
+            for (int i = 0; i < mode->getModeSize(); i++)
             {
-                localOrder = layout->get_steps()[i];
+                localOrder = mode->getSteps()[i];
                 
                 if (localOrder < 2)
                     orderedKeyRatios.push_back(1);
@@ -71,7 +61,7 @@ void KeyboardGrid::set_ordered_key_view(int placementType)
                     }
                 }
             }
-			jassert(orderedKeyRatios.size() == layout->scaleSize);
+			jassert(orderedKeyRatios.size() == mode->getScaleSize());
 			break;
     }
 }
@@ -81,7 +71,7 @@ void KeyboardGrid::resize_ordered_key(Key* key)
     if (orderedKeyRatios.size() < 1)
         set_ordered_key_view(0);
     
-    key->orderHeightRatio = orderedKeyRatios[key->keyNumber % layout->scaleSize];
+    key->orderHeightRatio = orderedKeyRatios[key->keyNumber % mode->getScaleSize()];
     key->orderWidthRatio = 1.0f - (key->order > 0) * 1.25f * key->order / 8.0f;
     
 }
@@ -108,11 +98,6 @@ void KeyboardGrid::place_key(Key* key)
     float colToPlace = ceil(key->modeDegree);
     int offset = (key->order > 0) * (int)(column_size() / 2.0);
     offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
-    
-    if (key->order > 0)
-    {
-        colToPlace = ceil(colToPlace);
-    }
     
     pt = Point<int>((int)((colToPlace + 1) * (column_size() + columnGap) - offset), 0 + rowGap);
     

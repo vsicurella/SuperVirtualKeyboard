@@ -10,11 +10,11 @@
 
 #pragma once
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Structures/ModeLayout.h"
+#include "../Structures/Mode.h"
 
 class ReaperWriter
 {
-    ModeLayout* mode;
+    Mode* mode;
     //Scale* scale;
     
     Array<String> orderSymbols;
@@ -26,16 +26,16 @@ class ReaperWriter
     
 public:
     
-    ReaperWriter(ModeLayout* modeIn);
+    ReaperWriter(Mode* modeIn);
     ~ReaperWriter();
     
-    void set_mode(ModeLayout* modeIn);
+    void set_mode(Mode* modeIn);
     void set_symbol(int orderIndex, String symbolIn);
     bool set_path(String pathIn);
     
     String ask_for_location();
     
-    ModeLayout* get_mode();
+    Mode* get_mode();
     Array<String> get_symbols();
 	String get_symbol(int orderIndexIn);
     String get_path();

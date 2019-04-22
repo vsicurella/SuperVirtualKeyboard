@@ -17,12 +17,6 @@ using namespace VirtualKeyboard;
 
 Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* cmdMgrIn)
 {
-	// Default values
-	tuningSize = 12;
-	modeSize = 7;
-	notesToShow = 128;	
-	rows = 1;
-
 	removeMouseListener(this);
 
     pluginState = pluginStateIn;
@@ -30,16 +24,14 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
     appCmdMgr = cmdMgrIn;
 
 	// Create children (piano keys)        
-	for (int i = 0; i < notesToShow; i++)
+	for (int i = 0; i < 128; i++)
 	{
 		String keyName = "Key " + String(i);
 		Key* key = new Key(keyName, i);
 		addChildComponent(keys.add(key));
-		keysPtr.push_back(key);
 	}
 
 	addMouseListener(this, true);
-	//setRepaintsOnMouseActivity(true);
 	toBack();
 	
 	setSize(1000, 250);
@@ -50,7 +42,7 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
 
 void Keyboard::init_data_node()
 {
-    pianoNode = ValueTree(IDs::pianoNode);
+	pianoNode = ValueTree(IDs::pianoNode);
 
 	pianoNode.setProperty(IDs::pianoUIMode, pianoModeSelected, undo);
 	pianoNode.setProperty(IDs::pianoOrientation, pianoOrientationSelected, undo);
@@ -67,13 +59,15 @@ void Keyboard::init_data_node()
 
 		key->pianoKeyNode.setProperty(IDs::pianoKeyNumber, i, nullptr);
 		key->pianoKeyNode.setProperty(IDs::pianoKeyMidiNote, key->mappedMIDInote, nullptr);
-		key->pianoKeyNode.setProperty(IDs::pianoKeyWidthMod, key->widthMod, nullptr);
-		key->pianoKeyNode.setProperty(IDs::pianoKeyHeightMod, key->heightMod, nullptr);
-		key->pianoKeyNode.setProperty(IDs::pianoKeyXOffset, key->xOffset, nullptr);
-		key->pianoKeyNode.setProperty(IDs::pianoKeyYOffset, key->yOffset, nullptr);
+key->pianoKeyNode.setProperty(IDs::pianoKeyWidthMod, key->widthMod, nullptr);
+key->pianoKeyNode.setProperty(IDs::pianoKeyHeightMod, key->heightMod, nullptr);
+key->pianoKeyNode.setProperty(IDs::pianoKeyXOffset, key->xOffset, nullptr);
+key->pianoKeyNode.setProperty(IDs::pianoKeyYOffset, key->yOffset, nullptr);
 
-		pianoNode.addChild(key->pianoKeyNode, i, nullptr);
+pianoNode.addChild(key->pianoKeyNode, i, nullptr);
 	}
+
+	pluginState->pianoNode = pianoNode;
 }
 
 void Keyboard::restore_data_node(ValueTree pianoNodeIn)
@@ -85,7 +79,7 @@ void Keyboard::restore_data_node(ValueTree pianoNodeIn)
 	pianoOrientationSelected = pianoNode[IDs::pianoOrientation];
 
 	midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
-    jassert(midiChannelSelected);
+	jassert(midiChannelSelected);
 
 	midiNoteOffset = pianoNode[IDs::pianoMidiNoteOffset];
 
@@ -103,7 +97,7 @@ void Keyboard::restore_data_node(ValueTree pianoNodeIn)
 
 ValueTree Keyboard::get_node()
 {
-    return pianoNode;
+	return pianoNode;
 }
 
 //===============================================================================================
@@ -122,11 +116,11 @@ Point<int> Keyboard::get_position_of_key(int midiNoteIn)
 Key* Keyboard::get_key_from_position(Point<int> posIn)
 {
 	Key* keyOut = nullptr;
-	
+
 	if (reallyContains(posIn, true))
 	{
 		Component* c = getComponentAt(posIn);
-		
+
 		if (c->getName().startsWith("Key"))
 			keyOut = dynamic_cast<Key*>(c);
 	}
@@ -164,49 +158,49 @@ int Keyboard::get_min_height()
 	return 10;
 }
 
+int Keyboard::getWidthFromHeight(int heightIn)
+{
+	int wOut = 100;
+	
+	if (displayIsReady)
+		wOut = mode->getKeyboardOrdersSize(0) * heightIn * defaultKeyWHRatio;
+	
+	return wOut;
+}
 
 //===============================================================================================
 
-void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
+void Keyboard::apply_mode_layout(Mode* modeIn)
 {
-	modeLayout = layoutIn;
- 	grid = KeyboardGrid(modeLayout);
+	mode = modeIn;
+ 	grid.reset(new KeyboardGrid(mode));
+	grid->set_ordered_key_view(0);
 
-	// for convenience
-	scaleLayout = modeLayout->get_order();
-	tuningSize = scaleLayout.size();
-	modeSize = modeLayout->modeSize;
-	modeOrder = modeLayout->get_highest_order();
-	modalKeysSize = modeLayout->get_num_modal_notes();
-
-
-	// Setup keys for layout
-	keysOrder.resize(modeOrder + 1);
+	keysOrder.clear();
+	keysOrder.resize(mode->getMaxStep());
+	
 	Key* key;
-	for (int i = 0; i < notesToShow; i++)
+	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
 
-		key->order = scaleLayout[i % tuningSize];
+		key->order = mode->getOrders()[i];
 		keysOrder[key->order].push_back(key);
 		
-		grid.set_ordered_key_view(0);
-		grid.resize_ordered_key(key);
+		grid->resize_ordered_key(key);
 
 		key->setColour(0, get_key_color(key));
 		key->setColour(1, get_key_color(key).contrasting(0.25));
 		key->setColour(2, Colours::yellow.darker());
 
-		key->modeDegree = modeLayout->degrees[(i % tuningSize)] + modeSize * (i / tuningSize);
+		key->modeDegree = mode->getDegrees()[i];
 
 		if (key->order == 0)
-		{
 			key->toBack();
-		}
+		
 		else
-		{
 			key->toFront(false);
-		}
+
 
 		key->setVisible(true);
 	}
@@ -214,35 +208,6 @@ void Keyboard::apply_mode_layout(ModeLayout* layoutIn)
 	// Calculate properties
 	displayIsReady = true;
 	resized();
-}
-
-void VirtualKeyboard::Keyboard::reapply_mode()
-{
-    scaleLayout = modeLayout->get_order_array_offset();
-    
-    keysOrder.clear();
-    
-    Key* key;
-    for (int i = 0; i < keys.size(); i++)
-    {
-        key = keys.getUnchecked(i);
-        
-        key->order = scaleLayout[i % tuningSize];
-        keysOrder[key->order].push_back(key);
-        
-        grid.resize_ordered_key(key);
-        
-        key->setColour(0, get_key_color(key));
-        key->setColour(1, get_key_color(key).contrasting(0.25));
-        key->setColour(2, Colours::yellow.darker());
-        
-        key->modeDegree = modeLayout->degrees[(i % tuningSize)] + modeSize * (i / tuningSize);
-        
-        if (key->order == 0)
-            key->toBack();
-        else
-            key->toFront(false);        
-    }
 }
 
 //===============================================================================================
@@ -791,9 +756,9 @@ void Keyboard::resized()
 		keyWidth = keyHeight * defaultKeyWHRatio;
 
 		// Adjust Parent bounds and grid
-		pianoWidth = modalKeysSize * keyWidth;
-		setSize(pianoWidth, getHeight());
-		grid.setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
+		pianoWidth = mode->getKeyboardOrdersSize(0) * keyWidth;
+		//setSize(pianoWidth, getHeight());
+		grid->setBounds(Rectangle<int>(0, 0, getWidth(), getHeight()));
 
 		// Resize keys
 	    Key* key;
@@ -801,10 +766,12 @@ void Keyboard::resized()
 		for (int i = 0; i < keys.size(); i++)
 		{
 			key = keys.getUnchecked(i);
+			
 			w = keyWidth * key->orderWidthRatio;
 			h = keyHeight * key->orderHeightRatio;
 			key->setSize(w, h);
-			grid.place_key(key);
+			
+			grid->place_key(key);
 		}
 	}
 }

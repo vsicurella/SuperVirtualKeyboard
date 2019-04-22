@@ -29,18 +29,7 @@ namespace IDs
 	static Identifier modeOffset("ModeOffset");
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
-    static Identifier modeUserName("UserModeName");
-	static Identifier modeFullName("ModeName");
-	static Identifier modeScaleName("NameScaleSize");
-	static Identifier modeModeName("NameModeSize");
-	static Identifier stepArray("StepsArray");
-	static Identifier keyboardOrderArray("OrderArray");
-	static Identifier keyboardModeDegrees("ModeDegreeArray");
-	static Identifier modeArrayValue("Value");
-	static Identifier stepValue("Step");
-	static Identifier orderValue("Order");
-	static Identifier degreeValue("Degree");
-
+    static Identifier modeName("ModeName");
 
 	// Keyboard Window
 	static Identifier keyboardWindowNode("KeyboardWindowNode");

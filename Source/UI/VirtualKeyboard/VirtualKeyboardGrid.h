@@ -11,23 +11,20 @@
 #pragma once
 
 #include "../../Structures/FractionalGrid.h"
-#include "../../Structures/ModeLayout.h"
+#include "../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 
 namespace VirtualKeyboard
 {
     struct KeyboardGrid : public FractionalGrid
     {
-        int order = 1;
-        int modeSize = 7;
+        int modeSize;
         
-        ModeLayout* layout;
+        Mode* mode;
         
         std::vector<float> orderedKeyRatios;
-        
-        KeyboardGrid();
-        
-        KeyboardGrid(ModeLayout* layoutIn);
+                
+        KeyboardGrid(Mode* modeIn);
         
         ~KeyboardGrid() {};
         

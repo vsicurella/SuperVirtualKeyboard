@@ -13,8 +13,8 @@
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
       <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"
             file="Source/Structures/FractionalGrid.h"/>
-      <FILE id="doFNva" name="ModeLayout.cpp" compile="1" resource="0" file="Source/Structures/ModeLayout.cpp"/>
-      <FILE id="ZNc2fR" name="ModeLayout.h" compile="0" resource="0" file="Source/Structures/ModeLayout.h"/>
+      <FILE id="doFNva" name="Mode.cpp" compile="1" resource="0" file="Source/Structures/Mode.cpp"/>
+      <FILE id="ZNc2fR" name="Mode.h" compile="0" resource="0" file="Source/Structures/Mode.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">

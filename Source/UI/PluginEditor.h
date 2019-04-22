@@ -14,7 +14,7 @@
 #include "../PluginProcessor.h"
 
 #include "KeyboardEditorBar.h"
-#include "../Structures/ModeLayout.h"
+#include "../Structures/Mode.h"
 #include "VirtualKeyboard/Keyboard.h"
 
 #include "../File IO/ReaperWriter.h"

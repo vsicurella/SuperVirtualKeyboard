@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginState.h"
-#include "../Structures/ModeLayout.h"
+#include "../Structures/Mode.h"
 //[/Headers]
 
 
@@ -96,8 +96,8 @@ private:
 
 	// Preset Menus
 
-    OwnedArray<ModeLayout>* presets;
-    Array<Array<ModeLayout*>>* presetsSorted;
+    OwnedArray<Mode>* presets;
+    Array<Array<Mode*>>* presetsSorted;
 
     HashMap<String, int> menuToPresetIndex;
     std::unique_ptr<PopupMenu> menuSortByScale;
