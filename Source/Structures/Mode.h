@@ -53,6 +53,8 @@ struct Mode
 	Array<int>* getKeyboardOrdersSizes();
 
 	int getKeyboardOrdersSize(int ordersIn);
+    
+    Array<int> getStepsOfOrders();
 
 	Array<int> getSteps();
 
@@ -78,9 +80,21 @@ struct Mode
 	Simply parses a string reprsenting step sizes and returns a vector
 	*/
 	static Array<int> parse_steps(String stepsIn);
+    
+    /*
+     Takes in step vector like {2, 2, 1, 2, 2, 2, 1}
+     Returns a vector of each index repeated by it's own magnitude {2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1}
+     */
+    static Array<int> expand_steps(Array<int> ordersIn);
+    
+    /*
+     Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
+     Returns a string like "2 2 1 2 2 2 1"
+     */
+    static String steps_to_string(Array<int> stepsIn);
 
 	/*
-	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
+	Takes in step vector like {2, 2, 1, 2, 2, 2, 1}
 	Returns a vector of key orders {0, 1, 0, 1, 0, 0, 1,...}
 	*/
 	static Array<int> steps_to_orders(Array<int> stepsIn);
@@ -90,7 +104,7 @@ struct Mode
 	Returns a keyboard-size vector of offset key orders
 	*/
 	static Array<int> expand_orders(Array<int> ordersIn, int offsetIn);
-
+    
 	/*
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "2, 2, 1, 2,..."
@@ -104,20 +118,17 @@ struct Mode
 	static Array<float> orders_to_degrees(Array<int> stepsIn);
 
 	/*
-	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
-	Returns a string like "2 2 1 2 2 2 1"
-	*/
-	static String steps_to_string(Array<int> stepsIn);
-
-	/*
 	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
 	Returns a vector of sizes large->small like {5, 2} 
 	*/
-
 	static Array<int> interval_sizes(Array<int> stepsIn);
 
 
 private:
+    
+    // Hopefully I come up with a better way to either resize keyboard keys, give keys a step value, or
+    // place keys in a grid such that I won't need this
+    void updateStepsOfOrders();
 
 	template <class T>
 	void add_array_to_node(const Array<T>& arrayIn, Identifier arrayID, Identifier itemId);
@@ -139,6 +150,8 @@ private:
 	Array<int> orders;
 	Array<float> degrees;
 
+    // Keyboard Convenience
+    Array<int> stepsOfOrders; // each index is the step which the note is associated with
 	Array<int> keyboardOrdersSizes; // amount of keys in each key order groupings
 };
 

@@ -188,35 +188,9 @@ void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
         case 2:
             break;
             
-        default: 
+        default:
+            break;
 			
-			keyDegreeProportions.resize(resolution * 10);
-
-			float maxWRatio = 0.6;
-			float maxHRatio = 0.6;
-
-			for (int p = 1; p < 10; p += 2)
-			{
-				for (int b = 10; b > 0; b--)
-				{
-					if (p == 1 && b == 2)
-						int lol = 0;
-
-					fr = (double) p / b;
-					ind = (int)(fr * resolution);
-					Point<float> check = keyDegreeProportions.getUnchecked((ind));
-					if (check == Point<float>(0, 0))
-					{
-						proportions.setX(maxWRatio - (fr - 0.5) / 0.5);
-						proportions.setY(maxHRatio - (fr - 0.5) / 0.5);
-						keyDegreeProportions.setUnchecked(ind, proportions);
-					}
-				}
-			}
-
-			keyDegreeProportions.set(0, Point<float>(1, 1));
-			
-			break;
     }
 }
 
@@ -224,8 +198,17 @@ void Keyboard::setKeyProportions(Key* keyIn)
 {
 	int degree = (int) ((keyIn->getDegree() - (int)keyIn->getDegree()) * resolution);
     
-    keyIn->degreeWidthRatio = keyDegreeProportions[degree].getX();
-    keyIn->degreeHeightRatio = keyDegreeProportions[degree].getY();
+    float height = 1.0f - (log(keyIn->step) - 0.6) / 2.6 * 0.6 * (keyIn->order + 1) / keyIn->step;
+    float width = 0.66 * keyIn->step / (keyIn->order + 1);
+    
+    if (keyIn->order == 0)
+    {
+        height = 1;
+        width = 1;
+    }
+    
+    keyIn->degreeWidthRatio = width;
+    keyIn->degreeHeightRatio = height;
 }
 
 //===============================================================================================
@@ -253,6 +236,8 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
         key->setColour(2, get_key_color(key).contrasting(0.75));
         
         key->degree = mode->getDegrees()[i];
+        key->step = mode->getStepsOfOrders()[i];
+        
         setKeyProportions(key);
 
         key->setVisible(true);

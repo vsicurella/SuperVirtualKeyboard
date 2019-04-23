@@ -32,7 +32,8 @@ namespace VirtualKeyboard
         
         // Properties
         int order; // front most keys are 0, "black" keys are 1, etc
-        float degree;
+        float degree; 
+        int step;
         
         float degreeWidthRatio;
         float degreeHeightRatio;

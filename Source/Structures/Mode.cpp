@@ -69,7 +69,8 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 	orders = expand_orders(ordersDefault, offsetIn);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
-
+    updateStepsOfOrders();
+    
 	init_node();
 }
 
@@ -124,6 +125,7 @@ void Mode::setOffset(int offsetIn)
 	orders = expand_orders(ordersDefault, offset);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
+    updateStepsOfOrders();
 
 	add_array_to_node(orders, "newordersarray", "value");
 
@@ -211,6 +213,20 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 	jassert(ordersOut.size() == 128);
 	ordersOut.minimiseStorageOverheads();
 	return ordersOut;
+}
+
+Array<int> Mode::expand_steps(Array<int> stepsIn)
+{
+    Array<int> stepsOut;
+    
+    for (int i = 0; i < stepsIn.size(); i++)
+    {
+        for (int s = 0; s < stepsIn[i]; s++)
+            stepsOut.add(stepsIn[i]);
+    }
+    
+    stepsOut.minimiseStorageOverheads();
+    return stepsOut;
 }
 
 Array<int> Mode::orders_to_steps(Array<int> layoutIn)
@@ -309,6 +325,12 @@ int Mode::getModeSize() const
 	return modeSize;
 }
 
+
+Array<int> Mode::getStepsOfOrders()
+{
+    return stepsOfOrders;
+}
+
 String Mode::getFamily() const
 {
 	return family;
@@ -396,6 +418,11 @@ String Mode::getScaleDescription()
 String Mode::getModeDescription()
 {
 	return String(modeSize) + " " + family + " " + String(scaleSize);
+}
+
+void Mode::updateStepsOfOrders()
+{
+    stepsOfOrders = expand_steps(orders_to_steps(orders));
 }
 
 template <class T>
