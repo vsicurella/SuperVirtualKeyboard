@@ -206,6 +206,8 @@ namespace VirtualKeyboard
         
         float pianoWidth;
         float minWindowHeight;
+
+		double resolution = 10e5;
         
         // Locks
         bool rightMouseHeld = false;
