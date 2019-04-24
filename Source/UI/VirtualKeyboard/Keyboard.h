@@ -79,6 +79,14 @@ namespace VirtualKeyboard
         float get_velocity(Key* keyIn, const MouseEvent& e);
         
 		int getWidthFromHeight(int heightIn);
+
+		//===============================================================================================
+
+		void paint(Graphics& g) override;
+
+		void resized() override;
+
+		void visibilityChanged() override;
         
         //===============================================================================================
 
@@ -112,16 +120,6 @@ namespace VirtualKeyboard
         
         //===============================================================================================
         
-        ApplicationCommandTarget* getNextCommandTarget() override;
-        
-        void getAllCommands(Array< CommandID > &commands) override;
-        
-        void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
-        
-        bool perform(const InvocationInfo &info) override;
-        
-        //===============================================================================================
-        
         
         void mouseExit(const MouseEvent& e) override;
         
@@ -143,15 +141,6 @@ namespace VirtualKeyboard
         
         //===============================================================================================
         
-        
-        void paint(Graphics& g) override;
-        
-        void resized() override;
-        
-        void visibilityChanged() override;
-        
-        //===============================================================================================
-        
         void triggerKeyNoteOn(Key* key, float velocityIn);
         
         void triggerKeyNoteOff(VirtualKeyboard::Key* key);
@@ -161,7 +150,16 @@ namespace VirtualKeyboard
         void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
         
         //===============================================================================================
-        
+
+		ApplicationCommandTarget* getNextCommandTarget() override;
+
+		void getAllCommands(Array< CommandID > &commands) override;
+
+		void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
+
+		bool perform(const InvocationInfo &info) override;
+
+		//===============================================================================================       
         
     private:
         

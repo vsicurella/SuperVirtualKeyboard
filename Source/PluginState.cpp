@@ -142,13 +142,13 @@ Mode* SuperVirtualKeyboardPluginState::get_current_mode()
 	return modeCurrent;
 }
 
-int SuperVirtualKeyboardPluginState::is_mode_in_presets(Mode* modeIn)
+int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	int index = 0;
 
 	for (auto mode : presets)
 	{
-		if (modeIn->getStepsString() == mode->getStepsString())
+		if (stepsStringIn == mode->getStepsString())
 			return index;
 		index++;
 	}

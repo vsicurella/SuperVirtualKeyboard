@@ -172,43 +172,47 @@ void Keyboard::setUIMode(UIMode uiModeIn)
 
 void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
 {
-    keyPlacementSelected = placementIn;
-    keyDegreeProportions.clear();
-
-	int deg;
-	double fr;
-	int ind;
-
-	Point<float> proportions;
-
-    switch (keyPlacementSelected)
-    {
-        case 1:
-            break;
-        case 2:
-            break;
-            
-        default:
-            break;
-			
-    }
+	keyPlacementSelected = placementIn;
+	apply_mode_layout(mode);
 }
 
 void Keyboard::setKeyProportions(Key* keyIn)
 {
-	int degree = (int) ((keyIn->getDegree() - (int)keyIn->getDegree()) * resolution);
-    
-    float height = 1.0f - (log(keyIn->step) - 0.6) / 2.6 * 0.6 * (keyIn->order + 1) / keyIn->step;
-    float width = 0.66 * keyIn->step / (keyIn->order + 1);
+	float spread = 4;
+	float stepHeight;
+	float keyHeight;
+	float width;
+
+	switch (keyPlacementSelected)
+	{
+	case 1:
+
+		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
+		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
+		width = 0.8;
+
+		break;
+
+	case 2:
+		break;
+
+	default:
+
+		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
+		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
+		width = 0.8 - (keyIn->order - 1) * 0.1;
+
+		break;
+	}
     
     if (keyIn->order == 0)
     {
-        height = 1;
+        keyHeight = 1;
         width = 1;
     }
     
     keyIn->degreeWidthRatio = width;
-    keyIn->degreeHeightRatio = height;
+    keyIn->degreeHeightRatio = keyHeight;
 }
 
 //===============================================================================================
@@ -220,9 +224,7 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
     
     keysOrder.clear();
     keysOrder.resize(mode->getMaxStep());
-    
-    setKeyPlacement(KeyPlacementType::nestedRight);
-    
+        
     Key* key;
     for (int i = 0; i < keys.size(); i++)
     {
@@ -440,89 +442,59 @@ void Keyboard::retrigger_notes()
 
 //===============================================================================================
 
-ApplicationCommandTarget* Keyboard::getNextCommandTarget()
+void Keyboard::paint(Graphics& g)
 {
-    return findFirstTargetParentComponent();
+	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
+	g.setColour(Colours::grey);
+	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
+
+	if (!displayIsReady)
+	{
+		g.setColour(Colours::white);
+		g.setFont(14.0f);
+		//g.drawText("ViewPianoComponent", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
+	}
 }
 
-void Keyboard::getAllCommands(Array< CommandID > &c)
+void Keyboard::resized()
 {
-    Array<CommandID> commands{
-        IDs::CommandIDs::setKeyColor,
-        IDs::CommandIDs::pianoPlayMode,
-        IDs::CommandIDs::pianoEditMode,
-        IDs::CommandIDs::setPianoHorizontal,
-        IDs::CommandIDs::setPianoVerticalL,
-        IDs::CommandIDs::setPianoVerticalR };
-    
-    c.addArray(commands);
+	if (displayIsReady)
+	{
+		// Calculate key sizes
+		keyHeight = getHeight();
+		keyWidth = keyHeight * defaultKeyWHRatio;
+
+		// Adjust Parent bounds and grid
+		pianoWidth = mode->getKeyboardOrdersSize(0) * keyWidth;
+		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
+
+		// Resize keys
+		Key* key;
+		int w, h;
+		for (int i = 0; i < keys.size(); i++)
+		{
+			key = keys.getUnchecked(i);
+			w = keyWidth * key->degreeWidthRatio;
+			h = keyHeight * key->degreeHeightRatio;
+			key->setSize(w, h);
+
+			grid->placeKey(key);
+		}
+
+		setSize(keys.getLast()->getPosition().x + keyWidth, keyHeight);
+	}
 }
 
-void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+void Keyboard::visibilityChanged()
 {
-    switch (commandID)
-    {
-        case IDs::CommandIDs::setKeyColor:
-            result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-            //result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::pianoPlayMode:
-            result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
-            //result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
-            //result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::pianoEditMode:
-            result.setInfo("Piano Edit Mode", "Adjust the size and proportions of the keyboard to your preferences.", "Piano", 0);
-            //result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
-            //result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::setPianoHorizontal:
-            result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
-            result.setTicked(orientationSelected == Orientation::horizontal);
-            result.addDefaultKeypress('w', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::setPianoVerticalL:
-            result.setInfo("Vertical Left Layout", "Draws the piano with the left facing orientation", "Piano", 0);
-            result.setTicked(orientationSelected == Orientation::verticalLeft);
-            result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
-            break;
-        case IDs::CommandIDs::setPianoVerticalR:
-            result.setInfo("Vertical Right Layout", "Draws the piano with the right facing orientation", "Piano", 0);
-            result.setTicked(orientationSelected == Orientation::verticalRight);
-            result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
-            break;
-        default:
-            break;
-    }
+	if (isShowing())
+		setWantsKeyboardFocus(true);
+	else
+		setWantsKeyboardFocus(false);
 }
 
-bool Keyboard::perform(const InvocationInfo &info)
-{
-    switch (info.commandID)
-    {
-        case IDs::CommandIDs::setKeyColor:
-            break;
-        case IDs::CommandIDs::pianoPlayMode:
-            break;
-        case IDs::CommandIDs::pianoEditMode:
-            break;
-        case IDs::CommandIDs::setPianoHorizontal:
-            // TBI
-            break;
-        case IDs::CommandIDs::setPianoVerticalL:
-            // TBI
-            break;
-        case IDs::CommandIDs::setPianoVerticalR:
-            // TBI
-            break;
-        default:
-            return false;
-    }
-    return true;
-}
 
 //===============================================================================================
-
 
 void Keyboard::mouseExit(const MouseEvent& e)
 {
@@ -651,7 +623,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     {
         upHeld = true;
         
-        if (shiftHeld)
+        if (shiftHeld && keysOn.size() > 0)
         {
             transpose_keys(1);
             repaint();
@@ -663,7 +635,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     {
         downHeld = true;
         
-        if (shiftHeld)
+        if (shiftHeld && keysOn.size() > 0)
         {
             transpose_keys(-1);
             repaint();
@@ -675,7 +647,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     {
         leftHeld = true;
         
-        if (shiftHeld)
+        if (shiftHeld && keysOn.size() > 0)
         {
             if (transpose_keys_modal(-1))
                 repaint();
@@ -687,7 +659,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     {
         rightHeld = true;
         
-        if (shiftHeld)
+        if (shiftHeld && keysOn.size() > 0)
         {
             if (transpose_keys_modal(1))
                 repaint();
@@ -699,7 +671,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     {
         spaceHeld = true;
         
-        if (shiftHeld)
+        if (shiftHeld && keysOn.size() > 0)
         {
             retrigger_notes();
         }
@@ -765,59 +737,6 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 
 //===============================================================================================
 
-
-void Keyboard::paint(Graphics& g)
-{
-    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
-    g.setColour(Colours::grey);
-    g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-    
-    if (!displayIsReady)
-    {
-        g.setColour(Colours::white);
-        g.setFont(14.0f);
-        //g.drawText("ViewPianoComponent", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
-    }
-}
-
-void Keyboard::resized()
-{
-    if (displayIsReady)
-    {
-        // Calculate key sizes
-        keyHeight = getHeight();
-        keyWidth = keyHeight * defaultKeyWHRatio;
-        
-        // Adjust Parent bounds and grid
-        pianoWidth = mode->getKeyboardOrdersSize(0) * keyWidth;
-        setSize(pianoWidth, getHeight());
-        grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
-        
-        // Resize keys
-        Key* key;
-        int w, h;
-        for (int i = 0; i < keys.size(); i++)
-        {
-            key = keys.getUnchecked(i);
-            w = keyWidth * key->degreeWidthRatio;
-            h = keyHeight * key->degreeHeightRatio;
-            key->setSize(w, h);
-            
-            grid->placeKey(key);
-        }
-    }
-}
-
-void Keyboard::visibilityChanged()
-{
-    if (isShowing())
-        setWantsKeyboardFocus(true);
-    else
-        setWantsKeyboardFocus(false);
-}
-
-//===============================================================================================
-
 void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 {
     if (velocityIn > 0)
@@ -867,4 +786,112 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
 {
     Key* key = keys.getUnchecked(midiNote);
     key->externalMidiState = 0;
+}
+
+//===============================================================================================
+
+ApplicationCommandTarget* Keyboard::getNextCommandTarget()
+{
+	return findFirstTargetParentComponent();
+}
+
+void Keyboard::getAllCommands(Array< CommandID > &c)
+{
+	Array<CommandID> commands{
+		IDs::CommandIDs::setKeyColor,
+		IDs::CommandIDs::pianoPlayMode,
+		IDs::CommandIDs::pianoEditMode,
+		IDs::CommandIDs::setPianoHorizontal,
+		IDs::CommandIDs::setPianoVerticalL,
+		IDs::CommandIDs::setPianoVerticalR,
+		IDs::CommandIDs::setKeysNestedRight,
+		IDs::CommandIDs::setKeysNestedCenter,
+		IDs::CommandIDs::setKeysAdjacent };
+
+	c.addArray(commands);
+}
+
+void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+{
+	switch (commandID)
+	{
+	case IDs::CommandIDs::setKeyColor:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::pianoPlayMode:
+		result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::pianoEditMode:
+		result.setInfo("Piano Edit Mode", "Adjust the size and proportions of the keyboard to your preferences.", "Piano", 0);
+		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
+		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::setPianoHorizontal:
+		result.setInfo("Horizontal Layout", "Draws the piano as you'd sit down and play one", "Piano", 0);
+		result.setTicked(orientationSelected == Orientation::horizontal);
+		result.addDefaultKeypress('w', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::setPianoVerticalL:
+		result.setInfo("Vertical Left Layout", "Draws the piano with the left facing orientation", "Piano", 0);
+		result.setTicked(orientationSelected == Orientation::verticalLeft);
+		result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::setPianoVerticalR:
+		result.setInfo("Vertical Right Layout", "Draws the piano with the right facing orientation", "Piano", 0);
+		result.setTicked(orientationSelected == Orientation::verticalRight);
+		result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+		break;
+	case IDs::CommandIDs::setKeysNestedRight:
+		result.setInfo("Keys Aligned Right", "The keys outside of the mode will be justified to the right.", "Piano", 0);
+		result.setTicked(keyPlacementSelected == KeyPlacementType::nestedRight);
+		break;
+	case IDs::CommandIDs::setKeysNestedCenter:
+		result.setInfo("Keys Aligned Center", "The keys outside of the mode will be centered.", "Piano", 0);
+		result.setTicked(keyPlacementSelected == KeyPlacementType::nestedCenter);
+		break;
+	case IDs::CommandIDs::setKeysAdjacent:
+		result.setInfo("Keys Adjacent", "The keys outside of the mode will placed adjacent to each other.", "Piano", 0);
+		result.setTicked(keyPlacementSelected == KeyPlacementType::adjacent);
+		break;
+	default:
+		break;
+	}
+}
+
+bool Keyboard::perform(const InvocationInfo &info)
+{
+	switch (info.commandID)
+	{
+	case IDs::CommandIDs::setKeyColor:
+		break;
+	case IDs::CommandIDs::pianoPlayMode:
+		break;
+	case IDs::CommandIDs::pianoEditMode:
+		break;
+	case IDs::CommandIDs::setPianoHorizontal:
+		// TBI
+		break;
+	case IDs::CommandIDs::setPianoVerticalL:
+		// TBI
+		break;
+	case IDs::CommandIDs::setPianoVerticalR:
+		// TBI
+		break;
+	case IDs::CommandIDs::setKeysNestedRight:
+		setKeyPlacement(KeyPlacementType::nestedRight);
+		break;
+	case IDs::CommandIDs::setKeysNestedCenter:
+		setKeyPlacement(KeyPlacementType::nestedCenter);
+		break;
+	case IDs::CommandIDs::setKeysAdjacent:
+		setKeyPlacement(KeyPlacementType::adjacent);
+		break;
+
+	default:
+		return false;
+	}
+	return true;
 }

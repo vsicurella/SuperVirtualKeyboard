@@ -77,6 +77,9 @@ namespace IDs
 		setPianoHorizontal,
 		setPianoVerticalL,
 		setPianoVerticalR,
+		setKeysNestedRight,
+		setKeysNestedCenter,
+		setKeysAdjacent
 	};
 }
 

@@ -56,7 +56,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	update_children_to_preset();
 
-	appCmdMgr.registerAllCommandsForTarget(piano.get());
 	appCmdMgr.registerAllCommandsForTarget(this);
         
     setSize(1000, 250);

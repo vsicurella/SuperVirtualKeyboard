@@ -108,7 +108,6 @@ KeyboardEditorBar::~KeyboardEditorBar()
     offsetSld = nullptr;
     offsetLabel = nullptr;
 
-
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
@@ -266,15 +265,13 @@ void KeyboardEditorBar::set_mode_library_text(String presetName)
 
 void KeyboardEditorBar::create_and_send_mode()
 {
-	std::unique_ptr<Mode> mode(new Mode(modeTextEditor->getText(), "Custom"));
+	String steps = modeTextEditor->getText();
+	int index = pluginState->is_mode_in_presets(steps);
 
-	// check to see if mode matches a preset
-	int index = pluginState->is_mode_in_presets(mode.get());
-
-	if (index)
+	if (index)	
 		pluginState->set_current_mode(index);
 	else
-		pluginState->set_current_mode(mode.get());
+		pluginState->set_current_mode(new Mode(steps, "Custom"));
 }
 
 //==============================================================================
@@ -337,6 +334,9 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setPianoHorizontal, "Horizontal Keyboard");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setPianoVerticalL, "Vertical Keyboard Left");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setPianoVerticalR, "Vertical Keyboard Right");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysNestedRight, "Cascade Keys");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysNestedCenter, "Flat Keys");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysAdjacent, "Adjacent Keys");
 	}
 
 	return menu;

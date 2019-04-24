@@ -29,6 +29,7 @@ Mode::Mode()
 	orders = expand_orders(ordersDefault, offset);
 	degrees = orders_to_degrees(ordersDefault);
 	keyboardOrdersSizes = interval_sizes(orders);
+	updateStepsOfOrders();
 
 	init_node();
 }
@@ -49,6 +50,7 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
 	orders = expand_orders(ordersDefault, offsetIn);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
+	updateStepsOfOrders();
 
 	init_node();
 }
