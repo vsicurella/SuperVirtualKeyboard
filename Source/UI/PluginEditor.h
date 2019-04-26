@@ -16,6 +16,7 @@
 #include "KeyboardEditorBar.h"
 #include "../Structures/Mode.h"
 #include "VirtualKeyboard/Keyboard.h"
+#include "ColorChoosingWindow.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -32,7 +33,7 @@ class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public Timer
 {
 public:
-    SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor&);
+    SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor&, ApplicationCommandManager*);
     ~SuperVirtualKeyboardAudioProcessorEditor();
 
     //==============================================================================
@@ -42,12 +43,10 @@ public:
 
 	//==============================================================================
 
-
 	void timerCallback() override;
 	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
 	void focusGained(FocusChangeType changeType) override;
 	void userTriedToCloseWindow() override;
-	void visibilityChanged() override;
     
     //==============================================================================
 
@@ -102,7 +101,7 @@ private:
 	MidiKeyboardState externalMidi;
     ValueTree keyboardWindowNode;
 
-	ApplicationCommandManager appCmdMgr;
+	ApplicationCommandManager* appCmdMgr;
 
 	std::unique_ptr<FilenameComponent> openFileBox;
 	std::unique_ptr<FilenameComponent> saveFileBox;
@@ -110,6 +109,9 @@ private:
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<Keyboard> piano;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
+
+	std::unique_ptr<DocumentWindow> colorChooserWindow;
+	std::unique_ptr<ColorChooserWindow> colorChooser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };

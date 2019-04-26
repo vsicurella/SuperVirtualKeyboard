@@ -25,7 +25,8 @@ struct SuperVirtualKeyboardPluginState
 			pluginStateNode(IDs::pluginStateNode),
 			modeLibraryNode(IDs::modeLibraryNode),
 			presetCurrentNode(IDs::presetNode),
-			undoManager(new UndoManager())
+			undoManager(new UndoManager()),
+			appCmdMgr(new ApplicationCommandManager())
 
 	{
 		createPresets();
@@ -54,6 +55,7 @@ struct SuperVirtualKeyboardPluginState
 
 	//==============================================================================
 
+	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
 
 private:
 

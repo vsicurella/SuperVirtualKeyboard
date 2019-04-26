@@ -38,6 +38,10 @@
             file="Source/UI/KeyboardEditorBar.cpp"/>
       <FILE id="GBz5d1" name="KeyboardEditorBar.h" compile="0" resource="0"
             file="Source/UI/KeyboardEditorBar.h"/>
+      <FILE id="Sjkl1h" name="ColorChoosingWindow.cpp" compile="1" resource="0"
+            file="Source/UI/ColorChoosingWindow.cpp"/>
+      <FILE id="u28f1w" name="ColorChoosingWindow.h" compile="0" resource="0"
+            file="Source/UI/ColorChoosingWindow.h"/>
     </GROUP>
     <FILE id="qf8oNW" name="PluginIDs.h" compile="0" resource="0" file="Source/PluginIDs.h"/>
     <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>

@@ -798,12 +798,11 @@ ApplicationCommandTarget* Keyboard::getNextCommandTarget()
 void Keyboard::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
-		IDs::CommandIDs::setKeyColor,
-		IDs::CommandIDs::pianoPlayMode,
-		IDs::CommandIDs::pianoEditMode,
-		IDs::CommandIDs::setPianoHorizontal,
-		IDs::CommandIDs::setPianoVerticalL,
-		IDs::CommandIDs::setPianoVerticalR,
+		//IDs::CommandIDs::pianoPlayMode,
+		//IDs::CommandIDs::pianoEditMode,
+		//IDs::CommandIDs::setPianoHorizontal,
+		//IDs::CommandIDs::setPianoVerticalL,
+		//IDs::CommandIDs::setPianoVerticalR,
 		IDs::CommandIDs::setKeysNestedRight,
 		IDs::CommandIDs::setKeysNestedCenter,
 		IDs::CommandIDs::setKeysAdjacent };
@@ -815,10 +814,6 @@ void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &resul
 {
 	switch (commandID)
 	{
-	case IDs::CommandIDs::setKeyColor:
-		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
-		break;
 	case IDs::CommandIDs::pianoPlayMode:
 		result.setInfo("Piano Play Mode", "Click the keyboard keys to play the mode and send MIDI data.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
@@ -865,8 +860,6 @@ bool Keyboard::perform(const InvocationInfo &info)
 {
 	switch (info.commandID)
 	{
-	case IDs::CommandIDs::setKeyColor:
-		break;
 	case IDs::CommandIDs::pianoPlayMode:
 		break;
 	case IDs::CommandIDs::pianoEditMode:

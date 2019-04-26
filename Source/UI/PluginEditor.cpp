@@ -14,12 +14,12 @@
 using namespace VirtualKeyboard;
 
 //==============================================================================
-SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p)
-	: AudioProcessorEditor(&p), processor(p),
+SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p, ApplicationCommandManager* cmdMgr)
+	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr),
 	pluginState(processor.get_plugin_state()),
-	piano(new Keyboard(pluginState, &appCmdMgr)),
+	piano(new Keyboard(pluginState, appCmdMgr)),
 	view(new Viewport("Piano Viewport")),
-	keyboardEditorBar(new KeyboardEditorBar(pluginState, &appCmdMgr))
+	keyboardEditorBar(new KeyboardEditorBar(pluginState, appCmdMgr))
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
@@ -56,8 +56,17 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	update_children_to_preset();
 
-	appCmdMgr.registerAllCommandsForTarget(this);
-        
+	colorChooserWindow.reset(new DocumentWindow("Color Chooser Window", Colours::slategrey, DocumentWindow::closeButton));
+	addChildComponent(colorChooserWindow.get());
+	colorChooserWindow->setSize(300, 650);
+	colorChooserWindow->addToDesktop();
+
+	colorChooser.reset(new ColorChooserWindow(pluginState->get_current_mode()));
+	colorChooserWindow->setContentComponent(colorChooser.get());
+
+	appCmdMgr->registerAllCommandsForTarget(this);
+	appCmdMgr->registerAllCommandsForTarget(piano.get());
+
     setSize(1000, 250);
 	
 	startTimerHz(20);
@@ -186,20 +195,12 @@ void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInp
 
 void SuperVirtualKeyboardAudioProcessorEditor::focusGained(FocusChangeType changeType)
 {
-	setWantsKeyboardFocus(true);
+	setWantsKeyboardFocus(false);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
 {
 	setVisible(false);
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::visibilityChanged()
-{
-	if (isVisible())
-	{
-		setWantsKeyboardFocus(true);
-	}
 }
 
 bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
@@ -284,10 +285,9 @@ File SuperVirtualKeyboardAudioProcessorEditor::fileDialog(String message, bool f
 
 //==============================================================================
 
-
 ApplicationCommandTarget* SuperVirtualKeyboardAudioProcessorEditor::getNextCommandTarget()
 {
-	return findFirstTargetParentComponent();
+	return piano.get();// findFirstTargetParentComponent();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID > &c)
@@ -295,7 +295,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID >
 	Array<CommandID> commands{
 		IDs::CommandIDs::saveCustomLayout,
 		IDs::CommandIDs::loadCustomLayout,
-		IDs::CommandIDs::saveReaperMap };
+		IDs::CommandIDs::saveReaperMap,
+		IDs::CommandIDs::setKeyColor,
+	};
 
 	c.addArray(commands);
 }
@@ -319,6 +321,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
 		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
 		break;
+	case IDs::CommandIDs::setKeyColor:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+		break;
 	default:
 		break;
 	}
@@ -336,6 +342,9 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 		break;
 	case IDs::CommandIDs::saveReaperMap:
 		write_reaper_file();
+		break;
+	case IDs::CommandIDs::setKeyColor:
+		colorChooserWindow->setVisible(true);
 		break;
 	default:
 		return false;

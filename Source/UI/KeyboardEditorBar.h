@@ -63,7 +63,6 @@ public:
     void buttonClicked (Button* buttonThatWasClicked) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void mouseEnter (const MouseEvent& e) override;
     void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel) override;
     bool keyPressed (const KeyPress& key) override;
     bool keyStateChanged (bool isKeyDown) override;
