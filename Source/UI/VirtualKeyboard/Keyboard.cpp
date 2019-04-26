@@ -512,8 +512,8 @@ void Keyboard::mouseDown(const MouseEvent& e)
         if (shiftHeld && !altHeld && key->activeColor == 2)
         {
             // note off
-            triggerKeyNoteOff(key);
             lastKeyClicked = 0;
+            triggerKeyNoteOff(key);
         }
         else
         {
@@ -527,6 +527,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
             lastKeyClicked = key->keyNumber;
         }
     }
+    std::cout << e.eventComponent->getName() << std::endl;
 }
 
 void Keyboard::mouseDrag(const MouseEvent& e)
@@ -752,13 +753,13 @@ void Keyboard::triggerKeyNoteOff(Key* key)
 {
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
     
-    key->activeColor = 0;
-    
     if (key->isMouseOver())
         key->activeColor = 1;
+    else
+        key->activeColor = 0;
     
-    int ind = -1;
     // find key in vector, swap with end, and pop off
+    int ind = -1;
     for (int i = 0; i < keysOn.size(); i++)
     {
         if (key->keyNumber == keysOn[i]->keyNumber)

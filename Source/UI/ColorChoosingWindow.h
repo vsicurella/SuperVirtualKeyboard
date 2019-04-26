@@ -34,17 +34,15 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class ColorChooserWindow  : public Component
+class ColorChooserWindow  : public DocumentWindow
 {
 public:
     //==============================================================================
-    ColorChooserWindow (Mode* modeIn);
+    ColorChooserWindow (String windowName, Colour backgroundColor, int windowFlags);
     ~ColorChooserWindow();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void setCurrentMode(Mode* modeIn);
-
 	void closeButtonPressed();
     //[/UserMethods]
 
@@ -55,13 +53,10 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	Mode* mode;
-
-	std::unique_ptr<ColourSelector> colorSelector;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ColourSelector> component;
+    std::unique_ptr<ColourSelector> colorChooser;
 
 
     //==============================================================================

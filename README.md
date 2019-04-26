@@ -1,6 +1,6 @@
-﻿# SuperVirtualKeyboard
+# SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-18 (Contact me for build)
+LATEST VERSION: Alpha 2019-04-26 (Contact me for build)
 
 SUMMARY:
 
@@ -26,7 +26,6 @@ TO DO:
  - Add custom colors
  - Change keyboard orientation
  - Add note names
- - Shift keyboard by offset
  - Set transposition parameters
  - Graphics shading & other niceties
  - more...
@@ -36,5 +35,4 @@ BUGS:
  - Midi device doesn't get reconfigured when device settings change
  - Window resizing is bad funky
  - Clicking on a held note should turn it off, but it doesn't work on Mac
- - Top piano notes don't get drawn
  - Definitely some more...

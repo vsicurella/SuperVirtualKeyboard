@@ -17,8 +17,8 @@ using namespace VirtualKeyboard;
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p, ApplicationCommandManager* cmdMgr)
 	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr),
 	pluginState(processor.get_plugin_state()),
+    view(new Viewport("Piano Viewport")),
 	piano(new Keyboard(pluginState, appCmdMgr)),
-	view(new Viewport("Piano Viewport")),
 	keyboardEditorBar(new KeyboardEditorBar(pluginState, appCmdMgr))
 {
 	setName("Super Virtual Keyboard");
@@ -55,14 +55,10 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	}
 
 	update_children_to_preset();
-
-	colorChooserWindow.reset(new DocumentWindow("Color Chooser Window", Colours::slategrey, DocumentWindow::closeButton));
-	addChildComponent(colorChooserWindow.get());
-	colorChooserWindow->setSize(300, 650);
-	colorChooserWindow->addToDesktop();
-
-	colorChooser.reset(new ColorChooserWindow(pluginState->get_current_mode()));
-	colorChooserWindow->setContentComponent(colorChooser.get());
+    
+    colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
+    colorChooserWindow->setSize(450, 450);
+    colorChooserWindow->addToDesktop();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano.get());

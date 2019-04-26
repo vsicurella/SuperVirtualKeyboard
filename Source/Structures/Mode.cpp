@@ -120,18 +120,12 @@ String Mode::setName(String nameIn)
 
 void Mode::setOffset(int offsetIn)
 {
-	add_array_to_node(orders, "ordersarray", "value");
-
-	offset = offsetIn;
+	offset = -offsetIn;
 	
 	orders = expand_orders(ordersDefault, offset);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
-
-	add_array_to_node(orders, "newordersarray", "value");
-
-	DBG(modeNode.toXmlString());
 
 	modeNode.setProperty(IDs::modeOffset, offset, nullptr);
 }

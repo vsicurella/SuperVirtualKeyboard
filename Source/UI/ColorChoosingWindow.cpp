@@ -27,20 +27,18 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-ColorChooserWindow::ColorChooserWindow (Mode* modeIn)
+ColorChooserWindow::ColorChooserWindow (String windowName, Colour backgroundColor, int windowFlags)
+    : DocumentWindow(windowName, backgroundColor, windowFlags)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    component.reset (new ColourSelector());
-    addAndMakeVisible (component.get());
-    component->setName ("new component");
+    colorChooser.reset (new ColourSelector());
+    addAndMakeVisible (colorChooser.get());
+    colorChooser->setName ("Color Chooser");
 
 
     //[UserPreSize]
-	colorSelector.reset(new ColourSelector());
-	colorSelector->setName("Color Selector");
-	colorSelector->setSize(300, 300);
 
 	setOpaque(true);
     //[/UserPreSize]
@@ -57,7 +55,7 @@ ColorChooserWindow::~ColorChooserWindow()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    component = nullptr;
+    colorChooser = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -79,22 +77,17 @@ void ColorChooserWindow::paint (Graphics& g)
 void ColorChooserWindow::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
+    DocumentWindow::resized();
     //[/UserPreResize]
 
-    component->setBounds (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (1.0000f));
+    colorChooser->setBounds (0, getHeight() - proportionOfHeight (0.9500f), proportionOfWidth (1.0000f), proportionOfHeight (0.9500f));
     //[UserResized] Add your own custom resize handling here..
-	colorSelector->setBoundsRelative(0, 0.2, 0.8, 0.8);
     //[/UserResized]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void ColorChooserWindow::setCurrentMode(Mode* modeIn)
-{
-	mode = modeIn;
-}
-
 void ColorChooserWindow::closeButtonPressed()
 {
 	setVisible(false);
@@ -112,13 +105,14 @@ void ColorChooserWindow::closeButtonPressed()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ColorChooserWindow" componentName=""
-                 parentClasses="public Component" constructorParams="Mode* modeIn"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="1" initialWidth="450" initialHeight="450">
+                 parentClasses="public DocumentWindow" constructorParams="String windowName, Colour backgroundColor, int windowFlags"
+                 variableInitialisers="DocumentWindow(windowName, backgroundColor, windowFlags)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="450" initialHeight="450">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <GENERICCOMPONENT name="new component" id="d9ba9435617a7d65" memberName="component"
-                    virtualName="" explicitFocusOrder="0" pos="0 0 100% 100%" class="ColourSelector"
-                    params=""/>
+  <GENERICCOMPONENT name="Color Chooser" id="d9ba9435617a7d65" memberName="colorChooser"
+                    virtualName="" explicitFocusOrder="0" pos="0 0Rr 100% 94.937%"
+                    class="ColourSelector" params=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

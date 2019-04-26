@@ -111,7 +111,7 @@ private:
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
 	std::unique_ptr<DocumentWindow> colorChooserWindow;
-	std::unique_ptr<ColorChooserWindow> colorChooser;
+    std::unique_ptr<ColourSelector> colorSelector;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };
