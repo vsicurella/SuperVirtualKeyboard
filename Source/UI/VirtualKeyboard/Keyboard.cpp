@@ -231,7 +231,7 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
         key = keys.getUnchecked(i);
         
         key->order = mode->getOrders()[i];
-        keysOrder[key->order].push_back(key);
+        keysOrder.getReference(key->order).add(key);
 
         key->setColour(0, get_key_color(key));
         key->setColour(1, get_key_color(key).contrasting(0.25));
@@ -247,8 +247,8 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
     
     // bring all keys to front with highest orders frontmost
     for (int o = 0; o < keysOrder.size(); o++)
-        for (int k = 0; k < keysOrder.at(o).size(); k++)
-            keysOrder.at(o).at(k)->toFront(false);
+        for (int k = 0; k < keysOrder.getUnchecked(o).size(); k++)
+            keysOrder.getReference(o).getReference(k)->toFront(false);
     
     // Calculate properties
     displayIsReady = true;
@@ -259,7 +259,7 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
 
 Colour Keyboard::get_key_color(Key* keyIn)
 {
-    return keyOrderColors.at(keyIn->order % keyOrderColors.size());
+    return keyOrderColors.getUnchecked(keyIn->order % keyOrderColors.size());
 }
 
 void Keyboard::all_notes_off()
@@ -297,11 +297,11 @@ void Keyboard::isolate_last_note()
 
 bool Keyboard::check_keys_modal(int& orderDetected)
 {
-    orderDetected = keysOn[0]->order;
+    orderDetected = keysOn.getUnchecked(0)->order;
     
     for (int i = 1; i < keysOn.size(); i++)
     {
-        if (keysOn[i]->order != orderDetected)
+        if (keysOn.getUnchecked(i)->order != orderDetected)
             return false;
     }
     
@@ -313,10 +313,11 @@ Key* Keyboard::transpose_key_modal(Key* key, int stepsIn)
     Key* keyOut = nullptr;
     int newKey = -1;
     int theOrder = key->order;
+	Array<Key*>* orderArray = &keysOrder.getReference(theOrder);
     
-    for (int i = 0; i < keysOrder[theOrder].size(); i++)
+    for (int i = 0; i < orderArray->size(); i++)
     {
-        if (key->degree == keysOrder[theOrder][i]->degree)
+		if (key->degree == orderArray->getUnchecked(i)->degree)
         {
             newKey = i;
             break;
@@ -325,8 +326,8 @@ Key* Keyboard::transpose_key_modal(Key* key, int stepsIn)
     
     newKey += stepsIn;
     
-    if (newKey >= 0 && newKey < keysOrder[theOrder].size())
-        keyOut = keysOrder[theOrder][newKey];
+    if (newKey >= 0 && newKey < orderArray->size())
+        keyOut = orderArray->getUnchecked(newKey);
     
     return keyOut;
 }
@@ -352,8 +353,10 @@ bool Keyboard::transpose_keys_modal(int modalStepsIn)
     int theOrder;
     if (check_keys_modal(theOrder))
     {
-        std::vector<Key*> oldKeys = std::vector<Key*>(keysOn);
-        std::vector<Key*> newKeys;
+        Array<Key*> oldKeys = Array<Key*>(keysOn);
+        Array<Key*> newKeys;
+		Array<Key*>* orderSelected = &keysOrder.getReference(theOrder);
+
         Key* key;
         Key* newKey;
         int newDeg = -1;
@@ -361,35 +364,28 @@ bool Keyboard::transpose_keys_modal(int modalStepsIn)
         
         for (int i = 0; i < oldKeys.size(); i++)
         {
-            key = oldKeys[i];
+            key = oldKeys.getUnchecked(i);
             velocity = key->velocity;
+
+			newDeg = orderSelected->indexOf(key) + modalStepsIn;
             
-            // Find index of key in the order array, and get new index
-            for (int j = 0; j < keysOrder[theOrder].size(); j++)
-            {
-                if (key->degree == keysOrder[theOrder].at(j)->degree)
-                {
-                    newDeg = j + modalStepsIn;
-                }
-            }
-            
-            if (newDeg < 0 || newDeg >= keysOrder[theOrder].size())
+            if (newDeg < 0 || newDeg >= orderSelected->size())
                 continue;
             
-            newKey = keysOrder[theOrder][newDeg];
+            newKey = orderSelected->getUnchecked(newDeg);
             newKey->velocity = velocity;
             
             if (lastKeyClicked == key->keyNumber)
                 lastKeyClicked = newKey->keyNumber;
             
-            newKeys.push_back(newKey);
+            newKeys.add(newKey);
         }
         
-        for (int i = 0; i < oldKeys.size(); i++)
-            triggerKeyNoteOff(oldKeys[i]);
+		for (int i = 0; i < oldKeys.size(); i++)
+			triggerKeyNoteOff(oldKeys.getReference(i));
         
         for (int i = 0; i < newKeys.size(); i++)
-            triggerKeyNoteOn(newKeys[i], newKeys[i]->velocity);
+            triggerKeyNoteOn(newKeys.getReference(i), newKeys.getReference(i)->velocity);
         
         return true;
     }
@@ -398,17 +394,16 @@ bool Keyboard::transpose_keys_modal(int modalStepsIn)
 
 void Keyboard::transpose_keys(int stepsIn)
 {
-    std::vector<Key*> oldKeys = std::vector<Key*>(keysOn);
-    std::vector<Key*> newKeys;
+    Array<Key*> oldKeys = Array<Key*>(keysOn);
+	Array<Key*> newKeys;
     Key* key;
     Key* newKey;
     int newKeyInd;
     float velocity;
     
-    
     for (int i = 0; i < oldKeys.size(); i++)
     {
-        key = oldKeys[i];
+        key = oldKeys.getUnchecked(i);
         velocity = key->velocity;
         newKeyInd = key->keyNumber + stepsIn;
         
@@ -420,24 +415,24 @@ void Keyboard::transpose_keys(int stepsIn)
         
         newKey = keys.getUnchecked(newKeyInd);
         newKey->velocity = velocity;
-        newKeys.push_back(newKey);
+        newKeys.add(newKey);
     }
     
     for (int i = 0; i < oldKeys.size(); i++)
-        triggerKeyNoteOff(oldKeys[i]);
+        triggerKeyNoteOff(oldKeys.getReference(i));
     
     for (int i = 0; i < newKeys.size(); i++)
-        triggerKeyNoteOn(newKeys[i], newKeys[i]->velocity);
+        triggerKeyNoteOn(newKeys.getReference(i), newKeys.getReference(i)->velocity);
 }
 
 void Keyboard::retrigger_notes()
 {
-    std::vector<VirtualKeyboard::Key*> retrigger = std::vector<VirtualKeyboard::Key*>(keysOn);
+	Array<Key*> retrigger = Array <Key*>(keysOn);
     
     all_notes_off();
     
     for (int i = 0; i < retrigger.size(); i++)
-        triggerKeyNoteOn(retrigger.at(i), retrigger.at(i)->velocity);
+        triggerKeyNoteOn(retrigger.getReference(i), retrigger.getUnchecked(i)->velocity);
 }
 
 //===============================================================================================
@@ -745,7 +740,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
         keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
         key->activeColor = 2;
         key->velocity = velocityIn;
-        keysOn.push_back(key);
+        keysOn.add(key);
     }
 }
 
@@ -757,24 +752,9 @@ void Keyboard::triggerKeyNoteOff(Key* key)
         key->activeColor = 1;
     else
         key->activeColor = 0;
-    
-    // find key in vector, swap with end, and pop off
-    int ind = -1;
-    for (int i = 0; i < keysOn.size(); i++)
-    {
-        if (key->keyNumber == keysOn[i]->keyNumber)
-        {
-            ind = i;
-            break;
-        }
-    }
-    if (ind > -1)
-    {
-        Key* temp = keysOn[keysOn.size() - 1];
-        keysOn[keysOn.size() - 1] = keysOn[ind];
-        keysOn[ind] = temp;
-        keysOn.pop_back();
-    }
+
+	keysOn.swap(keysOn.indexOf(key), keysOn.size() - 1);
+	keysOn.removeLast(1);
 }
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)

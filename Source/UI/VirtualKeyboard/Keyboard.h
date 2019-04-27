@@ -177,8 +177,8 @@ namespace VirtualKeyboard
         ValueTree pianoNode;
         OwnedArray<Key> keys;
         
-        std::vector<std::vector<Key*>> keysOrder;
-        std::vector<Key*> keysOn;
+        Array<Array<Key*>> keysOrder;
+        Array<Key*> keysOn;
         Mode* mode;
         
         // Parameters
@@ -191,7 +191,7 @@ namespace VirtualKeyboard
         bool mpeOn = false;
         
         Array<Point<float>> keyDegreeProportions;
-        std::vector<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
+        Array<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
         
         // Properties
