@@ -71,10 +71,6 @@ public:
 
 	//==============================================================================
 
-	bool keyPressed(const KeyPress& key) override;
-
-	//==============================================================================
-
 	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
 
 	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;

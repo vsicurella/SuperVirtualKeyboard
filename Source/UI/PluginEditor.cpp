@@ -277,22 +277,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 
 }
 
-
-//==============================================================================
-
-
-bool SuperVirtualKeyboardAudioProcessorEditor::keyPressed(const KeyPress& key)
-{
-	if (key == KeyPress::returnKey)
-	{
-
-		return true;
-	}
-
-	return false;
-}
-
-
 //==============================================================================
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)

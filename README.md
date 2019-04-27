@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-26 (Contact me for build)
+LATEST VERSION: Alpha 2019-04-27 (Contact me for build)
 
 SUMMARY:
 
@@ -9,11 +9,11 @@ larger ones, easier to digest and compose with. This is actually a subproject of
 
 FEATURES:
 
- * This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. *
+ - * This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. *
 
  - Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
 
- - Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and /-not yet-/ "Space" to retrigger held notes.
+ - Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to de/retrigger held notes.
 
  - Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
    At this time, modal transposition is only possible if all held notes belong to the same mode (all white, all black, etc.)
