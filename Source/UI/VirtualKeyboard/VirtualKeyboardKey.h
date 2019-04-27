@@ -40,7 +40,7 @@ namespace VirtualKeyboard
         float velocity = 0;
         
         // more of a "status" flag
-        int activeColor = 0;
+        int activeState = 0;
 
 		std::unique_ptr<PopupMenu> editMenu;
 		std::unique_ptr<ColourSelector> colorSelector;
@@ -58,6 +58,8 @@ namespace VirtualKeyboard
 
 		//==============================================================================
 
+		void mouseEnter(const MouseEvent& e) override;
+		void mouseExit(const MouseEvent& e) override;
 		void mouseDown(const MouseEvent& e) override;
 		void mouseUp(const MouseEvent& e) override;
 

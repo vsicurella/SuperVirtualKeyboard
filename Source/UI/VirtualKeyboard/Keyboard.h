@@ -119,10 +119,7 @@ namespace VirtualKeyboard
         void transpose_keys(int modalStepsIn);
         
         //===============================================================================================
-        
-        
-        void mouseExit(const MouseEvent& e) override;
-        
+               
         void mouseDown(const MouseEvent& e) override;
         
         void mouseDrag(const MouseEvent& e) override;

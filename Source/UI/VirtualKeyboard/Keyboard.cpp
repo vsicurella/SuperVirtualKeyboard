@@ -442,13 +442,6 @@ void Keyboard::paint(Graphics& g)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-
-	if (!displayIsReady)
-	{
-		g.setColour(Colours::white);
-		g.setFont(14.0f);
-		//g.drawText("ViewPianoComponent", getLocalBounds(), Justification::centred, true);   // draw some placeholder text
-	}
 }
 
 void Keyboard::resized()
@@ -491,20 +484,12 @@ void Keyboard::visibilityChanged()
 
 //===============================================================================================
 
-void Keyboard::mouseExit(const MouseEvent& e)
-{
-    Key* key = keys.getUnchecked(lastKeyOver);
-    
-    if (!shiftHeld || key->activeColor < 2)
-        key->activeColor = 0;
-}
-
 void Keyboard::mouseDown(const MouseEvent& e)
 {
     Key* key = get_key_from_position(e);
     if (key)
     {
-        if (shiftHeld && !altHeld && key->activeColor == 2)
+        if (shiftHeld && !altHeld && key->activeState == 2)
         {
             // note off
             lastKeyClicked = 0;
@@ -534,7 +519,7 @@ void Keyboard::mouseDrag(const MouseEvent& e)
         if (key->keyNumber != lastKeyClicked)
         {
             Key* oldKey = keys.getUnchecked(lastKeyClicked);
-            if (!shiftHeld)
+            if (!shiftHeld || altHeld)
             {
                 triggerKeyNoteOff(oldKey);
             }
@@ -555,7 +540,7 @@ void Keyboard::mouseUp(const MouseEvent& e)
         if (!shiftHeld)
         {
             triggerKeyNoteOff(key);
-            key->activeColor = 1;
+            key->activeState = 1;
             repaint();
         }
     }
@@ -567,11 +552,6 @@ void Keyboard::mouseMove(const MouseEvent& e)
     
     if (key)
     {
-        if (key->activeColor < 2)
-        {
-            key->activeColor = 1;
-            repaint();
-        }
         lastKeyOver = key->keyNumber;
     }
 }
@@ -738,8 +718,8 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
     if (velocityIn > 0)
     {
         keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
-        key->activeColor = 2;
-        key->velocity = velocityIn;
+		key->activeState = 2;
+		key->velocity = velocityIn;
         keysOn.add(key);
     }
 }
@@ -747,14 +727,18 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 void Keyboard::triggerKeyNoteOff(Key* key)
 {
     keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
-    
-    if (key->isMouseOver())
-        key->activeColor = 1;
-    else
-        key->activeColor = 0;
 
+	if (key->isMouseOver())
+		key->activeState = 1;
+	else
+		key->activeState = 0;
+
+	keysOn.removeAllInstancesOf(key);
+
+	/*
 	keysOn.swap(keysOn.indexOf(key), keysOn.size() - 1);
 	keysOn.removeLast(1);
+	*/
 }
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
