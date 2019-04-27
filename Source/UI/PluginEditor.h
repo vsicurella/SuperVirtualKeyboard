@@ -45,7 +45,6 @@ public:
 
 	void timerCallback() override;
 	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
-	void focusGained(FocusChangeType changeType) override;
 	void userTriedToCloseWindow() override;
     
     //==============================================================================
@@ -59,6 +58,16 @@ public:
 	void update_children_to_preset();
 
 	bool write_reaper_file();
+
+	//===============================================================================================
+
+	void mouseDown(const MouseEvent& e) override;
+
+	void mouseDrag(const MouseEvent& e) override;
+
+	void mouseUp(const MouseEvent& e) override;
+
+	void mouseMove(const MouseEvent& e) override;
 
 	//==============================================================================
 

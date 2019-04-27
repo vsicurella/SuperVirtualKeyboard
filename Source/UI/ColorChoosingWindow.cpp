@@ -33,13 +33,11 @@ ColorChooserWindow::ColorChooserWindow (String windowName, Colour backgroundColo
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    colorChooser.reset (new ColourSelector());
-    addAndMakeVisible (colorChooser.get());
-    colorChooser->setName ("Color Chooser");
-
 
     //[UserPreSize]
-
+	colorChooser.reset(new ColourSelector());
+	setContentComponent(colorChooser.get());
+	colorChooser->setName("Color Chooser");
 	setOpaque(true);
     //[/UserPreSize]
 
@@ -55,7 +53,6 @@ ColorChooserWindow::~ColorChooserWindow()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    colorChooser = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -80,8 +77,8 @@ void ColorChooserWindow::resized()
     DocumentWindow::resized();
     //[/UserPreResize]
 
-    colorChooser->setBounds (0, getHeight() - proportionOfHeight (0.9494f), proportionOfWidth (1.0000f), proportionOfHeight (0.9494f));
     //[UserResized] Add your own custom resize handling here..
+	colorChooser->setBounds(0, getHeight() - proportionOfHeight(0.9493f), proportionOfWidth(1.0000f), proportionOfHeight(0.9493f));
     //[/UserResized]
 }
 
@@ -110,9 +107,6 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="450" initialHeight="450">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <GENERICCOMPONENT name="Color Chooser" id="d9ba9435617a7d65" memberName="colorChooser"
-                    virtualName="" explicitFocusOrder="0" pos="0 0Rr 100% 94.928%"
-                    class="ColourSelector" params=""/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

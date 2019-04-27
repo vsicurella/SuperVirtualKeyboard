@@ -64,12 +64,6 @@ void Key::restore_from_node(ValueTree parentNodeIn)
 }
 //==============================================================================
 
-void Key::mouseEnter(const MouseEvent& e)
-{
-	if (!isMouseButtonDown() && !(e.mods.isShiftDown() && activeState == 2))
-		activeState = 1;
-}
-
 void Key::mouseExit(const MouseEvent& e)
 {
 	if (!(e.mods.isShiftDown() && activeState == 2))

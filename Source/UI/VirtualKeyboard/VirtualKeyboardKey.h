@@ -58,7 +58,6 @@ namespace VirtualKeyboard
 
 		//==============================================================================
 
-		void mouseEnter(const MouseEvent& e) override;
 		void mouseExit(const MouseEvent& e) override;
 		void mouseDown(const MouseEvent& e) override;
 		void mouseUp(const MouseEvent& e) override;

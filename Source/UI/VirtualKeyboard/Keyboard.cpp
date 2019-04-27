@@ -31,7 +31,6 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
         addChildComponent(keys.add(key));
     }
     
-    addMouseListener(this, true);
     toBack();
     
     setSize(1000, 250);
@@ -40,7 +39,7 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
 
 //===============================================================================================
 
-void Keyboard::init_data_node()
+void Keyboard::initiateDataNode()
 {
     pianoNode = ValueTree(IDs::pianoNode);
     
@@ -76,7 +75,7 @@ void Keyboard::init_data_node()
     pluginState->pianoNode = pianoNode;
 }
 
-void Keyboard::restore_data_node(ValueTree pianoNodeIn)
+void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 {
     pianoNode = pianoNodeIn;
     
@@ -103,18 +102,28 @@ ValueTree Keyboard::get_node()
 
 //===============================================================================================
 
-MidiKeyboardState* Keyboard::get_keyboard_state()
+MidiKeyboardState* Keyboard::getMidiKeyboardState()
 {
     return &keyboardState;
 }
 
-Point<int> Keyboard::get_position_of_key(int midiNoteIn)
+Key* Keyboard::getKey(int keyNumIn)
+{
+	return keys.getUnchecked(keyNumIn);
+}
+
+int Keyboard::getLastKeyClicked()
+{
+	return lastKeyClicked;
+}
+
+Point<int> Keyboard::getPositionOfKey(int midiNoteIn)
 {
     Key* key = keys.getUnchecked(midiNoteIn % keys.size());
     return key->getPosition();
 }
 
-Key* Keyboard::get_key_from_position(Point<int> posIn)
+Key* Keyboard::getKeyFromPosition(Point<int> posIn)
 {
     Key* keyOut = nullptr;
     
@@ -129,7 +138,7 @@ Key* Keyboard::get_key_from_position(Point<int> posIn)
     return keyOut;
 }
 
-Key* Keyboard::get_key_from_position(const MouseEvent& e)
+Key* Keyboard::getKeyFromPosition(const MouseEvent& e)
 {
     Key* keyOut = nullptr;
     Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
@@ -143,7 +152,8 @@ Key* Keyboard::get_key_from_position(const MouseEvent& e)
     return keyOut;
 }
 
-float Keyboard::get_velocity(Key* keyIn, const MouseEvent& e)
+
+float Keyboard::getKeyVelocity(Key* keyIn, const MouseEvent& e)
 {
     Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
     Point<int> mouseInKey = mousePosition.withX(mousePosition.x - e.eventComponent->getX());
@@ -173,7 +183,7 @@ void Keyboard::setUIMode(UIMode uiModeIn)
 void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
 {
 	keyPlacementSelected = placementIn;
-	apply_mode_layout(mode);
+	applyMode(mode);
 }
 
 void Keyboard::setKeyProportions(Key* keyIn)
@@ -215,9 +225,15 @@ void Keyboard::setKeyProportions(Key* keyIn)
     keyIn->degreeHeightRatio = keyHeight;
 }
 
+void Keyboard::setLastKeyClicked(int keyNumIn)
+{
+	lastKeyClicked = keyNumIn;
+}
+
+
 //===============================================================================================
 
-void Keyboard::apply_mode_layout(Mode* modeIn)
+void Keyboard::applyMode(Mode* modeIn)
 {
     mode = modeIn;
     grid.reset(new KeyboardGrid(mode));
@@ -233,9 +249,9 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
         key->order = mode->getOrders()[i];
         keysOrder.getReference(key->order).add(key);
 
-        key->setColour(0, get_key_color(key));
-        key->setColour(1, get_key_color(key).contrasting(0.25));
-        key->setColour(2, get_key_color(key).contrasting(0.75));
+        key->setColour(0, getKeyColor(key));
+        key->setColour(1, getKeyColor(key).contrasting(0.25));
+        key->setColour(2, getKeyColor(key).contrasting(0.75));
         
         key->degree = mode->getDegrees()[i];
         key->step = mode->getStepsOfOrders()[i];
@@ -257,12 +273,12 @@ void Keyboard::apply_mode_layout(Mode* modeIn)
 
 //===============================================================================================
 
-Colour Keyboard::get_key_color(Key* keyIn)
+Colour Keyboard::getKeyColor(Key* keyIn)
 {
     return keyOrderColors.getUnchecked(keyIn->order % keyOrderColors.size());
 }
 
-void Keyboard::all_notes_off()
+void Keyboard::allNoteOff()
 {
     Key* key;
     
@@ -274,7 +290,7 @@ void Keyboard::all_notes_off()
     repaint();
 }
 
-void Keyboard::isolate_last_note()
+void Keyboard::isolateLastNote()
 {
     if (lastKeyClicked >= 0 && lastKeyClicked < 128)
     {
@@ -295,7 +311,7 @@ void Keyboard::isolate_last_note()
 }
 
 
-bool Keyboard::check_keys_modal(int& orderDetected)
+bool Keyboard::keysAreInSameOrder(int& orderDetected)
 {
     orderDetected = keysOn.getUnchecked(0)->order;
     
@@ -308,7 +324,7 @@ bool Keyboard::check_keys_modal(int& orderDetected)
     return true;
 }
 
-Key* Keyboard::transpose_key_modal(Key* key, int stepsIn)
+Key* Keyboard::transposeKeyModally(Key* key, int stepsIn)
 {
     Key* keyOut = nullptr;
     int newKey = -1;
@@ -332,7 +348,7 @@ Key* Keyboard::transpose_key_modal(Key* key, int stepsIn)
     return keyOut;
 }
 
-Key* Keyboard::transpose_key(Key* key, int stepsIn)
+Key* Keyboard::transposeKeyChromatically(Key* key, int stepsIn)
 {
     Key* keyOut = nullptr;
     int newKey;
@@ -348,10 +364,10 @@ Key* Keyboard::transpose_key(Key* key, int stepsIn)
 }
 
 
-bool Keyboard::transpose_keys_modal(int modalStepsIn)
+bool Keyboard::transposeKeysOnModally(int modalStepsIn)
 {
     int theOrder;
-    if (check_keys_modal(theOrder))
+    if (keysAreInSameOrder(theOrder))
     {
         Array<Key*> oldKeys = Array<Key*>(keysOn);
         Array<Key*> newKeys;
@@ -392,7 +408,7 @@ bool Keyboard::transpose_keys_modal(int modalStepsIn)
     return false;
 }
 
-void Keyboard::transpose_keys(int stepsIn)
+void Keyboard::transposeKeysOnChromatically(int stepsIn)
 {
     Array<Key*> oldKeys = Array<Key*>(keysOn);
 	Array<Key*> newKeys;
@@ -425,11 +441,11 @@ void Keyboard::transpose_keys(int stepsIn)
         triggerKeyNoteOn(newKeys.getReference(i), newKeys.getReference(i)->velocity);
 }
 
-void Keyboard::retrigger_notes()
+void Keyboard::retriggerNotes()
 {
 	Array<Key*> retrigger = Array <Key*>(keysOn);
     
-    all_notes_off();
+    allNoteOff();
     
     for (int i = 0; i < retrigger.size(); i++)
         triggerKeyNoteOn(retrigger.getReference(i), retrigger.getUnchecked(i)->velocity);
@@ -473,90 +489,20 @@ void Keyboard::resized()
 	}
 }
 
-void Keyboard::visibilityChanged()
-{
-	if (isShowing())
-		setWantsKeyboardFocus(true);
-	else
-		setWantsKeyboardFocus(false);
-}
-
-
 //===============================================================================================
 
-void Keyboard::mouseDown(const MouseEvent& e)
-{
-    Key* key = get_key_from_position(e);
-    if (key)
-    {
-        if (shiftHeld && !altHeld && key->activeState == 2)
-        {
-            // note off
-            lastKeyClicked = 0;
-            triggerKeyNoteOff(key);
-        }
-        else
-        {
-            if (altHeld)
-            {
-                Key* oldKey = keys.getUnchecked(lastKeyClicked);
-                triggerKeyNoteOff(oldKey);
-            }
-            
-            triggerKeyNoteOn(key, get_velocity(key, e));
-            lastKeyClicked = key->keyNumber;
-        }
-    }
-    std::cout << e.eventComponent->getName() << std::endl;
-}
-
-void Keyboard::mouseDrag(const MouseEvent& e)
-{
-    Key* key = get_key_from_position(e);
-    
-    if (key)
-    {
-        if (key->keyNumber != lastKeyClicked)
-        {
-            Key* oldKey = keys.getUnchecked(lastKeyClicked);
-            if (!shiftHeld || altHeld)
-            {
-                triggerKeyNoteOff(oldKey);
-            }
-            
-            triggerKeyNoteOn(key, get_velocity(key, e));
-            lastKeyClicked = key->keyNumber;
-            repaint();
-        }
-    }
-}
-
-void Keyboard::mouseUp(const MouseEvent& e)
-{
-    Key* key = get_key_from_position(e);
-    
-    if (key)
-    {
-        if (!shiftHeld)
-        {
-            triggerKeyNoteOff(key);
-            key->activeState = 1;
-            repaint();
-        }
-    }
-}
 
 void Keyboard::mouseMove(const MouseEvent& e)
 {
-    Key* key = get_key_from_position(e);
-    
-    if (key)
-    {
-        lastKeyOver = key->keyNumber;
-    }
+	Key* key = getKeyFromPosition(e);
+
+	if (key)
+	{
+		lastKeyOver = key->keyNumber;
+	}
+
 }
 
-//===============================================================================================
 
 bool Keyboard::keyStateChanged(bool isKeyDown)
 {
@@ -601,7 +547,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
         
         if (shiftHeld && keysOn.size() > 0)
         {
-            transpose_keys(1);
+            transposeKeysOnChromatically(1);
             repaint();
         }
         return true;
@@ -613,7 +559,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
         
         if (shiftHeld && keysOn.size() > 0)
         {
-            transpose_keys(-1);
+            transposeKeysOnChromatically(-1);
             repaint();
         }
         return true;
@@ -625,7 +571,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
         
         if (shiftHeld && keysOn.size() > 0)
         {
-            if (transpose_keys_modal(-1))
+            if (transposeKeysOnModally(-1))
                 repaint();
         }
         return true;
@@ -637,7 +583,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
         
         if (shiftHeld && keysOn.size() > 0)
         {
-            if (transpose_keys_modal(1))
+            if (transposeKeysOnModally(1))
                 repaint();
         }
         return true;
@@ -649,7 +595,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
         
         if (shiftHeld && keysOn.size() > 0)
         {
-            retrigger_notes();
+            retriggerNotes();
         }
         return true;
     }
@@ -678,7 +624,7 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
     {
         shiftHeld = false;
         
-        isolate_last_note();
+        isolateLastNote();
         
         Key* key = keys.getUnchecked(lastKeyClicked);
         
@@ -691,7 +637,7 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
     if (!altHeld && modifiers.isAltDown())
     {
         altHeld = true;
-        isolate_last_note();
+        isolateLastNote();
         repaint();
     }
     

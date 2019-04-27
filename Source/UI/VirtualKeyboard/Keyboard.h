@@ -60,35 +60,31 @@ namespace VirtualKeyboard
         
         //===============================================================================================
         
-        void init_data_node();
+        void initiateDataNode();
         
-        void restore_data_node(ValueTree pianoNodeIn);
+        void restoreDataNode(ValueTree pianoNodeIn);
         
         ValueTree get_node();
         
         //===============================================================================================
         
-        MidiKeyboardState* get_keyboard_state();
+        MidiKeyboardState* getMidiKeyboardState();
+
+		Key* getKey(int keyNumIn);
+
+		int getLastKeyClicked();
         
-        Point<int> get_position_of_key(int midiNoteIn);
+        Point<int> getPositionOfKey(int midiNoteIn);
         
-        VirtualKeyboard::Key* get_key_from_position(Point<int> posIn);
+        Key* getKeyFromPosition(Point<int> posIn);
         
-        VirtualKeyboard::Key* get_key_from_position(const MouseEvent& e);
-        
-        float get_velocity(Key* keyIn, const MouseEvent& e);
+        Key* getKeyFromPosition(const MouseEvent& e);
+
+        float getKeyVelocity(Key* keyIn, const MouseEvent& e);
         
 		int getWidthFromHeight(int heightIn);
 
 		//===============================================================================================
-
-		void paint(Graphics& g) override;
-
-		void resized() override;
-
-		void visibilityChanged() override;
-        
-        //===============================================================================================
 
         void setUIMode(UIMode uiModeIn);
         
@@ -96,39 +92,42 @@ namespace VirtualKeyboard
         
         void setKeyProportions(Key* keyIn);
 
+		// might want to restructure so this is not necessary
+		void setLastKeyClicked(int keyNumIn);
+
         //===============================================================================================
         
-        Colour get_key_color(Key* keyIn);
+        Colour getKeyColor(Key* keyIn);
         
-        void apply_mode_layout(Mode* layoutIn);
+        void applyMode(Mode* layoutIn);
                 
-        void all_notes_off();
+        void allNoteOff();
         
-        void isolate_last_note();
+        void isolateLastNote();
         
-        void retrigger_notes();
+        void retriggerNotes();
         
-        bool check_keys_modal(int& orderDetected);
+        bool keysAreInSameOrder(int& orderDetected);
         
-        Key* transpose_key_modal(Key* key, int stepsIn);
+        Key* transposeKeyModally(Key* key, int stepsIn);
         
-        Key* transpose_key(Key* key, int stepsIn);
+        Key* transposeKeyChromatically(Key* key, int stepsIn);
         
-        bool transpose_keys_modal(int modalStepsIn);
+        bool transposeKeysOnModally(int modalStepsIn);
         
-        void transpose_keys(int modalStepsIn);
-        
-        //===============================================================================================
-               
-        void mouseDown(const MouseEvent& e) override;
-        
-        void mouseDrag(const MouseEvent& e) override;
-        
-        void mouseUp(const MouseEvent& e) override;
-        
-        void mouseMove(const MouseEvent& e) override;
+        void transposeKeysOnChromatically(int modalStepsIn);
         
         //===============================================================================================
+
+		void paint(Graphics& g) override;
+
+		void resized() override;
+
+		//===============================================================================================
+
+		void mouseMove(const MouseEvent& e) override;
+
+		//===============================================================================================
         
         bool keyStateChanged(bool isKeyDown) override;
         
@@ -140,7 +139,7 @@ namespace VirtualKeyboard
         
         void triggerKeyNoteOn(Key* key, float velocityIn);
         
-        void triggerKeyNoteOff(VirtualKeyboard::Key* key);
+        void triggerKeyNoteOff(Key* key);
         
         void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
         
