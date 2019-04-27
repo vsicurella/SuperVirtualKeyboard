@@ -80,7 +80,7 @@ void ColorChooserWindow::resized()
     DocumentWindow::resized();
     //[/UserPreResize]
 
-    colorChooser->setBounds (0, getHeight() - proportionOfHeight (0.9500f), proportionOfWidth (1.0000f), proportionOfHeight (0.9500f));
+    colorChooser->setBounds (0, getHeight() - proportionOfHeight (0.9494f), proportionOfWidth (1.0000f), proportionOfHeight (0.9494f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -111,7 +111,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="450" initialHeight="450">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GENERICCOMPONENT name="Color Chooser" id="d9ba9435617a7d65" memberName="colorChooser"
-                    virtualName="" explicitFocusOrder="0" pos="0 0Rr 100% 94.937%"
+                    virtualName="" explicitFocusOrder="0" pos="0 0Rr 100% 94.928%"
                     class="ColourSelector" params=""/>
 </JUCER_COMPONENT>
 

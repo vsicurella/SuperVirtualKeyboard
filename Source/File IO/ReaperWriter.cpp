@@ -104,7 +104,7 @@ void ReaperWriter::setup_default_symbols()
 bool ReaperWriter::write_file()
 {
     
-    if (!fileOut.exists())
+    if (!fileOut.getParentDirectory().exists())
         return false;
     
 	std::unique_ptr<FileOutputStream> outStream(fileOut.createOutputStream());
