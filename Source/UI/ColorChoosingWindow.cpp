@@ -19,7 +19,8 @@ ColorChooserWindow::ColorChooserWindow (String windowName, Colour backgroundColo
 	setContentComponent(colorChooser.get());
 	colorChooser->setName("Color Chooser");
 	setOpaque(true);
-	
+	setAlwaysOnTop(true);
+
     setSize (450, 450);
 
 }

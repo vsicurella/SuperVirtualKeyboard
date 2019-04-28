@@ -376,8 +376,9 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 	for (int i = 0; i < orderArray->size(); i++)
 	{
 		key = orderArray->getUnchecked(i);
+		key->customColor = false; // reset key so that it changes no matter what
 		key->setColour(colorIndex, getKeyColor(key));
-		key->customColor = false; // weird byproduct of implementation
+		key->customColor = false; // since the default color is changed, it needs to be def
 	}
 }
 

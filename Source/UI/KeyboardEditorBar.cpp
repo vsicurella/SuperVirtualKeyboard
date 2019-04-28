@@ -125,11 +125,11 @@ void KeyboardEditorBar::resized()
 	pianoMenu->setBounds(1, 5, proportionOfWidth(1.0f), 24);
     //[/UserPreResize]
 
-    modeTextEditor->setBounds (proportionOfWidth (0.6283f) - 150, 6, 150, 24);
-    sendScaleBtn->setBounds (proportionOfWidth (0.7239f) - 88, 6, 88, 24);
-    modeLibraryBox->setBounds (proportionOfWidth (0.9961f) - 150, 6, 150, 24);
-    offsetSld->setBounds (proportionOfWidth (0.7707f), 2, 69, 32);
-    offsetLabel->setBounds (proportionOfWidth (0.7268f), 6, 47, 24);
+    modeTextEditor->setBounds (getWidth() - 381 - 150, 6, 150, 24);
+    sendScaleBtn->setBounds (getWidth() - 283 - 88, 6, 88, 24);
+    modeLibraryBox->setBounds (getWidth() - 4 - 150, 6, 150, 24);
+    offsetSld->setBounds (getWidth() - 235, 2, 69, 32);
+    offsetLabel->setBounds (getWidth() - 280, 6, 47, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -400,23 +400,22 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Custom Mode Entry" id="8c559f3dc17dcbb0" memberName="modeTextEditor"
-              virtualName="" explicitFocusOrder="0" pos="62.829%r 6 150 24"
-              initialText="2 2 1 2 2 2 1" multiline="0" retKeyStartsLine="0"
-              readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="381Rr 6 150 24" initialText="2 2 1 2 2 2 1"
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
+              caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Send Scale Button" id="3a2872f3357f900b" memberName="sendScaleBtn"
-              virtualName="" explicitFocusOrder="0" pos="72.39%r 6 88 24" buttonText="Send Scale"
+              virtualName="" explicitFocusOrder="0" pos="283Rr 6 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mode Library Box" id="91d2066d9e23de1c" memberName="modeLibraryBox"
-            virtualName="" explicitFocusOrder="0" pos="99.61%r 6 150 24"
-            editable="0" layout="33" items="" textWhenNonSelected="Pick a mode..."
-            textWhenNoItems="(no choices)"/>
+            virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="0"
+            layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="77.073% 2 69 32" min="-6e1"
+          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-6e1"
           max="6.7e1" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
-         virtualName="" explicitFocusOrder="0" pos="72.683% 6 47 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Offset:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
          kerning="0" bold="0" italic="0" justification="33"/>
