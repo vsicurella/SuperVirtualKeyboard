@@ -9,7 +9,7 @@ larger ones, easier to digest and compose with. This is actually a subproject of
 
 FEATURES:
 
- - * This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. *
+ - -> This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. <-
 
  - Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
 
@@ -19,11 +19,15 @@ FEATURES:
    At this time, modal transposition is only possible if all held notes belong to the same mode (all white, all black, etc.)
 
  - Save your layout as a text file that Reaper can load as "MIDI Note Names" so that you can see the layout in Reaper's piano roll!
+ 
+ - Change the colors of the keys! Open up the color chooser from the Edit menu, select a color then click and use a modifier to paint      the keys. 
+    - No modifiers will paint all keys of the same scale degree
+    - Shift will paint all belonging to the same mode
+    - Control will only paint the clicked key.
 
 TO DO:
 
  - Customize key sizes and positions
- - Add custom colors
  - Change keyboard orientation
  - Add note names
  - Set transposition parameters
