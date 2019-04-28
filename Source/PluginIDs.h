@@ -42,6 +42,7 @@ namespace IDs
 	static Identifier pianoUIMode("PianoUIMode");
 	static Identifier pianoOrientation("PianoOrientation");
 	static Identifier pianoKeyboardState("PianoKeyboardState");
+	static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
 	static Identifier pianoMidiNoteOffset("MidiNodeOffset");
 	static Identifier pianoMPEToggle("MpeToggle");
@@ -60,6 +61,7 @@ namespace IDs
 	static Identifier pianoKeyHeightMod("KeyHeightModifier");
 	static Identifier pianoKeyXOffset("KeyXOffset");
 	static Identifier pianoKeyYOffset("KeyYOffset");
+	static Identifier pianoKeyColorIsCustom("KeyColorIsCustom");
 	static Identifier pianoKeyColorDefault("KeyColorDefault");
 	static Identifier pianoKeyColorHighlighted("KeyColorHighlighted");
 	static Identifier pianoKeyColorPressed("KeyColorPressed");

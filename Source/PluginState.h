@@ -52,6 +52,17 @@ struct SuperVirtualKeyboardPluginState
 	void set_current_mode(Mode* modeIn);
 
 	void set_current_key_settings(ValueTree pianoNodeIn);
+	//==============================================================================
+	
+	template <class T>
+	static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId);
+
+	template <class T>
+	static void get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Identifier arrayID);
+
+	static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId);
+
+	static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID);
 
 	//==============================================================================
 

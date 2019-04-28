@@ -63,14 +63,24 @@ namespace VirtualKeyboard
         void initiateDataNode();
         
         void restoreDataNode(ValueTree pianoNodeIn);
+
+		void updatePianoNode();
+
+		void updateKeyNode(int keyNumIn);
+
+		void updateKeyNodes();
         
-        ValueTree get_node();
+        ValueTree getNode();
         
         //===============================================================================================
         
         MidiKeyboardState* getMidiKeyboardState();
 
 		Key* getKey(int keyNumIn);
+
+		Array<Key*>* getKeysByOrder(int orderIn);
+
+		Array<Key*> getKeysByScaleDegree(int scaleDegreeIn);
 
 		int getLastKeyClicked();
         
@@ -81,10 +91,14 @@ namespace VirtualKeyboard
         Key* getKeyFromPosition(const MouseEvent& e);
 
         float getKeyVelocity(Key* keyIn, const MouseEvent& e);
+
+		Mode* getMode();
         
 		int getWidthFromHeight(int heightIn);
 
 		//===============================================================================================
+
+		int getUIMode();
 
         void setUIMode(UIMode uiModeIn);
         
@@ -98,6 +112,18 @@ namespace VirtualKeyboard
         //===============================================================================================
         
         Colour getKeyColor(Key* keyIn);
+
+		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn);
+		
+		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn);
+
+		void setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn);
+
+		void setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn);
+
+		void resetKeyColors();
+
+		//===============================================================================================
         
         void applyMode(Mode* layoutIn);
                 

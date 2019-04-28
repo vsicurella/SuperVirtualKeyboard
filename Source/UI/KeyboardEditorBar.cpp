@@ -127,7 +127,7 @@ void KeyboardEditorBar::resized()
 
     modeTextEditor->setBounds (proportionOfWidth (0.6283f) - 150, 6, 150, 24);
     sendScaleBtn->setBounds (proportionOfWidth (0.7239f) - 88, 6, 88, 24);
-    modeLibraryBox->setBounds (proportionOfWidth (0.9912f) - 150, 6, 150, 24);
+    modeLibraryBox->setBounds (proportionOfWidth (0.9961f) - 150, 6, 150, 24);
     offsetSld->setBounds (proportionOfWidth (0.7707f), 2, 69, 32);
     offsetLabel->setBounds (proportionOfWidth (0.7268f), 6, 47, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -407,7 +407,7 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="72.39%r 6 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mode Library Box" id="91d2066d9e23de1c" memberName="modeLibraryBox"
-            virtualName="" explicitFocusOrder="0" pos="99.122%r 6 150 24"
+            virtualName="" explicitFocusOrder="0" pos="99.61%r 6 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="Pick a mode..."
             textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"

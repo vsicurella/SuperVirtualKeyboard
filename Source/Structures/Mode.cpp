@@ -420,33 +420,3 @@ void Mode::updateStepsOfOrders()
 {
     stepsOfOrders = expand_steps(orders_to_steps(orders));
 }
-
-template <class T>
-void Mode::add_array_to_node(const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
-{
-	ValueTree arrayTree = ValueTree(arrayID);
-	ValueTree item;
-
-	for (int i = 0; i < arrayIn.size(); i++)
-	{
-		item = ValueTree(itemId);
-		item.setProperty("Value", arrayIn[i], nullptr);
-		arrayTree.addChild(item, i, nullptr);
-	}
-
-	modeNode.addChild(arrayTree, -1, nullptr);
-}
-
-template <class T>
-void Mode::get_array_from_node(Array<T>& arrayIn, const ValueTree nodeIn, Identifier arrayID)
-{
-	ValueTree childArray = nodeIn.getChildWithName(arrayID);
-
-	if (childArray.isValid())
-	{
-		for (int i = 0; i < childArray.getNumChildren(); i++)
-		{
-			arrayIn.add(childArray.getChild(i).getProperty("Value"));
-		}
-	}
-}

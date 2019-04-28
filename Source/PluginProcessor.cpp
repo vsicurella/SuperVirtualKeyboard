@@ -25,7 +25,7 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
 {
-	pluginState->set_current_mode(8);
+	//pluginState->set_current_mode(8);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()

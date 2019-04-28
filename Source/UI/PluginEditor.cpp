@@ -44,6 +44,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	saveFileBox.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
 
 	pluginState->presetCurrentNode.addListener(this);
+	piano->getNode().addListener(this);
 
     if (!pluginState->keyboardWindowNode.isValid())
     {
@@ -53,12 +54,11 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	{
 		restore_node_data(pluginState->keyboardWindowNode);
 	}
-
-	update_children_to_preset();
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
     colorChooserWindow->addToDesktop();
+	colorChooserWindow->addChangeListener(this);
 	
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano.get());
@@ -86,8 +86,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
 	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 
+	// setup initial preset, needed for piano node to initiate
+	pluginState->set_current_mode(8);
+
 	piano->initiateDataNode();
-	pluginState->pianoNode = piano->get_node();
 	keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
 
 	pluginState->keyboardWindowNode = keyboardWindowNode;
@@ -97,6 +99,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
 void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
 {
 	keyboardWindowNode = nodeIn;
+	update_children_to_preset();
 	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
 	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
 }
@@ -140,12 +143,17 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	Mode* modeCurrent = pluginState->get_current_mode();
 
-	piano->applyMode(modeCurrent);
-	
-	keyboardEditorBar->set_mode_readout_text(modeCurrent->getStepsString());
+	if (pluginState->presetCurrentNode.getChild(1).isValid())
+	{
+		piano->restoreDataNode(pluginState->presetCurrentNode.getChild(1));
+	}
+	else
+		piano->resetKeyColors();
 
-	//if ((int)pluginState->presetCurrentNode[IDs::indexOfMode] != 0)
-		keyboardEditorBar->set_mode_library_text(modeCurrent->getDescription());
+	piano->applyMode(modeCurrent);
+
+	keyboardEditorBar->set_mode_readout_text(modeCurrent->getStepsString());
+	keyboardEditorBar->set_mode_library_text(modeCurrent->getDescription());
 }
 
 //==============================================================================
@@ -201,80 +209,131 @@ void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 {
-	Key* key = piano->getKeyFromPosition(e);
-
-	if (key)
+	if (piano->getUIMode() == UIMode::playMode)
 	{
-		if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->activeState == 2)
+		Key* key = piano->getKeyFromPosition(e);
+		if (key)
 		{
-			// note off
-			//piano->lastKeyClicked = 0;
-			piano->triggerKeyNoteOff(key);
-		}
-		else
-		{
-			if (e.mods.isAltDown())
+			if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->activeState == 2)
 			{
-				Key* oldKey = piano->getKey(piano->getLastKeyClicked());
-				piano->triggerKeyNoteOff(oldKey);
+				// note off
+				//piano->lastKeyClicked = 0;
+				piano->triggerKeyNoteOff(key);
 			}
+			else
+			{
+				if (e.mods.isAltDown())
+				{
+					Key* oldKey = piano->getKey(piano->getLastKeyClicked());
+					piano->triggerKeyNoteOff(oldKey);
+				}
 
-			piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
-			piano->setLastKeyClicked(key->keyNumber);
+				piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
+				piano->setLastKeyClicked(key->keyNumber);
+			}
 		}
 	}
-	std::cout << e.eventComponent->getName() << std::endl;
+	else if (piano->getUIMode() == UIMode::editMode)
+	{
+		Key* key = piano->getKeyFromPosition(e);
+		if (key)
+		{
+			if (e.mods.isShiftDown())
+				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
+			else if (e.mods.isCtrlDown())
+				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
+			else
+				piano->setKeyColorDegree(key->keyNumber, 3, colorChooserWindow->getColorSelected());
+		}
+	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseDrag(const MouseEvent& e)
 {
-	Key* key = piano->getKeyFromPosition(e);
-
-	if (key)
+	if (piano->getUIMode() == UIMode::playMode)
 	{
-		if (key->keyNumber != piano->getLastKeyClicked())
-		{
-			Key* oldKey = piano->getKey(piano->getLastKeyClicked());
-			if (!e.mods.isShiftDown() || e.mods.isAltDown())
-			{
-				piano->triggerKeyNoteOff(oldKey);
-			}
+		Key* key = piano->getKeyFromPosition(e);
 
-			piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
-			piano->setLastKeyClicked(key->keyNumber);
-			repaint();
+		if (key)
+		{
+			if (key->keyNumber != piano->getLastKeyClicked())
+			{
+				Key* oldKey = piano->getKey(piano->getLastKeyClicked());
+				if (!e.mods.isShiftDown() || e.mods.isAltDown())
+				{
+					piano->triggerKeyNoteOff(oldKey);
+				}
+
+				piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
+				piano->setLastKeyClicked(key->keyNumber);
+				repaint();
+			}
 		}
 	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseUp(const MouseEvent& e)
 {
-	Key* key = piano->getKeyFromPosition(e);
-
-	if (key)
+	if (piano->getUIMode() == UIMode::playMode)
 	{
-		if (!e.mods.isShiftDown())
+		Key* key = piano->getKeyFromPosition(e);
+
+		if (key)
 		{
-			piano->triggerKeyNoteOff(key);
-			key->activeState = 1;
-			repaint();
+			if (!e.mods.isShiftDown())
+			{
+				piano->triggerKeyNoteOff(key);
+				key->activeState = 1;
+				repaint();
+			}
 		}
 	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 {
-	Key* key = piano->getKeyFromPosition(e);
-
-	if (key)
+	if (piano->getUIMode() == UIMode::playMode)
 	{
-		if (key->activeState == 0)
+		Key* key = piano->getKeyFromPosition(e);
+
+		if (key)
 		{
-			key->activeState = 1;
-			repaint();
+			if (key->activeState == 0)
+			{
+				key->activeState = 1;
+				repaint();
+			}
 		}
 	}
+}
 
+//==============================================================================
+
+void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
+{
+	Component* changeSource = dynamic_cast<Component*>(source);
+	DBG("color change callback");
+	if (changeSource->getName() == "Color Chooser")
+	{
+		if (piano->getUIMode() == UIMode::editMode)
+		{
+			// Commit Color Changes
+			for (int i = 0; i < 128; i++)
+			{
+				piano->setKeyColor(i, 0, piano->getKey(i)->findColour(3));
+				piano->setKeyColor(i, 1, piano->getKey(i)->findColour(0).contrasting(0.25));
+				piano->setKeyColor(i, 2, piano->getKey(i)->findColour(0).contrasting(0.75));
+			}
+
+			piano->updateKeyNodes();
+			
+			// Update Preset Node
+			pluginState->presetCurrentNode.removeChild(1, pluginState->get_undo_mgr());
+			pluginState->presetCurrentNode.addChild(piano->getNode().createCopy(), 1, pluginState->get_undo_mgr());
+
+			piano->setUIMode(UIMode::playMode);
+		}
+	}
 }
 
 //==============================================================================
@@ -408,6 +467,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 		break;
 	case IDs::CommandIDs::setKeyColor:
 		colorChooserWindow->setVisible(true);
+		piano->setUIMode(UIMode::editMode);
 		break;
 	default:
 		return false;

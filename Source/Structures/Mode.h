@@ -130,12 +130,6 @@ private:
     // place keys in a grid such that I won't need this
     void updateStepsOfOrders();
 
-	template <class T>
-	void add_array_to_node(const Array<T>& arrayIn, Identifier arrayID, Identifier itemId);
-
-	template <class T>
-	void get_array_from_node(Array<T>& arrayIn, const ValueTree nodeIn, Identifier arrayID);
-
 	String name;
 	int scaleSize;
 	int modeSize;

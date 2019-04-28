@@ -102,6 +102,64 @@ struct ModeFamilySorter
 	}
 };
 
+template <class T>
+void SuperVirtualKeyboardPluginState::add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
+{
+	ValueTree arrayTree = ValueTree(arrayID);
+	ValueTree item;
+
+	for (int i = 0; i < arrayIn.size(); i++)
+	{
+		item = ValueTree(itemId);
+		item.setProperty("Value", arrayIn[i], nullptr);
+		arrayTree.addChild(item, i, nullptr);
+	}
+
+	nodeIn.addChild(arrayTree, -1, nullptr);
+}
+
+template <class T>
+void SuperVirtualKeyboardPluginState::get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Identifier arrayID)
+{
+	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+
+	if (childArray.isValid())
+	{
+		for (int i = 0; i < childArray.getNumChildren(); i++)
+		{
+			arrayIn.add(childArray.getChild(i).getProperty("Value"));
+		}
+	}
+}
+
+void SuperVirtualKeyboardPluginState::add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId)
+{
+	ValueTree arrayTree = ValueTree(arrayID);
+	ValueTree item;
+
+	for (int i = 0; i < arrayIn.size(); i++)
+	{
+		item = ValueTree(itemId);
+		item.setProperty("Value", arrayIn[i].toString(), nullptr);
+		arrayTree.addChild(item, i, nullptr);
+	}
+
+	nodeIn.addChild(arrayTree, -1, nullptr);
+}
+
+void SuperVirtualKeyboardPluginState::get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID)
+{
+	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+
+	if (childArray.isValid())
+	{
+		for (int i = 0; i < childArray.getNumChildren(); i++)
+		{
+			arrayIn.add(Colour::fromString(childArray.getChild(i).getProperty("Value").toString()));
+		}
+	}
+}
+
 UndoManager* SuperVirtualKeyboardPluginState::get_undo_mgr()
 {
 	return undoManager.get();
@@ -163,7 +221,7 @@ void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		presetCurrentNode.removeChild(0, undoManager.get());
+		presetCurrentNode.removeAllChildren(undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, presetIndexIn, undoManager.get());
 		presetCurrentNode.addChild(modeCurrent->modeNode.createCopy(), 0, undoManager.get());
 	}

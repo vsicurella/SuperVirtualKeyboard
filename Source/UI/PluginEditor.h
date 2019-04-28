@@ -27,10 +27,11 @@ using namespace VirtualKeyboard;
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
-													public ValueTree::Listener,
-													public FilenameComponentListener,
-													public MidiInputCallback,
-													public Timer
+													private ValueTree::Listener,
+													private FilenameComponentListener,
+													private ChangeListener,
+													private MidiInputCallback,
+													private Timer
 {
 public:
     SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor&, ApplicationCommandManager*);
@@ -68,6 +69,10 @@ public:
 	void mouseUp(const MouseEvent& e) override;
 
 	void mouseMove(const MouseEvent& e) override;
+
+	//==============================================================================
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
 	//==============================================================================
 
@@ -115,7 +120,7 @@ private:
 	std::unique_ptr<Keyboard> piano;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
-	std::unique_ptr<DocumentWindow> colorChooserWindow;
+	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)

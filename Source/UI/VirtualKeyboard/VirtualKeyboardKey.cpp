@@ -18,8 +18,7 @@ Key::Key(String nameIn, int keyNumIn)
     keyNumber = keyNumIn;
     mappedMIDInote = keyNumber;
 	
-	editMenu.reset(new PopupMenu());
-	colorSelector.reset(new ColourSelector(ColourSelector::ColourSelectorOptions::showColourspace));
+	setColour(0, Colours::transparentWhite);
 
     setOpaque(true);
 }
@@ -35,38 +34,40 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 
     Colour color = findColour(activeState);
     
+	/* // for specific "pressed" color, currently deprecated 
     if (activeState == 2)
     {
         color = findColour(0).interpolatedWith(findColour(2), 0.618);
     }
-    
+    */
+
     if (externalMidiState > 0)
         color = color.interpolatedWith(Colours::lightblue, 0.75);
     
     g.setColour(color);
     g.fillRect(fillBounds);
+
+	g.setColour(Colours::black);
+	g.drawRect(fillBounds, 0.8);
 }
 
-void Key::restore_from_node(ValueTree parentNodeIn)
+void Key::restore_from_node(ValueTree keyNodeIn)
 {
-    pianoKeyNode = parentNodeIn.getChild(keyNumber);
+    pianoKeyNode = keyNodeIn;
+	keyNumber = pianoKeyNode[IDs::pianoKeyNumber];
     mappedMIDInote = pianoKeyNode[IDs::pianoKeyMidiNote];
     widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
     heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
     xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
     yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
-    
+	customColor = (bool)pianoKeyNode[IDs::pianoKeyColorIsCustom];
     setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
-    setColour(1, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorHighlighted].toString()));
-    setColour(2, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorPressed].toString()));
-
-
 }
 //==============================================================================
 
 void Key::mouseExit(const MouseEvent& e)
 {
-	if (!(e.mods.isShiftDown() && activeState == 2))
+	if (activeState <= 1 && !(e.mods.isShiftDown() && activeState == 2))
 		activeState = 0;
 }
 

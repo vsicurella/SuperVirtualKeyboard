@@ -38,12 +38,12 @@ namespace VirtualKeyboard
         float degreeWidthRatio;
         float degreeHeightRatio;
         float velocity = 0;
+
+		bool customColor = false;
         
         // more of a "status" flag
+		// 0 = no interaction, 1 = mouseover, 2 = mouse down, 3 = color selecting
         int activeState = 0;
-
-		std::unique_ptr<PopupMenu> editMenu;
-		std::unique_ptr<ColourSelector> colorSelector;
         
         // Methods
         
@@ -63,5 +63,6 @@ namespace VirtualKeyboard
 		void mouseUp(const MouseEvent& e) override;
 
 		bool keyStateChanged(bool isKeyDown) override;
+
     };
 }
