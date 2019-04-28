@@ -62,7 +62,9 @@ void Key::restore_from_node(ValueTree keyNodeIn)
     yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
 	customColor = (bool)pianoKeyNode[IDs::pianoKeyColorIsCustom];
 	setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
+	setColour(3, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
 }
+
 //==============================================================================
 
 void Key::mouseExit(const MouseEvent& e)

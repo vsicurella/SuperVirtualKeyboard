@@ -64,6 +64,7 @@ void Keyboard::initiateDataNode()
     }
     
     pluginState->pianoNode = pianoNode;
+	pluginState->presetCurrentNode.addChild(pianoNode.createCopy(), 1, nullptr);
 }
 
 void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
@@ -906,11 +907,6 @@ void Keyboard::triggerKeyNoteOff(Key* key)
 		key->activeState = 0;
 
 	keysOn.removeAllInstancesOf(key);
-
-	/*
-	keysOn.swap(keysOn.indexOf(key), keysOn.size() - 1);
-	keysOn.removeLast(1);
-	*/
 }
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
