@@ -18,8 +18,7 @@ Key::Key(String nameIn, int keyNumIn)
     keyNumber = keyNumIn;
     mappedMIDInote = keyNumber;
 	
-	setColour(0, Colours::transparentWhite);
-
+	setColour(0, Colours::transparentBlack);
     setOpaque(true);
 }
 
@@ -48,7 +47,7 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
     g.fillRect(fillBounds);
 
 	g.setColour(Colours::black);
-	g.drawRect(fillBounds, 0.8);
+	g.drawRect(fillBounds);
 }
 
 void Key::restore_from_node(ValueTree keyNodeIn)
@@ -61,7 +60,7 @@ void Key::restore_from_node(ValueTree keyNodeIn)
     xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
     yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
 	customColor = (bool)pianoKeyNode[IDs::pianoKeyColorIsCustom];
-    setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
+	setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
 }
 //==============================================================================
 
@@ -69,22 +68,4 @@ void Key::mouseExit(const MouseEvent& e)
 {
 	if (activeState <= 1 && !(e.mods.isShiftDown() && activeState == 2))
 		activeState = 0;
-}
-
-void Key::mouseDown(const MouseEvent& e)
-{
-	if (e.mods.isRightButtonDown())
-	{
-		
-	}
-}
-
-void Key::mouseUp(const MouseEvent& e)
-{
-
-}
-
-bool Key::keyStateChanged(bool isKeyDown)
-{
-	return false;
 }

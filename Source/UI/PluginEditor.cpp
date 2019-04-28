@@ -238,7 +238,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 		Key* key = piano->getKeyFromPosition(e);
 		if (key)
 		{
-			if (e.mods.isShiftDown())
+			if (e.mods.isRightButtonDown())
+				key->customColor = false;
+			else if (e.mods.isShiftDown())
 				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
 			else if (e.mods.isCtrlDown())
 				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
@@ -317,15 +319,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 	{
 		if (piano->getUIMode() == UIMode::editMode)
 		{
-			// Commit Color Changes
-			for (int i = 0; i < 128; i++)
-			{
-				piano->setKeyColor(i, 0, piano->getKey(i)->findColour(3));
-				piano->setKeyColor(i, 1, piano->getKey(i)->findColour(0).contrasting(0.25));
-				piano->setKeyColor(i, 2, piano->getKey(i)->findColour(0).contrasting(0.75));
-			}
-
+			piano->applyMode(pluginState->get_current_mode());
 			piano->updateKeyNodes();
+			piano->updatePianoNode();
 			
 			// Update Preset Node
 			pluginState->presetCurrentNode.removeChild(1, pluginState->get_undo_mgr());

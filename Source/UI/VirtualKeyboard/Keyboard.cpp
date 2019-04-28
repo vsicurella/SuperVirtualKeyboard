@@ -63,7 +63,8 @@ void Keyboard::initiateDataNode()
         pianoNode.addChild(key->pianoKeyNode, i, nullptr);
     }
     
-	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyOrderColors, IDs::pianoKeyColors, "Color");
+	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyOrderColors, IDs::pianoKeyOrderColors, "Color");
+	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyDegreeColors, IDs::pianoKeyDegreeColors, "Color");
     pluginState->pianoNode = pianoNode;
 }
 
@@ -80,7 +81,10 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
     mpeOn = pianoNode[IDs::pianoMPEToggle];
     defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
 
-	SuperVirtualKeyboardPluginState::get_array_from_node(pianoNode, keyOrderColors, IDs::pianoKeyColors);
+	keyOrderColors.clear();
+	SuperVirtualKeyboardPluginState::get_array_from_node(pianoNode, keyOrderColors, IDs::pianoKeyOrderColors);
+	keyDegreeColors.clear();
+	SuperVirtualKeyboardPluginState::get_array_from_node(pianoNode, keyDegreeColors, IDs::pianoKeyDegreeColors);
     
     Key* key;
     for (int i = 0; i < keys.size(); i++)
@@ -101,8 +105,11 @@ void Keyboard::updatePianoNode()
 	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
 	pianoNode.setProperty(IDs::pianoWHRatio, defaultKeyWHRatio, undo);
 
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColors), nullptr);
-	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyOrderColors, IDs::pianoKeyColors, "Color");
+	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyOrderColors), nullptr);
+	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyOrderColors, IDs::pianoKeyOrderColors, "Color");
+	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyDegreeColors), nullptr);
+	SuperVirtualKeyboardPluginState::add_array_to_node(pianoNode, keyDegreeColors, IDs::pianoKeyDegreeColors, "Color");
+
 }
 
 void Keyboard::updateKeyNode(int keyNumIn)
@@ -313,6 +320,8 @@ void Keyboard::applyMode(Mode* modeIn)
     
     keysOrder.clear();
     keysOrder.resize(mode->getMaxStep());
+
+	keyDegreeColors.resize(mode->getScaleSize());
         
     Key* key;
     for (int i = 0; i < keys.size(); i++)
@@ -348,10 +357,14 @@ void Keyboard::applyMode(Mode* modeIn)
 
 Colour Keyboard::getKeyColor(Key* keyIn)
 {
-	Colour c = keyOrderColors[keyIn->order % keyOrderColors.size()];
-
+	Colour c;
+	// If has its own color, or else if it has a degree color, or else the default order color
 	if (keyIn->customColor)
 		c = keyIn->findColour(0);
+	else if (!keyDegreeColors[keyIn->keyNumber % mode->getScaleSize()].isTransparent())
+		c = keyDegreeColors[keyIn->keyNumber % mode->getScaleSize()];
+	else
+		c = keyOrderColors[keyIn->order % keyOrderColors.size()];
 
 	return c;
 }
@@ -378,26 +391,13 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 		key = orderArray->getUnchecked(i);
 		key->customColor = false; // reset key so that it changes no matter what
 		key->setColour(colorIndex, getKeyColor(key));
-		key->customColor = false; // since the default color is changed, it needs to be def
 	}
 }
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
 {
 	int deg = tuningDegreeIn % mode->getScaleSize();
-	Key* key = keys.getUnchecked(deg);
-	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
-
-	for (int i = 0; i < orderArray->size(); i++)
-	{
-		key = orderArray->getUnchecked(i);
-
-		if (key->keyNumber % mode->getScaleSize() == deg)
-		{
-			key->setColour(colorIndex, colorIn);
-			key->customColor = true;
-		}
-	}
+	keyDegreeColors.set(deg, colorIn);
 }
 
 void Keyboard::resetKeyColors()

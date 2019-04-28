@@ -194,6 +194,7 @@ namespace VirtualKeyboard
         std::unique_ptr<KeyboardGrid> grid;
         MidiKeyboardState keyboardState;
         MidiBuffer buffer;
+		Array<Key*> keysPause;
         
         // Data
         ValueTree pianoNode;
@@ -213,8 +214,11 @@ namespace VirtualKeyboard
         bool mpeOn = false;
         
         Array<Point<float>> keyDegreeProportions;
-        Array<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
+        
+		Array<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
+		
+		Array<Colour> keyDegreeColors;
         
         // Properties
         int keyWidth = 50;
