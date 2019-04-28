@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-27 (Contact me for build)
+LATEST VERSION: Alpha 2019-04-28 (Contact me for build)
 
 SUMMARY:
 
@@ -24,6 +24,9 @@ FEATURES:
     - No modifiers will paint all keys of the same scale degree
     - Shift will paint all belonging to the same mode
     - Control will only paint the clicked key.
+    - Right-clicking, with respective modifiers, resets the key to either the default mode or degree color.
+    
+  - Save and load your custom scales and key colors!
 
 TO DO:
 
