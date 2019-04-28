@@ -147,8 +147,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 	{
 		piano->restoreDataNode(pluginState->presetCurrentNode.getChild(1));
 	}
-	else
-		piano->resetKeyColors();
+	if (!(bool)pluginState->presetCurrentNode[IDs::presetHasCustomColor])
+		piano->resetKeyColors(true);
 
 	piano->applyMode(modeCurrent);
 
@@ -202,6 +202,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInp
 
 void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
 {
+	if (colorChooserWindow->isVisible())
+		colorChooserWindow->closeButtonPressed();
+
 	setVisible(false);
 }
 
@@ -239,9 +242,28 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 		if (key)
 		{
 			if (e.mods.isRightButtonDown())
-				key->customColor = false;
+			{
+				if (e.mods.isShiftDown())
+				{
+					piano->resetKeyOrderColors(key->order, true);
+				}
+				else if (e.mods.isCtrlDown())
+				{
+					piano->setKeyColor(key, 3, piano->getKeyDegreeColor(key->keyNumber), false);
+				}
+				else
+				{
+					piano->resetKeyDegreeColors(key->keyNumber);
+				}
+			}
+
 			else if (e.mods.isShiftDown())
+			{
+				if (piano->getKeyDegreeColor(key->keyNumber).isOpaque())
+					piano->resetKeyDegreeColors(key->keyNumber);
+				
 				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
+			}
 			else if (e.mods.isCtrlDown())
 				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
 			else
@@ -314,7 +336,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
 	Component* changeSource = dynamic_cast<Component*>(source);
-	DBG("color change callback");
+
 	if (changeSource->getName() == "Color Chooser")
 	{
 		if (piano->getUIMode() == UIMode::editMode)
@@ -324,9 +346,11 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 			piano->updatePianoNode();
 			
 			// Update Preset Node
-			pluginState->presetCurrentNode.removeChild(1, pluginState->get_undo_mgr());
-			pluginState->presetCurrentNode.addChild(piano->getNode().createCopy(), 1, pluginState->get_undo_mgr());
+			pluginState->presetCurrentNode.removeChild(1, nullptr);
+			pluginState->presetCurrentNode.addChild(piano->getNode().createCopy(), 1, nullptr);
+			pluginState->presetCurrentNode.setProperty(IDs::presetHasCustomColor, true, nullptr);
 
+			keyboardEditorBar->allowUserInput();
 			piano->setUIMode(UIMode::playMode);
 		}
 	}
@@ -464,6 +488,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 	case IDs::CommandIDs::setKeyColor:
 		colorChooserWindow->setVisible(true);
 		piano->setUIMode(UIMode::editMode);
+		keyboardEditorBar->allowUserInput(false);
 		break;
 	default:
 		return false;

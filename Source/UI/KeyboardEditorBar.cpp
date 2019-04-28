@@ -235,6 +235,15 @@ void KeyboardEditorBar::createAndSendMode()
 		pluginState->set_current_mode(new Mode(steps, "Custom"));
 }
 
+void KeyboardEditorBar::allowUserInput(bool isAllowed)
+{
+	modeLibraryBox->setEnabled(isAllowed);
+	offsetSld->setEnabled(isAllowed);
+	sendScaleBtn->setEnabled(isAllowed);
+	modeTextEditor->setEnabled(isAllowed);
+	pianoMenu->setEnabled(isAllowed);
+}
+
 //==============================================================================
 
 

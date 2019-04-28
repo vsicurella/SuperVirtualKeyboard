@@ -109,6 +109,7 @@ void Mode::restore_from_node(ValueTree nodeIn)
 		ordersDefault = steps_to_orders(steps);
 		orders = expand_orders(ordersDefault, offset);
 		degrees = orders_to_degrees(orders);
+		updateStepsOfOrders();
 	}
 }
 
@@ -128,6 +129,11 @@ void Mode::setOffset(int offsetIn)
     updateStepsOfOrders();
 
 	modeNode.setProperty(IDs::modeOffset, offset, nullptr);
+}
+
+int Mode::getOffset()
+{
+	return offset;
 }
 
 Array<int> Mode::parse_steps(String stepsIn)

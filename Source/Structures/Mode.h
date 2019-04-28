@@ -44,6 +44,8 @@ struct Mode
 	*/
 	void setOffset(int offsetIn);
 
+	int getOffset();
+
 	int getScaleSize() const;
 
 	int getModeSize() const;

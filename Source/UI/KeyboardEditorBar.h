@@ -59,6 +59,8 @@ public:
 
 	void textEditorReturnKeyPressed(TextEditor& editor) override;
 
+	void allowUserInput(bool isAllowed=true);
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;

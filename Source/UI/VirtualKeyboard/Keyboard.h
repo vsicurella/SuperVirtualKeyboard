@@ -113,15 +113,23 @@ namespace VirtualKeyboard
         
         Colour getKeyColor(Key* keyIn);
 
-		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn);
+		Colour getKeyOrderColor(int orderIn);
+
+		Colour getKeyDegreeColor(int degIn);
+
+		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor = true);
 		
-		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn);
+		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor = true);
 
 		void setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn);
 
 		void setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn);
 
-		void resetKeyColors();
+		void resetKeyOrderColors(int orderIn, bool resetDegrees = false);
+
+		void resetKeyDegreeColors(int tuningDegreeIn);
+
+		void resetKeyColors(bool resetDegrees=false);
 
 		//===============================================================================================
         

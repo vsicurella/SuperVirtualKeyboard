@@ -46,8 +46,9 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
     g.setColour(color);
     g.fillRect(fillBounds);
 
+	fillBounds.expand(1, 1);
 	g.setColour(Colours::black);
-	g.drawRect(fillBounds);
+	g.drawRect(fillBounds, 1.2);
 }
 
 void Key::restore_from_node(ValueTree keyNodeIn)

@@ -25,7 +25,6 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
 {
-	//pluginState->set_current_mode(8);
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -210,7 +209,6 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
 	MemoryOutputStream memOut;
 	pluginState->pluginStateNode.writeToStream(memOut);
 	destData.append(memOut.getData(), memOut.getDataSize());
-	
 }
 
 void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -220,7 +218,6 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 	
 	MemoryInputStream memIn(data, sizeInBytes, false);
 	pluginState->pluginStateNode.readFromStream(memIn);
-	
 }
 
 //==============================================================================

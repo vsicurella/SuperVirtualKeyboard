@@ -223,6 +223,7 @@ void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
 		modeCurrent = mode;
 		presetCurrentNode.removeAllChildren(undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, presetIndexIn, undoManager.get());
+		presetCurrentNode.setProperty(IDs::presetHasCustomColor, false, nullptr);
 		presetCurrentNode.addChild(modeCurrent->modeNode.createCopy(), 0, undoManager.get());
 	}
 }
@@ -235,6 +236,7 @@ void SuperVirtualKeyboardPluginState::set_current_mode(Mode* modeIn)
 		presets.set(0, modeCurrent, true);
 		presetCurrentNode.removeChild(0, undoManager.get());
 		presetCurrentNode.setProperty(IDs::indexOfMode, 0, undoManager.get());
+		presetCurrentNode.setProperty(IDs::presetHasCustomColor, false, nullptr);
 		presetCurrentNode.addChild(modeCurrent->modeNode.createCopy(), 0, undoManager.get());
 	}
 }
