@@ -204,22 +204,27 @@ void KeyboardEditorBar::textEditorReturnKeyPressed(TextEditor& editor)
 	createAndSendMode();
 }
 
-int KeyboardEditorBar::get_mode_preset_index(String anyNameIn)
+int KeyboardEditorBar::getModePresetIndex(String anyNameIn)
 {
     return menuToPresetIndex[anyNameIn];
 }
 
-int KeyboardEditorBar::get_mode_library_index()
+int KeyboardEditorBar::getModeLibraryIndex()
 {
     return modeLibraryBox->getSelectedId();
 }
 
-void KeyboardEditorBar::set_mode_readout_text(String steps)
+void KeyboardEditorBar::setOffsetReadout(int offIn)
+{
+    offsetSld->setValue(offIn);
+}
+
+void KeyboardEditorBar::setModeReadoutText(String steps)
 {
 	modeTextEditor->setText(steps, false);
 }
 
-void KeyboardEditorBar::set_mode_library_text(String presetName)
+void KeyboardEditorBar::setModeLibraryText(String presetName)
 {
 	modeLibraryBox->setText(presetName, NotificationType::dontSendNotification);
 }

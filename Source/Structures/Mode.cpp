@@ -38,16 +38,16 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
 {
 	stepsString = stepsIn;
 	family = familyIn;
-	offset = offsetIn;
+	offset = -offsetIn;
 
 	steps = parse_steps(stepsIn);
 	ordersDefault = steps_to_orders(steps);
 	mosClass = interval_sizes(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
-	name = getDescription();
+    name = getDescription();
 
-	orders = expand_orders(ordersDefault, offsetIn);
+	orders = expand_orders(ordersDefault, offset);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
@@ -59,7 +59,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 {
 	stepsString = steps_to_string(stepsIn);
 	family = familyIn;
-	offset = offsetIn;
+	offset = -offsetIn;
 
 	steps = stepsIn;
 	ordersDefault = steps_to_orders(steps);
@@ -68,7 +68,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 	modeSize = steps.size();
 	name = getDescription();
 
-	orders = expand_orders(ordersDefault, offsetIn);
+	orders = expand_orders(ordersDefault, offset);
 	degrees = orders_to_degrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
@@ -88,7 +88,7 @@ void Mode::init_node()
 	modeNode.setProperty(IDs::modeSize, modeSize, nullptr);
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
-	modeNode.setProperty(IDs::modeOffset, offset, nullptr);
+	modeNode.setProperty(IDs::modeOffset, -offset, nullptr);
 }
 
 void Mode::restore_from_node(ValueTree nodeIn)
@@ -102,7 +102,7 @@ void Mode::restore_from_node(ValueTree nodeIn)
 		modeSize = modeNode[IDs::modeSize];
 		stepsString = modeNode[IDs::stepString];
 		family = modeNode[IDs::family];
-		offset = modeNode[IDs::modeOffset];
+		offset = (int)modeNode[IDs::modeOffset] * -1;
 
 		steps = parse_steps(stepsString);
 		mosClass = interval_sizes(steps);
@@ -128,12 +128,12 @@ void Mode::setOffset(int offsetIn)
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
 
-	modeNode.setProperty(IDs::modeOffset, offset, nullptr);
+	modeNode.setProperty(IDs::modeOffset, offsetIn, nullptr);
 }
 
 int Mode::getOffset()
 {
-	return offset;
+	return -offset;
 }
 
 Array<int> Mode::parse_steps(String stepsIn)

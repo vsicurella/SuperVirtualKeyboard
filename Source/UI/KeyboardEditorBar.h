@@ -48,10 +48,11 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    int get_mode_preset_index(String anyNameIn);
-    int get_mode_library_index();
-    void set_mode_readout_text(String steps);
-	void set_mode_library_text(String presetName);
+    int getModePresetIndex(String anyNameIn);
+    int getModeLibraryIndex();
+    void setModeReadoutText(String steps);
+	void setModeLibraryText(String presetName);
+    void setOffsetReadout(int offIn);
 
 	void createAndSendMode();
 

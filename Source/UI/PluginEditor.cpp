@@ -152,8 +152,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 
 	piano->applyMode(modeCurrent);
 
-	keyboardEditorBar->set_mode_readout_text(modeCurrent->getStepsString());
-	keyboardEditorBar->set_mode_library_text(modeCurrent->getDescription());
+	keyboardEditorBar->setModeReadoutText(modeCurrent->getStepsString());
+	keyboardEditorBar->setModeLibraryText(modeCurrent->getDescription());
+    keyboardEditorBar->setOffsetReadout(modeCurrent->getOffset());
 }
 
 //==============================================================================
