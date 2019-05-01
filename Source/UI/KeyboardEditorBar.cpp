@@ -169,7 +169,7 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 			{
 				pluginState->get_current_mode()->setFamily(comboBoxThatHasChanged->getText());
 			}
-			
+
 			// If it's a default preset, it reverts to original name
 			String newModeName = pluginState->get_current_mode()->getDescription();
 			comboBoxThatHasChanged->setText(newModeName, NotificationType::dontSendNotification);
@@ -434,18 +434,18 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="283Rr 6 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mode Library Box" id="91d2066d9e23de1c" memberName="modeLibraryBox"
-            virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="1"
             layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-6e1"
-          max="6.7e1" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-60.0"
+          max="67.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
          virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Offset:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
