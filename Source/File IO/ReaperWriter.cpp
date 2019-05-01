@@ -87,12 +87,13 @@ void ReaperWriter::setup_default_symbols()
 	CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
 	String symbol;
 	int orderMax = mode->getMaxStep();
+	int repeats = 20;
 
-	for (int i = 0; i < 8; i++)
+	for (int i = 0; i < repeats; i++)
 	{
 		symbol = "";
 
-		for (int o = 0; o < (8 - i); o++)
+		for (int o = 0; o < (repeats - i); o++)
 		{
 			symbol += *block;
 		}

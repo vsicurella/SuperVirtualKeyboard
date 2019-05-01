@@ -53,7 +53,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 
     modeLibraryBox.reset (new ComboBox ("Mode Library Box"));
     addAndMakeVisible (modeLibraryBox.get());
-    modeLibraryBox->setEditableText (false);
+    modeLibraryBox->setEditableText (true);
     modeLibraryBox->setJustificationType (Justification::centredLeft);
     modeLibraryBox->setTextWhenNothingSelected (TRANS("Pick a mode..."));
     modeLibraryBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
@@ -160,7 +160,20 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == modeLibraryBox.get())
     {
         //[UserComboBoxCode_modeLibraryBox] -- add your combo box handling code here..
-		pluginState->set_current_mode(menuToPresetIndex[modeLibraryBox->getText()]);
+		if (comboBoxThatHasChanged->getSelectedId() > 0)
+			pluginState->set_current_mode(menuToPresetIndex[modeLibraryBox->getText()]);
+		else
+		{
+			// Preset is a user preset
+			if ((int)pluginState->presetCurrentNode.getProperty(IDs::libraryIndexOfMode) == 0)
+			{
+				pluginState->get_current_mode()->setFamily(comboBoxThatHasChanged->getText());
+			}
+			
+			// If it's a default preset, it reverts to original name
+			String newModeName = pluginState->get_current_mode()->getDescription();
+			comboBoxThatHasChanged->setText(newModeName, NotificationType::dontSendNotification);
+		}
         //[/UserComboBoxCode_modeLibraryBox]
     }
 

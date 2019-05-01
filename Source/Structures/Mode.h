@@ -36,7 +36,7 @@ struct Mode
 	/*
 		Sets custom name of the mode. 
 	*/
-	String setName(String nameIn);
+	String setFamily(String nameIn);
 
 	/*
 		Sets the offset of the mode and updates parameters so that the 
