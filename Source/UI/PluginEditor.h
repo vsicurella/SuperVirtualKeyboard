@@ -16,7 +16,7 @@
 #include "KeyboardEditorBar.h"
 #include "../Structures/Mode.h"
 #include "VirtualKeyboard/Keyboard.h"
-#include "ColorChoosingWindow.h"
+#include "Dialogs/ColorChoosingWindow.h"
 
 #include "../File IO/ReaperWriter.h"
 

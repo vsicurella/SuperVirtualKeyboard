@@ -113,9 +113,14 @@ void Mode::restore_from_node(ValueTree nodeIn)
 	}
 }
 
-String Mode::setName(String nameIn)
+String Mode::setFamily(String nameIn)
 {
-	name = nameIn;
+	family = nameIn;
+	modeNode.setProperty(IDs::family, family, nullptr);
+
+	name = getDescription();
+	modeNode.setProperty(IDs::modeName, name, nullptr);
+
 	return name;
 }
 

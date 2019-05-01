@@ -20,7 +20,7 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayoutNode");
-	static Identifier indexOfMode("IndexOfMode");
+	static Identifier libraryIndexOfMode("IndexOfMode");
 	static Identifier presetHasCustomColor("PresetHasCustomColor");
 
 	// ModeLayout

@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "../Structures/Mode.h"
+#include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../../Structures/Mode.h"
 
 
 

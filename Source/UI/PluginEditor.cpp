@@ -36,7 +36,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);
 
-	view.get()->setViewPositionProportionately(0.6, 0);
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
 
@@ -49,6 +48,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     if (!pluginState->keyboardWindowNode.isValid())
     {
         init_node_data();
+		view.get()->setViewPositionProportionately(0.52, 0);
     }
 	else
 	{
@@ -166,20 +166,21 @@ void SuperVirtualKeyboardAudioProcessorEditor::paint(Graphics& g)
 
 void SuperVirtualKeyboardAudioProcessorEditor::resized()
 {
+	int viewPositionKeyboardX = view->getViewPositionX();
 	AudioProcessorEditor::resized();
 
 	keyboardEditorBar->setBounds(0, 6, getWidth(), 36);
 	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight() - view.get()->getScrollBarThickness());
-	piano->setBounds(0, 0, piano->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight());
-
-	view->setViewPositionProportionately(0.618, 0);
+	piano->setBounds(0, 0, piano->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
 	
+	view->setViewPosition(viewPositionKeyboardX, 0);
+
 	// update node
 	if (keyboardWindowNode.isValid())
 	{
 		keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 		keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-		keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewArea().getX(), nullptr);
+		keyboardWindowNode.setProperty(IDs::viewportPosition, viewPositionKeyboardX, nullptr);
 	}
 	
 }
