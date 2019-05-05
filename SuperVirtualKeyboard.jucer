@@ -17,6 +17,8 @@
             file="Source/Structures/FractionalGrid.h"/>
       <FILE id="doFNva" name="Mode.cpp" compile="1" resource="0" file="Source/Structures/Mode.cpp"/>
       <FILE id="ZNc2fR" name="Mode.h" compile="0" resource="0" file="Source/Structures/Mode.h"/>
+      <FILE id="ScqT7w" name="Preset.cpp" compile="1" resource="0" file="Source/Structures/Preset.cpp"/>
+      <FILE id="nGJjJ7" name="Preset.h" compile="0" resource="0" file="Source/Structures/Preset.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">

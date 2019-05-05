@@ -19,7 +19,10 @@ namespace IDs
 	static Identifier pluginStateNode("PluginState");
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
-	static Identifier modePresetNode("ModeLayoutNode");
+	static Identifier modePresetNode("ModeLayout");
+	static Identifier keyPlacePresetNode("KeyPlacements");
+	static Identifier keyRatioPresetNode("KeyRatios");
+	static Identifier keyColorPresetNode("KeyColors");
 	static Identifier libraryIndexOfMode("IndexOfMode");
 	static Identifier presetHasCustomColor("PresetHasCustomColor");
 
@@ -33,7 +36,7 @@ namespace IDs
     static Identifier modeName("ModeName");
 
 	// Keyboard Window
-	static Identifier keyboardWindowNode("KeyboardWindowNode");
+	static Identifier keyboardWindowNode("KeyboardWindow");
 	static Identifier windowBoundsW("WindowW");
 	static Identifier windowBoundsH("WindowH");
 	static Identifier viewportPosition("ViewportPosition");
