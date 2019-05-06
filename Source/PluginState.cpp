@@ -160,7 +160,7 @@ void SuperVirtualKeyboardPluginState::get_array_from_node(const ValueTree nodeIn
 	}
 }
 
-UndoManager* SuperVirtualKeyboardPluginState::get_undo_mgr()
+UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
 {
 	return undoManager.get();
 }
@@ -175,9 +175,9 @@ Array<Array<Mode*>>* SuperVirtualKeyboardPluginState::get_presets_sorted()
 	return &presetsSorted;
 }
 
-ValueTree SuperVirtualKeyboardPluginState::get_current_preset()
+SvkPreset* SuperVirtualKeyboardPluginState::getCurrentPreset()
 {
-	return presetCurrentNode;
+	return presetCurrent.get();
 }
 
 int SuperVirtualKeyboardPluginState::get_current_preset_index()
@@ -195,7 +195,7 @@ int SuperVirtualKeyboardPluginState::get_current_preset_index()
 	return -1;
 }
 
-Mode* SuperVirtualKeyboardPluginState::get_current_mode()
+Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 {
 	return modeCurrent;
 }
@@ -214,7 +214,7 @@ int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 	return 0;
 }
 
-void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
+void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 {
 	Mode* mode = presets.getUnchecked(presetIndexIn);
 	
@@ -229,7 +229,7 @@ void SuperVirtualKeyboardPluginState::set_current_mode(int presetIndexIn)
 	}
 }
 
-void SuperVirtualKeyboardPluginState::set_current_mode(Mode* modeIn)
+void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 {
 	if (modeIn)
 	{
@@ -251,6 +251,20 @@ void SuperVirtualKeyboardPluginState::set_current_key_settings(ValueTree pianoNo
 		presetCurrentNode.addChild(pianoNodeIn.createCopy(), 1, undoManager.get());
 	}
 }
+
+bool SuperVirtualKeyboardPluginState::loadPreset()
+{
+	SvkPreset newPreset = SvkPreset::loadFromFile();
+
+	if (newPreset.parentNode.isValid())
+	{
+		presetCurrent.reset(new SvkPreset(newPreset));
+		return true;
+	}
+
+	return false;
+}
+
 
 //==============================================================================
 

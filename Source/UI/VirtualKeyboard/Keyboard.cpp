@@ -20,7 +20,7 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
     removeMouseListener(this);
     
     pluginState = pluginStateIn;
-    undo = pluginState->get_undo_mgr();
+    undo = pluginState->getUndoManager();
     appCmdMgr = cmdMgrIn;
     
     // Create children (piano keys)

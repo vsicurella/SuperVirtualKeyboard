@@ -161,18 +161,18 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_modeLibraryBox] -- add your combo box handling code here..
 		if (comboBoxThatHasChanged->getSelectedId() > 0)
-			pluginState->set_current_mode(menuToPresetIndex[modeLibraryBox->getText()]);
+			pluginState->setCurrentMode(menuToPresetIndex[modeLibraryBox->getText()]);
 		else
 		{
 			String newModeName;
 			// Preset is a user preset
 			if ((int)pluginState->presetCurrentNode.getProperty(IDs::libraryIndexOfMode) == 0)
 			{
-				pluginState->get_current_mode()->setFamily(comboBoxThatHasChanged->getText());
+				pluginState->getCurrentMode()->setFamily(comboBoxThatHasChanged->getText());
 			}
 
 			// If it's a default preset, it reverts to original name
-			newModeName = pluginState->get_current_mode()->getDescription();
+			newModeName = pluginState->getCurrentMode()->getDescription();
 			comboBoxThatHasChanged->setText(newModeName, NotificationType::dontSendNotification);
 		}
         //[/UserComboBoxCode_modeLibraryBox]
@@ -190,8 +190,8 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-        pluginState->get_current_mode()->setOffset((int) offsetSld->getValue());
-        pluginState->presetCurrentNode.setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->get_undo_mgr());
+        pluginState->getCurrentMode()->setOffset((int) offsetSld->getValue());
+        pluginState->presetCurrentNode.setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->getUndoManager());
         //[/UserSliderCode_offsetSld]
     }
 
@@ -249,9 +249,9 @@ void KeyboardEditorBar::createAndSendMode()
 	int index = pluginState->is_mode_in_presets(steps);
 
 	if (index)
-		pluginState->set_current_mode(index);
+		pluginState->setCurrentMode(index);
 	else
-		pluginState->set_current_mode(new Mode(steps, "Custom"));
+		pluginState->setCurrentMode(new Mode(steps, "Custom"));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
