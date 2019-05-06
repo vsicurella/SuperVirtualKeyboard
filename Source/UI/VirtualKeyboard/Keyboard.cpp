@@ -32,6 +32,8 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
     }
     
     toBack();
+
+	initiateDataNode();
     
     setSize(1000, 250);
     setOpaque(true);
@@ -41,9 +43,13 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
 
 void Keyboard::initiateDataNode()
 {
-    pianoNode = ValueTree(IDs::pianoNode);
-    
-	updatePianoNode();
+	if (pluginState->pianoNode.isValid())
+		pianoNode = pluginState->pianoNode;
+	else
+	{
+		pianoNode = ValueTree(IDs::pianoNode);
+		updatePianoNode();
+	}
     
     Key* key;
     for (int i = 0; i < keys.size(); i++)
@@ -402,6 +408,8 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 		key->customColor = false; // reset key so that it changes no matter what
 		key->setColour(colorIndex, getKeyColor(key));
 	}
+
+
 }
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)

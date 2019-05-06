@@ -50,8 +50,8 @@ public:
     
     //==============================================================================
 
-    void init_node_data();
-    void restore_node_data(ValueTree nodeIn);
+    void initNodeData();
+	void updateNodeData();
 
 	bool save_preset(const File& fileOut);
 	bool load_preset(const File& fileIn);
