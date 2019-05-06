@@ -206,6 +206,10 @@ namespace VirtualKeyboard
         
         // Data
         ValueTree pianoNode;
+		ValueTree keyPlacePresetNode;
+		ValueTree keyRatioPresetNode;
+		ValueTree keyColorPresetNode;
+
         OwnedArray<Key> keys;
         
         Array<Array<Key*>> keysOrder;

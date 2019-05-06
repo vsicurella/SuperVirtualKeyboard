@@ -44,22 +44,14 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	pluginState->presetCurrentNode.addListener(this);
 	piano->getNode().addListener(this);
-
-    if (!pluginState->keyboardWindowNode.isValid())
-    {
-        init_node_data();
-		view.get()->setViewPositionProportionately(0.52, 0);
-    }
-	else
-	{
-		restore_node_data(pluginState->keyboardWindowNode);
-	}
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
 	
+	initNodeData();
+
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano.get());
 
@@ -78,38 +70,42 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::init_node_data()
+void SuperVirtualKeyboardAudioProcessorEditor::initNodeData()
 {
-	keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
+	if (pluginState->keyboardWindowNode.isValid())
+	{
+		keyboardWindowNode = pluginState->keyboardWindowNode;
+		update_children_to_preset();
+		setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
+		view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
+	}
+	else
+	{
+		keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
+		
+		pluginState->set_current_mode(8);
+		updateNodeData();
 
+		keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
+		pluginState->keyboardWindowNode = keyboardWindowNode;
+		pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
+
+		view.get()->setViewPositionProportionately(0.52, 0);
+	}
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
+{
 	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
-
-	// setup initial preset, needed for piano node to initiate
-	pluginState->set_current_mode(8);
-
-	piano->initiateDataNode();
-	keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
-
-	pluginState->keyboardWindowNode = keyboardWindowNode;
-	pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::restore_node_data(ValueTree nodeIn)
-{
-	keyboardWindowNode = nodeIn;
-	update_children_to_preset();
-	setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
-	view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
 }
 
 bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(const File& fileOut)
 {
 	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
 	return xml->writeToFile(fileOut, "");
-}
-	
+}	
 
 bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 {

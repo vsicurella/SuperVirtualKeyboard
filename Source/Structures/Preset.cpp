@@ -45,16 +45,16 @@ SvkPreset::SvkPreset(SvkPreset& presetToCopy)
 
 SvkPreset::~SvkPreset() {}
 
-bool SvkPreset::writeToFile(String absoluteFilePath = "")
+bool SvkPreset::writeToFile(String absoluteFilePath)
 {
 	File fileOut = File(absoluteFilePath);
 
 	if (!fileOut.getParentDirectory().exists())
-	{
-		FileChooser chooser = FileChooser("Save your preset",
-			File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory),
+	{		
+		FileChooser chooser("Save your preset", 
+			File::getSpecialLocation(File::userDocumentsDirectory),
 			"*.svk");
-		
+
 		chooser.browseForFileToSave(true);
 		fileOut = chooser.getResult();
 	}
@@ -63,15 +63,15 @@ bool SvkPreset::writeToFile(String absoluteFilePath = "")
 	return xml->writeToFile(fileOut, "");
 }
 
-SvkPreset SvkPreset::loadFromFile(String absoluteFilePath = "")
+SvkPreset SvkPreset::loadFromFile(String absoluteFilePath)
 {
 	ValueTree nodeIn;
 	File fileIn = File(absoluteFilePath);
 
 	if (!fileIn.exists())
 	{
-		FileChooser chooser = FileChooser("Open preset",
-			File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory),
+		FileChooser chooser("Open preset",
+			File::getSpecialLocation(File::userDocumentsDirectory),
 			"*.svk");
 
 		chooser.browseForFileToOpen();

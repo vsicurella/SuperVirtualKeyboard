@@ -23,6 +23,7 @@ struct SvkPreset
 	ValueTree theKeyRatiosNode;
 	ValueTree theKeyColorsNode;
 
+	SvkPreset() {}
 	SvkPreset(ValueTree modeNodeIn, ValueTree pianoNodeIn);
 	SvkPreset(Mode* modeIn, VirtualKeyboard::Keyboard* pianoIn);
 	SvkPreset(ValueTree presetNodeIn);
@@ -30,11 +31,7 @@ struct SvkPreset
 	~SvkPreset();
 
 	bool writeToFile(String absoluteFilePath="");
-	static SvkPreset loadFromFile(String absoluteFilePath = "");
+	static SvkPreset loadFromFile(String absoluteFilePath="");
    
-	String toString();
-
-private:
-
-	
+	String toString();	
 };
