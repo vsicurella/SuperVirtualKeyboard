@@ -10,7 +10,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Mode.h"
-#include "../PluginState.h"
 #include "../UI/VirtualKeyboard/Keyboard.h"
 
 #pragma once

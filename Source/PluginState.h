@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "PluginIDs.h"
+#include "Structures/Preset.h"
 #include "Structures/Mode.h"
 
 struct SuperVirtualKeyboardPluginState
@@ -40,18 +41,20 @@ struct SuperVirtualKeyboardPluginState
 
 	OwnedArray<Mode>* get_presets();
 	Array<Array<Mode*>>* get_presets_sorted();
-	UndoManager* get_undo_mgr();
+	UndoManager* getUndoManager();
 
-	ValueTree get_current_preset();
+	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
-	Mode* get_current_mode();
+	Mode* getCurrentMode();
 
 	int is_mode_in_presets(String stepsStringIn);
 
-	void set_current_mode(int presetIndexIn);
-	void set_current_mode(Mode* modeIn);
+	void setCurrentMode(int presetIndexIn);
+	void setCurrentMode(Mode* modeIn);
 
 	void set_current_key_settings(ValueTree pianoNodeIn);
+	bool loadPreset();
+
 	//==============================================================================
 	
 	template <class T>
@@ -78,5 +81,6 @@ private:
 	OwnedArray<Mode> presets;
 	Array<Array<Mode*>> presetsSorted;
 
+	std::unique_ptr<SvkPreset> presetCurrent;
 	Mode* modeCurrent;
 };

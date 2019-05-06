@@ -83,7 +83,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::initNodeData()
 	{
 		keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
 		
-		pluginState->set_current_mode(8);
+		pluginState->setCurrentMode(8);
 		updateNodeData();
 
 		keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
@@ -118,9 +118,9 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 		
 		if (presetIn.hasType(IDs::presetNode))
 		{
-			pluginState->presetCurrentNode.removeAllChildren(pluginState->get_undo_mgr());
+			pluginState->presetCurrentNode.removeAllChildren(pluginState->getUndoManager());
 			pluginState->presetCurrentNode = presetIn;
-			pluginState->get_current_mode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
+			pluginState->getCurrentMode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
 		}
 
 		update_children_to_preset();
@@ -131,13 +131,13 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
 
 bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 {
-	ReaperWriter rpp = ReaperWriter(pluginState->get_current_mode());
+	ReaperWriter rpp = ReaperWriter(pluginState->getCurrentMode());
 	return rpp.write_file();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
-	Mode* modeCurrent = pluginState->get_current_mode();
+	Mode* modeCurrent = pluginState->getCurrentMode();
 
 	if (pluginState->presetCurrentNode.getChild(1).isValid())
 	{
@@ -339,7 +339,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 	{
 		if (piano->getUIMode() == UIMode::editMode)
 		{
-			piano->applyMode(pluginState->get_current_mode());
+			piano->applyMode(pluginState->getCurrentMode());
 			piano->updateKeyNodes();
 			piano->updatePianoNode();
 			
@@ -360,7 +360,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTre
 {
     if (treeWhosePropertyHasChanged.hasType(IDs::presetNode) && property == IDs::modeOffset)
     {
-        piano->applyMode(pluginState->get_current_mode());
+        piano->applyMode(pluginState->getCurrentMode());
     }
 }
 
@@ -475,10 +475,10 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 	switch (info.commandID)
 	{
 	case IDs::CommandIDs::saveCustomLayout:
-		save_preset(fileDialog("Save your preset..", true));
+		pluginState->getCurrentPreset()->writeToFile();
 		break;
 	case IDs::CommandIDs::loadCustomLayout:
-		load_preset(fileDialog("Please select a preset to load...", false));
+		pluginState->loadPreset();
 		break;
 	case IDs::CommandIDs::saveReaperMap:
 		write_reaper_file();
