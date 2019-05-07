@@ -227,6 +227,7 @@ namespace VirtualKeyboard
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
 		
 		Array<Colour> keyDegreeColors;
+		Array<Colour> keySingleColors; // organized by (keyNumber + Mode offset)
         
         // Properties
         int keyWidth = 50;

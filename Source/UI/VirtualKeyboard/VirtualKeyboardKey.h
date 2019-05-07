@@ -32,8 +32,9 @@ namespace VirtualKeyboard
         
         // Properties
         int order; // front most keys are 0, "black" keys are 1, etc
-        float degree; 
-        int step;
+		int scaleDegree; // corresponds to chromatic degree in the period
+        float modeDegree; // fractional degree. in Meantone[7], F# would be 3.5
+        int step; // the interval step that this note is a part of
         
         float degreeWidthRatio;
         float degreeHeightRatio;
