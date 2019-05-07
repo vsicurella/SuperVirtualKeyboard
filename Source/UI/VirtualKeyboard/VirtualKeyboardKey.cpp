@@ -24,7 +24,7 @@ Key::Key(String nameIn, int keyNumIn)
 
 float Key::getDegree()
 {
-    return degree;
+    return modeDegree;
 }
 
 void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
