@@ -27,7 +27,7 @@ void KeyboardGrid::placeKey(Key* key)
 {
     Point<int> pt;
     
-    float colToPlace = ceil(key->degree);
+    float colToPlace = ceil(key->modeDegree);
     int offset = (key->order > 0) * (int)(getColumnSize() / 2.0);
     offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
     

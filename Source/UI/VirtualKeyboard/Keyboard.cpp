@@ -30,7 +30,9 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
         Key* key = new Key(keyName, i);
         addChildComponent(keys.add(key));
     }
-    
+	
+	keySingleColors.resize(keys.size());
+
     toBack();
     
     setSize(1000, 250);
@@ -331,7 +333,8 @@ void Keyboard::applyMode(Mode* modeIn)
         key->setColour(1, key->findColour(0).contrasting(0.25));
         key->setColour(2, key->findColour(0).contrasting(0.75));
         
-        key->degree = mode->getDegrees()[i];
+		key->scaleDegree = totalModulus(i + mode->getOffset(), mode->getScaleSize());
+        key->modeDegree = mode->getDegrees()[i];
         key->step = mode->getStepsOfOrders()[i];
         
         setKeyProportions(key);
@@ -354,13 +357,13 @@ void Keyboard::applyMode(Mode* modeIn)
 Colour Keyboard::getKeyColor(Key* keyIn)
 {
 	Colour c;
-	int degOffset = (keyIn->keyNumber + mode->getOffset()) % mode->getScaleSize();
 	Key* offsetKey = keys.getUnchecked(((keyIn->keyNumber + mode->getOffset()) % 128 + 128) % 128);
+	int degOffset = (offsetKey->keyNumber) % mode->getScaleSize();
 
 	// If has its own color, or else if it has a degree color, or else the default order color
-	if (offsetKey->customColor)
-		c = offsetKey->findColour(3);
-	else if (!keyDegreeColors[degOffset].isTransparent())
+	if (keySingleColors[offsetKey->keyNumber].isOpaque())
+		c = keySingleColors[offsetKey->keyNumber];
+	else if (keyDegreeColors[degOffset].isOpaque())
 		c = keyDegreeColors[degOffset];
 	else
 		c = keyOrderColors[keyIn->order % keyOrderColors.size()];
@@ -383,6 +386,7 @@ void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useC
 {
 	keyIn->setColour(colorIndex, colorIn);
 	keyIn->customColor = useColor;
+	
 }
 
 void Keyboard::setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
@@ -541,7 +545,7 @@ Key* Keyboard::transposeKeyModally(Key* key, int stepsIn)
     
     for (int i = 0; i < orderArray->size(); i++)
     {
-		if (key->degree == orderArray->getUnchecked(i)->degree)
+		if (key->modeDegree == orderArray->getUnchecked(i)->modeDegree)
         {
             newKey = i;
             break;

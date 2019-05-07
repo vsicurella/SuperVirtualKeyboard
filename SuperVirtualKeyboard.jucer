@@ -43,6 +43,8 @@
       <FILE id="u28f1w" name="ColorChoosingWindow.h" compile="0" resource="0"
             file="Source/UI/ColorChoosingWindow.h"/>
     </GROUP>
+    <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
+          file="Source/CommonFunctions.h"/>
     <FILE id="qf8oNW" name="PluginIDs.h" compile="1" resource="0" file="Source/PluginIDs.h"/>
     <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
     <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
