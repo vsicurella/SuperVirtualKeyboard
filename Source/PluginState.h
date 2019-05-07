@@ -12,7 +12,7 @@
 #include "JuceHeader.h"
 #include "PluginIDs.h"
 #include "Structures/Preset.h"
-#include "Structures/Mode.h"
+#include "CommonFunctions.h"
 
 struct SuperVirtualKeyboardPluginState
 {
@@ -57,18 +57,6 @@ struct SuperVirtualKeyboardPluginState
 
 	//==============================================================================
 	
-	template <class T>
-	static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId);
-
-	template <class T>
-	static void get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Identifier arrayID);
-
-	static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId);
-
-	static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID);
-
-	//==============================================================================
-
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
 
 private:
