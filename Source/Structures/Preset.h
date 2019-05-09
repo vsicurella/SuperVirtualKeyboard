@@ -9,9 +9,7 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Mode.h"
-#include "../UI/VirtualKeyboard/Keyboard.h"
-
+#include "../PluginIDs.h"
 #pragma once
 
 struct SvkPreset
@@ -24,7 +22,6 @@ struct SvkPreset
 
 	SvkPreset() {}
 	SvkPreset(ValueTree modeNodeIn, ValueTree pianoNodeIn);
-	SvkPreset(Mode* modeIn, VirtualKeyboard::Keyboard* pianoIn);
 	SvkPreset(ValueTree presetNodeIn);
 	SvkPreset(SvkPreset& presetToCopy);
 	~SvkPreset();

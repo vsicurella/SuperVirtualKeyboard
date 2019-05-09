@@ -24,11 +24,6 @@ SvkPreset::SvkPreset(ValueTree modeNodeIn, ValueTree pianoNodeIn)
 	parentNode.addChild(theKeyColorsNode, 3, nullptr);
 }
 
-SvkPreset::SvkPreset(Mode* modeIn, VirtualKeyboard::Keyboard* pianoIn)
-{
-	SvkPreset(modeIn->modeNode, pianoIn->getNode());
-}
-
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
 	parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
