@@ -28,6 +28,7 @@ Mode::Mode()
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(ordersDefault);
+	scaleDegrees = scale_degrees(scaleSize, offset);
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
@@ -49,6 +50,7 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
+	scaleDegrees = scale_degrees(scaleSize, offset);
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
@@ -70,6 +72,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
+	scaleDegrees = scale_degrees(scaleSize, offset);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
     
@@ -109,6 +112,7 @@ void Mode::restore_from_node(ValueTree nodeIn)
 		ordersDefault = steps_to_orders(steps);
 		orders = expand_orders(ordersDefault, offset);
 		modeDegrees = orders_to_modeDegrees(orders);
+		scaleDegrees = scale_degrees(scaleSize, offset);
 		updateStepsOfOrders();
 	}
 }
@@ -130,6 +134,7 @@ void Mode::setOffset(int offsetIn)
 	
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
+	scaleDegrees = scale_degrees(scaleSize, offset);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
 
@@ -299,6 +304,22 @@ Array<float> Mode::orders_to_modeDegrees(Array<int> ordersIn)
 	return degreesOut;
 }
 
+Array<int> scale_degrees(int scaleSize, int offset)
+{
+	Array<int> degreesOut;
+
+	auto mod = [](int a, int n) {return ((a % n) + n) % n; };
+
+	for (int i = 0; i < scaleSize; i++)
+	{
+		degreesOut.add(mod(i - offset, scaleSize));
+	}
+
+	degreesOut.minimiseStorageOverheads();
+	return degreesOut;
+}
+
+
 Array<int> Mode::interval_sizes(Array<int> stepsIn)
 {
 	Array<int> intervals;
@@ -381,10 +402,16 @@ Array<int> Mode::getOrders()
 	return orders;
 }
 
-Array<float> Mode::getDegrees()
+Array<float> Mode::getModalDegrees()
 {
 	return modeDegrees;
 }
+
+Array<int> Mode::getScaleDegrees()
+{
+	return scaleDegrees;
+}
+
 
 int Mode::getMaxStep()
 {

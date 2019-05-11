@@ -66,7 +66,9 @@ struct Mode
 
 	Array<int> getOrders();
 
-	Array<float> getDegrees();
+	Array<float> getModalDegrees();
+
+	Array<int> getScaleDegrees();
 
 	int getMaxStep();
 
@@ -118,6 +120,11 @@ struct Mode
 	and returns scale step size layout "0, 0.5, 1, 1.5,..."
 	*/
 	static Array<float> orders_to_modeDegrees(Array<int> stepsIn);
+
+	/*
+	Simply creates an array of scale degrees based off of scale size and offset
+	*/
+	static Array<int> scale_degrees(int scaleSize, int offset = 0);
 
 	/*
 	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
