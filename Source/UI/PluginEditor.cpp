@@ -340,7 +340,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 		if (piano->getUIMode() == UIMode::editMode)
 		{
 			piano->applyMode(pluginState->getCurrentMode());
-			piano->updateKeyNodes();
 			piano->updatePianoNode();
 			
 			// Update Preset Node

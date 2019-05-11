@@ -222,6 +222,8 @@ namespace VirtualKeyboard
         Array<Array<Key*>> keysOrder;
         Array<Key*> keysOn;
         Mode* mode;
+
+		Array<int> keyMidiNoteMappings;
                 
 		Array<Colour> keyColorsOrder = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };

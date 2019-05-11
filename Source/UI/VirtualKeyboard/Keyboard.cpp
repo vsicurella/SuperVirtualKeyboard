@@ -29,6 +29,9 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
         String keyName = "Key " + String(i);
         Key* key = new Key(keyName, i);
         addChildComponent(keys.add(key));
+
+		// Set default Midi Note Mappings
+		keyMidiNoteMappings.add(i);
     }
 	
 	keyColorsSingle.resize(keys.size());
@@ -46,15 +49,14 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
 void Keyboard::initiateDataNode()
 {
 	if (pluginState->pianoNode.isValid())
-		pianoNode = pluginState->pianoNode;
+		restoreDataNode(pluginState->pianoNode);
 	else
 	{
 		pianoNode = ValueTree(IDs::pianoNode);
 		updatePianoNode();
+		pluginState->pianoNode = pianoNode;
+		pluginState->presetCurrentNode.addChild(pianoNode.createCopy(), 1, nullptr);
 	}
-        
-    pluginState->pianoNode = pianoNode;
-	pluginState->presetCurrentNode.addChild(pianoNode.createCopy(), 1, nullptr);
 }
 
 void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
@@ -67,6 +69,9 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
     midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
     mpeOn = pianoNode[IDs::pianoMPEToggle];
     defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
+
+	keyMidiNoteMappings.clear();
+	get_array_from_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings);
 
 	keyColorsOrder.clear();
 	get_array_from_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder);
@@ -104,6 +109,10 @@ void Keyboard::updatePianoNode()
 
 void Keyboard::updateKeyProperties()
 {
+	// Mapped Midi Notes
+	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyMidiNoteMappings), nullptr);
+	add_array_to_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings, "MidiNote");
+
 	// Colors
 	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
 	add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
@@ -332,9 +341,10 @@ void Keyboard::applyMode(Mode* modeIn)
         
 		key->scaleDegree = totalModulus(i - mode->getOffset(), mode->getScaleSize());
         key->modeDegree = mode->getDegrees()[i];
-        key->step = mode->getStepsOfOrders()[i];
-        
+		key->step = mode->getStepsOfOrders()[i];
         setKeyProportions(key);
+
+		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keyMidiNoteMappings.size())];
 
         key->setVisible(true);
     }
