@@ -33,7 +33,7 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 
     Colour color = findColour(activeState);
     
-	/* // for specific "pressed" color, currently deprecated 
+	/* // for specific "pressed" color, currently unused 
     if (activeState == 2)
     {
         color = findColour(0).interpolatedWith(findColour(2), 0.618);
@@ -49,20 +49,6 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 	fillBounds.expand(1, 1);
 	g.setColour(Colours::black);
 	g.drawRect(fillBounds, 1.2);
-}
-
-void Key::restore_from_node(ValueTree keyNodeIn)
-{
-    pianoKeyNode = keyNodeIn;
-	keyNumber = pianoKeyNode[IDs::pianoKeyNumber];
-    mappedMIDInote = pianoKeyNode[IDs::pianoKeyMidiNote];
-    widthMod = pianoKeyNode[IDs::pianoKeyWidthMod];
-    heightMod = pianoKeyNode[IDs::pianoKeyHeightMod];
-    xOffset = pianoKeyNode[IDs::pianoKeyXOffset];
-    yOffset = pianoKeyNode[IDs::pianoKeyYOffset];
-	customColor = (bool)pianoKeyNode[IDs::pianoKeyColorIsCustom];
-	setColour(0, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
-	setColour(3, Colour::fromString(pianoKeyNode[IDs::pianoKeyColorDefault].toString()));
 }
 
 //==============================================================================

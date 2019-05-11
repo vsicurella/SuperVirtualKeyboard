@@ -66,9 +66,7 @@ namespace VirtualKeyboard
 
 		void updatePianoNode();
 
-		void updateKeyNode(int keyNumIn);
-
-		void updateKeyNodes();
+		void updateKeyProperties();
         
         ValueTree getNode();
         
@@ -203,6 +201,15 @@ namespace VirtualKeyboard
         MidiKeyboardState keyboardState;
         MidiBuffer buffer;
 		Array<Key*> keysPause;
+
+		// Parameters
+		int uiModeSelected = 0;
+		int orientationSelected = 0;
+		int keyPlacementSelected = 0;
+
+		int midiChannelSelected = 1;
+		int midiNoteOffset = 0;
+		bool mpeOn = false;
         
         // Data
         ValueTree pianoNode;
@@ -215,23 +222,21 @@ namespace VirtualKeyboard
         Array<Array<Key*>> keysOrder;
         Array<Key*> keysOn;
         Mode* mode;
-        
-        // Parameters
-        int uiModeSelected = 0;
-        int orientationSelected = 0;
-        int keyPlacementSelected = 0;
-        
-        int midiChannelSelected = 1;
-        int midiNoteOffset = 0;
-        bool mpeOn = false;
-        
-        Array<Point<float>> keyDegreeProportions;
-        
-		Array<Colour> keyOrderColors = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
+                
+		Array<Colour> keyColorsOrder = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
             Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
 		
-		Array<Colour> keyDegreeColors;
-		Array<Colour> keySingleColors; // organized by (keyNumber + Mode offset)
+		Array<Colour> keyColorsDegree;
+		Array<Colour> keyColorsSingle; // organized by (keyNumber - Mode offset)
+
+		Array<Point<float>> keyPlacesOrder;
+		Array<Point<float>> keyPlacesDegree;
+		Array<Point<float>> keyPlacesSingle;
+
+		Array<Point<float>> keyRatiosOrder;
+		Array<Point<float>> keyRatiosDegree;
+		Array<Point<float>> keyRatiosSingle;
+
         
         // Properties
         int keyWidth = 50;

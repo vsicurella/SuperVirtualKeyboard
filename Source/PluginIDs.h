@@ -48,26 +48,23 @@ namespace IDs
 	static Identifier pianoKeyboardState("PianoKeyboardState");
 	static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
-	static Identifier pianoMidiNoteOffset("MidiNodeOffset");
 	static Identifier pianoMPEToggle("MpeToggle");
 	static Identifier pianoWHRatio("WidthToHeightRatio");
-	static Identifier pianoKeyPlacement("KeyPlacement");
-	static Identifier pianoKeySizeRatios("KeySizeRatios");
-	static Identifier pianoKeyOrderColors("KeyOrderColors");
-	static Identifier pianoKeyDegreeColors("KeyDegreeColors");
+	static Identifier pianoKeyPlacementType("KeyPlacementType");
+	static Identifier pianoKeyColorsOrder("KeyOrderColors");
+	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
+	static Identifier pianoKeyColorDefault("KeySingleColors");
+	static Identifier pianoKeyPlaceOrder("KeyOrderPlaces");
+	static Identifier pianoKeyPlaceDegree("KeyDegreePlaces");
+	static Identifier pianoKeyPlaceSingle("KeySinglePlaces");
+	static Identifier pianoKeyRatioOrder("KeyOrderRatios");
+	static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
+	static Identifier pianoKeyRatioSingle("KeySingleRatios");
+	static Identifier pianoKeyMidiNoteMappings("KeyMappedMidiNotes");
+
 
 	// Piano Key Component
-	static Identifier pianoKeyNode("PianoKeyNode");
-	static Identifier pianoKeyNumber("KeyNumber");
-	static Identifier pianoKeyModeDegree("KeyModeDegree");
-	static Identifier pianoKeyOrder("KeyOrder");
-	static Identifier pianoKeyMidiNote("MappedMidiNote");
-	static Identifier pianoKeyWidthMod("KeyWidthModifier");
-	static Identifier pianoKeyHeightMod("KeyHeightModifier");
-	static Identifier pianoKeyXOffset("KeyXOffset");
-	static Identifier pianoKeyYOffset("KeyYOffset");
 	static Identifier pianoKeyColorIsCustom("KeyColorIsCustom");
-	static Identifier pianoKeyColorDefault("KeyColorDefault");
 	static Identifier pianoKeyColorHighlighted("KeyColorHighlighted");
 	static Identifier pianoKeyColorPressed("KeyColorPressed");
 	static Identifier pianoKeyColorExternal("KeyColorMidiInput");

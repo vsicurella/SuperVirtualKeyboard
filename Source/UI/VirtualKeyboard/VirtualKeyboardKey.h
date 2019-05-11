@@ -15,9 +15,7 @@
 namespace VirtualKeyboard
 {
     struct Key : public Button
-    {
-        ValueTree pianoKeyNode;
-        
+    {        
         // Parameters
         int keyNumber;
         
@@ -55,8 +53,6 @@ namespace VirtualKeyboard
         
         void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
         
-        void restore_from_node(ValueTree parentNodeIn);
-
 		//==============================================================================
 
 		void mouseExit(const MouseEvent& e) override;
