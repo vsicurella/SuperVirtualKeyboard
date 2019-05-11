@@ -151,8 +151,8 @@ Array<int> Mode::parse_steps(String stepsIn)
 	Array<int> stepsOut;
 
 	std::string theSteps = stepsIn.toStdString();
-	char* check;
-	long intCheck;
+	//char* check;
+	//long intCheck;
 
 	char c;
 	int step;
@@ -164,13 +164,13 @@ Array<int> Mode::parse_steps(String stepsIn)
 		digits = 0;
 		c = stepsIn[i];
 
-		strtol(&theSteps[i], &check, 10);
+		//strtol(&theSteps[i], &check, 10);
 
-		while ((*check) && (i + digits) < stepsIn.length())
+		while ((c != ' ' && c != '\t') && (i + digits) < stepsIn.length())
 		{
 			digits++;
 			c = stepsIn[i + digits];
-			strtol(&theSteps[i + digits], &check, 10);
+			//strtol(&theSteps[i + digits], &check, 10);
 		}
 
 		if (digits > 0)
