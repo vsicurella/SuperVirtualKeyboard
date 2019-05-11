@@ -304,7 +304,7 @@ Array<float> Mode::orders_to_modeDegrees(Array<int> ordersIn)
 	return degreesOut;
 }
 
-Array<int> scale_degrees(int scaleSize, int offset)
+Array<int> Mode::scale_degrees(int scaleSize, int offset)
 {
 	Array<int> degreesOut;
 
