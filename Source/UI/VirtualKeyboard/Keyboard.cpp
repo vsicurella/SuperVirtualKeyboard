@@ -334,18 +334,19 @@ void Keyboard::applyMode(Mode* modeIn)
         
         key->order = mode->getOrders()[i];
         keysOrder.getReference(key->order).add(key);
+		
+		key->scaleDegree = mode->getScaleDegrees()[i % mode->getScaleSize()];
+		key->modeDegree = mode->getModalDegrees()[i];
+		
+		key->step = mode->getStepsOfOrders()[i];
+		setKeyProportions(key);
+		
+		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keyMidiNoteMappings.size())];
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
         key->setColour(2, key->findColour(0).contrasting(0.75));
         
-		key->scaleDegree = totalModulus(key->keyNumber - mode->getOffset(), mode->getScaleSize());
-        key->modeDegree = mode->getModalDegrees()[i];
-		key->step = mode->getStepsOfOrders()[i];
-        setKeyProportions(key);
-
-		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keyMidiNoteMappings.size())];
-
         key->setVisible(true);
     }
     
@@ -366,12 +367,13 @@ Colour Keyboard::getKeyColor(Key* keyIn)
 	Colour c;
 	
 	int offsetKeyNum = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
+	int degOffset = totalModulus(keyIn->keyNumber - mode->getOffset(), mode->getScaleSize()); // this is a workaround
 
 	// If has its own color, or else if it has a degree color, or else the default order color
 	if (keyColorsSingle[offsetKeyNum].isOpaque())
 		c = keyColorsSingle[offsetKeyNum];
-	else if (keyColorsDegree[keyIn->scaleDegree].isOpaque())
-		c = keyColorsDegree[keyIn->scaleDegree];
+	else if (keyColorsDegree[degOffset].isOpaque())
+		c = keyColorsDegree[degOffset];
 	else
 		c = keyColorsOrder[keyIn->order % keyColorsOrder.size()];
 
