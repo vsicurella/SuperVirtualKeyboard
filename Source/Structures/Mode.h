@@ -117,7 +117,7 @@ struct Mode
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "0, 0.5, 1, 1.5,..."
 	*/
-	static Array<float> orders_to_degrees(Array<int> stepsIn);
+	static Array<float> orders_to_modeDegrees(Array<int> stepsIn);
 
 	/*
 	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
@@ -144,7 +144,8 @@ private:
 	Array<int> mosClass;
 
 	Array<int> orders;
-	Array<float> degrees;
+	Array<int> scaleDegrees;
+	Array<float> modeDegrees;
 
     // Keyboard Convenience
     Array<int> stepsOfOrders; // each index is the step which the note is associated with

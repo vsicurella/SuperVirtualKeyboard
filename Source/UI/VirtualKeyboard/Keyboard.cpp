@@ -339,7 +339,7 @@ void Keyboard::applyMode(Mode* modeIn)
         key->setColour(1, key->findColour(0).contrasting(0.25));
         key->setColour(2, key->findColour(0).contrasting(0.75));
         
-		key->scaleDegree = totalModulus(i - mode->getOffset(), mode->getScaleSize());
+		key->scaleDegree = totalModulus(key->keyNumber - mode->getOffset(), mode->getScaleSize());
         key->modeDegree = mode->getDegrees()[i];
 		key->step = mode->getStepsOfOrders()[i];
         setKeyProportions(key);

@@ -27,7 +27,7 @@ Mode::Mode()
 	name = getDescription();
 
 	orders = expand_orders(ordersDefault, offset);
-	degrees = orders_to_degrees(ordersDefault);
+	modeDegrees = orders_to_modeDegrees(ordersDefault);
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
@@ -48,7 +48,7 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
     name = getDescription();
 
 	orders = expand_orders(ordersDefault, offset);
-	degrees = orders_to_degrees(orders);
+	modeDegrees = orders_to_modeDegrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
@@ -69,7 +69,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 	name = getDescription();
 
 	orders = expand_orders(ordersDefault, offset);
-	degrees = orders_to_degrees(orders);
+	modeDegrees = orders_to_modeDegrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
     
@@ -108,7 +108,7 @@ void Mode::restore_from_node(ValueTree nodeIn)
 		mosClass = interval_sizes(steps);
 		ordersDefault = steps_to_orders(steps);
 		orders = expand_orders(ordersDefault, offset);
-		degrees = orders_to_degrees(orders);
+		modeDegrees = orders_to_modeDegrees(orders);
 		updateStepsOfOrders();
 	}
 }
@@ -129,7 +129,7 @@ void Mode::setOffset(int offsetIn)
 	offset = -offsetIn;
 	
 	orders = expand_orders(ordersDefault, offset);
-	degrees = orders_to_degrees(orders);
+	modeDegrees = orders_to_modeDegrees(orders);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
 
@@ -145,6 +145,10 @@ Array<int> Mode::parse_steps(String stepsIn)
 {
 	Array<int> stepsOut;
 
+	std::string theSteps = stepsIn.toStdString();
+	char* check;
+	long intCheck;
+
 	char c;
 	int step;
 	int digits;
@@ -155,10 +159,13 @@ Array<int> Mode::parse_steps(String stepsIn)
 		digits = 0;
 		c = stepsIn[i];
 
-		while ((c != ',' && c != ' ') && (i + digits) < stepsIn.length())
+		strtol(&theSteps[i], &check, 10);
+
+		while ((*check) && (i + digits) < stepsIn.length())
 		{
 			digits++;
 			c = stepsIn[i + digits];
+			strtol(&theSteps[i + digits], &check, 10);
 		}
 
 		if (digits > 0)
@@ -264,7 +271,7 @@ Array<int> Mode::orders_to_steps(Array<int> layoutIn)
 	return stepsOut;
 }
 
-Array<float> Mode::orders_to_degrees(Array<int> ordersIn)
+Array<float> Mode::orders_to_modeDegrees(Array<int> ordersIn)
 {
 	Array<float> degreesOut;
 	float deg = -1;
@@ -376,7 +383,7 @@ Array<int> Mode::getOrders()
 
 Array<float> Mode::getDegrees()
 {
-	return degrees;
+	return modeDegrees;
 }
 
 int Mode::getMaxStep()
