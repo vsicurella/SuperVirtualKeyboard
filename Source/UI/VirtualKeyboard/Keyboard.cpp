@@ -341,7 +341,7 @@ void Keyboard::applyMode(Mode* modeIn)
         key->setColour(1, key->findColour(0).contrasting(0.25));
         key->setColour(2, key->findColour(0).contrasting(0.75));
         
-		key->scaleDegree = totalModulus(i + mode->getOffset(), mode->getScaleSize());
+		key->scaleDegree = totalModulus(i - mode->getOffset(), mode->getScaleSize());
         key->modeDegree = mode->getDegrees()[i];
         key->step = mode->getStepsOfOrders()[i];
         
@@ -365,14 +365,14 @@ void Keyboard::applyMode(Mode* modeIn)
 Colour Keyboard::getKeyColor(Key* keyIn)
 {
 	Colour c;
-	Key* offsetKey = keys.getUnchecked(totalModulus(keyIn->keyNumber + mode->getOffset(), 128));
-	int degOffset = (offsetKey->keyNumber) % mode->getScaleSize();
+	
+	int offsetKeyNum = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
 
 	// If has its own color, or else if it has a degree color, or else the default order color
-	if (keySingleColors[offsetKey->keyNumber].isOpaque())
-		c = keySingleColors[offsetKey->keyNumber];
-	else if (keyDegreeColors[degOffset].isOpaque())
-		c = keyDegreeColors[degOffset];
+	if (keySingleColors[offsetKeyNum].isOpaque())
+		c = keySingleColors[offsetKeyNum];
+	else if (keyDegreeColors[keyIn->scaleDegree].isOpaque())
+		c = keyDegreeColors[keyIn->scaleDegree];
 	else
 		c = keyOrderColors[keyIn->order % keyOrderColors.size()];
 
@@ -386,15 +386,16 @@ Colour Keyboard::getKeyOrderColor(int orderIn)
 
 Colour Keyboard::getKeyDegreeColor(int degIn)
 {
-	int degOffset = totalModulus(degIn + mode->getOffset(), mode->getScaleSize());
-	return keyDegreeColors[degOffset];
+	int deg = totalModulus(degIn, mode->getScaleSize());
+	return keyDegreeColors[deg];
 }
 
 void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor)
 {
 	keyIn->setColour(colorIndex, colorIn);
 	keyIn->customColor = useColor;
-	int keyNumOffset = totalModulus(keyIn->keyNumber + mode->getOffset(), mode->getScaleSize());
+
+	int keyNumOffset = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
 	keySingleColors.set(keyNumOffset, colorIn);
 }
 
@@ -419,7 +420,7 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
 {
-	int degOffset = totalModulus(tuningDegreeIn + mode->getOffset(), mode->getScaleSize());
+	int degOffset = tuningDegreeIn; // totalModulus(tuningDegreeIn, mode->getScaleSize());
 	keyDegreeColors.set(degOffset, colorIn);
 
 	// needed to display changes
@@ -430,7 +431,7 @@ void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colo
 	{
 		key = orderArray->getUnchecked(i);
 
-		if ((key->keyNumber + mode->getOffset()) % mode->getScaleSize() == degOffset)
+		if (key->scaleDegree == degOffset)
 		{
 			key->setColour(colorIndex, colorIn);
 		}
@@ -460,18 +461,17 @@ void Keyboard::resetKeyOrderColors(int orderIn, bool resetDegrees)
 
 void Keyboard::resetKeyDegreeColors(int tuningDegreeIn)
 {
-	int degOffset = (tuningDegreeIn + mode->getOffset()) % mode->getScaleSize();
-	keyDegreeColors.set(degOffset, Colours::transparentBlack);
+	keyDegreeColors.set(tuningDegreeIn, Colours::transparentBlack);
 
 	// needed to display changes
-	Key* key = keys.getUnchecked(degOffset);
+	Key* key = keys.getUnchecked(tuningDegreeIn);
 	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
 
 	for (int i = 0; i < orderArray->size(); i++)
 	{
 		key = orderArray->getUnchecked(i);
 
-		if ((key->keyNumber + mode->getOffset()) % mode->getScaleSize() == degOffset)
+		if (key->scaleDegree == tuningDegreeIn)
 		{
 			key->setColour(3, getKeyOrderColor(key->order));
 		}
