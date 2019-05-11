@@ -247,7 +247,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 				}
 				else if (e.mods.isCtrlDown())
 				{
-					piano->setKeyColor(key, 3, piano->getKeyDegreeColor(key->keyNumber), false);
+					piano->setKeyColor(key, 3, piano->getKeyDegreeColor(key->scaleDegree), false);
 				}
 				else
 				{
@@ -257,15 +257,15 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 
 			else if (e.mods.isShiftDown())
 			{
-				if (piano->getKeyDegreeColor(key->keyNumber).isOpaque())
-					piano->resetKeyDegreeColors(key->keyNumber);
+				if (piano->getKeyDegreeColor(key->scaleDegree).isOpaque())
+					piano->resetKeyDegreeColors(key->scaleDegree);
 				
 				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
 			}
 			else if (e.mods.isCtrlDown())
 				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
 			else
-				piano->setKeyColorDegree(key->keyNumber, 3, colorChooserWindow->getColorSelected());
+				piano->setKeyColorDegree(key->scaleDegree, 3, colorChooserWindow->getColorSelected());
 		}
 	}
 }
