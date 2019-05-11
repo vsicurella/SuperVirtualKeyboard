@@ -16,7 +16,6 @@ Key::Key(String nameIn, int keyNumIn)
 : Button(nameIn)
 {
     keyNumber = keyNumIn;
-    mappedMIDInote = keyNumber;
 	
 	setColour(0, Colours::transparentBlack);
     setOpaque(true);
