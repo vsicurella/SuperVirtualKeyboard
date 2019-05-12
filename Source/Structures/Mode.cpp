@@ -99,7 +99,7 @@ void Mode::restore_from_node(ValueTree nodeIn)
 {
 	if (nodeIn.hasType(IDs::modePresetNode))
 	{
-		modeNode = nodeIn;
+		modeNode.copyPropertiesAndChildrenFrom(nodeIn, nullptr);
 
 		name = modeNode[IDs::modeName];
 		scaleSize = modeNode[IDs::scaleSize];

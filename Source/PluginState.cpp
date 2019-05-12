@@ -72,9 +72,16 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+
+		if (presetCurrent->theKeyboardNode.isValid())
+			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+
 		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
+
+		pluginStateNode.removeChild(1, nullptr);
+		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+		pluginStateNode.addChild(modePresetNode, 1, nullptr);
 	}
 }
 
@@ -84,9 +91,16 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	{
 		modeCurrent = modeIn;
 		presets.set(0, modeCurrent, true);
-		modePresetNode = modeCurrent->modeNode;
-		presetCurrent->updateModeNode(modeIn->modeNode);
+
+		if (presetCurrent->theKeyboardNode.isValid())
+			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+
+		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
+
+		pluginStateNode.removeChild(1, nullptr);
+		modePresetNode = modeCurrent->modeNode;
+		pluginStateNode.addChild(modePresetNode, 1, nullptr);
 	}
 }
 
@@ -107,6 +121,7 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
+	presetCurrent->theModeNode.copyPropertiesAndChildrenFrom(modePresetNode, nullptr);
 	return presetCurrent->writeToFile();
 }
 
@@ -119,6 +134,7 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	{
 		presetCurrent.reset(new SvkPreset(SvkPreset::loadFromFile()));
 		modeCurrent->restore_from_node(presetCurrent->theModeNode);
+		modePresetNode = modeCurrent->modeNode;
 		return true;
 	}
 

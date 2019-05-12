@@ -59,6 +59,11 @@ void Keyboard::initiateDataNode()
 		for (int i = 0; i < keys.size(); i++)
 			keyMidiNoteMappings.add(i);
 
+		pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
+		pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
+		pianoNode.setProperty(IDs::pianoMidiChannel, 1, nullptr);
+		pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
+		pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
 		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 	}
 }
@@ -326,6 +331,7 @@ void Keyboard::applyMode(Mode* modeIn)
     keysOrder.resize(mode->getMaxStep());
 
 	keyColorsDegree.resize(mode->getScaleSize());
+	currentOffset = mode->getOffset();
         
     Key* key;
     for (int i = 0; i < keys.size(); i++)
@@ -391,6 +397,12 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 	return keyColorsDegree[deg];
 }
 
+Colour Keyboard::getKeySingleColor(int keyIn)
+{
+	int keyNum = totalModulus(keyIn, keys.size());
+	return keyColorsSingle[keyNum];
+}
+
 void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor)
 {
 	keyIn->setColour(colorIndex, colorIn);
@@ -424,7 +436,7 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
 {
-	int degOffset = tuningDegreeIn; // totalModulus(tuningDegreeIn, mode->getScaleSize());
+	int degOffset = tuningDegreeIn;
 	keyColorsDegree.set(degOffset, colorIn);
 
 	// needed to display changes
@@ -435,7 +447,7 @@ void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colo
 	{
 		key = orderArray->getUnchecked(i);
 
-		if (key->scaleDegree == degOffset)
+		if (key->scaleDegree == degOffset && !key->customColor)
 		{
 			key->setColour(colorIndex, colorIn);
 		}
@@ -484,6 +496,17 @@ void Keyboard::resetKeyDegreeColors(int tuningDegreeIn)
 	}
 }
 
+void Keyboard::resetKeySingleColor(int keyNumberIn)
+{
+	Key* key = keys.getUnchecked(totalModulus(keyNumberIn, keys.size()));
+	key->customColor = false;
+
+	int keyNumOffset = totalModulus(key->keyNumber - mode->getOffset(), 128);
+
+	keyColorsSingle.set(keyNumOffset, Colours::transparentBlack);
+	key->setColour(3, getKeyOrderColor(key->order));
+}
+
 
 void Keyboard::resetKeyColors(bool resetDegrees)
 {
@@ -493,6 +516,7 @@ void Keyboard::resetKeyColors(bool resetDegrees)
 	{
 		key = keys.getUnchecked(i);
 		key->customColor = false;
+		keyColorsSingle.set(totalModulus(key->keyNumber - currentOffset, keys.size()), Colours::transparentBlack);
 	}
 
 	if (resetDegrees)

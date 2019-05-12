@@ -46,12 +46,7 @@ bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
 {
 	parentNode.removeChild(0, nullptr);
 
-	// don't allow editing
-	if (modeNodeIn.getProperty(IDs::factoryPreset))
-		theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
-	// allow editing
-	else
-		theModeNode = modeNodeIn;
+	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
 
 	parentNode.addChild(theModeNode, 0, nullptr);
 

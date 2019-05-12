@@ -62,8 +62,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
-	pluginState->getCurrentPreset()->parentNode.removeListener(this);
-	piano->getNode().removeListener(this);
+	pluginState->pluginStateNode.removeListener(this);
 }
 
 //==============================================================================
@@ -105,13 +104,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	Mode* modeCurrent = pluginState->getCurrentMode();
 	
-	if (pluginState->getCurrentPreset()->theKeyboardNode.getProperty(IDs::pianoHasCustomColor))
+	if (pluginState->getCurrentPreset()->theModeNode.getProperty(IDs::factoryPreset))
 	{
-		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
 	}
-	else
-		piano->resetKeyColors(true);
-
+		
 	piano->applyMode(modeCurrent);
 
 	keyboardEditorBar->setModeReadoutText(modeCurrent->getStepsString());
@@ -148,7 +144,10 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
 	bool loaded = pluginState->loadPreset();
 
 	if (loaded)
+	{
+		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
 		update_children_to_preset();
+	}
 
 	return loaded;
 }
@@ -251,7 +250,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 				}
 				else if (e.mods.isCtrlDown())
 				{
-					piano->setKeyColor(key, 3, piano->getKeyDegreeColor(key->scaleDegree), false);
+					piano->resetKeySingleColor(key->keyNumber);
 				}
 				else
 				{
@@ -263,7 +262,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 			{
 				if (piano->getKeyDegreeColor(key->scaleDegree).isOpaque())
 					piano->resetKeyDegreeColors(key->scaleDegree);
-				
+
+				else if (piano->getKeySingleColor(key->keyNumber).isOpaque())
+					piano->resetKeySingleColor(key->keyNumber);
+
 				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
 			}
 			else if (e.mods.isCtrlDown())
@@ -357,13 +359,21 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
-	if (treeWhosePropertyHasChanged.hasType(IDs::modePresetNode))
+	// The Mode offset is changed
+	if (treeWhosePropertyHasChanged.hasType(IDs::modePresetNode) && property == IDs::modeOffset)
+	{
 		update_children_to_preset();
+	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
 {
-
+	// The Mode has been changed
+	if (parentTree.hasType(IDs::pluginStateNode) && childWhichHasBeenAdded.hasType(IDs::modePresetNode))
+	{	
+		piano->resetKeyColors(true);
+		update_children_to_preset();
+	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
