@@ -19,17 +19,20 @@ struct SuperVirtualKeyboardPluginState
 	ValueTree pluginStateNode;
 	ValueTree modeLibraryNode;
 	ValueTree keyboardWindowNode;
+	ValueTree modePresetNode;
 	ValueTree pianoNode;
 
 	SuperVirtualKeyboardPluginState() :
 			pluginStateNode(IDs::pluginStateNode),
 			modeLibraryNode(IDs::modeLibraryNode),
+			modePresetNode(IDs::modePresetNode),
 			undoManager(new UndoManager()),
 			appCmdMgr(new ApplicationCommandManager())
 
 	{
 		createPresets();
 		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+		pluginStateNode.addChild(modePresetNode, 1, nullptr);
 		presetCurrent.reset(new SvkPreset());
 	}
 

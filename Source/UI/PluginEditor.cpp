@@ -45,9 +45,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
 
-	pluginState->getCurrentPreset()->parentNode.addListener(this);
+	pluginState->pluginStateNode.addListener(this);
 	initNodeData();
-	piano->getNode().addListener(this);
 
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano.get());
@@ -100,20 +99,17 @@ void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
-{
-	ReaperWriter rpp = ReaperWriter(pluginState->getCurrentMode());
-	return rpp.write_file();
-}
+
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	Mode* modeCurrent = pluginState->getCurrentMode();
-
-	if (pluginState->getCurrentPreset()->theKeyboardNode.isValid())
-		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
 	
-	if (!piano->getNode().getProperty(IDs::pianoHasCustomColor))
+	if (pluginState->getCurrentPreset()->theKeyboardNode.getProperty(IDs::pianoHasCustomColor))
+	{
+		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
+	}
+	else
 		piano->resetKeyColors(true);
 
 	piano->applyMode(modeCurrent);
@@ -122,6 +118,45 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 	keyboardEditorBar->setModeLibraryText(modeCurrent->getDescription());
     keyboardEditorBar->setOffsetReadout(modeCurrent->getOffset());
 	DBG("Children Updated");
+}
+
+void SuperVirtualKeyboardAudioProcessorEditor::beginColorEditing()
+{
+	colorChooserWindow->setVisible(true);
+	piano->setUIMode(UIMode::editMode);
+	keyboardEditorBar->allowUserInput(false);
+}
+
+//==============================================================================
+
+
+bool SuperVirtualKeyboardAudioProcessorEditor::save_preset()
+{
+	piano->updatePianoNode();
+	pluginState->updateKeyboardSettingsPreset();
+	bool written = pluginState->savePreset();
+	if (written)
+		DBG("file was saved");
+	else
+		DBG("not saved");
+
+	return written;
+}
+
+bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
+{
+	bool loaded = pluginState->loadPreset();
+
+	if (loaded)
+		update_children_to_preset();
+
+	return loaded;
+}
+
+bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
+{
+	ReaperWriter rpp = ReaperWriter(pluginState->getCurrentMode());
+	return rpp.write_file();
 }
 
 //==============================================================================
@@ -145,9 +180,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 	// update node
 	if (keyboardWindowNode.isValid())
 	{
-		keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-		keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-		keyboardWindowNode.setProperty(IDs::viewportPosition, viewPositionKeyboardX, nullptr);
+		updateNodeData();
 	}
 	
 }
@@ -324,22 +357,13 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
-	// when piano mode goes from "Edit" to "Play", update current preset
-	if (treeWhosePropertyHasChanged.hasType(IDs::pianoNode) && property == IDs::pianoUIMode)
-	{
-		if (piano->getUIMode() == UIMode::playMode)
-		{
-			piano->updatePianoNode();
-			pluginState->updateKeyboardSettingsPreset();
-		}
-	}
+	if (treeWhosePropertyHasChanged.hasType(IDs::modePresetNode))
+		update_children_to_preset();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
 {
-	// when mode is changed update components
-	if (parentTree.hasType(IDs::presetNode) && childWhichHasBeenAdded.hasType(IDs::modePresetNode))
-		update_children_to_preset();
+
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
@@ -434,29 +458,19 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 
 bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &info)
 {
-	bool written;
 	switch (info.commandID)
 	{
 	case IDs::CommandIDs::saveCustomLayout:
-		piano->updatePianoNode();
-		pluginState->updateKeyboardSettingsPreset();
-		written = pluginState->savePreset();
-		if (written)
-			DBG("file was saved");
-		else
-			DBG("not saved");
+		save_preset();
 		break;
 	case IDs::CommandIDs::loadCustomLayout:
-		if (pluginState->loadPreset())
-			update_children_to_preset();
+		load_preset();
 		break;
 	case IDs::CommandIDs::saveReaperMap:
 		write_reaper_file();
 		break;
 	case IDs::CommandIDs::setKeyColor:
-		colorChooserWindow->setVisible(true);
-		piano->setUIMode(UIMode::editMode);
-		keyboardEditorBar->allowUserInput(false);
+		beginColorEditing();
 		break;
 	default:
 		return false;

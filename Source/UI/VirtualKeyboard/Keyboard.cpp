@@ -55,9 +55,11 @@ void Keyboard::initiateDataNode()
 		updatePianoNode();
 		pluginState->pianoNode = pianoNode;
 
-		// Default Key Mappings
+		// Initialize default values
 		for (int i = 0; i < keys.size(); i++)
 			keyMidiNoteMappings.add(i);
+
+		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 	}
 }
 
@@ -99,13 +101,6 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 
 void Keyboard::updatePianoNode()
 {
-	pianoNode.setProperty(IDs::pianoOrientation, orientationSelected, undo);
-	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, undo);
-	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelSelected, undo);
-	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
-	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
-	pianoNode.setProperty(IDs::pianoWHRatio, defaultKeyWHRatio, undo);
-	pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 
 	updateKeyProperties();
 }
@@ -503,6 +498,7 @@ void Keyboard::resetKeyColors(bool resetDegrees)
 	if (resetDegrees)
 	{
 		keyColorsDegree.clear();
+		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 	}
 }
 
