@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-04-28 (Contact me for build)
+LATEST VERSION: Alpha 2019-05-12 (Contact me for build)
 
 SUMMARY:
 
@@ -41,5 +41,4 @@ BUGS:
 
  - Midi device doesn't get reconfigured when device settings change
  - Window resizing is bad funky
- - Clicking on a held note should turn it off, but it doesn't work on Mac
  - Definitely some more...
