@@ -72,11 +72,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		presetCurrentNode.removeAllChildren(undoManager.get());
-		presetCurrentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
-		presetCurrentNode.setProperty(IDs::presetHasCustomColor, false, nullptr);
-		presetCurrentNode.addChild(modeCurrent->modeNode.createCopy(), 0, undoManager.get());
-		// note that mode node is copied
+		presetCurrent->updateModeNode(mode->modeNode);
+		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
 	}
 }
 
@@ -86,30 +83,40 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	{
 		modeCurrent = modeIn;
 		presets.set(0, modeCurrent, true);
-		presetCurrentNode.removeChild(0, undoManager.get());
-		presetCurrentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
-		presetCurrentNode.setProperty(IDs::presetHasCustomColor, false, nullptr);
-		presetCurrentNode.addChild(modeCurrent->modeNode, 0, undoManager.get());
-		// node that mode node is passed by reference
+		presetCurrent->updateModeNode(modeIn->modeNode);
+		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
 	}
 }
 
-void SuperVirtualKeyboardPluginState::set_current_key_settings(ValueTree pianoNodeIn)
+void SuperVirtualKeyboardPluginState::updateModeOffset(int offsetIn)
 {
-	if (pianoNodeIn.isValid())
+	modeCurrent->setOffset(offsetIn);
+	presetCurrent->updateModeNode(modeCurrent->modeNode);
+}
+
+
+void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
+{
+	if (pianoNode.isValid())
 	{
-		presetCurrentNode.removeChild(1, undoManager.get());
-		presetCurrentNode.addChild(pianoNodeIn.createCopy(), 1, undoManager.get());
+		presetCurrent->updateKeyboardNode(pianoNode);
 	}
 }
+
+bool SuperVirtualKeyboardPluginState::savePreset()
+{
+	return presetCurrent->writeToFile();
+}
+
 
 bool SuperVirtualKeyboardPluginState::loadPreset()
 {
-	SvkPreset newPreset = SvkPreset::loadFromFile();
+	SvkPreset newPreset;
 
 	if (newPreset.parentNode.isValid())
 	{
-		presetCurrent.reset(new SvkPreset(newPreset));
+		presetCurrent.reset(new SvkPreset(SvkPreset::loadFromFile()));
+		modeCurrent->restore_from_node(presetCurrent->theModeNode);
 		return true;
 	}
 
@@ -177,6 +184,7 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	for (int i = 0; i < presets.size(); i++)
 	{
 		modeLibraryNode.addChild(presets.getUnchecked(i)->modeNode, i, nullptr);
+		presets.getUnchecked(i)->modeNode.setProperty(IDs::factoryPreset, true, nullptr);
 	}
 
 	presetsSorted.clear();

@@ -15,23 +15,21 @@ using namespace VirtualKeyboard;
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p, ApplicationCommandManager* cmdMgr)
-	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr),
-	pluginState(processor.get_plugin_state()),
-    view(new Viewport("Piano Viewport")),
-	piano(new Keyboard(pluginState, appCmdMgr)),
-	keyboardEditorBar(new KeyboardEditorBar(pluginState, appCmdMgr))
+	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.get_plugin_state())
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
-	setResizeLimits(640, 100, 10e4, 10e4);
 	setBroughtToFrontOnMouseClick(true);
 	
+	keyboardEditorBar.reset(new KeyboardEditorBar(pluginState, appCmdMgr));
 	keyboardEditorBar.get()->setName("Keyboard Editor Bar");
 	keyboardEditorBar.get()->setSize(640, 48);
 	addAndMakeVisible(keyboardEditorBar.get());
     
+	piano.reset(new Keyboard(pluginState, appCmdMgr));
 	piano.get()->setName("The Piano");
 
+	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);
@@ -41,16 +39,15 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	openFileBox.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
 	saveFileBox.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
-
-	pluginState->presetCurrentNode.addListener(this);
-	piano->getNode().addListener(this);
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
-	
+
+	pluginState->getCurrentPreset()->parentNode.addListener(this);
 	initNodeData();
+	piano->getNode().addListener(this);
 
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano.get());
@@ -59,13 +56,15 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	addMouseListener(this, true);
 
     setSize(1000, 250);
-	
+	setResizeLimits(640, 100, 10e4, 10e4);
+
 	startTimerHz(20);
 }
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
-	pluginState->presetCurrentNode.removeListener(this);
+	pluginState->getCurrentPreset()->parentNode.removeListener(this);
+	piano->getNode().removeListener(this);
 }
 
 //==============================================================================
@@ -101,34 +100,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
 	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::save_preset(const File& fileOut)
-{
-	std::unique_ptr<XmlElement> xml(pluginState->presetCurrentNode.createXml());
-	return xml->writeToFile(fileOut, "");
-}	
-
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset(const File& fileIn)
-{
-	ValueTree presetIn;
-
-	if (fileIn.exists())
-	{
-		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
-		presetIn = ValueTree::fromXml(*(xml.get()));
-		
-		if (presetIn.hasType(IDs::presetNode))
-		{
-			pluginState->presetCurrentNode.removeAllChildren(pluginState->getUndoManager());
-			pluginState->presetCurrentNode = presetIn;
-			pluginState->getCurrentMode()->restore_from_node(presetIn.getChildWithName(IDs::modePresetNode));
-		}
-
-		update_children_to_preset();
-	}
-
-	return presetIn.hasType(IDs::presetNode);
-}
-
 bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 {
 	ReaperWriter rpp = ReaperWriter(pluginState->getCurrentMode());
@@ -139,11 +110,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	Mode* modeCurrent = pluginState->getCurrentMode();
 
-	if (pluginState->presetCurrentNode.getChild(1).isValid())
-	{
-		piano->restoreDataNode(pluginState->presetCurrentNode.getChild(1));
-	}
-	if (!(bool)pluginState->presetCurrentNode[IDs::presetHasCustomColor])
+	if (pluginState->getCurrentPreset()->theKeyboardNode.isValid())
+		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
+	
+	if (!piano->getNode().getProperty(IDs::pianoHasCustomColor))
 		piano->resetKeyColors(true);
 
 	piano->applyMode(modeCurrent);
@@ -151,6 +121,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 	keyboardEditorBar->setModeReadoutText(modeCurrent->getStepsString());
 	keyboardEditorBar->setModeLibraryText(modeCurrent->getDescription());
     keyboardEditorBar->setOffsetReadout(modeCurrent->getOffset());
+	DBG("Children Updated");
 }
 
 //==============================================================================
@@ -339,16 +310,12 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 	{
 		if (piano->getUIMode() == UIMode::editMode)
 		{
-			piano->applyMode(pluginState->getCurrentMode());
 			piano->updatePianoNode();
-			
-			// Update Preset Node
-			pluginState->presetCurrentNode.removeChild(1, nullptr);
-			pluginState->presetCurrentNode.addChild(piano->getNode().createCopy(), 1, nullptr);
-			pluginState->presetCurrentNode.setProperty(IDs::presetHasCustomColor, true, nullptr);
+			pluginState->updateKeyboardSettingsPreset();
 
-			keyboardEditorBar->allowUserInput();
+			piano->applyMode(pluginState->getCurrentMode());
 			piano->setUIMode(UIMode::playMode);
+			keyboardEditorBar->allowUserInput();
 		}
 	}
 }
@@ -357,26 +324,22 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
-    if (treeWhosePropertyHasChanged.hasType(IDs::presetNode) && property == IDs::modeOffset)
-    {
-        piano->applyMode(pluginState->getCurrentMode());
-    }
+	// when piano mode goes from "Edit" to "Play", update current preset
+	if (treeWhosePropertyHasChanged.hasType(IDs::pianoNode) && property == IDs::pianoUIMode)
+	{
+		if (piano->getUIMode() == UIMode::playMode)
+		{
+			piano->updatePianoNode();
+			pluginState->updateKeyboardSettingsPreset();
+		}
+	}
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
 {
-	if (parentTree.hasType(IDs::presetNode))
-	{
-		if (childWhichHasBeenAdded.hasType(IDs::modePresetNode))
-		{
-			update_children_to_preset();
-
-			if (getWidth() > piano->getWidth())
-			{
-				//setSize(getWidth(), (piano->getWidth() / (pluginState->get_current_mode()->get_num_modal_notes() * (float)keyboardWindowNode[IDs::pianoWHRatio])));
-			}
-		}
-	}
+	// when mode is changed update components
+	if (parentTree.hasType(IDs::presetNode) && childWhichHasBeenAdded.hasType(IDs::modePresetNode))
+		update_children_to_preset();
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
@@ -471,13 +434,21 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 
 bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &info)
 {
+	bool written;
 	switch (info.commandID)
 	{
 	case IDs::CommandIDs::saveCustomLayout:
-		pluginState->getCurrentPreset()->writeToFile();
+		piano->updatePianoNode();
+		pluginState->updateKeyboardSettingsPreset();
+		written = pluginState->savePreset();
+		if (written)
+			DBG("file was saved");
+		else
+			DBG("not saved");
 		break;
 	case IDs::CommandIDs::loadCustomLayout:
-		pluginState->loadPreset();
+		if (pluginState->loadPreset())
+			update_children_to_preset();
 		break;
 	case IDs::CommandIDs::saveReaperMap:
 		write_reaper_file();

@@ -16,15 +16,16 @@ struct SvkPreset
 {
 	ValueTree parentNode;
 	ValueTree theModeNode;
-	ValueTree theKeyPlaceNode;
-	ValueTree theKeyRatiosNode;
-	ValueTree theKeyColorsNode;
+	ValueTree theKeyboardNode;
 
-	SvkPreset() {}
-	SvkPreset(ValueTree modeNodeIn, ValueTree pianoNodeIn);
+	SvkPreset();
+	SvkPreset(ValueTree modeNodeIn, ValueTree keyboardNodeIn);
 	SvkPreset(ValueTree presetNodeIn);
 	SvkPreset(SvkPreset& presetToCopy);
 	~SvkPreset();
+
+	bool updateModeNode(ValueTree modeNodeIn);
+	bool updateKeyboardNode(ValueTree keyboardNodeIn);
 
 	bool writeToFile(String absoluteFilePath="");
 	static SvkPreset loadFromFile(String absoluteFilePath="");

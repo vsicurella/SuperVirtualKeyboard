@@ -29,9 +29,6 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
         String keyName = "Key " + String(i);
         Key* key = new Key(keyName, i);
         addChildComponent(keys.add(key));
-
-		// Set default Midi Note Mappings
-		keyMidiNoteMappings.add(i);
     }
 	
 	keyColorsSingle.resize(keys.size());
@@ -42,6 +39,8 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCo
     
     setSize(1000, 250);
     setOpaque(true);
+
+	DBG("piano finished");
 }
 
 //===============================================================================================
@@ -55,7 +54,10 @@ void Keyboard::initiateDataNode()
 		pianoNode = ValueTree(IDs::pianoNode);
 		updatePianoNode();
 		pluginState->pianoNode = pianoNode;
-		pluginState->presetCurrentNode.addChild(pianoNode.createCopy(), 1, nullptr);
+
+		// Default Key Mappings
+		for (int i = 0; i < keys.size(); i++)
+			keyMidiNoteMappings.add(i);
 	}
 }
 
@@ -103,6 +105,7 @@ void Keyboard::updatePianoNode()
 	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 	pianoNode.setProperty(IDs::pianoMPEToggle, mpeOn, undo);
 	pianoNode.setProperty(IDs::pianoWHRatio, defaultKeyWHRatio, undo);
+	pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 
 	updateKeyProperties();
 }
@@ -261,11 +264,13 @@ void Keyboard::setUIMode(UIMode uiModeIn)
 		key->setColour(3, key->findColour(0));
 		key->activeState = uiModeSelected * 3;
 	}
+	pianoNode.setProperty(IDs::pianoUIMode, uiModeIn, nullptr);
 }
 
 void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
 {
 	keyPlacementSelected = placementIn;
+	pianoNode.setProperty(IDs::pianoKeyPlacementType, placementIn, nullptr);
 	applyMode(mode);
 }
 
@@ -341,7 +346,7 @@ void Keyboard::applyMode(Mode* modeIn)
 		key->step = mode->getStepsOfOrders()[i];
 		setKeyProportions(key);
 		
-		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keyMidiNoteMappings.size())];
+		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keys.size())];
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
@@ -398,6 +403,7 @@ void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useC
 
 	int keyNumOffset = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
 	keyColorsSingle.set(keyNumOffset, colorIn);
+	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
 }
 
 void Keyboard::setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
@@ -417,6 +423,8 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 		key->customColor = false; // reset key so that it changes no matter what
 		key->setColour(colorIndex, getKeyColor(key));
 	}
+
+	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
 }
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
@@ -437,6 +445,8 @@ void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colo
 			key->setColour(colorIndex, colorIn);
 		}
 	}
+
+	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
 }
 
 void Keyboard::resetKeyOrderColors(int orderIn, bool resetDegrees)
