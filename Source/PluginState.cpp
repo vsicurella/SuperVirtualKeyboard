@@ -72,7 +72,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		presetCurrent->updateModeNode(mode->modeNode);
+		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
 	}
 }
@@ -83,6 +84,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	{
 		modeCurrent = modeIn;
 		presets.set(0, modeCurrent, true);
+		modePresetNode = modeCurrent->modeNode;
 		presetCurrent->updateModeNode(modeIn->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
 	}

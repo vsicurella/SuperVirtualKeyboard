@@ -53,11 +53,13 @@ public:
     void initNodeData();
 	void updateNodeData();
 
-	bool save_preset(const File& fileOut);
-	bool load_preset(const File& fileIn);
-
 	void update_children_to_preset();
+	void beginColorEditing();
 
+	//===============================================================================================
+
+	bool save_preset();
+	bool load_preset();
 	bool write_reaper_file();
 
 	//===============================================================================================
