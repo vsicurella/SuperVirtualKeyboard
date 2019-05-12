@@ -115,6 +115,9 @@ namespace VirtualKeyboard
 
 		Colour getKeyDegreeColor(int degIn);
 
+		Colour getKeySingleColor(int keyIn);
+
+
 		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor = true);
 		
 		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor = true);
@@ -126,6 +129,8 @@ namespace VirtualKeyboard
 		void resetKeyOrderColors(int orderIn, bool resetDegrees = false);
 
 		void resetKeyDegreeColors(int tuningDegreeIn);
+
+		void resetKeySingleColor(int keyNumberIn);
 
 		void resetKeyColors(bool resetDegrees=false);
 
@@ -243,15 +248,15 @@ namespace VirtualKeyboard
         // Properties
         int keyWidth = 50;
         int keyHeight = 200;
-        float defaultKeyWHRatio = 0.25;
+        float defaultKeyWHRatio = 0.25f;
 
 		int lastKeyOver = 0;
 		int lastKeyClicked = 0;
+
+		int currentOffset = 0;
         
         float pianoWidth;
         float minWindowHeight;
-
-		double resolution = 10e5;
         
         // Locks
         bool rightMouseHeld = false;
