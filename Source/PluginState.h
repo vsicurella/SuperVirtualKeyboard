@@ -18,21 +18,19 @@ struct SuperVirtualKeyboardPluginState
 {
 	ValueTree pluginStateNode;
 	ValueTree modeLibraryNode;
-	ValueTree presetCurrentNode; // Always updated when some preset is selected
 	ValueTree keyboardWindowNode;
 	ValueTree pianoNode;
 
 	SuperVirtualKeyboardPluginState() :
 			pluginStateNode(IDs::pluginStateNode),
 			modeLibraryNode(IDs::modeLibraryNode),
-			presetCurrentNode(IDs::presetNode),
 			undoManager(new UndoManager()),
 			appCmdMgr(new ApplicationCommandManager())
 
 	{
 		createPresets();
 		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
-		pluginStateNode.addChild(presetCurrentNode, 1, nullptr);
+		presetCurrent.reset(new SvkPreset());
 	}
 
 	~SuperVirtualKeyboardPluginState() {}
@@ -51,8 +49,10 @@ struct SuperVirtualKeyboardPluginState
 
 	void setCurrentMode(int presetIndexIn);
 	void setCurrentMode(Mode* modeIn);
+	void updateModeOffset(int offsetIn);
+	void updateKeyboardSettingsPreset();
 
-	void set_current_key_settings(ValueTree pianoNodeIn);
+	bool savePreset();
 	bool loadPreset();
 
 	//==============================================================================

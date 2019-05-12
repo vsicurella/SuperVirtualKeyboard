@@ -166,7 +166,7 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 		{
 			String newModeName;
 			// Preset is a user preset
-			if ((int)pluginState->presetCurrentNode.getProperty(IDs::libraryIndexOfMode) == 0)
+			if ((int)pluginState->getCurrentPreset()->parentNode.getProperty(IDs::libraryIndexOfMode) == 0)
 			{
 				pluginState->getCurrentMode()->setFamily(comboBoxThatHasChanged->getText());
 			}
@@ -190,8 +190,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-        pluginState->getCurrentMode()->setOffset((int) offsetSld->getValue());
-        pluginState->presetCurrentNode.setProperty(IDs::modeOffset, (int) offsetSld->getValue(), pluginState->getUndoManager());
+		pluginState->updateModeOffset((int)offsetSld->getValue());
         //[/UserSliderCode_offsetSld]
     }
 

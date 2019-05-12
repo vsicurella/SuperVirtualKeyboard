@@ -92,6 +92,7 @@ void Mode::init_node()
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
 	modeNode.setProperty(IDs::modeOffset, -offset, nullptr);
+	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
 }
 
 void Mode::restore_from_node(ValueTree nodeIn)

@@ -24,7 +24,7 @@ namespace IDs
 	static Identifier keyRatioPresetNode("KeyRatios");
 	static Identifier keyColorPresetNode("KeyColors");
 	static Identifier libraryIndexOfMode("IndexOfMode");
-	static Identifier presetHasCustomColor("PresetHasCustomColor");
+	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
@@ -34,6 +34,7 @@ namespace IDs
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
     static Identifier modeName("ModeName");
+	static Identifier factoryPreset("FactoryPreset");
 
 	// Keyboard Window
 	static Identifier keyboardWindowNode("KeyboardWindow");

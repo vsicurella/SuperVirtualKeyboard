@@ -10,27 +10,29 @@
 
 #include "Preset.h"
 
-SvkPreset::SvkPreset(ValueTree modeNodeIn, ValueTree pianoNodeIn)
+SvkPreset::SvkPreset()
 {
 	parentNode = ValueTree(IDs::presetNode);
+	theModeNode = ValueTree(IDs::modePresetNode);
+	parentNode.addChild(theModeNode, 0, nullptr);
+}
+
+SvkPreset::SvkPreset(ValueTree modeNodeIn, ValueTree keyboardNodeIn)
+{
+	parentNode = ValueTree(IDs::presetNode);
+	theModeNode = ValueTree(IDs::modePresetNode);
+	theKeyboardNode = ValueTree(IDs::pianoNode);
+
 	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
-	theKeyPlaceNode = parentNode.getChildWithName(IDs::keyPlacePresetNode);
-	theKeyRatiosNode = parentNode.getChildWithName(IDs::keyRatioPresetNode);
-	theKeyColorsNode = parentNode.getChildWithName(IDs::keyColorPresetNode);
+	theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
 
 	parentNode.addChild(theModeNode, 0, nullptr);
-	parentNode.addChild(theKeyPlaceNode, 1, nullptr);
-	parentNode.addChild(theKeyRatiosNode, 2, nullptr);
-	parentNode.addChild(theKeyColorsNode, 3, nullptr);
+	parentNode.addChild(theKeyboardNode, 1, nullptr);
 }
 
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
-	parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
-	theModeNode = parentNode.getChildWithName(IDs::modePresetNode);
-	theKeyPlaceNode = parentNode.getChildWithName(IDs::keyPlacePresetNode);
-	theKeyRatiosNode = parentNode.getChildWithName(IDs::keyRatioPresetNode);
-	theKeyColorsNode = parentNode.getChildWithName(IDs::keyColorPresetNode);
+	SvkPreset(presetNodeIn.getChild(0), presetNodeIn.getChild(1));
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
@@ -39,6 +41,35 @@ SvkPreset::SvkPreset(SvkPreset& presetToCopy)
 }
 
 SvkPreset::~SvkPreset() {}
+
+bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
+{
+	parentNode.removeChild(0, nullptr);
+
+	// don't allow editing
+	if (modeNodeIn.getProperty(IDs::factoryPreset))
+		theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+	// allow editing
+	else
+		theModeNode = modeNodeIn;
+
+	parentNode.addChild(theModeNode, 0, nullptr);
+
+	return theModeNode.isValid();
+}
+
+bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
+{
+	if (!theKeyboardNode.isValid())
+	{
+		theKeyboardNode = ValueTree(IDs::pianoNode);
+		parentNode.addChild(theKeyboardNode, 1, nullptr);
+	}
+
+	theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
+	
+	return theKeyboardNode.isValid();
+}
 
 bool SvkPreset::writeToFile(String absoluteFilePath)
 {
@@ -54,8 +85,15 @@ bool SvkPreset::writeToFile(String absoluteFilePath)
 		fileOut = chooser.getResult();
 	}
 
-	std::unique_ptr<XmlElement> xml(parentNode.createXml());
-	return xml->writeToFile(fileOut, "");
+	DBG(parentNode.toXmlString());
+
+	if (fileOut.getParentDirectory().exists())
+	{
+		std::unique_ptr<XmlElement> xml(parentNode.createXml());
+		return xml->writeToFile(fileOut, "");
+	}
+
+	return false;
 }
 
 SvkPreset SvkPreset::loadFromFile(String absoluteFilePath)
@@ -73,12 +111,15 @@ SvkPreset SvkPreset::loadFromFile(String absoluteFilePath)
 		fileIn = chooser.getResult();
 	}
 
-	std::unique_ptr<XmlElement> xml = parseXML(fileIn);
-	nodeIn = ValueTree::fromXml(*(xml.get()));
-
-	if (nodeIn.hasType(IDs::presetNode))
+	if (fileIn.exists())
 	{
-		return SvkPreset(nodeIn);
+		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
+		nodeIn = ValueTree::fromXml(*(xml.get()));
+
+		if (nodeIn.hasType(IDs::presetNode))
+		{
+			return SvkPreset(nodeIn.getChild(0), nodeIn.getChild(1));
+		}
 	}
 	
 	return SvkPreset(ValueTree());
