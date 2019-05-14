@@ -91,10 +91,11 @@ bool SvkPreset::writeToFile(String absoluteFilePath)
 	return false;
 }
 
-SvkPreset SvkPreset::loadFromFile(String absoluteFilePath)
+SvkPreset* SvkPreset::loadFromFile(String absoluteFilePath)
 {
 	ValueTree nodeIn;
 	File fileIn = File(absoluteFilePath);
+    SvkPreset* presetOut;
 
 	if (!fileIn.exists())
 	{
@@ -113,11 +114,11 @@ SvkPreset SvkPreset::loadFromFile(String absoluteFilePath)
 
 		if (nodeIn.hasType(IDs::presetNode))
 		{
-			return SvkPreset(nodeIn.getChild(0), nodeIn.getChild(1));
+			presetOut = new SvkPreset(nodeIn.getChild(0), nodeIn.getChild(1));
 		}
 	}
-	
-	return SvkPreset(ValueTree());
+    
+    return presetOut;
 }
 
 String SvkPreset::toString()

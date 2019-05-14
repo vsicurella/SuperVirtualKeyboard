@@ -10,7 +10,7 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "Structures\Mode.h"
+#include "Structures/Mode.h"
 
 struct ModeScaleSorter
 {

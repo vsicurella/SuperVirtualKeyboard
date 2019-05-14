@@ -8,9 +8,10 @@
   ==============================================================================
 */
 
+#pragma once
+
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginIDs.h"
-#pragma once
 
 struct SvkPreset
 {
@@ -28,7 +29,9 @@ struct SvkPreset
 	bool updateKeyboardNode(ValueTree keyboardNodeIn);
 
 	bool writeToFile(String absoluteFilePath="");
-	static SvkPreset loadFromFile(String absoluteFilePath="");
+    
+    // make sure this is deleted when not needed
+	static SvkPreset* loadFromFile(String absoluteFilePath="");
    
 	String toString();	
 };

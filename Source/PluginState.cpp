@@ -79,9 +79,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
 
-		pluginStateNode.removeChild(1, nullptr);
 		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
-		pluginStateNode.addChild(modePresetNode, 1, nullptr);
+        sendChangeMessage();
 	}
 }
 
@@ -98,9 +97,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
 
-		pluginStateNode.removeChild(1, nullptr);
 		modePresetNode = modeCurrent->modeNode;
-		pluginStateNode.addChild(modePresetNode, 1, nullptr);
+        sendChangeMessage();
 	}
 }
 
@@ -128,11 +126,11 @@ bool SuperVirtualKeyboardPluginState::savePreset()
 
 bool SuperVirtualKeyboardPluginState::loadPreset()
 {
-	SvkPreset newPreset;
-
-	if (newPreset.parentNode.isValid())
+    std::unique_ptr<SvkPreset> newPreset(SvkPreset::loadFromFile());
+    
+	if (newPreset.get())
 	{
-		presetCurrent.reset(new SvkPreset(SvkPreset::loadFromFile()));
+        presetCurrent.swap(newPreset);
 		modeCurrent->restore_from_node(presetCurrent->theModeNode);
 		modePresetNode = modeCurrent->modeNode;
 		return true;
@@ -140,7 +138,6 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 	return false;
 }
-
 
 //==============================================================================
 

@@ -14,7 +14,7 @@
 #include "Structures/Preset.h"
 #include "CommonFunctions.h"
 
-struct SuperVirtualKeyboardPluginState
+struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 {
 	ValueTree pluginStateNode;
 	ValueTree modeLibraryNode;
@@ -32,7 +32,6 @@ struct SuperVirtualKeyboardPluginState
 	{
 		createPresets();
 		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
-		pluginStateNode.addChild(modePresetNode, 1, nullptr);
 		presetCurrent.reset(new SvkPreset());
 	}
 
@@ -57,7 +56,7 @@ struct SuperVirtualKeyboardPluginState
 
 	bool savePreset();
 	bool loadPreset();
-
+    
 	//==============================================================================
 	
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
