@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "UI/PluginEditor.h"
 #include "PluginState.h"
+#include "Structures/MidiRemapper.h"
 
 //==============================================================================
 /**
@@ -72,6 +73,9 @@ public:
 private:
 
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
+    
+    MidiRemapper midiInputFilter;
+    MidiRemapper midiOutputFilter;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;
