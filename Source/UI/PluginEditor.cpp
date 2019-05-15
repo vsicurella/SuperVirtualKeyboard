@@ -45,6 +45,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
 
+    pluginState->addChangeListener(this);
 	pluginState->pluginStateNode.addListener(this);
 	initNodeData();
 
@@ -339,9 +340,16 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	Component* changeSource = dynamic_cast<Component*>(source);
+	//Component* changeSource = dynamic_cast<Component*>(source);
 
-	if (changeSource->getName() == "Color Chooser")
+    if (source == pluginState)
+    {
+        piano->resetKeyColors(true);
+        piano->updatePianoNode();
+        update_children_to_preset();
+    }
+    
+	if (source == colorChooserWindow.get())
 	{
 		if (piano->getUIMode() == UIMode::editMode)
 		{
@@ -368,12 +376,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTre
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
 {
-	// The Mode has been changed
-	if (parentTree.hasType(IDs::pluginStateNode) && childWhichHasBeenAdded.hasType(IDs::modePresetNode))
-	{	
-		piano->resetKeyColors(true);
-		update_children_to_preset();
-	}
+
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)

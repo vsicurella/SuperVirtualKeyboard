@@ -79,9 +79,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
 
-		pluginStateNode.removeChild(1, nullptr);
 		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
-		pluginStateNode.addChild(modePresetNode, 1, nullptr);
+        sendChangeMessage();
 	}
 }
 
@@ -98,9 +97,8 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 		presetCurrent->updateModeNode(modeCurrent->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
 
-		pluginStateNode.removeChild(1, nullptr);
 		modePresetNode = modeCurrent->modeNode;
-		pluginStateNode.addChild(modePresetNode, 1, nullptr);
+        sendChangeMessage();
 	}
 }
 
@@ -121,18 +119,18 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
-	presetCurrent->theModeNode.copyPropertiesAndChildrenFrom(modePresetNode, nullptr);
+	presetCurrent->theModeNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
 	return presetCurrent->writeToFile();
 }
 
 
 bool SuperVirtualKeyboardPluginState::loadPreset()
 {
-	SvkPreset newPreset;
-
-	if (newPreset.parentNode.isValid())
+    std::unique_ptr<SvkPreset> newPreset(SvkPreset::loadFromFile());
+    
+	if (newPreset.get())
 	{
-		presetCurrent.reset(new SvkPreset(SvkPreset::loadFromFile()));
+        presetCurrent.swap(newPreset);
 		modeCurrent->restore_from_node(presetCurrent->theModeNode);
 		modePresetNode = modeCurrent->modeNode;
 		return true;
@@ -140,7 +138,6 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 	return false;
 }
-
 
 //==============================================================================
 
@@ -162,13 +159,15 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	presets.add(new Mode(Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog"));
 	presets.add(new Mode(Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium"));
 	presets.add(new Mode(Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood"));
+    presets.add(new Mode(Array<int>({ 3, 3, 1, 3, 1, 3, 1 }), "Hanson"));
 	presets.add(new Mode(Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone"));
 	presets.add(new Mode(Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine"));
 	presets.add(new Mode(Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone"));
+    presets.add(new Mode(Array<int>({ 1, 4, 1, 4, 1, 4, 1 }), "Magic"));
 	presets.add(new Mode(Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo"));
 	presets.add(new Mode(Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila"));
 	presets.add(new Mode(Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba"));
-	presets.add(new Mode(Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Meantone"));
+	presets.add(new Mode(Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Superpyth"));
 	presets.add(new Mode(Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic"));
 	presets.add(new Mode(Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic"));
 	presets.add(new Mode(Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine"));
@@ -177,6 +176,7 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	presets.add(new Mode(Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone"));
 	presets.add(new Mode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun"));
 	presets.add(new Mode(Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri"));
+    presets.add(new Mode(Array<int>({ 4, 1, 4, 1, 4, 1, 4 }), "Hanson"));
 	presets.add(new Mode(Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila"));
 	presets.add(new Mode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood"));
 	presets.add(new Mode(Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle"));
@@ -193,8 +193,22 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	presets.add(new Mode(Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone"));
 	presets.add(new Mode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone"));
 	presets.add(new Mode(Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }), "Injera"));
+    presets.add(new Mode(Array<int>({ 5, 5, 1, 5, 5, 5, 1 }), "Superpyth"));
+    presets.add(new Mode(Array<int>({ 4, 4, 4, 4, 4, 4, 7}), "Nusecond"));
 	presets.add(new Mode(Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone"));
-	presets.add(new Mode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3, }), "Orwell"));
+    presets.add(new Mode(Array<int>({ 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2 }), "Meantone"));
+	presets.add(new Mode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3}), "Orwell"));
+    presets.add(new Mode(Array<int>({ 6, 6, 6, 6, 7}), "Mothra"));
+    presets.add(new Mode(Array<int>({ 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 1}), "Mothra"));
+    presets.add(new Mode(Array<int>({ 5, 4, 5, 4, 5, 4, 4}), "Mohajira"));
+    presets.add(new Mode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1}), "Miracle"));
+    presets.add(new Mode(Array<int>({ 7, 7, 3, 7, 7, 7, 3 }), "Schismatic"));
+    presets.add(new Mode(Array<int>({ 4, 3, 4, 3, 3, 4, 3, 4, 3, 4, 3, 3}), "Schismatic"));
+    presets.add(new Mode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3 }), "Miracle"));
+    presets.add(new Mode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1}), "Magic"));
+    presets.add(new Mode(Array<int>({ 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 5}), "Hanson"));
+    presets.add(new Mode(Array<int>({ 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3}), "Tricot"));
+    presets.add(new Mode(Array<int>({ 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 7 }), "Sqrtphi"));
 	presets.add(new Mode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }), "BP Lambda"));
 	presets.add(new Mode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II"));
 

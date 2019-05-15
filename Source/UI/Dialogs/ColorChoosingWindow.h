@@ -33,8 +33,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
 
-
-
 private:
 
 	std::unique_ptr<ColourSelector> colorChooser;
