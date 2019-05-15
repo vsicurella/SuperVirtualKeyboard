@@ -44,12 +44,14 @@ SvkPreset::~SvkPreset() {}
 
 bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
 {
-	parentNode.removeChild(0, nullptr);
-
+	if (!theModeNode.isValid())
+    {
+        theModeNode = ValueTree(IDs::modePresetNode);
+        parentNode.addChild(theModeNode, 0, nullptr);
+    }
+    
 	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
-
-	parentNode.addChild(theModeNode, 0, nullptr);
-
+    
 	return theModeNode.isValid();
 }
 
