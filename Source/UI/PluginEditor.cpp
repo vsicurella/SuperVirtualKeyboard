@@ -345,6 +345,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
     if (source == pluginState)
     {
         piano->resetKeyColors(true);
+        piano->updatePianoNode();
         update_children_to_preset();
     }
     

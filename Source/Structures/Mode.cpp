@@ -132,14 +132,12 @@ String Mode::setFamily(String nameIn)
 void Mode::setOffset(int offsetIn)
 {
 	offset = -offsetIn;
-	
+    modeNode.setProperty(IDs::modeOffset, offsetIn, nullptr);
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
 	scaleDegrees = scale_degrees(scaleSize, offset);
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
-
-	modeNode.setProperty(IDs::modeOffset, offsetIn, nullptr);
 }
 
 int Mode::getOffset()
