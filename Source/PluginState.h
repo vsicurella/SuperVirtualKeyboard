@@ -12,6 +12,7 @@
 #include "JuceHeader.h"
 #include "PluginIDs.h"
 #include "Structures/Preset.h"
+#include "Structures/MidiRemapper.h"
 #include "CommonFunctions.h"
 
 struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
@@ -46,6 +47,9 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
 	Mode* getCurrentMode();
+    
+    MidiRemapper midiInputFilter;
+    MidiRemapper midiOutputFilter;
 
 	int is_mode_in_presets(String stepsStringIn);
 

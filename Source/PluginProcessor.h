@@ -73,9 +73,6 @@ public:
 private:
 
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
-    
-    MidiRemapper midiInputFilter;
-    MidiRemapper midiOutputFilter;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* externalKeyboardState;

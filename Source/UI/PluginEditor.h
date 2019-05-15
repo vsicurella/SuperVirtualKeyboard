@@ -28,7 +28,6 @@ using namespace VirtualKeyboard;
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
 													private ValueTree::Listener,
-													private FilenameComponentListener,
 													private ChangeListener,
 													private MidiInputCallback,
 													private Timer
@@ -89,8 +88,6 @@ public:
 	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
 
 	 //==============================================================================
-
-	 void filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged) override;
 
 	 File fileDialog(String message, bool forSaving);
 
