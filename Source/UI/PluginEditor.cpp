@@ -340,8 +340,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	//Component* changeSource = dynamic_cast<Component*>(source);
-
     if (source == pluginState)
     {
         piano->resetKeyColors(true);

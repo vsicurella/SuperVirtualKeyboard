@@ -56,7 +56,7 @@ void Keyboard::initiateDataNode()
 		pluginState->pianoNode = pianoNode;
 
 		// Initialize default values
-		for (int i = 0; i < keys.size(); i++)
+		for (int i = 0; i < 128; i++)
 			keyMidiNoteMappings.add(i);
 
 		pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
@@ -70,43 +70,59 @@ void Keyboard::initiateDataNode()
 
 void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 {
-    pianoNode = pianoNodeIn;
-    
-    orientationSelected = pianoNode[IDs::pianoOrientation];
-    keyPlacementSelected = pianoNode[IDs::pianoKeyPlacementType];
-	lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
-    midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
-    mpeOn = pianoNode[IDs::pianoMPEToggle];
-    defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
+	if (pianoNode.hasType(IDs::pianoNode))
+	{
+		pianoNode = pianoNodeIn;
 
-	keyMidiNoteMappings.clear();
-	get_array_from_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings);
+		orientationSelected = pianoNode[IDs::pianoOrientation];
+		keyPlacementSelected = pianoNode[IDs::pianoKeyPlacementType];
+		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
+		midiChannelSelected = pianoNode[IDs::pianoMidiChannel];
+		mpeOn = pianoNode[IDs::pianoMPEToggle];
+		defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
 
-	keyColorsOrder.clear();
-	get_array_from_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder);
-	keyColorsDegree.clear();
-	get_array_from_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree);
-	keyColorsSingle.clear();
-	get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorDefault);
+		if (pianoNode.getChildWithName(IDs::pianoKeyMidiNoteMappings).isValid())
+		{
+			keyMidiNoteMappings.clear();
+			get_array_from_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings);
+		}
 
-	keyPlacesOrder.clear();
-	get_array_from_node(pianoNode, keyPlacesOrder, IDs::pianoKeyPlaceOrder);
-	keyPlacesDegree.clear();
-	get_array_from_node(pianoNode, keyPlacesDegree, IDs::pianoKeyPlaceDegree);
-	keyPlacesSingle.clear();
-	get_array_from_node(pianoNode, keyPlacesSingle, IDs::pianoKeyPlaceSingle);
+		if (pianoNode.getChildWithName(IDs::pianoKeyColorsOrder).isValid())
+		{
+			keyColorsOrder.clear();
+			get_array_from_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder);
+		}
 
-	keyRatiosOrder.clear();
-	get_array_from_node(pianoNode, keyRatiosOrder, IDs::pianoKeyRatioOrder);
-	keyRatiosDegree.clear();
-	get_array_from_node(pianoNode, keyRatiosDegree, IDs::pianoKeyRatioDegree);
-	keyRatiosSingle.clear();
-	get_array_from_node(pianoNode, keyRatiosSingle, IDs::pianoKeyRatioSingle);
+		if (pianoNode.getChildWithName(IDs::pianoKeyColorsDegree).isValid())
+		{
+			keyColorsDegree.clear();
+			get_array_from_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree);
+		}
+
+		if (pianoNode.getChildWithName(IDs::pianoKeyColorDefault).isValid())
+		{
+			keyColorsSingle.clear();
+			get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorDefault);
+		}
+
+		keyPlacesOrder.clear();
+		get_array_from_node(pianoNode, keyPlacesOrder, IDs::pianoKeyPlaceOrder);
+		keyPlacesDegree.clear();
+		get_array_from_node(pianoNode, keyPlacesDegree, IDs::pianoKeyPlaceDegree);
+		keyPlacesSingle.clear();
+		get_array_from_node(pianoNode, keyPlacesSingle, IDs::pianoKeyPlaceSingle);
+
+		keyRatiosOrder.clear();
+		get_array_from_node(pianoNode, keyRatiosOrder, IDs::pianoKeyRatioOrder);
+		keyRatiosDegree.clear();
+		get_array_from_node(pianoNode, keyRatiosDegree, IDs::pianoKeyRatioDegree);
+		keyRatiosSingle.clear();
+		get_array_from_node(pianoNode, keyRatiosSingle, IDs::pianoKeyRatioSingle);
+	}
 }
 
 void Keyboard::updatePianoNode()
 {
-
 	updateKeyProperties();
 }
 
@@ -347,7 +363,7 @@ void Keyboard::applyMode(Mode* modeIn)
 		key->step = mode->getStepsOfOrders()[i];
 		setKeyProportions(key);
 		
-		key->mappedMIDInote = keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keys.size())];
+		key->mappedMIDInote = i;// keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keys.size())];
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
