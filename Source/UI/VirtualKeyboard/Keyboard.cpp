@@ -15,13 +15,12 @@
 
 using namespace VirtualKeyboard;
 
-Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* cmdMgrIn)
+Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn)
 {
     removeMouseListener(this);
     
     pluginState = pluginStateIn;
     undo = pluginState->getUndoManager();
-    appCmdMgr = cmdMgrIn;
     
     // Create children (piano keys)
     for (int i = 0; i < 128; i++)

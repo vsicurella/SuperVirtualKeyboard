@@ -5,6 +5,10 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
+    <FILE id="QraZo4" name="MidiInputFilter.cpp" compile="1" resource="0"
+          file="Source/MidiInputFilter.cpp"/>
+    <FILE id="fl32q7" name="MidiInputFilter.h" compile="0" resource="0"
+          file="Source/MidiInputFilter.h"/>
     <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
       <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
             file="Source/File IO/ReaperWriter.cpp"/>

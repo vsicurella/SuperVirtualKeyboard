@@ -26,7 +26,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	keyboardEditorBar.get()->setSize(640, 48);
 	addAndMakeVisible(keyboardEditorBar.get());
     
-	piano.reset(new Keyboard(pluginState, appCmdMgr));
+	piano.reset(new Keyboard(pluginState));
 	piano.get()->setName("The Piano");
 
 	view.reset(new Viewport("Piano Viewport"));
@@ -36,9 +36,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	processor.set_midi_input_state(&externalMidi);
 	externalMidi.addListener(piano.get());
-
-	openFileBox.reset(new FilenameComponent("OpenFile", {}, false, false, false, ".svk", "", "Load preset..."));
-	saveFileBox.reset(new FilenameComponent("SaveFile", {}, true, false, true, ".svk", "", "Load preset..."));
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
@@ -394,19 +391,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree&
 
 //==============================================================================
 
-
-void SuperVirtualKeyboardAudioProcessorEditor::filenameComponentChanged(FilenameComponent* fileComponentThatHasChanged)
-{
-	if (fileComponentThatHasChanged == openFileBox.get())
-	{
-		
-	}
-
-	if (fileComponentThatHasChanged == saveFileBox.get())
-	{
-
-	}
-}
 
 File SuperVirtualKeyboardAudioProcessorEditor::fileDialog(String message, bool forSaving)
 {

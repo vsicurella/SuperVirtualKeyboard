@@ -114,9 +114,6 @@ private:
     ValueTree keyboardWindowNode;
 
 	ApplicationCommandManager* appCmdMgr;
-
-	std::unique_ptr<FilenameComponent> openFileBox;
-	std::unique_ptr<FilenameComponent> saveFileBox;
 	
 	std::unique_ptr<Viewport> view;
 	std::unique_ptr<Keyboard> piano;
