@@ -25,6 +25,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
 {
+    midiStateInput = pluginState->midiStateIn.get();
+    midiStateOutput = pluginState->midiStateOut.get();
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -102,11 +104,6 @@ MidiBuffer* SuperVirtualKeyboardAudioProcessor::get_midi_buffer()
 	return &midiBuffer;
 }
 
-void SuperVirtualKeyboardAudioProcessor::set_midi_input_state(MidiKeyboardState* stateIn)
-{
-	externalKeyboardState = stateIn;
-}
-
 //==============================================================================
 void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
@@ -147,23 +144,19 @@ bool SuperVirtualKeyboardAudioProcessor::isBusesLayoutSupported (const BusesLayo
 void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 
-	if (externalKeyboardState)
-	{
-		auto midiEvent = MidiBuffer::Iterator(midiMessages);
-		MidiMessage msg;
-		int smpl;
+    auto midiEvent = MidiBuffer::Iterator(midiMessages);
+    MidiMessage msg;
+    int smpl;
 
-		while (midiEvent.getNextEvent(msg, smpl))
-		{
-			externalKeyboardState->processNextMidiEvent(msg);
-		}
-	}
+    while (midiEvent.getNextEvent(msg, smpl))
+    {
+        midiStateInput->processNextMidiEvent(msg);
+    }
 
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data
     for (auto i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
 
 	midiMessages.addEvents(midiBuffer, 0, -1, 0);
 	midiBuffer.clear();
