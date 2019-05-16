@@ -48,10 +48,10 @@ void Keyboard::initiateDataNode()
 {
 	if (pluginState->pianoNode.isValid())
 		restoreDataNode(pluginState->pianoNode);
-	else
+    
+	if (!pianoNode.isValid())
 	{
 		pianoNode = ValueTree(IDs::pianoNode);
-		updatePianoNode();
 		pluginState->pianoNode = pianoNode;
 
 		// Initialize default values
@@ -64,12 +64,14 @@ void Keyboard::initiateDataNode()
 		pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
 		pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
 		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+        
+        updatePianoNode();
 	}
 }
 
 void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 {
-	if (pianoNode.hasType(IDs::pianoNode))
+	if (pianoNodeIn.hasType(IDs::pianoNode))
 	{
 		pianoNode = pianoNodeIn;
 
