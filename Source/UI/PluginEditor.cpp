@@ -60,6 +60,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
+    pluginState->removeChangeListener(this);
 	pluginState->pluginStateNode.removeListener(this);
 }
 
