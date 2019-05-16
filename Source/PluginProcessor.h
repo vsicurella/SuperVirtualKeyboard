@@ -57,7 +57,6 @@ public:
 	//==============================================================================
 
 	MidiBuffer* get_midi_buffer();
-	void set_midi_input_state(MidiKeyboardState* stateIn);
 
     //==============================================================================
 
@@ -75,7 +74,8 @@ private:
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
 
 	MidiBuffer midiBuffer;
-	MidiKeyboardState* externalKeyboardState;
+	MidiKeyboardState* midiStateInput;
+    MidiKeyboardState* midiStateOutput;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

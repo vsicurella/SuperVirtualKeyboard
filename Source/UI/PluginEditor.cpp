@@ -33,9 +33,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano.get());
 	view.get()->setTopLeftPosition(1, 49);
-
-	processor.set_midi_input_state(&externalMidi);
-	externalMidi.addListener(piano.get());
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);

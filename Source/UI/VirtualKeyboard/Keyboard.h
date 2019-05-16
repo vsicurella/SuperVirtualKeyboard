@@ -72,8 +72,6 @@ namespace VirtualKeyboard
         
         //===============================================================================================
         
-        MidiKeyboardState* getMidiKeyboardState();
-
 		Key* getKey(int keyNumIn);
 
 		Array<Key*>* getKeysByOrder(int orderIn);
@@ -202,7 +200,7 @@ namespace VirtualKeyboard
         
 		// Functionality
         std::unique_ptr<KeyboardGrid> grid;
-        MidiKeyboardState keyboardState;
+        MidiKeyboardState* keyboardState;
         MidiBuffer buffer;
 		Array<Key*> keysPause;
 

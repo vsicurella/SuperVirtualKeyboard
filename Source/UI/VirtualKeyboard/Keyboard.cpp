@@ -21,6 +21,8 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn)
     
     pluginState = pluginStateIn;
     undo = pluginState->getUndoManager();
+    keyboardState = pluginState->midiStateOut.get();
+    pluginState->midiStateIn->addListener(this);
     
     // Create children (piano keys)
     for (int i = 0; i < 128; i++)
@@ -164,11 +166,6 @@ ValueTree Keyboard::getNode()
 }
 
 //===============================================================================================
-
-MidiKeyboardState* Keyboard::getMidiKeyboardState()
-{
-    return &keyboardState;
-}
 
 Key* Keyboard::getKey(int keyNumIn)
 {
@@ -951,7 +948,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 {
     if (velocityIn > 0)
     {
-        keyboardState.noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
+        keyboardState->noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
 		key->activeState = 2;
 		key->velocity = velocityIn;
         keysOn.add(key);
@@ -960,7 +957,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 
 void Keyboard::triggerKeyNoteOff(Key* key)
 {
-    keyboardState.noteOff(midiChannelSelected, key->mappedMIDInote, 0);
+    keyboardState->noteOff(midiChannelSelected, key->mappedMIDInote, 0);
 
 	if (key->isMouseOver())
 		key->activeState = 1;
