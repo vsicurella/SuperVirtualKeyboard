@@ -15,7 +15,7 @@ using namespace VirtualKeyboard;
 
 //==============================================================================
 SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p, ApplicationCommandManager* cmdMgr)
-	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.get_plugin_state())
+	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.getPluginState())
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
@@ -27,7 +27,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	addAndMakeVisible(keyboardEditorBar.get());
     
 	piano.reset(new Keyboard(pluginState));
-	piano.get()->setName("The Piano");
+	piano->setName("The Piano");
+	piano->addListener(&processor);
 
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
@@ -59,6 +60,7 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 {
     pluginState->removeChangeListener(this);
 	pluginState->pluginStateNode.removeListener(this);
+	piano->removeListener(&processor);
 }
 
 //==============================================================================
@@ -158,7 +160,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 
 void SuperVirtualKeyboardAudioProcessorEditor::paint(Graphics& g)
 {
-	
+	g.fillAll(Colours::darkgrey);
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::resized()
@@ -184,15 +186,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 
 void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 {
-	piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
-		*processor.get_midi_buffer(), 0, 4096, true);
+	//piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
+	//	*processor.get_midi_buffer(), 0, 4096, true);
 
-	piano.get()->repaint();
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
-{
-	externalMidi.processNextMidiEvent(message);
+	//piano.get()->repaint();
 }
 
 //==============================================================================

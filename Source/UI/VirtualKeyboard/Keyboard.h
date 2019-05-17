@@ -49,6 +49,7 @@ namespace VirtualKeyboard
     class Keyboard :
         public Component,
         public ApplicationCommandTarget,
+		public MidiKeyboardState,
         public MidiKeyboardStateListener // Only for displaying external MIDI input
     {
         

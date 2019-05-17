@@ -24,9 +24,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        ),
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
-{
+{	
     midiStateInput = pluginState->midiStateIn.get();
-    midiStateOutput = pluginState->midiStateOut.get();
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -109,6 +108,7 @@ void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int s
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+	MidiMessageCollector::reset(sampleRate);
 }
 
 void SuperVirtualKeyboardAudioProcessor::releaseResources()
@@ -143,14 +143,16 @@ bool SuperVirtualKeyboardAudioProcessor::isBusesLayoutSupported (const BusesLayo
 
 void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-
+	// Input filtering
     auto midiEvent = MidiBuffer::Iterator(midiMessages);
     MidiMessage msg;
     int smpl;
 
     while (midiEvent.getNextEvent(msg, smpl))
     {
+		msg.setNoteNumber(pluginState->midiInputFilter.getNote(msg.getNoteNumber()));
         midiStateInput->processNextMidiEvent(msg);
+		addMessageToQueue(msg);
     }
 
     // In case we have more outputs than inputs, this code clears any output
@@ -158,7 +160,17 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
     for (auto i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-	midiMessages.addEvents(midiBuffer, 0, -1, 0);
+	// Midi Output filtering
+	midiMessages.clear();
+	removeNextBlockOfMessages(midiBuffer, 4096);
+	auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
+	
+	while (midiEventOut.getNextEvent(msg, smpl))
+	{
+		msg.setNoteNumber(pluginState->midiOutputFilter.getNote(msg.getNoteNumber()));
+		midiMessages.addEvent(msg, smpl);
+	}
+
 	midiBuffer.clear();
 }
 
@@ -180,9 +192,9 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
 	
-	MemoryOutputStream memOut;
+	MemoryOutputStream memOut(destData, true);
 	pluginState->pluginStateNode.writeToStream(memOut);
-	destData.append(memOut.getData(), memOut.getDataSize());
+	//destData.append(memOut.getData(), memOut.getDataSize());
 }
 
 void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -196,7 +208,7 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 
 //==============================================================================
 
-SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin_state()
+SuperVirtualKeyboardPluginState* SuperVirtualKeyboardAudioProcessor::getPluginState()
 {
 	return pluginState.get();
 }
@@ -206,4 +218,16 @@ SuperVirtualKeyboardPluginState * SuperVirtualKeyboardAudioProcessor::get_plugin
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new SuperVirtualKeyboardAudioProcessor();
+}
+
+//==============================================================================
+
+void SuperVirtualKeyboardAudioProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
+{
+	addMessageToQueue(MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity));
+}
+
+void SuperVirtualKeyboardAudioProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
+{
+	addMessageToQueue(MidiMessage::noteOff(midiChannel, midiNoteNumber, velocity));
 }

@@ -18,7 +18,8 @@
 //==============================================================================
 /**
 */
-class SuperVirtualKeyboardAudioProcessor  : public AudioProcessor
+class SuperVirtualKeyboardAudioProcessor  : public AudioProcessor,
+											public MidiMessageCollector
 {
 public:
     //==============================================================================
@@ -65,17 +66,23 @@ public:
 
 	//==============================================================================
 
-	SuperVirtualKeyboardPluginState* get_plugin_state();
+	SuperVirtualKeyboardPluginState* getPluginState();
 
 	//==============================================================================
-    
+
+	void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
+	void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
+
+	//==============================================================================
+
+
 private:
 
 	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* midiStateInput;
-    MidiKeyboardState* midiStateOutput;
+	bool init = false;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };
