@@ -65,7 +65,6 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
     std::unique_ptr<MidiKeyboardState> midiStateIn;
-    std::unique_ptr<MidiKeyboardState> midiStateOut;
 
 private:
 

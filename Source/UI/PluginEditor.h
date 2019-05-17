@@ -29,7 +29,6 @@ class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
 													private ValueTree::Listener,
 													private ChangeListener,
-													private MidiInputCallback,
 													private Timer
 {
 public:
@@ -44,7 +43,6 @@ public:
 	//==============================================================================
 
 	void timerCallback() override;
-	void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
 	void userTriedToCloseWindow() override;
     
     //==============================================================================
