@@ -13,6 +13,7 @@
 MidiRemapper::MidiRemapper()
     : noteRange(0, 127)
 {
+    midiNoteMapping = nullptr;
 }
 
 MidiRemapper::MidiRemapper(Array<int>* mapIn)

@@ -34,6 +34,10 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 		createPresets();
 		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
 		presetCurrent.reset(new SvkPreset());
+        midiStateIn.reset(new MidiKeyboardState());
+        
+        midiInputFilter = MidiRemapper();
+        midiOutputFilter = MidiRemapper();
 	}
 
 	~SuperVirtualKeyboardPluginState() {}

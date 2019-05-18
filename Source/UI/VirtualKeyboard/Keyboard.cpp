@@ -21,8 +21,6 @@ Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn)
     
     pluginState = pluginStateIn;
     undo = pluginState->getUndoManager();
-
-    keyboardState = pluginState->midiStateIn.get();
     
     // Create children (piano keys)
     for (int i = 0; i < 128; i++)
@@ -969,6 +967,8 @@ void Keyboard::triggerKeyNoteOff(Key* key)
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
+    const MessageManagerLock mmLock;
+    
     Key* key = keys.getUnchecked(midiNote);
     key->externalMidiState = 1;
 	repaint();
@@ -976,6 +976,8 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
+    const MessageManagerLock mmLock;
+
     Key* key = keys.getUnchecked(midiNote);
     key->externalMidiState = 0;
 	repaint();
