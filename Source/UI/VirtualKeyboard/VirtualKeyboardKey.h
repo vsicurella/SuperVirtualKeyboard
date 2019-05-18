@@ -25,8 +25,12 @@ namespace VirtualKeyboard
         float yOffset = 0;
         
         //Pitch* mappedPitch = nullptr;
-        int mappedMIDInote;
+        int mappedNoteIn;
+        int mappedNoteOut;
         int externalMidiState = 0;
+        
+        bool showNoteNumber = false;
+        bool showNoteName = false;
         
         // Properties
         int order; // front most keys are 0, "black" keys are 1, etc
@@ -41,7 +45,7 @@ namespace VirtualKeyboard
 		bool customColor = false;
         
         // more of a "status" flag
-		// 0 = no interaction, 1 = mouseover, 2 = mouse down, 3 = color selecting
+		// 0 = no interaction, 1 = mouseover, 2 = mouse down, 3 = color selecting, 4 = note map selecting
         int activeState = 0;
         
         // Methods

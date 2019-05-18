@@ -75,6 +75,14 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
     offsetLabel->setColour (TextEditor::textColourId, Colours::black);
     offsetLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    mapButton.reset (new TextButton ("Map Notes Button"));
+    addAndMakeVisible (mapButton.get());
+    mapButton->setButtonText (TRANS("Map Notes"));
+    mapButton->setConnectedEdges (Button::ConnectedOnBottom);
+    mapButton->addListener (this);
+    mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
+    mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
+
 
     //[UserPreSize]
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
@@ -88,6 +96,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 
     //[Constructor] You can add your own custom stuff here..
 	populate_preset_menu();
+    mapButton->setClickingTogglesState(true);
     //[/Constructor]
 }
 
@@ -101,6 +110,7 @@ KeyboardEditorBar::~KeyboardEditorBar()
     modeLibraryBox = nullptr;
     offsetSld = nullptr;
     offsetLabel = nullptr;
+    mapButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -130,6 +140,7 @@ void KeyboardEditorBar::resized()
     modeLibraryBox->setBounds (getWidth() - 4 - 150, 6, 150, 24);
     offsetSld->setBounds (getWidth() - 235, 2, 69, 32);
     offsetLabel->setBounds (getWidth() - 280, 6, 47, 24);
+    mapButton->setBounds (getWidth() - 542 - 79, 6, 79, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -146,6 +157,12 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
 		// check to see if mode matches a preset
 		createAndSendMode();
         //[/UserButtonCode_sendScaleBtn]
+    }
+    else if (buttonThatWasClicked == mapButton.get())
+    {
+        //[UserButtonCode_mapButton] -- add your button handler code here..
+        sendChangeMessage();
+        //[/UserButtonCode_mapButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -227,6 +244,11 @@ int KeyboardEditorBar::getModeLibraryIndex()
     return modeLibraryBox->getSelectedId();
 }
 
+bool KeyboardEditorBar::isMapButtonOn()
+{
+    return mapButton->getToggleState();
+}
+
 void KeyboardEditorBar::setOffsetReadout(int offIn)
 {
     offsetSld->setValue(offIn);
@@ -255,7 +277,7 @@ void KeyboardEditorBar::createAndSendMode()
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
 {
-	modeLibraryBox->setEnabled(isAllowed);
+ 	modeLibraryBox->setEnabled(isAllowed);
 	offsetSld->setEnabled(isAllowed);
 	sendScaleBtn->setEnabled(isAllowed);
 	modeTextEditor->setEnabled(isAllowed);
@@ -417,7 +439,7 @@ void KeyboardEditorBar::populate_preset_menu()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="KeyboardEditorBar" componentName="Keyboard Editor Bar"
-                 parentClasses="public Component, private TextEditor::Listener"
+                 parentClasses="public Component, private TextEditor::Listener, public ChangeBroadcaster"
                  constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn"
                  variableInitialisers="pluginState(pluginStateIn), appCmdMgr(managerIn)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
@@ -437,15 +459,19 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="1"
             layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-6e1"
-          max="6.7e1" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-60.0"
+          max="67.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
          virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Offset:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
+              virtualName="" explicitFocusOrder="0" pos="542Rr 6 79 24" bgColOff="ff5c6ea4"
+              bgColOn="ffa7b438" buttonText="Map Notes" connectedEdges="8"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

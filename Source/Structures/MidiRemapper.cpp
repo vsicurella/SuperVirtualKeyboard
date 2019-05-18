@@ -55,3 +55,21 @@ void MidiRemapper::setNoteRange(int lowestMidiNote, int highestMidiNote)
 {
     noteRange = Point<int>(lowestMidiNote, highestMidiNote);
 }
+
+Array<int>* MidiRemapper::getNoteMap()
+{
+    return midiNoteMapping;
+}
+
+
+Array<int> MidiRemapper::getStandardMap()
+{
+    Array <int> mapOut;
+    
+    mapOut.resize(128);
+    
+    for (int i = 0; i < 128; i++)
+        mapOut.set(i, i);
+    
+    return mapOut;
+}

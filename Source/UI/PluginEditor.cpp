@@ -43,6 +43,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     pluginState->addChangeListener(this);
 	pluginState->pluginStateNode.addListener(this);
     pluginState->midiStateIn->addListener(piano.get());
+    keyboardEditorBar->addChangeListener(this);
 	initNodeData();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
@@ -60,6 +61,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
 {
     pluginState->removeChangeListener(this);
+    keyboardEditorBar->removeChangeListener(this);
 	pluginState->pluginStateNode.removeListener(this);
     pluginState->midiStateIn->removeListener(piano.get());
     piano->removeListener(&processor);
@@ -115,7 +117,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 void SuperVirtualKeyboardAudioProcessorEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
-	piano->setUIMode(UIMode::editMode);
+	piano->setUIMode(UIMode::colorMode);
 	keyboardEditorBar->allowUserInput(false);
 }
 
@@ -204,9 +206,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 {
+    Key* key = piano->getKeyFromPosition(e);
+
 	if (piano->getUIMode() == UIMode::playMode)
 	{
-		Key* key = piano->getKeyFromPosition(e);
 		if (key)
 		{
 			if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->activeState == 2)
@@ -228,9 +231,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 			}
 		}
 	}
-	else if (piano->getUIMode() == UIMode::editMode)
+	else if (piano->getUIMode() == UIMode::colorMode)
 	{
-		Key* key = piano->getKeyFromPosition(e);
 		if (key)
 		{
 			if (e.mods.isRightButtonDown())
@@ -263,8 +265,17 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
 				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
 			else
 				piano->setKeyColorDegree(key->scaleDegree, 3, colorChooserWindow->getColorSelected());
+            
+            piano->repaint();
 		}
 	}
+    else if (piano->getUIMode() == UIMode::mapMode)
+    {
+        if (key)
+        {
+            piano->selectKeyToMap(key);
+        }
+    }
 }
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseDrag(const MouseEvent& e)
@@ -311,7 +322,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseUp(const MouseEvent& e)
 
 void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 {
-	if (piano->getUIMode() == UIMode::playMode)
+	if (piano->getUIMode() != UIMode::colorMode)
 	{
 		Key* key = piano->getKeyFromPosition(e);
 
@@ -330,6 +341,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 
 void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
+    // New Mode loaded
     if (source == pluginState)
     {
         piano->resetKeyColors(true);
@@ -337,9 +349,10 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
         update_children_to_preset();
     }
     
+    // Color editing has finished
 	if (source == colorChooserWindow.get())
 	{
-		if (piano->getUIMode() == UIMode::editMode)
+		if (piano->getUIMode() == UIMode::colorMode)
 		{
 			piano->updatePianoNode();
 			pluginState->updateKeyboardSettingsPreset();
@@ -350,9 +363,25 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 		}
 	}
     
+    // Prepare to play
     if (source == &processor)
     {
         pluginState->midiStateIn->addListener(piano.get());
+    }
+    
+    // Mapping button toggled
+    if (source == keyboardEditorBar.get())
+    {
+        if (keyboardEditorBar->isMapButtonOn())
+        {
+            pluginState->pauseMidiInput();
+            piano->setUIMode(UIMode::mapMode);
+        }
+        else
+        {
+            pluginState->pauseMidiInput(false);
+            piano->setUIMode(UIMode::playMode);
+        }
     }
 }
 

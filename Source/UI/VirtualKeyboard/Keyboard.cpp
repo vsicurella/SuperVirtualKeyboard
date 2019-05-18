@@ -269,14 +269,34 @@ int Keyboard::getUIMode()
 void Keyboard::setUIMode(UIMode uiModeIn)
 {
     uiModeSelected = uiModeIn;
+    
 	Key* key;
 	for (int i = 0; i < keys.size(); i++)
 	{
 		key = keys.getUnchecked(i);
-		key->setColour(3, key->findColour(0));
-		key->activeState = uiModeSelected * 3;
+        
+        if (uiModeIn == UIMode::colorMode)
+        {
+            key->activeState = 3;
+            key->setColour(3, key->findColour(0));
+            key->showNoteNumber = showNoteNumbers;
+        }
+        
+        else if (uiModeIn == UIMode::mapMode)
+        {
+            key->showNoteNumber = true;
+            key->activeState = 0;
+        }
+        
+        else
+        {
+            key->showNoteNumber = showNoteNumbers;
+            key->activeState = 0;
+        }
 	}
+    
 	pianoNode.setProperty(IDs::pianoUIMode, uiModeIn, nullptr);
+    repaint();
 }
 
 void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
@@ -331,7 +351,6 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
 	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 }
 
-
 //===============================================================================================
 
 void Keyboard::applyMode(Mode* modeIn)
@@ -359,7 +378,8 @@ void Keyboard::applyMode(Mode* modeIn)
 		key->step = mode->getStepsOfOrders()[i];
 		setKeyProportions(key);
 		
-		key->mappedMIDInote = i;// keyMidiNoteMappings[totalModulus(i - mode->getOffset(), keys.size())];
+        key->mappedNoteIn = pluginState->getInputNoteMap()->getUnchecked(i);
+		key->mappedNoteOut = pluginState->getOutputNoteMap()->getUnchecked(totalModulus(i - mode->getOffset(), keys.size()));
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
@@ -376,6 +396,18 @@ void Keyboard::applyMode(Mode* modeIn)
     // Calculate properties
     displayIsReady = true;
     resized();
+}
+
+
+//===============================================================================================
+
+void Keyboard::selectKeyToMap(Key* keyIn)
+{
+    keys.getUnchecked(lastKeyClicked)->activeState = 0;
+    
+    lastKeyClicked = keyIn->keyNumber;
+    keyIn->setColour(4, getKeyColor(keyIn).interpolatedWith(Colours::yellow, 0.618f));
+    keyIn->activeState = 4;
 }
 
 //===============================================================================================
@@ -946,7 +978,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 {
     if (velocityIn > 0)
     {
-        noteOn(midiChannelSelected, key->mappedMIDInote, velocityIn);
+        noteOn(midiChannelSelected, key->mappedNoteOut, velocityIn);
 		key->activeState = 2;
 		key->velocity = velocityIn;
         keysOn.add(key);
@@ -955,7 +987,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 
 void Keyboard::triggerKeyNoteOff(Key* key)
 {
-    noteOff(midiChannelSelected, key->mappedMIDInote, 0);
+    noteOff(midiChannelSelected, key->mappedNoteOut, 0);
 
 	if (key->isMouseOver())
 		key->activeState = 1;
@@ -969,8 +1001,21 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 {
     const MessageManagerLock mmLock;
     
-    Key* key = keys.getUnchecked(midiNote);
-    key->externalMidiState = 1;
+    Key* key;
+    int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);
+
+    if (uiModeSelected == playMode)
+    {
+        key = keys.getUnchecked(keyTriggered);
+        key->externalMidiState = 1;
+    }
+    else if (uiModeSelected == mapMode)
+    {
+        key = keys.getUnchecked(lastKeyClicked);
+        key->mappedNoteIn = midiNote;
+        pluginState->getInputNoteMap()->set(midiNote, key->keyNumber);
+    }
+    
 	repaint();
 }
 
@@ -978,8 +1023,15 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
 {
     const MessageManagerLock mmLock;
 
-    Key* key = keys.getUnchecked(midiNote);
-    key->externalMidiState = 0;
+    Key* key;
+    int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);
+
+    if (uiModeSelected == playMode)
+    {
+        key = keys.getUnchecked(keyTriggered);
+        key->externalMidiState = 0;
+    }
+    
 	repaint();
 }
 
