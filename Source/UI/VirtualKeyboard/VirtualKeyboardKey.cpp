@@ -48,6 +48,17 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 	fillBounds.expand(1, 1);
 	g.setColour(Colours::black);
 	g.drawRect(fillBounds, 1.2);
+    
+    if (showNoteNumber)
+    {
+        g.setColour(color.contrasting());
+        String numTxt = String(mappedNoteIn);
+        Rectangle<int> txtArea = getLocalBounds();
+        txtArea.removeFromBottom(6);
+        g.drawText(numTxt,
+                   txtArea,
+                   Justification::centredBottom);
+    }
 }
 
 //==============================================================================

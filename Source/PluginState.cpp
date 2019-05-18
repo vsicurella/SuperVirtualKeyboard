@@ -51,6 +51,16 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
+Array<int>* SuperVirtualKeyboardPluginState::getInputNoteMap()
+{
+    return &noteInputMap;
+}
+
+Array<int>* SuperVirtualKeyboardPluginState::getOutputNoteMap()
+{
+    return &noteOutputMap;
+}
+
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	int index = 0;
@@ -137,6 +147,18 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	}
 
 	return false;
+}
+
+//==============================================================================
+
+void SuperVirtualKeyboardPluginState::pauseMidiInput(bool setPaused)
+{
+    midiInputPaused = setPaused;
+}
+
+bool SuperVirtualKeyboardPluginState::isMidiPaused()
+{
+    return midiInputPaused;
 }
 
 //==============================================================================

@@ -24,7 +24,9 @@ struct MidiRemapper
     void setNoteRange(int lowestMidiNote, int highestMidiNote);
     
     Array<int>* setNoteMap(Array<int>& noteMapIn);
+    Array<int>* getNoteMap();
     
+    static Array<int> getStandardMap();
     
 private:
     

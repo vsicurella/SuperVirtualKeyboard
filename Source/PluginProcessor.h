@@ -83,8 +83,7 @@ private:
 
 	MidiBuffer midiBuffer;
 	MidiKeyboardState* midiStateInput;
-	bool init = false;
     int msgCount = 0;
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
 };

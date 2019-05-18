@@ -29,7 +29,8 @@ namespace VirtualKeyboard
     enum UIMode
     {
         playMode = 0,
-        editMode
+        colorMode,
+        mapMode
     };
     
     enum Orientation
@@ -105,6 +106,10 @@ namespace VirtualKeyboard
 
 		// might want to restructure so this is not necessary
 		void setLastKeyClicked(int keyNumIn);
+        
+        //===============================================================================================
+
+        void selectKeyToMap(Key* keyIn);
 
         //===============================================================================================
         
@@ -214,6 +219,8 @@ namespace VirtualKeyboard
 		int midiNoteOffset = 0;
 		bool mpeOn = false;
         
+        bool showNoteNumbers = false;
+                
         // Data
         ValueTree pianoNode;
 		ValueTree keyPlacePresetNode;

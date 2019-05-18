@@ -37,6 +37,7 @@
 */
 class KeyboardEditorBar  : public Component,
                            private TextEditor::Listener,
+                           public ChangeBroadcaster,
                            public Button::Listener,
                            public ComboBox::Listener,
                            public Slider::Listener
@@ -61,6 +62,8 @@ public:
 	void textEditorReturnKeyPressed(TextEditor& editor) override;
 
 	void allowUserInput(bool isAllowed=true);
+    
+    bool isMapButtonOn();
 
     //[/UserMethods]
 
@@ -107,10 +110,7 @@ private:
     std::unique_ptr<PopupMenu> menuSortByMode;
     std::unique_ptr<PopupMenu> menuSortByFamily;
 
-	// Key Locks
-
-	bool enterDown = false;
-
+    
     //[/UserVariables]
 
     //==============================================================================
@@ -119,6 +119,7 @@ private:
     std::unique_ptr<ComboBox> modeLibraryBox;
     std::unique_ptr<Slider> offsetSld;
     std::unique_ptr<Label> offsetLabel;
+    std::unique_ptr<TextButton> mapButton;
 
 
     //==============================================================================

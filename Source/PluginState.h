@@ -22,7 +22,7 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	ValueTree keyboardWindowNode;
 	ValueTree modePresetNode;
 	ValueTree pianoNode;
-
+    
 	SuperVirtualKeyboardPluginState() :
 			pluginStateNode(IDs::pluginStateNode),
 			modeLibraryNode(IDs::modeLibraryNode),
@@ -36,8 +36,11 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 		presetCurrent.reset(new SvkPreset());
         midiStateIn.reset(new MidiKeyboardState());
         
-        midiInputFilter = MidiRemapper();
-        midiOutputFilter = MidiRemapper();
+        noteInputMap = MidiRemapper::getStandardMap();
+        noteOutputMap = MidiRemapper::getStandardMap();
+        
+        midiInputFilter = MidiRemapper(&noteInputMap);
+        midiOutputFilter = MidiRemapper(&noteOutputMap);
 	}
 
 	~SuperVirtualKeyboardPluginState() {}
@@ -51,6 +54,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
 	Mode* getCurrentMode();
+    Array<int>* getInputNoteMap();
+    Array<int>* getOutputNoteMap();
     
     MidiRemapper midiInputFilter;
     MidiRemapper midiOutputFilter;
@@ -59,11 +64,15 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 
 	void setCurrentMode(int presetIndexIn);
 	void setCurrentMode(Mode* modeIn);
+    
 	void updateModeOffset(int offsetIn);
 	void updateKeyboardSettingsPreset();
 
 	bool savePreset();
 	bool loadPreset();
+
+    void pauseMidiInput(bool setPaused=true);
+    bool isMidiPaused();
     
 	//==============================================================================
 	
@@ -82,4 +91,9 @@ private:
 
 	std::unique_ptr<SvkPreset> presetCurrent;
 	Mode* modeCurrent;
+    
+    Array<int> noteInputMap;
+    Array<int> noteOutputMap;
+    
+    bool midiInputPaused = false;
 };

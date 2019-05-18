@@ -151,10 +151,12 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
     auto midiEvent = MidiBuffer::Iterator(midiMessages);
     MidiMessage msg;
     int smpl;
-
+    
     while (midiEvent.getNextEvent(msg, smpl))
     {
-		msg.setNoteNumber(pluginState->midiInputFilter.getNote(msg.getNoteNumber()));
+        if (!pluginState->isMidiPaused())
+            msg.setNoteNumber(pluginState->midiInputFilter.getNote(msg.getNoteNumber()));
+        
         msg.setTimeStamp(++msgCount);
         midiStateInput->processNextMidiEvent(msg);
 		addMessageToQueue(msg);
@@ -169,14 +171,17 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
     msgCount = 0;
 	midiMessages.clear();
 	removeNextBlockOfMessages(midiBuffer, 4096);
-	auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
-	
-	while (midiEventOut.getNextEvent(msg, smpl))
-	{
-		msg.setNoteNumber(pluginState->midiOutputFilter.getNote(msg.getNoteNumber()));
-        msg.setTimeStamp(++msgCount);
-		midiMessages.addEvent(msg, smpl);
-	}
+    
+    if (!pluginState->isMidiPaused())
+    {
+        auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
+        while (midiEventOut.getNextEvent(msg, smpl))
+        {
+            msg.setNoteNumber(pluginState->midiOutputFilter.getNote(msg.getNoteNumber()));
+            msg.setTimeStamp(++msgCount);
+            midiMessages.addEvent(msg, smpl);
+        }
+    }
 
     midiBuffer.clear();
     msgCount = 0;
