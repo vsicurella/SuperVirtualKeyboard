@@ -42,6 +42,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
     pluginState->addChangeListener(this);
 	pluginState->pluginStateNode.addListener(this);
+    pluginState->midiStateIn->addListener(piano.get());
 	initNodeData();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
@@ -60,7 +61,8 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 {
     pluginState->removeChangeListener(this);
 	pluginState->pluginStateNode.removeListener(this);
-	piano->removeListener(&processor);
+    pluginState->midiStateIn->removeListener(piano.get());
+    piano->removeListener(&processor);
 }
 
 //==============================================================================
@@ -101,10 +103,6 @@ void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
 	Mode* modeCurrent = pluginState->getCurrentMode();
-	
-	if (pluginState->getCurrentPreset()->theModeNode.getProperty(IDs::factoryPreset))
-	{
-	}
 		
 	piano->applyMode(modeCurrent);
 
@@ -351,6 +349,11 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 			keyboardEditorBar->allowUserInput();
 		}
 	}
+    
+    if (source == &processor)
+    {
+        pluginState->midiStateIn->addListener(piano.get());
+    }
 }
 
 //==============================================================================

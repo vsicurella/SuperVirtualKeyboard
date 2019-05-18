@@ -24,7 +24,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        ),
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
-{	
+{
+    MidiMessageCollector::reset(41000); // default
     midiStateInput = pluginState->midiStateIn.get();
 }
 
@@ -109,6 +110,9 @@ void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int s
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	MidiMessageCollector::reset(sampleRate);
+    pluginState->midiStateIn.reset(new MidiKeyboardState());
+    midiStateInput = pluginState->midiStateIn.get();
+    sendChangeMessage();
 }
 
 void SuperVirtualKeyboardAudioProcessor::releaseResources()
@@ -151,6 +155,7 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
     while (midiEvent.getNextEvent(msg, smpl))
     {
 		msg.setNoteNumber(pluginState->midiInputFilter.getNote(msg.getNoteNumber()));
+        msg.setTimeStamp(++msgCount);
         midiStateInput->processNextMidiEvent(msg);
 		addMessageToQueue(msg);
     }
@@ -161,6 +166,7 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
         buffer.clear (i, 0, buffer.getNumSamples());
 
 	// Midi Output filtering
+    msgCount = 0;
 	midiMessages.clear();
 	removeNextBlockOfMessages(midiBuffer, 4096);
 	auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
@@ -168,10 +174,12 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
 	while (midiEventOut.getNextEvent(msg, smpl))
 	{
 		msg.setNoteNumber(pluginState->midiOutputFilter.getNote(msg.getNoteNumber()));
+        msg.setTimeStamp(++msgCount);
 		midiMessages.addEvent(msg, smpl);
 	}
 
-	midiBuffer.clear();
+    midiBuffer.clear();
+    msgCount = 0;
 }
 
 //==============================================================================
@@ -224,10 +232,14 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void SuperVirtualKeyboardAudioProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
-	addMessageToQueue(MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity));
+    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
+    msg.setTimeStamp(++msgCount);
+    addMessageToQueue(msg);
 }
 
 void SuperVirtualKeyboardAudioProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
-	addMessageToQueue(MidiMessage::noteOff(midiChannel, midiNoteNumber, velocity));
+    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
+    msg.setTimeStamp(++msgCount);
+	addMessageToQueue(msg);
 }
