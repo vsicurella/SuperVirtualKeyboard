@@ -17,22 +17,20 @@ SvkPreset::SvkPreset()
 	parentNode.addChild(theModeNode, 0, nullptr);
 }
 
-SvkPreset::SvkPreset(ValueTree modeNodeIn, ValueTree keyboardNodeIn)
+SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
 	parentNode = ValueTree(IDs::presetNode);
 	theModeNode = ValueTree(IDs::modePresetNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
 
-	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
-	theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
+	theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(0), nullptr);
+	theKeyboardNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(1), nullptr);
 
 	parentNode.addChild(theModeNode, 0, nullptr);
 	parentNode.addChild(theKeyboardNode, 1, nullptr);
-}
 
-SvkPreset::SvkPreset(ValueTree presetNodeIn)
-{
-	SvkPreset(presetNodeIn.getChild(0), presetNodeIn.getChild(1));
+	if (presetNodeIn.hasProperty(IDs::rootMidiNote))
+		parentNode.setProperty(IDs::rootMidiNote,(int)presetNodeIn[IDs::rootMidiNote], nullptr);
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
@@ -116,7 +114,7 @@ SvkPreset* SvkPreset::loadFromFile(String absoluteFilePath)
 
 		if (nodeIn.hasType(IDs::presetNode))
 		{
-			presetOut = new SvkPreset(nodeIn.getChild(0), nodeIn.getChild(1));
+			presetOut = new SvkPreset(nodeIn);
 		}
 	}
     

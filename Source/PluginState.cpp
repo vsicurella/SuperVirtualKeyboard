@@ -56,6 +56,7 @@ void SuperVirtualKeyboardPluginState::setRootNote(int rootNoteIn)
     rootMidiNote = totalModulus(rootNoteIn, 128);
 	modeCurrent->setRootNote(rootMidiNote);
 	pluginStateNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+	presetCurrent->parentNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
 }
    
 int SuperVirtualKeyboardPluginState::getRootNote()
@@ -149,6 +150,13 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	if (newPreset.get())
 	{
         presetCurrent.swap(newPreset);
+		DBG(presetCurrent->parentNode.toXmlString());
+
+		if (presetCurrent->parentNode.hasProperty(IDs::rootMidiNote))
+		{
+			rootMidiNote = totalModulus((int)presetCurrent->parentNode.getProperty(IDs::rootMidiNote), 128);
+		}
+
 		modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
 		modePresetNode = modeCurrent->modeNode;
 		return true;

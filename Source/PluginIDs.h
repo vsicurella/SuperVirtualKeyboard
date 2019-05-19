@@ -20,15 +20,10 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
-	static Identifier keyPlacePresetNode("KeyPlacements");
-	static Identifier keyRatioPresetNode("KeyRatios");
-	static Identifier keyColorPresetNode("KeyColors");
-	static Identifier libraryIndexOfMode("IndexOfMode");
-	static Identifier pianoHasCustomColor("PresetHasCustomColor");
+	static Identifier preferencesNode("Preferences");
 
 	// Settings
 	static Identifier rootMidiNote("RootNote");
-
 
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
@@ -38,6 +33,7 @@ namespace IDs
 	static Identifier family("Family");
     static Identifier modeName("ModeName");
 	static Identifier factoryPreset("FactoryPreset");
+	static Identifier libraryIndexOfMode("IndexOfMode");
 
 	// Keyboard Window
 	static Identifier keyboardWindowNode("KeyboardWindow");
@@ -54,6 +50,7 @@ namespace IDs
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
 	static Identifier pianoMPEToggle("MpeToggle");
 	static Identifier pianoWHRatio("WidthToHeightRatio");
+	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
@@ -87,7 +84,8 @@ namespace IDs
 		setPianoVerticalR,
 		setKeysNestedRight,
 		setKeysNestedCenter,
-		setKeysAdjacent
+		setKeysAdjacent,
+		showMidiNoteNumbers
 	};
 }
 
