@@ -62,7 +62,7 @@ public:
 	void textEditorReturnKeyPressed(TextEditor& editor) override;
 
 	void allowUserInput(bool isAllowed=true);
-    
+
     bool isMapButtonOn();
 
     //[/UserMethods]
@@ -110,7 +110,7 @@ private:
     std::unique_ptr<PopupMenu> menuSortByMode;
     std::unique_ptr<PopupMenu> menuSortByFamily;
 
-    
+
     //[/UserVariables]
 
     //==============================================================================

@@ -23,15 +23,15 @@ struct Mode
 
 	Mode();
 
-	Mode(String stepsIn, String familyIn="undefined", int offsetIn=0);
+	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60);
 
-	Mode(Array<int> stepsIn, String familyIn="undefined", int offsetIn=0);
+	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60);
 
 	~Mode();
 
 	void init_node();
 
-	void restore_from_node(ValueTree nodeIn);
+	void restore_from_node(ValueTree nodeIn, int rootNoteIn=60);
 
 	/*
 		Sets custom name of the mode. 
@@ -42,7 +42,9 @@ struct Mode
 		Sets the offset of the mode and updates parameters so that the 
 		offset replaces the current visualization of the mode
 	*/
-	void setOffset(int offsetIn);
+	void setRootNote(int rootNoteIn);
+
+	int getRootNote();
 
 	int getOffset();
 
@@ -143,6 +145,8 @@ private:
 	int scaleSize;
 	int modeSize;
 	String family;
+	
+	int rootNote = 60;
 	int offset;
 
 	String stepsString;

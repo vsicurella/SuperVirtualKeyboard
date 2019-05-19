@@ -61,13 +61,14 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 
     offsetSld.reset (new Slider ("Offset Slider"));
     addAndMakeVisible (offsetSld.get());
-    offsetSld->setRange (-60, 67, 1);
+    offsetSld->setRange (0, 127, 1);
     offsetSld->setSliderStyle (Slider::IncDecButtons);
     offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+	offsetSld->setValue(pluginState->getRootNote(), NotificationType::dontSendNotification);
     offsetSld->addListener (this);
 
     offsetLabel.reset (new Label ("Offset Label",
-                                  TRANS("Offset:")));
+                                  TRANS("Root:")));
     addAndMakeVisible (offsetLabel.get());
     offsetLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     offsetLabel->setJustificationType (Justification::centredLeft);
@@ -207,7 +208,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-		pluginState->updateModeOffset((int)offsetSld->getValue());
+		pluginState->setRootNote((int)offsetSld->getValue());
         //[/UserSliderCode_offsetSld]
     }
 
@@ -251,7 +252,7 @@ bool KeyboardEditorBar::isMapButtonOn()
 
 void KeyboardEditorBar::setOffsetReadout(int offIn)
 {
-    offsetSld->setValue(offIn);
+    offsetSld->setValue(offIn, dontSendNotification);
 }
 
 void KeyboardEditorBar::setModeReadoutText(String steps)
@@ -459,15 +460,15 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="1"
             layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="-60.0"
-          max="67.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="0"
+          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
          virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Offset:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         edBkgCol="0" labelText="Root:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
               virtualName="" explicitFocusOrder="0" pos="542Rr 6 79 24" bgColOff="ff5c6ea4"
               bgColOn="ffa7b438" buttonText="Map Notes" connectedEdges="8"

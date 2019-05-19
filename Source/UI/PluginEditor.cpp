@@ -110,7 +110,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 
 	keyboardEditorBar->setModeReadoutText(modeCurrent->getStepsString());
 	keyboardEditorBar->setModeLibraryText(modeCurrent->getDescription());
-    keyboardEditorBar->setOffsetReadout(modeCurrent->getOffset());
+    keyboardEditorBar->setOffsetReadout(modeCurrent->getRootNote());
 	DBG("Children Updated");
 }
 
@@ -389,8 +389,8 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
-	// The Mode offset is changed
-	if (treeWhosePropertyHasChanged.hasType(IDs::modePresetNode) && property == IDs::modeOffset)
+	// Root note is changed
+	if (treeWhosePropertyHasChanged.hasType(IDs::pluginStateNode) && property == IDs::rootMidiNote)
 	{
 		update_children_to_preset();
 	}

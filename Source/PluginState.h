@@ -57,6 +57,9 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
     Array<int>* getInputNoteMap();
     Array<int>* getOutputNoteMap();
     
+    void setRootNote(int rootNoteIn);
+    int getRootNote();
+    
     MidiRemapper midiInputFilter;
     MidiRemapper midiOutputFilter;
 
@@ -65,7 +68,6 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	void setCurrentMode(int presetIndexIn);
 	void setCurrentMode(Mode* modeIn);
     
-	void updateModeOffset(int offsetIn);
 	void updateKeyboardSettingsPreset();
 
 	bool savePreset();
@@ -96,4 +98,6 @@ private:
     Array<int> noteOutputMap;
     
     bool midiInputPaused = false;
+    
+    int rootMidiNote = 60;
 };
