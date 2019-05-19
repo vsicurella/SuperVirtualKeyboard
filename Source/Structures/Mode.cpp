@@ -17,7 +17,7 @@ Mode::Mode()
 {
 	stepsString = "1";
 	family = "undefined";
-	offset = 0;
+	rootNote = 60;
 
 	steps = parse_steps(stepsString);
 	ordersDefault = steps_to_orders(steps);
@@ -25,6 +25,7 @@ Mode::Mode()
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	name = getDescription();
+	offset = getOffset() * -1;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(ordersDefault);
@@ -35,11 +36,11 @@ Mode::Mode()
 	init_node();
 }
 
-Mode::Mode(String stepsIn, String familyIn, int offsetIn)
+Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
 {
 	stepsString = stepsIn;
 	family = familyIn;
-	offset = -offsetIn;
+	rootNote = rootNoteIn;
 
 	steps = parse_steps(stepsIn);
 	ordersDefault = steps_to_orders(steps);
@@ -47,6 +48,7 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
     name = getDescription();
+	offset = getOffset() * -1;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
@@ -57,11 +59,11 @@ Mode::Mode(String stepsIn, String familyIn, int offsetIn)
 	init_node();
 }
 
-Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
+Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 {
 	stepsString = steps_to_string(stepsIn);
 	family = familyIn;
-	offset = -offsetIn;
+	rootNote = rootNoteIn;
 
 	steps = stepsIn;
 	ordersDefault = steps_to_orders(steps);
@@ -69,6 +71,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int offsetIn)
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	name = getDescription();
+	offset = getOffset() * -1;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
@@ -91,11 +94,10 @@ void Mode::init_node()
 	modeNode.setProperty(IDs::modeSize, modeSize, nullptr);
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
-	modeNode.setProperty(IDs::modeOffset, -offset, nullptr);
 	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
 }
 
-void Mode::restore_from_node(ValueTree nodeIn)
+void Mode::restore_from_node(ValueTree nodeIn, int rootNoteIn)
 {
 	if (nodeIn.hasType(IDs::modePresetNode))
 	{
@@ -106,7 +108,9 @@ void Mode::restore_from_node(ValueTree nodeIn)
 		modeSize = modeNode[IDs::modeSize];
 		stepsString = modeNode[IDs::stepString];
 		family = modeNode[IDs::family];
-		offset = (int)modeNode[IDs::modeOffset] * -1;
+
+		rootNote = rootNoteIn;
+		offset = getOffset() * -1;
 
 		steps = parse_steps(stepsString);
 		mosClass = interval_sizes(steps);
@@ -129,21 +133,30 @@ String Mode::setFamily(String nameIn)
 	return name;
 }
 
-void Mode::setOffset(int offsetIn)
+void Mode::setRootNote(int rootNoteIn)
 {
-	offset = -offsetIn;
-    modeNode.setProperty(IDs::modeOffset, offsetIn, nullptr);
-	orders = expand_orders(ordersDefault, offset);
-	modeDegrees = orders_to_modeDegrees(orders);
-	scaleDegrees = scale_degrees(scaleSize, offset);
-	keyboardOrdersSizes = interval_sizes(orders);
-    updateStepsOfOrders();
+	if (rootNote != rootNoteIn)
+	{
+		rootNote = rootNoteIn;
+		offset = getOffset() * -1;
+		orders = expand_orders(ordersDefault, offset);
+		modeDegrees = orders_to_modeDegrees(orders);
+		scaleDegrees = scale_degrees(scaleSize, offset);
+		keyboardOrdersSizes = interval_sizes(orders);
+		updateStepsOfOrders();
+	}
+}
+
+int Mode::getRootNote()
+{
+	return rootNote;
 }
 
 int Mode::getOffset()
 {
-	return -offset;
+	return ((rootNote % scaleSize) + scaleSize) % scaleSize;
 }
+
 
 Array<int> Mode::parse_steps(String stepsIn)
 {

@@ -26,11 +26,14 @@ namespace IDs
 	static Identifier libraryIndexOfMode("IndexOfMode");
 	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 
+	// Settings
+	static Identifier rootMidiNote("RootNote");
+
+
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
 	static Identifier modeSize("ModeSize");
 	static Identifier stepString("StepsString");
-	static Identifier modeOffset("ModeOffset");
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
     static Identifier modeName("ModeName");

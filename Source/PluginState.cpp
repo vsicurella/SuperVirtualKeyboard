@@ -51,6 +51,19 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
+void SuperVirtualKeyboardPluginState::setRootNote(int rootNoteIn)
+{
+    rootMidiNote = totalModulus(rootNoteIn, 128);
+	modeCurrent->setRootNote(rootMidiNote);
+	pluginStateNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+}
+   
+int SuperVirtualKeyboardPluginState::getRootNote()
+{
+    return rootMidiNote;
+}
+    
+
 Array<int>* SuperVirtualKeyboardPluginState::getInputNoteMap()
 {
     return &noteInputMap;
@@ -82,6 +95,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
+		modeCurrent->setRootNote(rootMidiNote);
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
@@ -99,6 +113,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	if (modeIn)
 	{
 		modeCurrent = modeIn;
+		modeCurrent->setRootNote(rootMidiNote);
 		presets.set(0, modeCurrent, true);
 
 		if (presetCurrent->theKeyboardNode.isValid())
@@ -111,13 +126,6 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
         sendChangeMessage();
 	}
 }
-
-void SuperVirtualKeyboardPluginState::updateModeOffset(int offsetIn)
-{
-	modeCurrent->setOffset(offsetIn);
-	presetCurrent->updateModeNode(modeCurrent->modeNode);
-}
-
 
 void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 {
@@ -141,7 +149,7 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	if (newPreset.get())
 	{
         presetCurrent.swap(newPreset);
-		modeCurrent->restore_from_node(presetCurrent->theModeNode);
+		modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
 		modePresetNode = modeCurrent->modeNode;
 		return true;
 	}
@@ -220,7 +228,6 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	presets.add(new Mode(Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone"));
     presets.add(new Mode(Array<int>({ 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2 }), "Meantone"));
 	presets.add(new Mode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3}), "Orwell"));
-    presets.add(new Mode(Array<int>({ 6, 6, 6, 6, 7}), "Mothra"));
     presets.add(new Mode(Array<int>({ 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 1}), "Mothra"));
     presets.add(new Mode(Array<int>({ 5, 4, 5, 4, 5, 4, 4}), "Mohajira"));
     presets.add(new Mode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1}), "Miracle"));
@@ -230,7 +237,6 @@ void SuperVirtualKeyboardPluginState::createPresets()
     presets.add(new Mode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1}), "Magic"));
     presets.add(new Mode(Array<int>({ 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 5}), "Hanson"));
     presets.add(new Mode(Array<int>({ 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3}), "Tricot"));
-    presets.add(new Mode(Array<int>({ 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 3, 7, 3, 3, 3, 3, 3, 7 }), "Sqrtphi"));
 	presets.add(new Mode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }), "BP Lambda"));
 	presets.add(new Mode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II"));
 
