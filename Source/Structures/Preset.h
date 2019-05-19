@@ -20,7 +20,6 @@ struct SvkPreset
 	ValueTree theKeyboardNode;
 
 	SvkPreset();
-	SvkPreset(ValueTree modeNodeIn, ValueTree keyboardNodeIn);
 	SvkPreset(ValueTree presetNodeIn);
 	SvkPreset(SvkPreset& presetToCopy);
 	~SvkPreset();
