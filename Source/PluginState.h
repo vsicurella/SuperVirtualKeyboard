@@ -20,19 +20,27 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	ValueTree pluginStateNode;
 	ValueTree modeLibraryNode;
 	ValueTree keyboardWindowNode;
+
+	ValueTree pluginSettingsNode;
+	ValueTree midiSettingsNode;
 	ValueTree modePresetNode;
 	ValueTree pianoNode;
     
 	SuperVirtualKeyboardPluginState() :
-			pluginStateNode(IDs::pluginStateNode),
-			modeLibraryNode(IDs::modeLibraryNode),
-			modePresetNode(IDs::modePresetNode),
-			undoManager(new UndoManager()),
-			appCmdMgr(new ApplicationCommandManager())
+		pluginStateNode(IDs::pluginStateNode),
+		modeLibraryNode(IDs::modeLibraryNode),
+		modePresetNode(IDs::modePresetNode),
+		pluginSettingsNode(IDs::pluginSettingsNode),
+		midiSettingsNode(IDs::midiSettingsNode),
+		undoManager(new UndoManager()),
+		appCmdMgr(new ApplicationCommandManager())
 
 	{
 		createPresets();
 		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+		pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
+		pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
+	
 		presetCurrent.reset(new SvkPreset());
         midiStateIn.reset(new MidiKeyboardState());
         
@@ -41,6 +49,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
         
         midiInputFilter = MidiRemapper(&noteInputMap);
         midiOutputFilter = MidiRemapper(&noteOutputMap);
+
+		updateMidiSettingsNode();
 	}
 
 	~SuperVirtualKeyboardPluginState() {}
@@ -54,14 +64,20 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
 	Mode* getCurrentMode();
-    Array<int>* getInputNoteMap();
-    Array<int>* getOutputNoteMap();
+
     
     void setRootNote(int rootNoteIn);
     int getRootNote();
     
+	// going to move these over to a midi processor class at some point
+	Array<int>* getInputNoteMap();
+	Array<int>* getOutputNoteMap();
     MidiRemapper midiInputFilter;
     MidiRemapper midiOutputFilter;
+	void setMidiInputMap(Array<int> mapIn);
+	void setMidiOutputMap(Array<int> mapIn);
+	void mapInputNote(int noteIn, int noteOut);
+	void mapOutputNode(int noteIn, int noteOut);
 
 	int is_mode_in_presets(String stepsStringIn);
 
@@ -69,6 +85,7 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	void setCurrentMode(Mode* modeIn);
     
 	void updateKeyboardSettingsPreset();
+	void updateMidiSettingsNode();
 
 	bool savePreset();
 	bool loadPreset();

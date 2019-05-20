@@ -189,7 +189,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 	//piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
 	//	*processor.get_midi_buffer(), 0, 4096, true);
 
-	//piano.get()->repaint();
+	piano.get()->repaint();
 }
 
 //==============================================================================
@@ -390,7 +390,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
 {
 	// Root note is changed
-	if (treeWhosePropertyHasChanged.hasType(IDs::pluginStateNode) && property == IDs::rootMidiNote)
+	if (treeWhosePropertyHasChanged.hasType(IDs::midiSettingsNode) && property == IDs::rootMidiNote)
 	{
 		update_children_to_preset();
 	}
