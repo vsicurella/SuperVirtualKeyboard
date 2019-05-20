@@ -55,8 +55,8 @@ void SuperVirtualKeyboardPluginState::setRootNote(int rootNoteIn)
 {
     rootMidiNote = totalModulus(rootNoteIn, 128);
 	modeCurrent->setRootNote(rootMidiNote);
-	pluginStateNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-	presetCurrent->parentNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+
+	midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
 }
    
 int SuperVirtualKeyboardPluginState::getRootNote()
@@ -136,9 +136,24 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 	}
 }
 
+void SuperVirtualKeyboardPluginState::updateMidiSettingsNode()
+{
+	midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
+
+	midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiInputMap), nullptr);
+	add_array_to_node(midiSettingsNode, noteInputMap, IDs::midiInputMap, "Note");
+
+	midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiOutputMap), nullptr);
+	add_array_to_node(midiSettingsNode, noteOutputMap, IDs::midiOutputMap, "Note");
+}
+
+
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
-	presetCurrent->theModeNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+	updateMidiSettingsNode();
+	modePresetNode = modeCurrent->modeNode;
+	presetCurrent->updateParentNode(pluginStateNode);
+
 	return presetCurrent->writeToFile();
 }
 
@@ -150,15 +165,42 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	if (newPreset.get())
 	{
         presetCurrent.swap(newPreset);
-		DBG(presetCurrent->parentNode.toXmlString());
 
-		if (presetCurrent->parentNode.hasProperty(IDs::rootMidiNote))
+		
+		if (presetCurrent->thePluginSettingsNode.isValid())
 		{
-			rootMidiNote = totalModulus((int)presetCurrent->parentNode.getProperty(IDs::rootMidiNote), 128);
+			pluginSettingsNode.copyPropertiesAndChildrenFrom(presetCurrent->thePluginSettingsNode, nullptr);
 		}
 
-		modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
-		modePresetNode = modeCurrent->modeNode;
+		if (presetCurrent->theMidiSettingsNode.isValid())
+		{
+			if (midiSettingsNode.hasProperty(IDs::midiInputMap))
+			{
+				noteInputMap.clear();
+				get_array_from_node(midiSettingsNode, noteInputMap, IDs::midiInputMap);
+			}
+
+			if (midiSettingsNode.hasProperty(IDs::midiOutputMap))
+			{
+				noteOutputMap.clear();
+				get_array_from_node(midiSettingsNode, noteOutputMap, IDs::midiOutputMap);
+			}
+
+			rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
+			midiSettingsNode.copyPropertiesAndChildrenFrom(presetCurrent->theMidiSettingsNode, nullptr);
+		}
+
+		if (presetCurrent->theModeNode.isValid())
+		{
+			modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
+			modePresetNode = modeCurrent->modeNode;
+		}
+		
+		if (presetCurrent->theKeyboardNode.isValid())
+		{
+			pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
+		}
+
 		return true;
 	}
 
@@ -166,6 +208,29 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 }
 
 //==============================================================================
+
+void SuperVirtualKeyboardPluginState::setMidiInputMap(Array<int> mapIn)
+{
+	noteInputMap = mapIn;
+}
+
+void SuperVirtualKeyboardPluginState::setMidiOutputMap(Array<int> mapIn)
+{
+	noteOutputMap = mapIn;
+}
+
+void SuperVirtualKeyboardPluginState::mapInputNote(int noteIn, int noteOut)
+{
+	midiInputFilter.setNote(noteIn, noteOut);
+}
+
+void SuperVirtualKeyboardPluginState::mapOutputNode(int noteIn, int noteOut)
+{
+	midiOutputFilter.setNote(noteIn, noteOut);
+}
+
+//==============================================================================
+
 
 void SuperVirtualKeyboardPluginState::pauseMidiInput(bool setPaused)
 {
