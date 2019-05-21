@@ -72,6 +72,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	// going to move these over to a midi processor class at some point
 	Array<int>* getInputNoteMap();
 	Array<int>* getOutputNoteMap();
+	int getInputNote(int midiNoteIn);
+
     MidiRemapper midiInputFilter;
     MidiRemapper midiOutputFilter;
 	void setMidiInputMap(Array<int> mapIn);
