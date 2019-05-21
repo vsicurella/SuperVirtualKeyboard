@@ -992,7 +992,7 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     //const MessageManagerLock mmLock;
     
     Key* key;
-    int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);
+    int keyTriggered = pluginState->getInputNote(midiNote);
 
     if (uiModeSelected == playMode)
     {
@@ -1021,7 +1021,7 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
     //const MessageManagerLock mmLock;
 
     Key* key;
-    int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);
+    int keyTriggered = pluginState->getInputNote(midiNote);
 
     if (uiModeSelected == playMode)
     {

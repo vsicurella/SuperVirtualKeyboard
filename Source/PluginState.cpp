@@ -70,6 +70,11 @@ Array<int>* SuperVirtualKeyboardPluginState::getInputNoteMap()
     return &noteInputMap;
 }
 
+int SuperVirtualKeyboardPluginState::getInputNote(int midiNoteIn)
+{
+	return midiInputFilter.getNote(midiNoteIn);
+}
+
 Array<int>* SuperVirtualKeyboardPluginState::getOutputNoteMap()
 {
     return &noteOutputMap;
