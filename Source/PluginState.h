@@ -76,7 +76,7 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
     MidiRemapper midiOutputFilter;
 	void setMidiInputMap(Array<int> mapIn);
 	void setMidiOutputMap(Array<int> mapIn);
-	void mapInputNote(int noteIn, int noteOut);
+	Array<int> mapInputNote(int noteIn, int noteOut);
 	void mapOutputNode(int noteIn, int noteOut);
 
 	int is_mode_in_presets(String stepsStringIn);

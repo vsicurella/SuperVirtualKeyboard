@@ -219,9 +219,10 @@ void SuperVirtualKeyboardPluginState::setMidiOutputMap(Array<int> mapIn)
 	noteOutputMap = mapIn;
 }
 
-void SuperVirtualKeyboardPluginState::mapInputNote(int noteIn, int noteOut)
+Array<int> SuperVirtualKeyboardPluginState::mapInputNote(int noteIn, int noteOut)
 {
 	midiInputFilter.setNote(noteIn, noteOut);
+	return midiInputFilter.removeDuplicates(noteIn);
 }
 
 void SuperVirtualKeyboardPluginState::mapOutputNode(int noteIn, int noteOut)

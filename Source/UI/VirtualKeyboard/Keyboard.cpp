@@ -989,7 +989,7 @@ void Keyboard::triggerKeyNoteOff(Key* key)
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    const MessageManagerLock mmLock;
+    //const MessageManagerLock mmLock;
     
     Key* key;
     int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);
@@ -1003,7 +1003,14 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     {
         key = keys.getUnchecked(lastKeyClicked);
         key->mappedNoteIn = midiNote;
-        pluginState->mapInputNote(midiNote, key->keyNumber);
+		Array<int> keysToNull = pluginState->mapInputNote(midiNote, key->keyNumber);
+		
+		Key* toNull;
+		for (int i = 0; i < keysToNull.size(); i++)
+		{
+			toNull = keys.getUnchecked(keysToNull[i]);
+			toNull->mappedNoteIn = -1;
+		}
     }
     
 	//repaint();
@@ -1011,7 +1018,7 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    const MessageManagerLock mmLock;
+    //const MessageManagerLock mmLock;
 
     Key* key;
     int keyTriggered = pluginState->getInputNoteMap()->getUnchecked(midiNote);

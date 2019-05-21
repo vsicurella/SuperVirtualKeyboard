@@ -22,6 +22,8 @@ struct MidiRemapper
     
     int setNote(int noteIn, int noteOut);
     void setNoteRange(int lowestMidiNote, int highestMidiNote);
+
+	Array<int> removeDuplicates(int noteToKeep);
     
     Array<int>* setNoteMap(Array<int>& noteMapIn);
     Array<int>* getNoteMap();
@@ -32,4 +34,6 @@ private:
     
     Array<int>* midiNoteMapping;
     Point<int> noteRange;
+
+
 };
