@@ -54,6 +54,7 @@ public:
     void setModeReadoutText(String steps);
 	void setModeLibraryText(String presetName);
     void setOffsetReadout(int offIn);
+	int getOffsetReadout();
 
 	void createAndSendMode();
 

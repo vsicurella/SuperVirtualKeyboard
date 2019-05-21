@@ -41,7 +41,6 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	colorChooserWindow->addChangeListener(this);
 
     pluginState->addChangeListener(this);
-	pluginState->pluginStateNode.addListener(this);
     pluginState->midiStateIn->addListener(piano.get());
     keyboardEditorBar->addChangeListener(this);
 	initNodeData();
@@ -62,7 +61,6 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 {
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
-	pluginState->pluginStateNode.removeListener(this);
     pluginState->midiStateIn->removeListener(piano.get());
     piano->removeListener(&processor);
 }
@@ -369,7 +367,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
         pluginState->midiStateIn->addListener(piano.get());
     }
     
-    // Mapping button toggled
+    // Root note or Mapping button toggled 
     if (source == keyboardEditorBar.get())
     {
         if (keyboardEditorBar->isMapButtonOn())
@@ -382,38 +380,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
             pluginState->pauseMidiInput(false);
             piano->setUIMode(UIMode::playMode);
         }
-    }
-}
 
-//==============================================================================
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
-{
-	// Root note is changed
-	if (treeWhosePropertyHasChanged.hasType(IDs::midiSettingsNode) && property == IDs::rootMidiNote)
-	{
 		update_children_to_preset();
-	}
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged)
-{
-
+    }
 }
 
 //==============================================================================

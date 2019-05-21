@@ -28,6 +28,23 @@ Array<int>* MidiRemapper::setNoteMap(Array<int>& noteMapIn)
     return midiNoteMapping;
 }
 
+Array<int> MidiRemapper::removeDuplicates(int noteToKeep)
+{
+	int val = midiNoteMapping->getUnchecked(noteToKeep);
+	Array<int> indiciesOut;
+
+	for (int i = 0; i < midiNoteMapping->size(); i++)
+	{
+		if (i != noteToKeep && midiNoteMapping->getUnchecked(i) == val)
+		{
+			midiNoteMapping->set(i, -1);
+			indiciesOut.add(i);
+		}
+	}
+
+	return indiciesOut;
+}
+
 int MidiRemapper::getNote(int midiNoteIn)
 {
     int midiNoteOut = jlimit(noteRange.x, noteRange.y, midiNoteIn);

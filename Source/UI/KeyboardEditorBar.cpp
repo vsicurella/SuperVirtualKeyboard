@@ -211,6 +211,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
 		pluginState->setRootNote((int)offsetSld->getValue());
+		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
     }
 
@@ -255,6 +256,11 @@ bool KeyboardEditorBar::isMapButtonOn()
 void KeyboardEditorBar::setOffsetReadout(int offIn)
 {
     offsetSld->setValue(offIn, dontSendNotification);
+}
+
+int KeyboardEditorBar::getOffsetReadout()
+{
+	return offsetSld->getValue();
 }
 
 void KeyboardEditorBar::setModeReadoutText(String steps)
