@@ -225,6 +225,17 @@ static void get_array_from_node(const ValueTree nodeIn, Array<Point<double>>& ar
 			arrayIn.add(pointFromString(arrayIn[0], childArray.getChild(i).getProperty("Value")));
 }
 
+template <class T>
+static void set_value_in_array(ValueTree nodeIn, Identifier arrayID, int indexToChange, T valueToSet)
+{
+    ValueTree arrayNode = nodeIn.getChildWithName(arrayID);
+    
+    if (arrayNode.isValid() && indexToChange >= 0 && indexToChange < arrayNode.getNumChildren())
+    {
+        arrayNode.getChild(indexToChange).setProperty("Value", valueToSet, nullptr);
+    }
+}
+
 static int totalModulus(int numIn, int mod)
 {
 	return ((numIn % mod) + mod) % mod;
