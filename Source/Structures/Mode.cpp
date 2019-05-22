@@ -372,7 +372,6 @@ int Mode::getModeSize() const
 	return modeSize;
 }
 
-
 Array<int> Mode::getStepsOfOrders()
 {
     return stepsOfOrders;
@@ -427,7 +426,7 @@ Array<int> Mode::getScaleDegrees()
 
 int Mode::getMaxStep()
 {
-	int step = 0;
+	int step = 1;
 
 	for (int i = 0; i < steps.size(); i++)
 	{

@@ -75,12 +75,6 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
-int SuperVirtualKeyboardPluginState::getRootMidiNote()
-{
-    return midiProcessor->getRootNote();
-}
-
-
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	int index = 0;
@@ -102,7 +96,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		modeCurrent->setRootNote(getRootMidiNote());
+		modeCurrent->setRootNote(midiProcessor->getRootNote());
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
@@ -120,7 +114,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	if (modeIn)
 	{
 		modeCurrent = modeIn;
-		modeCurrent->setRootNote(getRootMidiNote());
+		modeCurrent->setRootNote(midiProcessor->getRootNote());
 		presets.set(0, modeCurrent, true);
 
 		if (presetCurrent->theKeyboardNode.isValid())
@@ -145,7 +139,7 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
-	updateMidiSettingsNode();
+    midiProcessor->updateNode();
 	modePresetNode = modeCurrent->modeNode;
 	presetCurrent->updateParentNode(pluginStateNode);
 
@@ -174,7 +168,7 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 		if (presetCurrent->theModeNode.isValid())
 		{
-			modeCurrent->restore_from_node(presetCurrent->theModeNode, getRootMidiNote());
+			modeCurrent->restore_from_node(presetCurrent->theModeNode, midiProcessor->getRootNote());
 			modePresetNode = modeCurrent->modeNode;
 		}
 		

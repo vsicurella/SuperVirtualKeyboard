@@ -90,7 +90,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 	pianoMenu->toBack();
 	modeTextEditor->addListener(this);
 
-	offsetSld->setValue(pluginState->getRootNote(), NotificationType::dontSendNotification);
+	offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
 
     //[/UserPreSize]
 
@@ -210,7 +210,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-		pluginState->setRootNote((int)offsetSld->getValue());
+		pluginState->getMidiProcessor()->setRootNote((int)offsetSld->getValue());
 		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
     }
