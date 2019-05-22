@@ -968,7 +968,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 {
     if (velocityIn > 0)
     {
-        noteOn(midiChannelSelected, key->mappedNoteOut, velocityIn);
+        noteOn(midiChannelSelected, key->keyNumber, velocityIn);
 		key->activeState = 2;
 		key->velocity = velocityIn;
         keysOn.add(key);
@@ -977,7 +977,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 
 void Keyboard::triggerKeyNoteOff(Key* key)
 {
-    noteOff(midiChannelSelected, key->mappedNoteOut, 0);
+    noteOff(midiChannelSelected, key->keyNumber, 0);
 
 	if (key->isMouseOver())
 		key->activeState = 1;
