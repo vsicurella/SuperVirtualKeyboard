@@ -28,7 +28,8 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     
 	piano.reset(new Keyboard(pluginState));
 	piano->setName("The Piano");
-	piano->addListener(&processor);
+	piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
+    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano.get()); // displays MIDI input on Keyboard
 
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
@@ -62,7 +63,7 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
     pluginState->midiStateIn->removeListener(piano.get());
-    piano->removeListener(&processor);
+    piano->removeListener(pluginState->getMidiProcessor());
 }
 
 //==============================================================================
@@ -364,7 +365,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
     // Prepare to play
     if (source == &processor)
     {
-        pluginState->midiStateIn->addListener(piano.get());
+        //pluginState->midiStateIn->addListener(piano.get());
     }
     
     // Root note or Mapping button toggled 
@@ -372,12 +373,12 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
     {
         if (keyboardEditorBar->isMapButtonOn())
         {
-            pluginState->pauseMidiInput();
+            pluginState->getMidiProcessor()->pauseMidiInput();
             piano->setUIMode(UIMode::mapMode);
         }
         else
         {
-            pluginState->pauseMidiInput(false);
+            pluginState->getMidiProcessor()->pauseMidiInput(false);
             piano->setUIMode(UIMode::playMode);
         }
 

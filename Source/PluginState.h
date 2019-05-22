@@ -10,6 +10,7 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "MidiProcessor.h"
 #include "PluginIDs.h"
 #include "Structures/Preset.h"
 #include "Structures/MidiRemapper.h"
@@ -26,33 +27,7 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	ValueTree modePresetNode;
 	ValueTree pianoNode;
     
-	SuperVirtualKeyboardPluginState() :
-		pluginStateNode(IDs::pluginStateNode),
-		modeLibraryNode(IDs::modeLibraryNode),
-		modePresetNode(IDs::modePresetNode),
-		pluginSettingsNode(IDs::pluginSettingsNode),
-		midiSettingsNode(IDs::midiSettingsNode),
-		undoManager(new UndoManager()),
-		appCmdMgr(new ApplicationCommandManager())
-
-	{
-		createPresets();
-		pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
-		pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
-		pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
-	
-		presetCurrent.reset(new SvkPreset());
-        midiStateIn.reset(new MidiKeyboardState());
-        
-        noteInputMap = MidiRemapper::getStandardMap();
-        noteOutputMap = MidiRemapper::getStandardMap();
-        
-        midiInputFilter = MidiRemapper(&noteInputMap);
-        midiOutputFilter = MidiRemapper(&noteOutputMap);
-
-		updateMidiSettingsNode();
-	}
-
+    SuperVirtualKeyboardPluginState();
 	~SuperVirtualKeyboardPluginState() {}
 
 	//==============================================================================
@@ -61,25 +36,11 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	Array<Array<Mode*>>* get_presets_sorted();
 	UndoManager* getUndoManager();
 
+    SvkMidiProcessor* getMidiProcessor();
 	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
 	Mode* getCurrentMode();
-
-    
-    void setRootNote(int rootNoteIn);
-    int getRootNote();
-    
-	// going to move these over to a midi processor class at some point
-	Array<int>* getInputNoteMap();
-	Array<int>* getOutputNoteMap();
-	int getInputNote(int midiNoteIn);
-
-    MidiRemapper midiInputFilter;
-    MidiRemapper midiOutputFilter;
-	void setMidiInputMap(Array<int> mapIn);
-	void setMidiOutputMap(Array<int> mapIn);
-	Array<int> mapInputNote(int noteIn, int noteOut);
-	void mapOutputNode(int noteIn, int noteOut);
+    int getRootMidiNote();
 
 	int is_mode_in_presets(String stepsStringIn);
 
@@ -91,9 +52,6 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 
 	bool savePreset();
 	bool loadPreset();
-
-    void pauseMidiInput(bool setPaused=true);
-    bool isMidiPaused();
     
 	//==============================================================================
 	
@@ -106,17 +64,12 @@ private:
 
 	//==============================================================================
 
+    std::unique_ptr<SvkMidiProcessor> midiProcessor;
+    std::unique_ptr<SvkPreset> presetCurrent;
 	std::unique_ptr<UndoManager> undoManager;
-	OwnedArray<Mode> presets;
+	
+    OwnedArray<Mode> presets;
 	Array<Array<Mode*>> presetsSorted;
 
-	std::unique_ptr<SvkPreset> presetCurrent;
 	Mode* modeCurrent;
-    
-    Array<int> noteInputMap;
-    Array<int> noteOutputMap;
-    
-    bool midiInputPaused = false;
-    
-    int rootMidiNote = 60;
 };

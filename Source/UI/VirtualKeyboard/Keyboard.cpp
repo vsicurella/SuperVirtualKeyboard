@@ -368,8 +368,8 @@ void Keyboard::applyMode(Mode* modeIn)
 		key->step = mode->getStepsOfOrders()[i];
 		setKeyProportions(key);
 		
-        key->mappedNoteIn = pluginState->getInputNoteMap()->getUnchecked(i);
-		key->mappedNoteOut = pluginState->getOutputNoteMap()->getUnchecked(totalModulus(i - mode->getOffset(), keys.size()));
+        key->mappedNoteIn = pluginState->getMidiProcessor()->getInputNote(i);
+        key->mappedNoteIn = pluginState->getMidiProcessor()->getOutputNote(i);
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
@@ -989,10 +989,8 @@ void Keyboard::triggerKeyNoteOff(Key* key)
 
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    //const MessageManagerLock mmLock;
-    
     Key* key;
-    int keyTriggered = pluginState->getInputNote(midiNote);
+    int keyTriggered = midiNote;
 
     if (uiModeSelected == playMode)
     {
@@ -1003,6 +1001,7 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     {
         key = keys.getUnchecked(lastKeyClicked);
         key->mappedNoteIn = midiNote;
+        /*
 		Array<int> keysToNull = pluginState->mapInputNote(midiNote, key->keyNumber);
 		
 		Key* toNull;
@@ -1011,25 +1010,20 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 			toNull = keys.getUnchecked(keysToNull[i]);
 			toNull->mappedNoteIn = -1;
 		}
+         */
     }
-    
-	//repaint();
 }
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    //const MessageManagerLock mmLock;
-
     Key* key;
-    int keyTriggered = pluginState->getInputNote(midiNote);
+    int keyTriggered = midiNote;
 
     if (uiModeSelected == playMode)
     {
         key = keys.getUnchecked(keyTriggered);
         key->externalMidiState = 0;
     }
-    
-	//repaint();
 }
 
 //===============================================================================================

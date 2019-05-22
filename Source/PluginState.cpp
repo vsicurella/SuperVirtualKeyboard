@@ -10,6 +10,30 @@
 
 #include "PluginState.h"
 
+SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
+{
+    appCmdMgr.reset(new ApplicationCommandManager());
+    undoManager.reset(new UndoManager());
+    presetCurrent.reset(new SvkPreset());
+    midiProcessor.reset(new SvkMidiProcessor());
+    midiStateIn.reset(new MidiKeyboardState());
+
+    // setup data nodes
+    pluginStateNode = ValueTree(IDs::pluginStateNode);
+    modeLibraryNode = ValueTree(IDs::modeLibraryNode);
+    pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
+    
+    pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+    pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
+    pluginStateNode.addChild(midiProcessor->midiSettingsNode, -1, nullptr);
+
+    createPresets();
+}
+
+SvkMidiProcessor* SuperVirtualKeyboardPluginState::getMidiProcessor()
+{
+    return midiProcessor.get();
+}
 
 UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
 {
@@ -51,34 +75,11 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
-void SuperVirtualKeyboardPluginState::setRootNote(int rootNoteIn)
+int SuperVirtualKeyboardPluginState::getRootMidiNote()
 {
-    rootMidiNote = totalModulus(rootNoteIn, 128);
-	modeCurrent->setRootNote(rootMidiNote);
-
-	midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-}
-   
-int SuperVirtualKeyboardPluginState::getRootNote()
-{
-    return rootMidiNote;
-}
-    
-
-Array<int>* SuperVirtualKeyboardPluginState::getInputNoteMap()
-{
-    return &noteInputMap;
+    return midiProcessor->getRootNote();
 }
 
-int SuperVirtualKeyboardPluginState::getInputNote(int midiNoteIn)
-{
-	return midiInputFilter.getNote(midiNoteIn);
-}
-
-Array<int>* SuperVirtualKeyboardPluginState::getOutputNoteMap()
-{
-    return &noteOutputMap;
-}
 
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
@@ -101,7 +102,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		modeCurrent->setRootNote(rootMidiNote);
+		modeCurrent->setRootNote(getRootMidiNote());
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
@@ -119,7 +120,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	if (modeIn)
 	{
 		modeCurrent = modeIn;
-		modeCurrent->setRootNote(rootMidiNote);
+		modeCurrent->setRootNote(getRootMidiNote());
 		presets.set(0, modeCurrent, true);
 
 		if (presetCurrent->theKeyboardNode.isValid())
@@ -139,17 +140,6 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 	{
 		presetCurrent->updateKeyboardNode(pianoNode);
 	}
-}
-
-void SuperVirtualKeyboardPluginState::updateMidiSettingsNode()
-{
-	midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
-
-	midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiInputMap), nullptr);
-	add_array_to_node(midiSettingsNode, noteInputMap, IDs::midiInputMap, "Note");
-
-	midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiOutputMap), nullptr);
-	add_array_to_node(midiSettingsNode, noteOutputMap, IDs::midiOutputMap, "Note");
 }
 
 
@@ -179,25 +169,12 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 		if (presetCurrent->theMidiSettingsNode.isValid())
 		{
-			if (midiSettingsNode.hasProperty(IDs::midiInputMap))
-			{
-				noteInputMap.clear();
-				get_array_from_node(midiSettingsNode, noteInputMap, IDs::midiInputMap);
-			}
-
-			if (midiSettingsNode.hasProperty(IDs::midiOutputMap))
-			{
-				noteOutputMap.clear();
-				get_array_from_node(midiSettingsNode, noteOutputMap, IDs::midiOutputMap);
-			}
-
-			rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
-			midiSettingsNode.copyPropertiesAndChildrenFrom(presetCurrent->theMidiSettingsNode, nullptr);
+            midiProcessor->restoreFromNode(presetCurrent->theMidiSettingsNode);
 		}
 
 		if (presetCurrent->theModeNode.isValid())
 		{
-			modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
+			modeCurrent->restore_from_node(presetCurrent->theModeNode, getRootMidiNote());
 			modePresetNode = modeCurrent->modeNode;
 		}
 		
@@ -214,41 +191,6 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 //==============================================================================
 
-void SuperVirtualKeyboardPluginState::setMidiInputMap(Array<int> mapIn)
-{
-	noteInputMap = mapIn;
-}
-
-void SuperVirtualKeyboardPluginState::setMidiOutputMap(Array<int> mapIn)
-{
-	noteOutputMap = mapIn;
-}
-
-Array<int> SuperVirtualKeyboardPluginState::mapInputNote(int noteIn, int noteOut)
-{
-	midiInputFilter.setNote(noteIn, noteOut);
-	return midiInputFilter.removeDuplicates(noteIn);
-}
-
-void SuperVirtualKeyboardPluginState::mapOutputNode(int noteIn, int noteOut)
-{
-	midiOutputFilter.setNote(noteIn, noteOut);
-}
-
-//==============================================================================
-
-
-void SuperVirtualKeyboardPluginState::pauseMidiInput(bool setPaused)
-{
-    midiInputPaused = setPaused;
-}
-
-bool SuperVirtualKeyboardPluginState::isMidiPaused()
-{
-    return midiInputPaused;
-}
-
-//==============================================================================
 
 void SuperVirtualKeyboardPluginState::createPresets()
 {
