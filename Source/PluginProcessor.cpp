@@ -26,6 +26,7 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 #endif
 {
     //midiStateInput = pluginState->midiStateIn.get();
+    
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()

@@ -28,8 +28,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     
 	piano.reset(new Keyboard(pluginState));
 	piano->setName("The Piano");
-	piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
-    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano.get()); // displays MIDI input on Keyboard
+
 
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
@@ -42,8 +41,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	colorChooserWindow->addChangeListener(this);
 
     pluginState->addChangeListener(this);
-    pluginState->midiStateIn->addListener(piano.get());
     keyboardEditorBar->addChangeListener(this);
+    piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
+    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano.get()); // displays MIDI on Keyboard
 	initNodeData();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
@@ -62,8 +62,8 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 {
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
-    pluginState->midiStateIn->removeListener(piano.get());
     piano->removeListener(pluginState->getMidiProcessor());
+    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano.get());
 }
 
 //==============================================================================

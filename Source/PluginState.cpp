@@ -16,12 +16,12 @@ SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
     undoManager.reset(new UndoManager());
     presetCurrent.reset(new SvkPreset());
     midiProcessor.reset(new SvkMidiProcessor());
-    midiStateIn.reset(new MidiKeyboardState());
 
     // setup data nodes
     pluginStateNode = ValueTree(IDs::pluginStateNode);
     modeLibraryNode = ValueTree(IDs::modeLibraryNode);
     pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
+    modePresetNode = ValueTree(IDs::modePresetNode);
     
     pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
     pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
