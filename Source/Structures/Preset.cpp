@@ -142,7 +142,7 @@ SvkPreset* SvkPreset::loadFromFile(String absoluteFilePath)
 {
 	ValueTree nodeIn;
 	File fileIn = File(absoluteFilePath);
-    SvkPreset* presetOut;
+    SvkPreset* presetOut = nullptr;
 
 	if (!fileIn.exists())
 	{

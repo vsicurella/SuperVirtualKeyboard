@@ -40,7 +40,6 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	SvkPreset* getCurrentPreset();
 	int get_current_preset_index();
 	Mode* getCurrentMode();
-    int getRootMidiNote();
 
 	int is_mode_in_presets(String stepsStringIn);
 
