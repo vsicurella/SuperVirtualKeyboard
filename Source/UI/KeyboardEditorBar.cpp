@@ -88,10 +88,11 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
 	addAndMakeVisible(pianoMenu.get());
 	pianoMenu->toBack();
+    
+    modeTextEditor->setMouseClickGrabsKeyboardFocus(true);
 	modeTextEditor->addListener(this);
-
-	offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
-
+	
+    offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
     //[/UserPreSize]
 
     setSize (600, 400);
