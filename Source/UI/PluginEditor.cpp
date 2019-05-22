@@ -51,6 +51,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
+    
 
     setSize(1000, 250);
 	setResizeLimits(640, 100, 10e4, 10e4);
