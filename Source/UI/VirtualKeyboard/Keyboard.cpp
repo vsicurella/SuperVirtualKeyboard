@@ -82,6 +82,12 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 		mpeOn = pianoNode[IDs::pianoMPEToggle];
 		defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
 
+		if (pianoNode.getChildWithName(IDs::pianoKeyMidiNoteMappings).isValid())
+		{
+			keyMidiNoteMappings.clear();
+			get_array_from_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings);
+		}
+
 		if (pianoNode.getChildWithName(IDs::pianoKeyColorsOrder).isValid())
 		{
 			keyColorsOrder.clear();
@@ -94,10 +100,10 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 			get_array_from_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree);
 		}
 
-		if (pianoNode.getChildWithName(IDs::pianoKeyColorSingle).isValid())
+		if (pianoNode.getChildWithName(IDs::pianoKeyColorDefault).isValid())
 		{
 			keyColorsSingle.clear();
-			get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle);
+			get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorDefault);
 		}
 
 		keyPlacesOrder.clear();
@@ -123,13 +129,17 @@ void Keyboard::updatePianoNode()
 
 void Keyboard::updateKeyProperties()
 {
+	// Mapped Midi Notes
+	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyMidiNoteMappings), nullptr);
+	add_array_to_node(pianoNode, keyMidiNoteMappings, IDs::pianoKeyMidiNoteMappings, "MidiNote");
+
 	// Colors
 	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
 	add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
 	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsDegree), nullptr);
 	add_array_to_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, "Color");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorSingle), nullptr);
-	add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, "Color");
+	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorDefault), nullptr);
+	add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorDefault, "Color");
 
 	// Placements
 	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceOrder), nullptr);
@@ -1003,10 +1013,10 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     {
         key = keys.getUnchecked(lastKeyClicked);
         key->mappedNoteIn = midiNote;
-        pluginState->mapInputNote(midiNote, key->keyNumber);
+        pluginState->getInputNoteMap()->set(midiNote, key->keyNumber);
     }
     
-	//repaint();
+	repaint();
 }
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
@@ -1022,7 +1032,7 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
         key->externalMidiState = 0;
     }
     
-	//repaint();
+	repaint();
 }
 
 //===============================================================================================
