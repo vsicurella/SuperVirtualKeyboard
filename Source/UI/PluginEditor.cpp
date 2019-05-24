@@ -40,6 +40,10 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
 
+	midiRemapperDialog.reset(new MidiRemapperWindow(pluginState));
+	midiRemapperDialog->setSize(800, 600);
+	midiRemapperDialog->addToDesktop();
+
     pluginState->addChangeListener(this);
 	pluginState->pluginStateNode.addListener(this);
     pluginState->midiStateIn->addListener(piano.get());
@@ -445,6 +449,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID >
 		IDs::CommandIDs::loadCustomLayout,
 		IDs::CommandIDs::saveReaperMap,
 		IDs::CommandIDs::setKeyColor,
+		IDs::CommandIDs::remapMidiNotes
 	};
 
 	c.addArray(commands);
@@ -473,6 +478,9 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
+	case IDs::CommandIDs::remapMidiNotes:
+		result.setInfo("Set midi note mapping", "Allows you to remap your keyboard to trigger modal notes.", "Midi", 0);
+		break;
 	default:
 		break;
 	}
@@ -493,6 +501,9 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 		break;
 	case IDs::CommandIDs::setKeyColor:
 		beginColorEditing();
+		break;
+	case IDs::CommandIDs::remapMidiNotes:
+		midiRemapperDialog->setVisible(true);
 		break;
 	default:
 		return false;

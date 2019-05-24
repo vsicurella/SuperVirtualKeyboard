@@ -16,7 +16,9 @@
 #include "KeyboardEditorBar.h"
 #include "../Structures/Mode.h"
 #include "VirtualKeyboard/Keyboard.h"
+
 #include "Dialogs/ColorChoosingWindow.h"
+#include "Dialogs/MidiRemapperWindow.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -116,6 +118,8 @@ private:
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
+
+	std::unique_ptr<MidiRemapperWindow> midiRemapperDialog;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };

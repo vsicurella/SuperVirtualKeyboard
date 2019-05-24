@@ -85,7 +85,8 @@ namespace IDs
 		setKeysNestedRight,
 		setKeysNestedCenter,
 		setKeysAdjacent,
-		showMidiNoteNumbers
+		showMidiNoteNumbers,
+		remapMidiNotes
 	};
 }
 
