@@ -64,6 +64,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
     offsetSld->setRange (0, 127, 1);
     offsetSld->setSliderStyle (Slider::IncDecButtons);
     offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+	offsetSld->setValue(pluginState->getRootNote(), NotificationType::dontSendNotification);
     offsetSld->addListener (this);
 
     offsetLabel.reset (new Label ("Offset Label",
@@ -89,9 +90,6 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 	addAndMakeVisible(pianoMenu.get());
 	pianoMenu->toBack();
 	modeTextEditor->addListener(this);
-
-	offsetSld->setValue(pluginState->getRootNote(), NotificationType::dontSendNotification);
-
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -193,7 +191,7 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 			// If it's a default preset, it reverts to original name
 			newModeName = pluginState->getCurrentMode()->getDescription();
-			comboBoxThatHasChanged->setText(newModeName, dontSendNotification);
+			comboBoxThatHasChanged->setText(newModeName, NotificationType::dontSendNotification);
 		}
         //[/UserComboBoxCode_modeLibraryBox]
     }
@@ -264,7 +262,7 @@ void KeyboardEditorBar::setModeReadoutText(String steps)
 
 void KeyboardEditorBar::setModeLibraryText(String presetName)
 {
-	modeLibraryBox->setText(presetName, dontSendNotification);
+	modeLibraryBox->setText(presetName, NotificationType::dontSendNotification);
 }
 
 void KeyboardEditorBar::createAndSendMode()

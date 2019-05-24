@@ -15,18 +15,15 @@
 
 namespace IDs
 {
-	// Parent Nodes
+	// Plugin State & Presets
 	static Identifier pluginStateNode("PluginState");
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
-	static Identifier modePresetNode("Mode");
-	static Identifier pluginSettingsNode("PluginSettings");
-	static Identifier midiSettingsNode("MidiSettings");
+	static Identifier modePresetNode("ModeLayout");
+	static Identifier preferencesNode("Preferences");
 
-	// Midi Settings
+	// Settings
 	static Identifier rootMidiNote("RootNote");
-	static Identifier midiInputMap("MidiInputMap");
-	static Identifier midiOutputMap("MidiInputMap");
 
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
@@ -36,7 +33,7 @@ namespace IDs
 	static Identifier family("Family");
     static Identifier modeName("ModeName");
 	static Identifier factoryPreset("FactoryPreset");
-	static Identifier libraryIndexOfMode("ModeLibraryIndex");
+	static Identifier libraryIndexOfMode("IndexOfMode");
 
 	// Keyboard Window
 	static Identifier keyboardWindowNode("KeyboardWindow");
@@ -49,7 +46,7 @@ namespace IDs
 	static Identifier pianoUIMode("PianoUIMode");
 	static Identifier pianoOrientation("PianoOrientation");
 	static Identifier pianoKeyboardState("PianoKeyboardState");
-	static Identifier pianoLastKeyClicked("LastKeyClicked");
+	static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
 	static Identifier pianoMPEToggle("MpeToggle");
 	static Identifier pianoWHRatio("WidthToHeightRatio");
@@ -57,13 +54,14 @@ namespace IDs
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
-	static Identifier pianoKeyColorSingle("KeySingleColors");
+	static Identifier pianoKeyColorDefault("KeySingleColors");
 	static Identifier pianoKeyPlaceOrder("KeyOrderPlaces");
 	static Identifier pianoKeyPlaceDegree("KeyDegreePlaces");
 	static Identifier pianoKeyPlaceSingle("KeySinglePlaces");
 	static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 	static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 	static Identifier pianoKeyRatioSingle("KeySingleRatios");
+	static Identifier pianoKeyMidiNoteMappings("KeyMappedMidiNotes");
 
 
 	// Piano Key Component
