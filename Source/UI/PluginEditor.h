@@ -29,7 +29,6 @@ using namespace VirtualKeyboard;
 */
 class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													public ApplicationCommandTarget,
-													private ValueTree::Listener,
 													private ChangeListener,
 													private Timer
 {
@@ -74,18 +73,6 @@ public:
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
-
-	//==============================================================================
-
-	 void valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
-
-	 void valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
-
-	 void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override;
-
-	 void valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex) override;
-
-	 void valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged) override;
 
 	 //==============================================================================
 

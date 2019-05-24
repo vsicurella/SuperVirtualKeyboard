@@ -64,7 +64,6 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
     offsetSld->setRange (0, 127, 1);
     offsetSld->setSliderStyle (Slider::IncDecButtons);
     offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-	offsetSld->setValue(pluginState->getRootNote(), NotificationType::dontSendNotification);
     offsetSld->addListener (this);
 
     offsetLabel.reset (new Label ("Offset Label",
@@ -90,6 +89,9 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 	addAndMakeVisible(pianoMenu.get());
 	pianoMenu->toBack();
 	modeTextEditor->addListener(this);
+
+	offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
+
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -191,7 +193,7 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 			// If it's a default preset, it reverts to original name
 			newModeName = pluginState->getCurrentMode()->getDescription();
-			comboBoxThatHasChanged->setText(newModeName, NotificationType::dontSendNotification);
+			comboBoxThatHasChanged->setText(newModeName, dontSendNotification);
 		}
         //[/UserComboBoxCode_modeLibraryBox]
     }
@@ -208,7 +210,8 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-		pluginState->setRootNote((int)offsetSld->getValue());
+		pluginState->getMidiProcessor()->setRootNote((int)offsetSld->getValue());
+		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
     }
 
@@ -255,6 +258,11 @@ void KeyboardEditorBar::setOffsetReadout(int offIn)
     offsetSld->setValue(offIn, dontSendNotification);
 }
 
+int KeyboardEditorBar::getOffsetReadout()
+{
+	return offsetSld->getValue();
+}
+
 void KeyboardEditorBar::setModeReadoutText(String steps)
 {
 	modeTextEditor->setText(steps, false);
@@ -262,7 +270,7 @@ void KeyboardEditorBar::setModeReadoutText(String steps)
 
 void KeyboardEditorBar::setModeLibraryText(String presetName)
 {
-	modeLibraryBox->setText(presetName, NotificationType::dontSendNotification);
+	modeLibraryBox->setText(presetName, dontSendNotification);
 }
 
 void KeyboardEditorBar::createAndSendMode()
@@ -460,15 +468,15 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="1"
             layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="0"
-          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="0.0"
+          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
          virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Root:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
               virtualName="" explicitFocusOrder="0" pos="542Rr 6 79 24" bgColOff="ff5c6ea4"
               bgColOn="ffa7b438" buttonText="Map Notes" connectedEdges="8"

@@ -25,8 +25,8 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
 	pluginState(new SuperVirtualKeyboardPluginState())
 #endif
 {
-    MidiMessageCollector::reset(41000); // default
-    midiStateInput = pluginState->midiStateIn.get();
+    //midiStateInput = pluginState->midiStateIn.get();
+    
 }
 
 SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
@@ -97,21 +97,12 @@ void SuperVirtualKeyboardAudioProcessor::changeProgramName (int index, const Str
 }
 
 //==============================================================================
-
-
-MidiBuffer* SuperVirtualKeyboardAudioProcessor::get_midi_buffer()
-{
-	return &midiBuffer;
-}
-
-//==============================================================================
 void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-	MidiMessageCollector::reset(sampleRate);
-    pluginState->midiStateIn.reset(new MidiKeyboardState());
-    midiStateInput = pluginState->midiStateIn.get();
+	pluginState->getMidiProcessor()->reset(sampleRate);
+    //midiStateInput = pluginState->midiStateIn.get();
     sendChangeMessage();
 }
 
@@ -147,44 +138,12 @@ bool SuperVirtualKeyboardAudioProcessor::isBusesLayoutSupported (const BusesLayo
 
 void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-	// Input filtering
-    auto midiEvent = MidiBuffer::Iterator(midiMessages);
-    MidiMessage msg;
-    int smpl;
-    
-    while (midiEvent.getNextEvent(msg, smpl))
-    {
-        if (!pluginState->isMidiPaused())
-            msg.setNoteNumber(pluginState->midiInputFilter.getNote(msg.getNoteNumber()));
-        
-        msg.setTimeStamp(++msgCount);
-        midiStateInput->processNextMidiEvent(msg);
-		addMessageToQueue(msg);
-    }
-
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data
     for (auto i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
-
-	// Midi Output filtering
-    msgCount = 0;
-	midiMessages.clear();
-	removeNextBlockOfMessages(midiBuffer, 4096);
     
-    if (!pluginState->isMidiPaused())
-    {
-        auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
-        while (midiEventOut.getNextEvent(msg, smpl))
-        {
-            msg.setNoteNumber(pluginState->midiOutputFilter.getNote(msg.getNoteNumber()));
-            msg.setTimeStamp(++msgCount);
-            midiMessages.addEvent(msg, smpl);
-        }
-    }
-
-    midiBuffer.clear();
-    msgCount = 0;
+    pluginState->getMidiProcessor()->processMidi(midiMessages);
 }
 
 //==============================================================================
@@ -234,17 +193,3 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 //==============================================================================
-
-void SuperVirtualKeyboardAudioProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
-{
-    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
-    msg.setTimeStamp(++msgCount);
-    addMessageToQueue(msg);
-}
-
-void SuperVirtualKeyboardAudioProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
-{
-    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
-    msg.setTimeStamp(++msgCount);
-	addMessageToQueue(msg);
-}

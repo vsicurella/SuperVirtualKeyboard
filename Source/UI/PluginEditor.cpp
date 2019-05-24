@@ -28,7 +28,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     
 	piano.reset(new Keyboard(pluginState));
 	piano->setName("The Piano");
-	piano->addListener(&processor);
+
 
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
@@ -45,9 +45,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	midiRemapperDialog->addToDesktop();
 
     pluginState->addChangeListener(this);
-	pluginState->pluginStateNode.addListener(this);
-    pluginState->midiStateIn->addListener(piano.get());
     keyboardEditorBar->addChangeListener(this);
+    piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
+    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano.get()); // displays MIDI on Keyboard
 	initNodeData();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
@@ -66,9 +66,8 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 {
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
-	pluginState->pluginStateNode.removeListener(this);
-    pluginState->midiStateIn->removeListener(piano.get());
-    piano->removeListener(&processor);
+    piano->removeListener(pluginState->getMidiProcessor());
+    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano.get());
 }
 
 //==============================================================================
@@ -193,7 +192,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 	//piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
 	//	*processor.get_midi_buffer(), 0, 4096, true);
 
-	//piano.get()->repaint();
+	piano.get()->repaint();
 }
 
 //==============================================================================
@@ -370,54 +369,25 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
     // Prepare to play
     if (source == &processor)
     {
-        pluginState->midiStateIn->addListener(piano.get());
+        //pluginState->midiStateIn->addListener(piano.get());
     }
     
-    // Mapping button toggled
+    // Root note or Mapping button toggled 
     if (source == keyboardEditorBar.get())
     {
         if (keyboardEditorBar->isMapButtonOn())
         {
-            pluginState->pauseMidiInput();
+            pluginState->getMidiProcessor()->pauseMidiInput();
             piano->setUIMode(UIMode::mapMode);
         }
         else
         {
-            pluginState->pauseMidiInput(false);
+            pluginState->getMidiProcessor()->pauseMidiInput(false);
             piano->setUIMode(UIMode::playMode);
         }
-    }
-}
 
-//==============================================================================
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreePropertyChanged(ValueTree& treeWhosePropertyHasChanged, const Identifier& property)
-{
-	// Root note is changed
-	if (treeWhosePropertyHasChanged.hasType(IDs::pluginStateNode) && property == IDs::rootMidiNote)
-	{
 		update_children_to_preset();
-	}
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildAdded(ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeChildOrderChanged(ValueTree& parentTreeWhoseChildrenHaveMoved, int oldIndex, int newIndex)
-{
-
-}
-
-void SuperVirtualKeyboardAudioProcessorEditor::valueTreeParentChanged(ValueTree& treeWhoseParentHasChanged)
-{
-
+    }
 }
 
 //==============================================================================
