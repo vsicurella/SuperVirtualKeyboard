@@ -62,10 +62,8 @@ Point<int> MidiRemapper::getNoteRange()
 
 int MidiRemapper::setNote(int noteIn, int noteOut)
 {
-	if (midiNoteMapping)
-	{
-		midiNoteMapping->set(noteIn, noteOut);
-	}
+    if (midiNoteMapping)
+        midiNoteMapping->set(noteIn, noteOut);
     
     return noteOut;
 }
