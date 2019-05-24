@@ -3,7 +3,7 @@
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
               jucerVersion="5.4.3" companyName="Finer Notes" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Analyzer">
+              pluginVST3Category="Analyzer" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
     <FILE id="VI9lFR" name="MidiProcessor.cpp" compile="1" resource="0"
           file="Source/MidiProcessor.cpp"/>
@@ -32,6 +32,10 @@
               file="Source/UI/Dialogs/ColorChoosingWindow.cpp"/>
         <FILE id="OW7jdx" name="ColorChoosingWindow.h" compile="0" resource="0"
               file="Source/UI/Dialogs/ColorChoosingWindow.h"/>
+        <FILE id="KNufAG" name="MidiRemapperWindow.cpp" compile="1" resource="0"
+              file="Source/UI/Dialogs/MidiRemapperWindow.cpp"/>
+        <FILE id="Pt2NrT" name="MidiRemapperWindow.h" compile="0" resource="0"
+              file="Source/UI/Dialogs/MidiRemapperWindow.h"/>
       </GROUP>
       <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
         <FILE id="iSjBmx" name="Keyboard.cpp" compile="1" resource="0" file="Source/UI/VirtualKeyboard/Keyboard.cpp"/>

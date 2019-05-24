@@ -13,29 +13,24 @@
 SvkPreset::SvkPreset()
 {
 	parentNode = ValueTree(IDs::presetNode);
+	theModeNode = ValueTree(IDs::modePresetNode);
+	parentNode.addChild(theModeNode, 0, nullptr);
 }
 
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
 	parentNode = ValueTree(IDs::presetNode);
-	thePluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
-	theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 	theModeNode = ValueTree(IDs::modePresetNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
 
-	thePluginSettingsNode.copyPropertiesAndChildrenFrom(
-		presetNodeIn.getChildWithName(IDs::pluginSettingsNode), nullptr);
-	theMidiSettingsNode.copyPropertiesAndChildrenFrom(
-		presetNodeIn.getChildWithName(IDs::midiSettingsNode), nullptr);
-	theModeNode.copyPropertiesAndChildrenFrom(
-		presetNodeIn.getChildWithName(IDs::modePresetNode), nullptr);
-	theKeyboardNode.copyPropertiesAndChildrenFrom(
-		presetNodeIn.getChildWithName(IDs::pianoNode), nullptr);
+	theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(0), nullptr);
+	theKeyboardNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(1), nullptr);
 
-	parentNode.addChild(thePluginSettingsNode, 0, nullptr);
-	parentNode.addChild(theMidiSettingsNode, 1, nullptr);
-	parentNode.addChild(theModeNode, 2, nullptr);
-	parentNode.addChild(theKeyboardNode, 3, nullptr);
+	parentNode.addChild(theModeNode, 0, nullptr);
+	parentNode.addChild(theKeyboardNode, 1, nullptr);
+
+	if (presetNodeIn.hasProperty(IDs::rootMidiNote))
+		parentNode.setProperty(IDs::rootMidiNote,(int)presetNodeIn[IDs::rootMidiNote], nullptr);
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
@@ -43,60 +38,19 @@ SvkPreset::SvkPreset(SvkPreset& presetToCopy)
 	SvkPreset(presetToCopy.parentNode);
 }
 
-bool SvkPreset::updateParentNode(ValueTree pluginStateNodeIn)
-{
-	updatePluginSettingsNode(pluginStateNodeIn.getChildWithName(IDs::pluginSettingsNode));
-	updateMidiSettingsNode(pluginStateNodeIn.getChildWithName(IDs::midiSettingsNode));
-	updateModeNode(pluginStateNodeIn.getChildWithName(IDs::modePresetNode));
-	updateKeyboardNode(pluginStateNodeIn.getChildWithName(IDs::pianoNode));
-
-	return pluginStateNodeIn.isValid();
-}
-
-bool SvkPreset::updatePluginSettingsNode(ValueTree pluginSettingsIn)
-{
-	if (!thePluginSettingsNode.isValid())
-	{
-		thePluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
-		parentNode.addChild(thePluginSettingsNode, 0, nullptr);
-	}
-
-	if (pluginSettingsIn.hasType(IDs::pluginSettingsNode))
-	{
-		thePluginSettingsNode.copyPropertiesAndChildrenFrom(pluginSettingsIn, nullptr);
-	}
-
-	return pluginSettingsIn.isValid();
-}
-
-bool SvkPreset::updateMidiSettingsNode(ValueTree midiSettingsIn)
-{
-	if (!theMidiSettingsNode.isValid())
-	{
-		theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
-		parentNode.addChild(theMidiSettingsNode, 1, nullptr);
-	}
-
-	if (midiSettingsIn.hasType(IDs::midiSettingsNode))
-	{
-		theMidiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsIn, nullptr);
-	}
-
-	return midiSettingsIn.isValid();
-}
+SvkPreset::~SvkPreset() {}
 
 bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
 {
 	if (!theModeNode.isValid())
     {
         theModeNode = ValueTree(IDs::modePresetNode);
-        parentNode.addChild(theModeNode, 2, nullptr);
+        parentNode.addChild(theModeNode, 0, nullptr);
     }
     
-	if (modeNodeIn.hasType(IDs::modePresetNode))
-		theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
     
-	return modeNodeIn.isValid();
+	return theModeNode.isValid();
 }
 
 bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
@@ -104,13 +58,12 @@ bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
 	if (!theKeyboardNode.isValid())
 	{
 		theKeyboardNode = ValueTree(IDs::pianoNode);
-		parentNode.addChild(theKeyboardNode, 3, nullptr);
+		parentNode.addChild(theKeyboardNode, 1, nullptr);
 	}
 
-	if (keyboardNodeIn.hasType(IDs::pianoNode))
-		theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
+	theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
 	
-	return keyboardNodeIn.isValid();
+	return theKeyboardNode.isValid();
 }
 
 bool SvkPreset::writeToFile(String absoluteFilePath)
