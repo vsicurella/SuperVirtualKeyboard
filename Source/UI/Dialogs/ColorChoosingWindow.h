@@ -28,7 +28,7 @@ public:
     //==============================================================================
 	Colour getColorSelected();
 
-	void closeButtonPressed();
+	void closeButtonPressed() override;
 
     void paint (Graphics& g) override;
     void resized() override;

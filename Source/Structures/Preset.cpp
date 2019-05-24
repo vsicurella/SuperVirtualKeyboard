@@ -40,6 +40,23 @@ SvkPreset::SvkPreset(SvkPreset& presetToCopy)
 
 SvkPreset::~SvkPreset() {}
 
+bool SvkPreset::updateParentNode(ValueTree pluginStateIn)
+{
+    if (pluginStateIn.hasType(IDs::pluginStateNode) || pluginStateIn.hasType((IDs::presetNode)))
+    {
+        theKeyboardNode.copyPropertiesFrom(pluginStateIn.getChildWithName(IDs::pianoNode), nullptr);
+        
+        theModeNode.copyPropertiesFrom(pluginStateIn.getChildWithName(IDs::modePresetNode), nullptr);
+        
+        thePluginSettingsNode.copyPropertiesFrom(pluginStateIn.getChildWithName(IDs::pluginSettingsNode), nullptr);
+        
+        theMidiSettingsNode.copyPropertiesFrom(pluginStateIn.getChildWithName(IDs::midiSettingsNode), nullptr);
+        
+    }
+    
+    return pluginStateIn.isValid();
+}
+
 bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
 {
 	if (!theModeNode.isValid())

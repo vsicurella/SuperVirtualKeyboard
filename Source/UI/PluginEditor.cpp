@@ -39,10 +39,12 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     colorChooserWindow->setSize(450, 450);
     colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
-
-	midiRemapperDialog.reset(new MidiRemapperWindow(pluginState));
-	midiRemapperDialog->setSize(800, 600);
-	midiRemapperDialog->addToDesktop();
+    
+    midiRemapperWindow.reset(new MidiRemapperWindow());
+    midiRemapperWindow->setSize(800, 600);
+	midiRemapperComponent.reset(new MidiRemapperDialog(pluginState));
+    midiRemapperComponent->setSize(800, 600);
+    midiRemapperWindow->setContentOwned(midiRemapperComponent.get(), true);
 
     pluginState->addChangeListener(this);
     keyboardEditorBar->addChangeListener(this);
@@ -474,7 +476,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &inf
 		beginColorEditing();
 		break;
 	case IDs::CommandIDs::remapMidiNotes:
-		midiRemapperDialog->setVisible(true);
+		midiRemapperWindow->setVisible(true);
 		break;
 	default:
 		return false;

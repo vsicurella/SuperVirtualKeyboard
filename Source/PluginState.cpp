@@ -75,6 +75,16 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
+Array<int>* SuperVirtualKeyboardPluginState::getMidiInputMap()
+{
+    return midiProcessor->getInputNoteMap();
+}
+
+Array<int>* SuperVirtualKeyboardPluginState::getMidiOutputMap()
+{
+    return midiProcessor->getOutputNoteMap();
+}
+
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	int index = 0;
