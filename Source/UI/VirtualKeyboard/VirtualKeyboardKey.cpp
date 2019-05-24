@@ -49,7 +49,7 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 	g.setColour(Colours::black);
 	g.drawRect(fillBounds, 1.2);
     
-    if (showNoteNumber)
+    if (showNoteNumber && mappedNoteIn >= 0)
     {
         g.setColour(color.contrasting());
         String numTxt = String(mappedNoteIn);

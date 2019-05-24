@@ -10,6 +10,30 @@
 
 #include "PluginState.h"
 
+SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
+{
+    appCmdMgr.reset(new ApplicationCommandManager());
+    undoManager.reset(new UndoManager());
+    presetCurrent.reset(new SvkPreset());
+    midiProcessor.reset(new SvkMidiProcessor());
+
+    // setup data nodes
+    pluginStateNode = ValueTree(IDs::pluginStateNode);
+    modeLibraryNode = ValueTree(IDs::modeLibraryNode);
+    pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
+    modePresetNode = ValueTree(IDs::modePresetNode);
+    
+    pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+    pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
+    pluginStateNode.addChild(midiProcessor->midiSettingsNode, -1, nullptr);
+
+    createPresets();
+}
+
+SvkMidiProcessor* SuperVirtualKeyboardPluginState::getMidiProcessor()
+{
+    return midiProcessor.get();
+}
 
 UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
 {
@@ -51,30 +75,6 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
-void SuperVirtualKeyboardPluginState::setRootNote(int rootNoteIn)
-{
-    rootMidiNote = totalModulus(rootNoteIn, 128);
-	modeCurrent->setRootNote(rootMidiNote);
-	pluginStateNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-	presetCurrent->parentNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-}
-   
-int SuperVirtualKeyboardPluginState::getRootNote()
-{
-    return rootMidiNote;
-}
-    
-
-Array<int>* SuperVirtualKeyboardPluginState::getInputNoteMap()
-{
-    return &noteInputMap;
-}
-
-Array<int>* SuperVirtualKeyboardPluginState::getOutputNoteMap()
-{
-    return &noteOutputMap;
-}
-
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	int index = 0;
@@ -96,7 +96,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
 	if (mode)
 	{
 		modeCurrent = mode;
-		modeCurrent->setRootNote(rootMidiNote);
+		modeCurrent->setRootNote(midiProcessor->getRootNote());
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
@@ -114,7 +114,7 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 	if (modeIn)
 	{
 		modeCurrent = modeIn;
-		modeCurrent->setRootNote(rootMidiNote);
+		modeCurrent->setRootNote(midiProcessor->getRootNote());
 		presets.set(0, modeCurrent, true);
 
 		if (presetCurrent->theKeyboardNode.isValid())
@@ -136,9 +136,13 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 	}
 }
 
+
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
-	presetCurrent->theModeNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+    midiProcessor->updateNode();
+	modePresetNode = modeCurrent->modeNode;
+	presetCurrent->updateParentNode(pluginStateNode);
+
 	return presetCurrent->writeToFile();
 }
 
@@ -150,15 +154,29 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 	if (newPreset.get())
 	{
         presetCurrent.swap(newPreset);
-		DBG(presetCurrent->parentNode.toXmlString());
 
-		if (presetCurrent->parentNode.hasProperty(IDs::rootMidiNote))
+		
+		if (presetCurrent->thePluginSettingsNode.isValid())
 		{
-			rootMidiNote = totalModulus((int)presetCurrent->parentNode.getProperty(IDs::rootMidiNote), 128);
+			pluginSettingsNode.copyPropertiesAndChildrenFrom(presetCurrent->thePluginSettingsNode, nullptr);
 		}
 
-		modeCurrent->restore_from_node(presetCurrent->theModeNode, rootMidiNote);
-		modePresetNode = modeCurrent->modeNode;
+		if (presetCurrent->theMidiSettingsNode.isValid())
+		{
+            midiProcessor->restoreFromNode(presetCurrent->theMidiSettingsNode);
+		}
+
+		if (presetCurrent->theModeNode.isValid())
+		{
+			modeCurrent->restore_from_node(presetCurrent->theModeNode, midiProcessor->getRootNote());
+			modePresetNode = modeCurrent->modeNode;
+		}
+		
+		if (presetCurrent->theKeyboardNode.isValid())
+		{
+			pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
+		}
+
 		return true;
 	}
 
@@ -167,17 +185,6 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 //==============================================================================
 
-void SuperVirtualKeyboardPluginState::pauseMidiInput(bool setPaused)
-{
-    midiInputPaused = setPaused;
-}
-
-bool SuperVirtualKeyboardPluginState::isMidiPaused()
-{
-    return midiInputPaused;
-}
-
-//==============================================================================
 
 void SuperVirtualKeyboardPluginState::createPresets()
 {
