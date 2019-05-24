@@ -20,10 +20,15 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
-	static Identifier preferencesNode("Preferences");
+	static Identifier pluginSettingsNode("Preferences");
 
 	// Settings
+    static Identifier midiSettingsNode("MidiSettings");
 	static Identifier rootMidiNote("RootNote");
+    static Identifier midiInputMap("InputMapping");
+    static Identifier midiOutputMap("OutputMappint");
+    static Identifier midiInputName("InputDevice");
+    static Identifier midiOutputName("OutputDevice");
 
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
@@ -54,7 +59,7 @@ namespace IDs
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
-	static Identifier pianoKeyColorDefault("KeySingleColors");
+	static Identifier pianoKeyColorSingle("KeySingleColors");
 	static Identifier pianoKeyPlaceOrder("KeyOrderPlaces");
 	static Identifier pianoKeyPlaceDegree("KeyDegreePlaces");
 	static Identifier pianoKeyPlaceSingle("KeySinglePlaces");

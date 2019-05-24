@@ -19,6 +19,7 @@
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiRemapperWindow.h"
+#include "Dialogs/MidiRemapperDialog.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -106,7 +107,8 @@ private:
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
 
-	std::unique_ptr<MidiRemapperWindow> midiRemapperDialog;
+	std::unique_ptr<MidiRemapperWindow> midiRemapperWindow;
+    std::unique_ptr<MidiRemapperDialog> midiRemapperComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
 };
