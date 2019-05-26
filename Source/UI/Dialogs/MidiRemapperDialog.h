@@ -88,7 +88,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void visibilityChanged() override;
 	void textEditorTextChanged(TextEditor& t) override;
-	
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;

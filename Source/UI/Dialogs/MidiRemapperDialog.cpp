@@ -76,7 +76,7 @@ Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int colum
 			noteNum = (*inputMap)[rowNumber];
 
 		editor->setText(String(noteNum));
-	}	
+	}
 
 	return existingComponentToUpdate;
 }
@@ -90,46 +90,16 @@ void MidiRemapTableModel::paintRowBackground (Graphics& g, int rowNumber, int wi
 		g.setColour(Colours::lightgrey);
 
     g.fillRect(0, 0, width, height);
-
-	if (rowIsSelected)
-	{
-		g.setColour(Colours::black);
-		g.drawDashedLine(Line<float>(0, 0, width, 0), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
-		g.drawDashedLine(Line<float>(width, 0, width, height-1), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
-		g.drawDashedLine(Line<float>(width, height-1, 0, height-1), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
-		g.drawDashedLine(Line<float>(0, height-1, 0, 0), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
-	}
-
 }
 
 void MidiRemapTableModel::paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-	if (selectedCell == Point<int>(rowNumber, columnId))
+	if (columnId == 1)
 	{
-		g.setColour(Colours::lightblue);
-		g.fillRect(0, 0, width, height);
+		g.setColour(Colours::black);
+		g.drawText(String(rowNumber), 0, 0, width, height, Justification::centred);
+		g.drawLine(width, 0, width, height, 2.0);
 	}
-
-    String str;
-    switch (columnId)
-    {
-        case keyNumber:
-            str = String(rowNumber);
-            break;
-        case inputNote:
-            str = String((*inputMap)[rowNumber]);
-            break;
-        case outputNote:
-            str = String((*outputMap)[rowNumber]);
-
-            break;
-        default:
-            break;
-    }
-
-	g.setColour(Colours::black);
-    g.drawText(str, 0, 0, width, height, Justification::centred);
-	g.drawLine(width, 0, width, height, 2.0);
 }
 //[/MiscUserDefs]
 

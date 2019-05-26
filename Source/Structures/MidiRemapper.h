@@ -11,29 +11,29 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "InjectiveMap.h"
 
-struct MidiRemapper
+class MidiRemapper
 {
+	std::unique_ptr<InjectiveMap> midiNoteMapping;
+	Point<int> noteRange;
+
+public:
+
 	MidiRemapper();
-    MidiRemapper(Array<int>* mapIn);
+    MidiRemapper(Array<int> mapIn);
     
-    int getNote(int midiNoteIn);
+    int getNoteRemapped(int midiNoteIn);
+	int getNoteMidi(int remappedNoteIn);
+
     Point<int> getNoteRange();
     
     int setNote(int noteIn, int noteOut);
     void setNoteRange(int lowestMidiNote, int highestMidiNote);
-
-	Array<int> removeDuplicates(int noteToKeep);
     
-    Array<int>* setNoteMap(Array<int>* noteMapIn);
-    Array<int>* getNoteMap();
+	InjectiveMap* setNoteMap(Array<int> mapToCopy);
+	InjectiveMap* getInjectiveMap();
+	int* getNoteMap();
     
     static Array<int> getStandardMap();
-    
-private:
-    
-    Array<int>* midiNoteMapping;
-    Point<int> noteRange;
-
-
 };
