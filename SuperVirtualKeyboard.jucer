@@ -14,6 +14,9 @@
       <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
     </GROUP>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
+      <FILE id="vATes6" name="InjectiveMap.cpp" compile="1" resource="0"
+            file="Source/Structures/InjectiveMap.cpp"/>
+      <FILE id="uK2AIM" name="InjectiveMap.h" compile="0" resource="0" file="Source/Structures/InjectiveMap.h"/>
       <FILE id="VyoYfT" name="FractionalGrid.cpp" compile="1" resource="0"
             file="Source/Structures/FractionalGrid.cpp"/>
       <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"

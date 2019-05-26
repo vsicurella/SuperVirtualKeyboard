@@ -30,8 +30,9 @@ class SvkMidiProcessor : public MidiMessageCollector
     
     int rootMidiNote = 60;
     
-    std::unique_ptr<Array<int>> noteInputMap;
-    std::unique_ptr<Array<int>> noteOutputMap;
+    int* noteInputMap;
+    int* noteOutputMap;
+
     std::unique_ptr<MidiRemapper> midiInputFilter;
     std::unique_ptr<MidiRemapper> midiOutputFilter;
     
@@ -59,8 +60,15 @@ public:
     
     int getRootNote();
 
-    Array<int>* getInputNoteMap();
-    Array<int>* getOutputNoteMap();
+    int* getInputNoteMap();
+    int* getOutputNoteMap();
+
+	InjectiveMap* getInputInjectiveMap();
+	InjectiveMap* getOutputInjectiveMap();
+
+	MidiRemapper* getInputRemapper();
+	MidiRemapper* getOutputRemapper();
+
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
     
@@ -75,8 +83,8 @@ public:
     void setMidiInputMap(Array<int> mapIn);
     void setMidiOutputMap(Array<int> mapIn);
     
-    Array<int> mapInputNote(int noteIn, int noteOut);
-    void mapOutputNode(int noteIn, int noteOut);
+    int mapInputNote(int noteIn, int noteOut);
+    int mapOutputNode(int noteIn, int noteOut);
     
     void processMidi(MidiBuffer& midiMessages);
     
