@@ -30,6 +30,10 @@
       <FILE id="ORt6g1" name="MidiRemapper.h" compile="0" resource="0" file="Source/Structures/MidiRemapper.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
+      <FILE id="w0yMkS" name="MidiRemapTableModel.cpp" compile="1" resource="0"
+            file="Source/UI/MidiRemapTableModel.cpp"/>
+      <FILE id="Nsj1MR" name="MidiRemapTableModel.h" compile="0" resource="0"
+            file="Source/UI/MidiRemapTableModel.h"/>
       <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
         <FILE id="xH4xEW" name="ColorChoosingWindow.cpp" compile="1" resource="0"
               file="Source/UI/Dialogs/ColorChoosingWindow.cpp"/>
