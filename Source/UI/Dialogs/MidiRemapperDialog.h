@@ -33,15 +33,26 @@ class MidiRemapTableModel : public TableListBoxModel
     Array<int>* inputMap;
     Array<int>* outputMap;
 
+	Point<int> selectedCell;
+
 public:
 
     MidiRemapTableModel(Array<int>* inputMapIn, Array<int>* outputMapIn);
+	~MidiRemapTableModel();
 
     int getNumRows() override;
+
+	void cellClicked(int rowNumber, int columnId, const MouseEvent& e) override;
+
+	void backgroundClicked(const MouseEvent& e) override;
+
+	Component* refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate) override;
 
     void paintRowBackground (Graphics&, int rowNumber, int width, int height, bool rowIsSelected) override;
 
     void paintCell (Graphics&, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
+
+
 
     enum RowType
     {
@@ -63,6 +74,7 @@ public:
                                                                     //[/Comments]
 */
 class MidiRemapperDialog  : public Component,
+                            public TextEditor::Listener,
                             public ComboBox::Listener,
                             public Slider::Listener,
                             public Button::Listener
@@ -74,6 +86,9 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void visibilityChanged() override;
+	void textEditorTextChanged(TextEditor& t) override;
+	
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -107,7 +122,6 @@ private:
     std::unique_ptr<Label> noteRangeLabel;
     std::unique_ptr<ToggleButton> manualMapToggle;
     std::unique_ptr<ToggleButton> modeMapToggle;
-    std::unique_ptr<Viewport> noteViewport;
     std::unique_ptr<ComboBox> modeLibraryBoxOG;
     std::unique_ptr<Label> modeBoxOriginal;
     std::unique_ptr<ComboBox> modeLibraryBoxOG2;
@@ -115,7 +129,6 @@ private:
     std::unique_ptr<Slider> modeOriginalRootSld;
     std::unique_ptr<Slider> modeRemapRootSld;
     std::unique_ptr<Label> rootNoteLabel;
-    std::unique_ptr<Viewport> degreesViewport;
 
 
     //==============================================================================

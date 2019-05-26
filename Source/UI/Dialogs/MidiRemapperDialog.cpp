@@ -31,43 +31,105 @@ MidiRemapTableModel::MidiRemapTableModel(Array<int>* inputMapIn, Array<int>* out
     numRows = jmin(inputMap->size(), outputMap->size());
 }
 
+MidiRemapTableModel::~MidiRemapTableModel()
+{
+	inputMap = nullptr;
+	outputMap = nullptr;
+}
+
 int MidiRemapTableModel::getNumRows()
 {
     return numRows;
 }
 
+void MidiRemapTableModel::cellClicked(int rowNumber, int columnId, const MouseEvent& e)
+{
+	selectedCell = Point<int>(rowNumber, columnId);
+}
+
+void MidiRemapTableModel::backgroundClicked(const MouseEvent& e)
+{
+	selectedCell = Point<int>();
+}
+
+Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate)
+{
+	if (columnId > 1)
+	{
+		TextEditor* editor;
+
+		if (!existingComponentToUpdate)
+		{
+			editor = new TextEditor("Text Editor " + Point<int>(rowNumber, columnId).toString());
+			editor->setEnabled(true);
+			editor->setMultiLine(false);
+			existingComponentToUpdate = editor;
+		}
+		else
+			editor = dynamic_cast<TextEditor*>(existingComponentToUpdate);
+
+		int noteNum;
+
+		if (columnId % 2)
+			noteNum = (*outputMap)[rowNumber];
+		else
+			noteNum = (*inputMap)[rowNumber];
+
+		editor->setText(String(noteNum));
+	}	
+
+	return existingComponentToUpdate;
+}
+
 void MidiRemapTableModel::paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
 {
 
-    if (!rowIsSelected)
-        g.setColour(Colours::dimgrey);
-    else
-        g.setColour(Colours::lightblue);
+	if (rowNumber % 2 == 0)
+		g.setColour(Colours::dimgrey);
+	else
+		g.setColour(Colours::lightgrey);
 
     g.fillRect(0, 0, width, height);
+
+	if (rowIsSelected)
+	{
+		g.setColour(Colours::black);
+		g.drawDashedLine(Line<float>(0, 0, width, 0), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
+		g.drawDashedLine(Line<float>(width, 0, width, height-1), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
+		g.drawDashedLine(Line<float>(width, height-1, 0, height-1), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
+		g.drawDashedLine(Line<float>(0, height-1, 0, 0), Array<float>({ 5, 3 }).getRawDataPointer(), 2);
+	}
+
 }
 
 void MidiRemapTableModel::paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
-    String str;
+	if (selectedCell == Point<int>(rowNumber, columnId))
+	{
+		g.setColour(Colours::lightblue);
+		g.fillRect(0, 0, width, height);
+	}
 
+    String str;
     switch (columnId)
     {
         case keyNumber:
             str = String(rowNumber);
             break;
         case inputNote:
-            str = String(inputMap[0][rowNumber]);
+            str = String((*inputMap)[rowNumber]);
             break;
         case outputNote:
-            str = String(outputMap[0][rowNumber]);
+            str = String((*outputMap)[rowNumber]);
 
             break;
         default:
             break;
     }
 
+	g.setColour(Colours::black);
     g.drawText(str, 0, 0, width, height, Justification::centred);
+	g.drawLine(width, 0, width, height, 2.0);
 }
 //[/MiscUserDefs]
 
@@ -134,11 +196,6 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
     modeMapToggle->addListener (this);
 
     modeMapToggle->setBounds (160, 128, 150, 24);
-
-    noteViewport.reset (new Viewport ("Notes Viewport"));
-    addAndMakeVisible (noteViewport.get());
-
-    noteViewport->setBounds (8, 184, 352, 264);
 
     modeLibraryBoxOG.reset (new ComboBox ("Mode Library Original"));
     addAndMakeVisible (modeLibraryBoxOG.get());
@@ -211,24 +268,23 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
 
     rootNoteLabel->setBounds (640, 40, 80, 24);
 
-    degreesViewport.reset (new Viewport ("Degrees Viewport"));
-    addAndMakeVisible (degreesViewport.get());
-
-    degreesViewport->setBounds (376, 184, 376, 264);
-
 
     //[UserPreSize]
 
-    remapTableHeader.reset(new TableHeaderComponent());
-    remapTableHeader->addColumn("Key/Midi Number", MidiRemapTableModel::keyNumber, noteViewport->getWidth()/3);
-    remapTableHeader->addColumn("Input Note", MidiRemapTableModel::inputNote, noteViewport->getWidth()/3);
-    remapTableHeader->addColumn("Output Note", MidiRemapTableModel::outputNote, noteViewport->getWidth()/3);
 
-    remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap()));
-    remapTable.reset(new TableListBox("RemapBox", remapTableModel.get()));
-    remapTable->setHeader(remapTableHeader.get());
-    remapTable->setBounds(noteViewport->getViewArea());
-    noteViewport->setViewedComponent(remapTable.get());
+	remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap()));
+	remapTable.reset(new TableListBox("RemapBox", remapTableModel.get()));
+	remapTable->setBounds(8, 184, 352, 264);
+	remapTable->updateContent();
+
+    remapTableHeader.reset(new TableHeaderComponent());
+    remapTableHeader->addColumn("Key", MidiRemapTableModel::keyNumber, remapTable->getWidth() * 0.2);
+    remapTableHeader->addColumn("Input Note", MidiRemapTableModel::inputNote, remapTable->getWidth() * 0.35);
+    remapTableHeader->addColumn("Output Note", MidiRemapTableModel::outputNote, remapTable->getWidth() * 0.35);
+
+	remapTable->setHeader(remapTableHeader.get());
+	remapTableHeader->setStretchToFitActive(true);
+	addAndMakeVisible(remapTable.get());
 
     //[/UserPreSize]
 
@@ -253,7 +309,6 @@ MidiRemapperDialog::~MidiRemapperDialog()
     noteRangeLabel = nullptr;
     manualMapToggle = nullptr;
     modeMapToggle = nullptr;
-    noteViewport = nullptr;
     modeLibraryBoxOG = nullptr;
     modeBoxOriginal = nullptr;
     modeLibraryBoxOG2 = nullptr;
@@ -261,7 +316,6 @@ MidiRemapperDialog::~MidiRemapperDialog()
     modeOriginalRootSld = nullptr;
     modeRemapRootSld = nullptr;
     rootNoteLabel = nullptr;
-    degreesViewport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -286,7 +340,6 @@ void MidiRemapperDialog::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-    //remapTable->setBounds(noteViewport->getViewArea());
     //[/UserResized]
 }
 
@@ -364,6 +417,41 @@ void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+void MidiRemapperDialog::visibilityChanged()
+{
+	if (isVisible() && remapTable->getNumChildComponents() < 256)
+	{
+		for (int r = 0; r < 128; r++)
+			for (int c = 1; c < 3; c++)
+			{
+				Component* co = remapTable->getCellComponent(c, r);
+				TextEditor* t = dynamic_cast<TextEditor*>(remapTable->getCellComponent(c, r));
+				if (t)
+					t->addListener(this);
+//				jassert(t);
+			}
+	}
+}
+
+
+void MidiRemapperDialog::textEditorTextChanged(TextEditor& t)
+{
+	int val = t.getText().getIntValue();
+	t.setText(String(val));
+
+	Point<int> cell;
+	pointFromString(cell, t.getName().fromFirstOccurrenceOf("Text Editor ", false, true));
+
+	if (cell.y - 1)
+	{
+		outputRemapper->setNote(cell.x, val);
+	}
+	else
+	{
+		inputRemapper->setNote(cell.x, val);
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -377,7 +465,8 @@ void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MidiRemapperDialog" componentName="Midi Remapper Dialog"
-                 parentClasses="public Component" constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
+                 parentClasses="public Component, public TextEditor::Listener"
+                 constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
                  variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="800" initialHeight="600">
@@ -389,62 +478,53 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="8 16 95 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Input Device:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="9cd98eb1a345671e" memberName="slider" virtualName=""
-          explicitFocusOrder="0" pos="112 64 248 24" min="0.0" max="127.0"
-          int="1.0" style="TwoValueHorizontal" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          explicitFocusOrder="0" pos="112 64 248 24" min="0" max="1.27e2"
+          int="1" style="TwoValueHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <LABEL name="Note Range Label" id="42e0042c75044473" memberName="noteRangeLabel"
          virtualName="" explicitFocusOrder="0" pos="8 64 150 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Note Range:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="ManualMapToggle" id="3c967f0af78d5468" memberName="manualMapToggle"
                 virtualName="" explicitFocusOrder="0" pos="16 128 150 24" buttonText="Manual Mapping"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
   <TOGGLEBUTTON name="Mode Map Toggle" id="bffb6c931fccea1c" memberName="modeMapToggle"
                 virtualName="" explicitFocusOrder="0" pos="160 128 150 24" buttonText="Mode Remapping"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <VIEWPORT name="Notes Viewport" id="ae7882599456b6e8" memberName="noteViewport"
-            virtualName="" explicitFocusOrder="0" pos="8 184 352 264" vscroll="1"
-            hscroll="1" scrollbarThickness="8" contentType="0" jucerFile=""
-            contentClass="" constructorParams=""/>
   <COMBOBOX name="Mode Library Original" id="5c0ffc83cbe274c1" memberName="modeLibraryBoxOG"
             virtualName="" explicitFocusOrder="0" pos="472 72 150 24" editable="0"
             layout="33" items="" textWhenNonSelected="Meantone[7] 12" textWhenNoItems="(no choices)"/>
   <LABEL name="Mode Box Original" id="5b2fda69d594937a" memberName="modeBoxOriginal"
          virtualName="" explicitFocusOrder="0" pos="376 72 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="From Mode:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="34"/>
   <COMBOBOX name="Mode Library Original" id="d97fde7b8560b769" memberName="modeLibraryBoxOG2"
             virtualName="" explicitFocusOrder="0" pos="472 118 150 24" editable="0"
             layout="33" items="" textWhenNonSelected="Meantone[7] 12" textWhenNoItems="(no choices)"/>
   <LABEL name="Mode Box Remap" id="44d358cbb3982e4" memberName="modeBoxRemap"
          virtualName="" explicitFocusOrder="0" pos="376 118 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="To Mode:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="34"/>
   <SLIDER name="Mode Original Root Slider" id="31eb79d952d2e1aa" memberName="modeOriginalRootSld"
-          virtualName="" explicitFocusOrder="0" pos="632 72 88 24" min="0.0"
-          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          virtualName="" explicitFocusOrder="0" pos="632 72 88 24" min="0"
+          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <SLIDER name="Mode Remap Root Slider" id="c98578a060cce67f" memberName="modeRemapRootSld"
-          virtualName="" explicitFocusOrder="0" pos="640 112 80 24" min="0.0"
-          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          virtualName="" explicitFocusOrder="0" pos="640 112 80 24" min="0"
+          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
           needsCallback="1"/>
   <LABEL name="Root Note Label" id="effe36cc4475b201" memberName="rootNoteLabel"
          virtualName="" explicitFocusOrder="0" pos="640 40 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Root Note:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <VIEWPORT name="Degrees Viewport" id="5b50b4addf240fe6" memberName="degreesViewport"
-            virtualName="" explicitFocusOrder="0" pos="376 184 376 264" vscroll="1"
-            hscroll="1" scrollbarThickness="8" contentType="0" jucerFile=""
-            contentClass="" constructorParams=""/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

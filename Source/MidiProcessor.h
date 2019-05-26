@@ -30,10 +30,10 @@ class SvkMidiProcessor : public MidiMessageCollector
     
     int rootMidiNote = 60;
     
-    Array<int> noteInputMap;
-    Array<int> noteOutputMap;
-    MidiRemapper midiInputFilter;
-    MidiRemapper midiOutputFilter;
+    std::unique_ptr<Array<int>> noteInputMap;
+    std::unique_ptr<Array<int>> noteOutputMap;
+    std::unique_ptr<MidiRemapper> midiInputFilter;
+    std::unique_ptr<MidiRemapper> midiOutputFilter;
     
     bool midiInputPaused = false;
     bool isInputRemapped = false;

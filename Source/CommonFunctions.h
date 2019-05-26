@@ -104,25 +104,28 @@ struct ModeFamilySorter
 	}
 };
 
-static Point<int> pointFromString(const Point<int>& p, String pointToStringIn)
+static Point<int> pointFromString(Point<int>& p, String pointToStringIn)
 {
 	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
 	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	return Point<int>(val1.getIntValue(), val2.getIntValue());
+	p = Point<int>(val1.getIntValue(), val2.getIntValue());
+	return p;
 }
 
-static Point<float> pointFromString(const Point<float>& p, String pointToStringIn)
+static Point<float> pointFromString(Point<float>& p, String pointToStringIn)
 {
 	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
 	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	return Point<float>(val1.getFloatValue(), val2.getFloatValue());
+	p = Point<float>(val1.getFloatValue(), val2.getFloatValue());
+	return p;
 }
 
-static Point<double> pointFromString(const Point<double>& p, String pointToStringIn)
+static Point<double> pointFromString(Point<double>& p, String pointToStringIn)
 {
 	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
 	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	return Point<double>(val1.getDoubleValue(), val2.getDoubleValue());
+	p = Point<double>(val1.getDoubleValue(), val2.getDoubleValue());
+	return p;
 }
 
 template <class T>

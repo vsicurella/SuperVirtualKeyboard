@@ -22,9 +22,9 @@ MidiRemapper::MidiRemapper(Array<int>* mapIn)
     midiNoteMapping = mapIn;
 }
 
-Array<int>* MidiRemapper::setNoteMap(Array<int>& noteMapIn)
+Array<int>* MidiRemapper::setNoteMap(Array<int>* noteMapIn)
 {
-    midiNoteMapping = &noteMapIn;
+    midiNoteMapping = noteMapIn;
     return midiNoteMapping;
 }
 
