@@ -12,12 +12,12 @@
 
 MidiRemapper::MidiRemapper()
 {
-	noteRange = Point<int>(0, 127);
+	noteRange = Point<int>(-1, 127);
 }
 
 MidiRemapper::MidiRemapper(Array<int> mapIn)
 {
-	noteRange = Point<int>(0, 127);
+	noteRange = Point<int>(-1, 127);
 	setNoteMap(mapIn);
 }
 
@@ -76,6 +76,27 @@ InjectiveMap* MidiRemapper::getInjectiveMap()
 int* MidiRemapper::getNoteMap()
 {
 	return midiNoteMapping->getValues();
+}
+
+int MidiRemapper::size()
+{
+	int sizeOut = 0;
+	if (midiNoteMapping.get())
+		sizeOut = midiNoteMapping->getSize();
+
+	return sizeOut;
+}
+
+String MidiRemapper::toString()
+{
+	String out;
+
+	for (int i = 0; i < midiNoteMapping->getSize(); i++)
+	{
+		out << "Midi Note In " << i << " --> " << midiNoteMapping->getValue(i) << "\t Midi Note Out " << i << " <-- " << midiNoteMapping->getKey(i) << "\n";
+	}
+
+	return out;
 }
 
 Array<int> MidiRemapper::getStandardMap()

@@ -34,6 +34,9 @@ public:
 	InjectiveMap* setNoteMap(Array<int> mapToCopy);
 	InjectiveMap* getInjectiveMap();
 	int* getNoteMap();
+	int size();
+
+	String toString();
     
     static Array<int> getStandardMap();
 };

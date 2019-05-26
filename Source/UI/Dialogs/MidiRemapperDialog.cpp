@@ -24,89 +24,7 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-MidiRemapTableModel::MidiRemapTableModel(int* inputMapIn, int* outputMapIn, int mapSize)
-{
-    inputMap = inputMapIn;
-    outputMap = outputMapIn;
 
-	numRows = mapSize;
-}
-
-MidiRemapTableModel::~MidiRemapTableModel()
-{
-	inputMap = nullptr;
-	outputMap = nullptr;
-}
-
-int MidiRemapTableModel::getNumRows()
-{
-    return numRows;
-}
-
-void MidiRemapTableModel::cellClicked(int rowNumber, int columnId, const MouseEvent& e)
-{
-	selectedCell = Point<int>(rowNumber, columnId);
-}
-
-void MidiRemapTableModel::backgroundClicked(const MouseEvent& e)
-{
-	selectedCell = Point<int>();
-}
-
-Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate)
-{
-	Point<int> cell = Point<int>(rowNumber, columnId);
-
-	DBG("Refreshing cell " + cell.toString());
-	if (columnId > 1 && rowNumber == jlimit(0, numRows, rowNumber))
-	{
-		TextEditor* editor;
-
-		if (!existingComponentToUpdate)
-		{
-			//Point<int> cell = Point<int>(rowNumber, columnId);
-			editor = new TextEditor("Text Editor " + cell.toString());
-			editor->setEnabled(true);
-			editor->setMultiLine(false);
-			existingComponentToUpdate = editor;
-			DBG("Created Text Editor in Cell " + cell.toString());
-		}
-		else
-			editor = dynamic_cast<TextEditor*>(existingComponentToUpdate);
-
-		int noteNum;
-
-		if (columnId % 2)
-			noteNum = outputMap[rowNumber];
-		else
-			noteNum = inputMap[rowNumber];
-
-		editor->setText(String(noteNum), false);
-	}
-
-	return existingComponentToUpdate;
-}
-
-void MidiRemapTableModel::paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
-{
-
-	if (rowNumber % 2 == 0)
-		g.setColour(Colours::dimgrey);
-	else
-		g.setColour(Colours::lightgrey);
-
-    g.fillRect(0, 0, width, height);
-}
-
-void MidiRemapTableModel::paintCell (Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
-{
-	if (columnId == 1)
-	{
-		g.setColour(Colours::black);
-		g.drawText(String(rowNumber), 0, 0, width, height, Justification::centred);
-		g.drawLine(width, 0, width, height, 2.0);
-	}
-}
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -250,17 +168,16 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
 	inputRemapper = pluginState->getMidiProcessor()->getInputRemapper();
 	outputRemapper = pluginState->getMidiProcessor()->getOutputRemapper();
 
-	remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap(), 128));
-	remapTable.reset(new TableListBox("RemapBox", remapTableModel.get()));
+	remapTable.reset(new TableListBox("Midi Remap Table"));
+	remapTableModel.reset(new MidiRemapTableModel(remapTable.get(), inputRemapper, outputRemapper, pluginState->textFilterInt.get()));
+	remapTable->setModel(remapTableModel.get());
 	remapTable->setBounds(8, 184, 352, 264);
 
-    remapTableHeader.reset(new TableHeaderComponent());
-    remapTableHeader->addColumn("Key", MidiRemapTableModel::keyNumber, remapTable->getWidth() * 0.2);
-    remapTableHeader->addColumn("Input Note", MidiRemapTableModel::inputNote, remapTable->getWidth() * 0.35);
-    remapTableHeader->addColumn("Output Note", MidiRemapTableModel::outputNote, remapTable->getWidth() * 0.35);
+	remapTable->setHeader(new TableHeaderComponent());
+	remapTable->getHeader().addColumn("Key", 1, remapTable->getWidth() * 0.2);
+	remapTable->getHeader().addColumn("Input Note", 2, remapTable->getWidth() * 0.35);
+	remapTable->getHeader().addColumn("Output Note", 3, remapTable->getWidth() * 0.35);
 
-	remapTable->setHeader(remapTableHeader.get());
-	remapTableHeader->setStretchToFitActive(true);
 	addAndMakeVisible(remapTable.get());
 
     //[/UserPreSize]
@@ -276,8 +193,7 @@ MidiRemapperDialog::~MidiRemapperDialog()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     remapTable.release();
-    remapTableHeader.release();
-    remapTableModel.release();
+	remapTableModel.release();
     //[/Destructor_pre]
 
     comboBox = nullptr;
@@ -396,8 +312,9 @@ void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
 
 void MidiRemapperDialog::initializeTextEditors()
 {
+	DBG("Initializing Text Editors");
 	remapTable->updateContent();
-
+	/*
 	for (int r = 0; r < 128; r++)
 		for (int c = 1; c < 3; c++)
 		{
@@ -410,6 +327,7 @@ void MidiRemapperDialog::initializeTextEditors()
 				textEditorBoxes.add(t);
 			}
 		}
+		*/
 }
 
 
@@ -417,35 +335,9 @@ void MidiRemapperDialog::visibilityChanged()
 {
 	if (isVisible() && remapTable->getNumChildComponents() < 256)
 	{
-		initializeTextEditors();
+		remapTable->updateContent();
 	}
 }
-
-
-void MidiRemapperDialog::textEditorTextChanged(TextEditor& t)
-{
-	int val = t.getText().getIntValue();
-	t.setText(String(val));
-
-	Point<int> cell;
-	pointFromString(cell, t.getName().fromFirstOccurrenceOf("Text Editor ", false, true));
-	DBG(t.getName() + " Changed, which corresponds to cell " + cell.toString());
-
-	if (cell.y - 1 && outputRemapper->getNoteRemapped(cell.x) != val)
-	{
-		DBG("Remapping Note " + String(cell.x) + " --> " + String(val));
-		outputRemapper->setNote(cell.x, val);
-		DBG("Output Remapped, Note " + String(cell.x) + " --> " + String(outputRemapper->getNoteRemapped(cell.x)));
-	}
-	else if (inputRemapper->getNoteRemapped(cell.x) != val)
-	{
-		DBG("Remapping Note " + String(cell.x) + " --> " + String(val));
-		inputRemapper->setNote(cell.x, val);
-		DBG("Input Remapped, Note " + String(cell.x) + " --> " + String(inputRemapper->getNoteRemapped(cell.x)));
-	}
-
-}
-
 //[/MiscUserCode]
 
 
@@ -459,8 +351,7 @@ void MidiRemapperDialog::textEditorTextChanged(TextEditor& t)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MidiRemapperDialog" componentName="Midi Remapper Dialog"
-                 parentClasses="public Component, public TextEditor::Listener"
-                 constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
+                 parentClasses="public Component" constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
                  variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="800" initialHeight="600">

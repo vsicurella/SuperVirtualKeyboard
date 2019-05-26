@@ -133,7 +133,7 @@ class TextFilterInt : public TextEditor::InputFilter
 
 		for (int c = 0; c < newInput.length(); c++)
 		{
-			if (newInput[c] >= 48 && newInput[c] < 58)
+			if (newInput[c] == 45 || (newInput[c] >= 48 && newInput[c] < 58))
 			{
 				out += newInput[c];
 				continue;

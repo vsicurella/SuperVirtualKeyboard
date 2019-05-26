@@ -24,43 +24,7 @@
 
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
-
-
-class MidiRemapTableModel : public TableListBoxModel
-{
-    int* inputMap;
-    int* outputMap;
-
-	int numRows;
-
-	Point<int> selectedCell;
-
-public:
-
-    MidiRemapTableModel(int* inputMapIn, int* outputMapIn, int mapSize);
-	~MidiRemapTableModel();
-
-    int getNumRows() override;
-
-	void cellClicked(int rowNumber, int columnId, const MouseEvent& e) override;
-
-	void backgroundClicked(const MouseEvent& e) override;
-
-	Component* refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate) override;
-
-    void paintRowBackground (Graphics&, int rowNumber, int width, int height, bool rowIsSelected) override;
-
-    void paintCell (Graphics&, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
-
-
-
-    enum RowType
-    {
-        keyNumber = 1,
-        inputNote,
-        outputNote
-    };
-};
+#include "../MidiRemapTableModel.h"
 //[/Headers]
 
 
@@ -74,7 +38,6 @@ public:
                                                                     //[/Comments]
 */
 class MidiRemapperDialog  : public Component,
-                            public TextEditor::Listener,
                             public ComboBox::Listener,
                             public Slider::Listener,
                             public Button::Listener
@@ -87,9 +50,8 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void initializeTextEditors();
-	
+
 	void visibilityChanged() override;
-	void textEditorTextChanged(TextEditor& t) override;
 
     //[/UserMethods]
 
@@ -103,12 +65,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-
-    std::unique_ptr<TableHeaderComponent> remapTableHeader;
-    std::unique_ptr<MidiRemapTableModel> remapTableModel;
-    std::unique_ptr<TableListBox> remapTable;
-
-	OwnedArray<TextEditor> textEditorBoxes;
+	std::unique_ptr<MidiRemapTableModel> remapTableModel;
+	std::unique_ptr<TableListBox> remapTable;
 
 	int boxW = 10;
 	int boxH = 8;
