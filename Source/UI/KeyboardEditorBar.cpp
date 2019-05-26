@@ -89,6 +89,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
 	addAndMakeVisible(pianoMenu.get());
 	pianoMenu->toBack();
 
+	modeTextEditor->setInputFilter(pluginState->textFilterIntOrSpace.get(), false);
     modeTextEditor->setMouseClickGrabsKeyboardFocus(true);
 	modeTextEditor->addListener(this);
 

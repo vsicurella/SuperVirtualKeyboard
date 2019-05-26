@@ -16,6 +16,8 @@ SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
     undoManager.reset(new UndoManager());
     presetCurrent.reset(new SvkPreset());
     midiProcessor.reset(new SvkMidiProcessor());
+	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
+	textFilterInt.reset(new TextFilterInt());
 
     // setup data nodes
     pluginStateNode = ValueTree(IDs::pluginStateNode);

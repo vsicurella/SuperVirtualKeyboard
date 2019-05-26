@@ -58,6 +58,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	//==============================================================================
 	
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
+	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
+	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
 
