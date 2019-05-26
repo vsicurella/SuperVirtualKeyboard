@@ -37,9 +37,9 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
-    colorChooserWindow->addToDesktop();
 	colorChooserWindow->addChangeListener(this);
-    
+	colorChooserWindow->addToDesktop();
+
     midiRemapperWindow.reset(new MidiRemapperWindow());
     midiRemapperWindow->setSize(800, 600);
 	midiRemapperComponent.reset(new MidiRemapperDialog(pluginState));

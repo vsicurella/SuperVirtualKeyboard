@@ -25,7 +25,7 @@ struct MidiRemapper
 
 	Array<int> removeDuplicates(int noteToKeep);
     
-    Array<int>* setNoteMap(Array<int>& noteMapIn);
+    Array<int>* setNoteMap(Array<int>* noteMapIn);
     Array<int>* getNoteMap();
     
     static Array<int> getStandardMap();
