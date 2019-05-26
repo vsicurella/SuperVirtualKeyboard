@@ -11,20 +11,19 @@
 #include "MidiRemapper.h"
 
 MidiRemapper::MidiRemapper()
-    : noteRange(0, 127)
 {
+	noteRange = Point<int>(0, 127);
 }
 
 MidiRemapper::MidiRemapper(Array<int> mapIn)
-    : noteRange(0, 127)
 {
+	noteRange = Point<int>(0, 127);
 	setNoteMap(mapIn);
 }
 
 InjectiveMap* MidiRemapper::setNoteMap(Array<int> mapToCopy)
 {
     midiNoteMapping.reset(new InjectiveMap(mapToCopy.getRawDataPointer(), mapToCopy.size()));
-	
 	return midiNoteMapping.get();
 }
 
