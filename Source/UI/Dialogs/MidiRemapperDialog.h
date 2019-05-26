@@ -28,16 +28,16 @@
 
 class MidiRemapTableModel : public TableListBoxModel
 {
-    int numRows = 3;
+    int* inputMap;
+    int* outputMap;
 
-    Array<int>* inputMap;
-    Array<int>* outputMap;
+	int numRows;
 
 	Point<int> selectedCell;
 
 public:
 
-    MidiRemapTableModel(Array<int>* inputMapIn, Array<int>* outputMapIn);
+    MidiRemapTableModel(int* inputMapIn, int* outputMapIn, int mapSize);
 	~MidiRemapTableModel();
 
     int getNumRows() override;

@@ -75,12 +75,11 @@ Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
 	return modeCurrent;
 }
 
-Array<int>* SuperVirtualKeyboardPluginState::getMidiInputMap()
+int* SuperVirtualKeyboardPluginState::getMidiInputMap()
 {
     return midiProcessor->getInputNoteMap();
 }
-
-Array<int>* SuperVirtualKeyboardPluginState::getMidiOutputMap()
+int* SuperVirtualKeyboardPluginState::getMidiOutputMap()
 {
     return midiProcessor->getOutputNoteMap();
 }

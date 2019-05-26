@@ -24,11 +24,12 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-MidiRemapTableModel::MidiRemapTableModel(Array<int>* inputMapIn, Array<int>* outputMapIn)
+MidiRemapTableModel::MidiRemapTableModel(int* inputMapIn, int* outputMapIn, int mapSize)
 {
     inputMap = inputMapIn;
     outputMap = outputMapIn;
-    numRows = jmin(inputMap->size(), outputMap->size());
+
+	numRows = mapSize;
 }
 
 MidiRemapTableModel::~MidiRemapTableModel()
@@ -54,7 +55,7 @@ void MidiRemapTableModel::backgroundClicked(const MouseEvent& e)
 
 Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate)
 {
-	if (columnId > 1)
+	if (columnId > 1 && rowNumber == jlimit(rowNumber, numRows, rowNumber))
 	{
 		TextEditor* editor;
 
@@ -71,9 +72,9 @@ Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int colum
 		int noteNum;
 
 		if (columnId % 2)
-			noteNum = (*outputMap)[rowNumber];
+			noteNum = outputMap[rowNumber];
 		else
-			noteNum = (*inputMap)[rowNumber];
+			noteNum = inputMap[rowNumber];
 
 		editor->setText(String(noteNum));
 	}
