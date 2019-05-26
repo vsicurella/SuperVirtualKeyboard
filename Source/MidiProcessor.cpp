@@ -152,7 +152,7 @@ InjectiveMap* SvkMidiProcessor::getInputInjectiveMap()
 
 InjectiveMap* SvkMidiProcessor::getOutputInjectiveMap()
 {
-	midiOutputFilter->getInjectiveMap();
+	return midiOutputFilter->getInjectiveMap();
 }
 
 MidiRemapper* SvkMidiProcessor::getInputRemapper()
