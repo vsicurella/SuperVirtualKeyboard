@@ -76,7 +76,7 @@ Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int colum
 		else
 			noteNum = inputMap[rowNumber];
 
-		editor->setText(String(noteNum));
+		editor->setText(String(noteNum), false);
 	}
 
 	return existingComponentToUpdate;
@@ -242,8 +242,10 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
 
     //[UserPreSize]
 
+	inputRemapper = pluginState->getMidiProcessor()->getInputRemapper();
+	outputRemapper = pluginState->getMidiProcessor()->getOutputRemapper();
 
-	remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap()));
+	remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap(), 128));
 	remapTable.reset(new TableListBox("RemapBox", remapTableModel.get()));
 	remapTable->setBounds(8, 184, 352, 264);
 	remapTable->updateContent();
@@ -413,11 +415,11 @@ void MidiRemapperDialog::textEditorTextChanged(TextEditor& t)
 	Point<int> cell;
 	pointFromString(cell, t.getName().fromFirstOccurrenceOf("Text Editor ", false, true));
 
-	if (cell.y - 1)
+	if (cell.y - 1 && outputRemapper->getNoteRemapped(cell.x) != val)
 	{
 		outputRemapper->setNote(cell.x, val);
 	}
-	else
+	else if (inputRemapper->getNoteRemapped(cell.x) != val)
 	{
 		inputRemapper->setNote(cell.x, val);
 	}
