@@ -55,16 +55,21 @@ void MidiRemapTableModel::backgroundClicked(const MouseEvent& e)
 
 Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int columnId, bool isRowSelected, Component* existingComponentToUpdate)
 {
-	if (columnId > 1 && rowNumber == jlimit(rowNumber, numRows, rowNumber))
+	Point<int> cell = Point<int>(rowNumber, columnId);
+
+	DBG("Refreshing cell " + cell.toString());
+	if (columnId > 1 && rowNumber == jlimit(0, numRows, rowNumber))
 	{
 		TextEditor* editor;
 
 		if (!existingComponentToUpdate)
 		{
-			editor = new TextEditor("Text Editor " + Point<int>(rowNumber, columnId).toString());
+			//Point<int> cell = Point<int>(rowNumber, columnId);
+			editor = new TextEditor("Text Editor " + cell.toString());
 			editor->setEnabled(true);
 			editor->setMultiLine(false);
 			existingComponentToUpdate = editor;
+			DBG("Created Text Editor in Cell " + cell.toString());
 		}
 		else
 			editor = dynamic_cast<TextEditor*>(existingComponentToUpdate);
@@ -248,7 +253,6 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
 	remapTableModel.reset(new MidiRemapTableModel(pluginState->getMidiInputMap(), pluginState->getMidiOutputMap(), 128));
 	remapTable.reset(new TableListBox("RemapBox", remapTableModel.get()));
 	remapTable->setBounds(8, 184, 352, 264);
-	remapTable->updateContent();
 
     remapTableHeader.reset(new TableHeaderComponent());
     remapTableHeader->addColumn("Key", MidiRemapTableModel::keyNumber, remapTable->getWidth() * 0.2);
@@ -390,19 +394,30 @@ void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+void MidiRemapperDialog::initializeTextEditors()
+{
+	remapTable->updateContent();
+
+	for (int r = 0; r < 128; r++)
+		for (int c = 1; c < 3; c++)
+		{
+			Component* co = remapTable->getCellComponent(c, r);
+			TextEditor* t = dynamic_cast<TextEditor*>(remapTable->getCellComponent(c, r));
+			if (t)
+			{
+				t->addListener(this);
+				t->setInputFilter(pluginState->textFilterInt.get(), false);
+				textEditorBoxes.add(t);
+			}
+		}
+}
+
+
 void MidiRemapperDialog::visibilityChanged()
 {
 	if (isVisible() && remapTable->getNumChildComponents() < 256)
 	{
-		for (int r = 0; r < 128; r++)
-			for (int c = 1; c < 3; c++)
-			{
-				Component* co = remapTable->getCellComponent(c, r);
-				TextEditor* t = dynamic_cast<TextEditor*>(remapTable->getCellComponent(c, r));
-				if (t)
-					t->addListener(this);
-//				jassert(t);
-			}
+		initializeTextEditors();
 	}
 }
 
@@ -414,15 +429,21 @@ void MidiRemapperDialog::textEditorTextChanged(TextEditor& t)
 
 	Point<int> cell;
 	pointFromString(cell, t.getName().fromFirstOccurrenceOf("Text Editor ", false, true));
+	DBG(t.getName() + " Changed, which corresponds to cell " + cell.toString());
 
 	if (cell.y - 1 && outputRemapper->getNoteRemapped(cell.x) != val)
 	{
+		DBG("Remapping Note " + String(cell.x) + " --> " + String(val));
 		outputRemapper->setNote(cell.x, val);
+		DBG("Output Remapped, Note " + String(cell.x) + " --> " + String(outputRemapper->getNoteRemapped(cell.x)));
 	}
 	else if (inputRemapper->getNoteRemapped(cell.x) != val)
 	{
+		DBG("Remapping Note " + String(cell.x) + " --> " + String(val));
 		inputRemapper->setNote(cell.x, val);
+		DBG("Input Remapped, Note " + String(cell.x) + " --> " + String(inputRemapper->getNoteRemapped(cell.x)));
 	}
+
 }
 
 //[/MiscUserCode]

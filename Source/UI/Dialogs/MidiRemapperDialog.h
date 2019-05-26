@@ -86,6 +86,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void initializeTextEditors();
+	
 	void visibilityChanged() override;
 	void textEditorTextChanged(TextEditor& t) override;
 
@@ -105,6 +107,8 @@ private:
     std::unique_ptr<TableHeaderComponent> remapTableHeader;
     std::unique_ptr<MidiRemapTableModel> remapTableModel;
     std::unique_ptr<TableListBox> remapTable;
+
+	OwnedArray<TextEditor> textEditorBoxes;
 
 	int boxW = 10;
 	int boxH = 8;
