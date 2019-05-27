@@ -10,10 +10,10 @@
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
-#include "../../PluginState.h"
-#include "../../PluginIDs.h"
-#include "../../Structures/Mode.h"
+#include "../../../../JuceLibraryCode/JuceHeader.h"
+#include "../../../PluginState.h"
+#include "../../../PluginIDs.h"
+#include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
 

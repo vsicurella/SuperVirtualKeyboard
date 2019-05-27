@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    MidiRemapperWindow.h
+    MidiSettingsWindow.h
     Created: 24 May 2019 6:28:28pm
     Author:  Vincenzo Sicurella
 
@@ -12,11 +12,11 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 
-class MidiRemapperWindow : public DialogWindow
+class MidiSettingsWindow : public DialogWindow
 {
 public:
     
-    MidiRemapperWindow()
+    MidiSettingsWindow()
     : DialogWindow("Midi Remapper Window", Colours::slategrey, true) {}
     
     void closeButtonPressed() override

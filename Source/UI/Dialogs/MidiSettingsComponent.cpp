@@ -20,7 +20,7 @@
 //[Headers] You can add your own extra header files here...
 //[/Headers]
 
-#include "MidiRemapperDialog.h"
+#include "MidiSettingsComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -28,42 +28,42 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginStateIn)
+MidiSettingsComponent::MidiSettingsComponent (SuperVirtualKeyboardPluginState* pluginStateIn)
     : pluginState(pluginStateIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
     setName ("Midi Remapper Dialog");
-    comboBox.reset (new ComboBox ("new combo box"));
-    addAndMakeVisible (comboBox.get());
-    comboBox->setEditableText (false);
-    comboBox->setJustificationType (Justification::centredLeft);
-    comboBox->setTextWhenNothingSelected (String());
-    comboBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBox->addListener (this);
+    midiInputBox.reset (new ComboBox ("Input Device Box"));
+    addAndMakeVisible (midiInputBox.get());
+    midiInputBox->setEditableText (false);
+    midiInputBox->setJustificationType (Justification::centredLeft);
+    midiInputBox->setTextWhenNothingSelected (String());
+    midiInputBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    midiInputBox->addListener (this);
 
-    comboBox->setBounds (112, 16, 240, 24);
+    midiInputBox->setBounds (112, 16, 240, 24);
 
-    midiInuptLable.reset (new Label ("Midi Input Label",
+    midiInputLabel.reset (new Label ("Midi Input Label",
                                      TRANS("Input Device:")));
-    addAndMakeVisible (midiInuptLable.get());
-    midiInuptLable->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    midiInuptLable->setJustificationType (Justification::centredLeft);
-    midiInuptLable->setEditable (false, false, false);
-    midiInuptLable->setColour (TextEditor::textColourId, Colours::black);
-    midiInuptLable->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    addAndMakeVisible (midiInputLabel.get());
+    midiInputLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    midiInputLabel->setJustificationType (Justification::centredLeft);
+    midiInputLabel->setEditable (false, false, false);
+    midiInputLabel->setColour (TextEditor::textColourId, Colours::black);
+    midiInputLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    midiInuptLable->setBounds (8, 16, 95, 24);
+    midiInputLabel->setBounds (8, 16, 95, 24);
 
-    slider.reset (new Slider ("new slider"));
-    addAndMakeVisible (slider.get());
-    slider->setRange (0, 127, 1);
-    slider->setSliderStyle (Slider::TwoValueHorizontal);
-    slider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    slider->addListener (this);
+    noteRangeSld.reset (new Slider ("Note Range Slider"));
+    addAndMakeVisible (noteRangeSld.get());
+    noteRangeSld->setRange (0, 127, 1);
+    noteRangeSld->setSliderStyle (Slider::TwoValueHorizontal);
+    noteRangeSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    noteRangeSld->addListener (this);
 
-    slider->setBounds (112, 64, 248, 24);
+    noteRangeSld->setBounds (112, 64, 248, 24);
 
     noteRangeLabel.reset (new Label ("Note Range Label",
                                      TRANS("Note Range:")));
@@ -137,7 +137,7 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
     addAndMakeVisible (modeOriginalRootSld.get());
     modeOriginalRootSld->setRange (0, 127, 1);
     modeOriginalRootSld->setSliderStyle (Slider::IncDecButtons);
-    modeOriginalRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
+    modeOriginalRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
     modeOriginalRootSld->addListener (this);
 
     modeOriginalRootSld->setBounds (632, 72, 88, 24);
@@ -146,10 +146,10 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
     addAndMakeVisible (modeRemapRootSld.get());
     modeRemapRootSld->setRange (0, 127, 1);
     modeRemapRootSld->setSliderStyle (Slider::IncDecButtons);
-    modeRemapRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
+    modeRemapRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
     modeRemapRootSld->addListener (this);
 
-    modeRemapRootSld->setBounds (640, 112, 80, 24);
+    modeRemapRootSld->setBounds (632, 112, 88, 24);
 
     rootNoteLabel.reset (new Label ("Root Note Label",
                                     TRANS("Root Note:")));
@@ -189,16 +189,16 @@ MidiRemapperDialog::MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginS
     //[/Constructor]
 }
 
-MidiRemapperDialog::~MidiRemapperDialog()
+MidiSettingsComponent::~MidiSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     remapTable.release();
 	remapTableModel.release();
     //[/Destructor_pre]
 
-    comboBox = nullptr;
-    midiInuptLable = nullptr;
-    slider = nullptr;
+    midiInputBox = nullptr;
+    midiInputLabel = nullptr;
+    noteRangeSld = nullptr;
     noteRangeLabel = nullptr;
     manualMapToggle = nullptr;
     modeMapToggle = nullptr;
@@ -216,7 +216,7 @@ MidiRemapperDialog::~MidiRemapperDialog()
 }
 
 //==============================================================================
-void MidiRemapperDialog::paint (Graphics& g)
+void MidiSettingsComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
@@ -227,7 +227,7 @@ void MidiRemapperDialog::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void MidiRemapperDialog::resized()
+void MidiSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
@@ -236,15 +236,15 @@ void MidiRemapperDialog::resized()
     //[/UserResized]
 }
 
-void MidiRemapperDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
 
-    if (comboBoxThatHasChanged == comboBox.get())
+    if (comboBoxThatHasChanged == midiInputBox.get())
     {
-        //[UserComboBoxCode_comboBox] -- add your combo box handling code here..
-        //[/UserComboBoxCode_comboBox]
+        //[UserComboBoxCode_midiInputBox] -- add your combo box handling code here..
+        //[/UserComboBoxCode_midiInputBox]
     }
     else if (comboBoxThatHasChanged == modeLibraryBoxOG.get())
     {
@@ -261,15 +261,15 @@ void MidiRemapperDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[/UsercomboBoxChanged_Post]
 }
 
-void MidiRemapperDialog::sliderValueChanged (Slider* sliderThatWasMoved)
+void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == slider.get())
+    if (sliderThatWasMoved == noteRangeSld.get())
     {
-        //[UserSliderCode_slider] -- add your slider handling code here..
-        //[/UserSliderCode_slider]
+        //[UserSliderCode_noteRangeSld] -- add your slider handling code here..
+        //[/UserSliderCode_noteRangeSld]
     }
     else if (sliderThatWasMoved == modeOriginalRootSld.get())
     {
@@ -286,7 +286,7 @@ void MidiRemapperDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
+void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -310,34 +310,6 @@ void MidiRemapperDialog::buttonClicked (Button* buttonThatWasClicked)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void MidiRemapperDialog::initializeTextEditors()
-{
-	DBG("Initializing Text Editors");
-	remapTable->updateContent();
-	/*
-	for (int r = 0; r < 128; r++)
-		for (int c = 1; c < 3; c++)
-		{
-			Component* co = remapTable->getCellComponent(c, r);
-			TextEditor* t = dynamic_cast<TextEditor*>(remapTable->getCellComponent(c, r));
-			if (t)
-			{
-				t->addListener(this);
-				t->setInputFilter(pluginState->textFilterInt.get(), false);
-				textEditorBoxes.add(t);
-			}
-		}
-		*/
-}
-
-
-void MidiRemapperDialog::visibilityChanged()
-{
-	if (isVisible() && remapTable->getNumChildComponents() < 256)
-	{
-		remapTable->updateContent();
-	}
-}
 //[/MiscUserCode]
 
 
@@ -350,29 +322,30 @@ void MidiRemapperDialog::visibilityChanged()
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="MidiRemapperDialog" componentName="Midi Remapper Dialog"
+<JUCER_COMPONENT documentType="Component" className="MidiSettingsComponent" componentName="Midi Remapper Dialog"
                  parentClasses="public Component" constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
                  variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="800" initialHeight="600">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <COMBOBOX name="new combo box" id="fdc675fc3d4fef33" memberName="comboBox"
+  <COMBOBOX name="Input Device Box" id="fdc675fc3d4fef33" memberName="midiInputBox"
             virtualName="" explicitFocusOrder="0" pos="112 16 240 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <LABEL name="Midi Input Label" id="87de2dc7bc47e162" memberName="midiInuptLable"
+  <LABEL name="Midi Input Label" id="87de2dc7bc47e162" memberName="midiInputLabel"
          virtualName="" explicitFocusOrder="0" pos="8 16 95 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Input Device:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="new slider" id="9cd98eb1a345671e" memberName="slider" virtualName=""
-          explicitFocusOrder="0" pos="112 64 248 24" min="0" max="1.27e2"
-          int="1" style="TwoValueHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="Note Range Slider" id="9cd98eb1a345671e" memberName="noteRangeSld"
+          virtualName="" explicitFocusOrder="0" pos="112 64 248 24" min="0.0"
+          max="127.0" int="1.0" style="TwoValueHorizontal" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
   <LABEL name="Note Range Label" id="42e0042c75044473" memberName="noteRangeLabel"
          virtualName="" explicitFocusOrder="0" pos="8 64 150 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Note Range:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="ManualMapToggle" id="3c967f0af78d5468" memberName="manualMapToggle"
                 virtualName="" explicitFocusOrder="0" pos="16 128 150 24" buttonText="Manual Mapping"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
@@ -385,31 +358,31 @@ BEGIN_JUCER_METADATA
   <LABEL name="Mode Box Original" id="5b2fda69d594937a" memberName="modeBoxOriginal"
          virtualName="" explicitFocusOrder="0" pos="376 72 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="From Mode:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <COMBOBOX name="Mode Library Original" id="d97fde7b8560b769" memberName="modeLibraryBoxOG2"
             virtualName="" explicitFocusOrder="0" pos="472 118 150 24" editable="0"
             layout="33" items="" textWhenNonSelected="Meantone[7] 12" textWhenNoItems="(no choices)"/>
   <LABEL name="Mode Box Remap" id="44d358cbb3982e4" memberName="modeBoxRemap"
          virtualName="" explicitFocusOrder="0" pos="376 118 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="To Mode:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <SLIDER name="Mode Original Root Slider" id="31eb79d952d2e1aa" memberName="modeOriginalRootSld"
-          virtualName="" explicitFocusOrder="0" pos="632 72 88 24" min="0"
-          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          virtualName="" explicitFocusOrder="0" pos="632 72 88 24" min="0.0"
+          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="Mode Remap Root Slider" id="c98578a060cce67f" memberName="modeRemapRootSld"
-          virtualName="" explicitFocusOrder="0" pos="640 112 80 24" min="0"
-          max="1.27e2" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          virtualName="" explicitFocusOrder="0" pos="632 112 88 24" min="0.0"
+          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Root Note Label" id="effe36cc4475b201" memberName="rootNoteLabel"
          virtualName="" explicitFocusOrder="0" pos="640 40 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Root Note:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

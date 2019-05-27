@@ -21,8 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../PluginState.h"
-#include "../Structures/Mode.h"
+#include "../../PluginState.h"
+#include "../../Structures/Mode.h"
 //[/Headers]
 
 

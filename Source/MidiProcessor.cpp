@@ -185,8 +185,7 @@ String SvkMidiProcessor::setMidiOutput(int deviceIndex)
 }
 
 void SvkMidiProcessor::setRootNote(int rootNoteIn)
-{
-    rootMidiNote = totalModulus(rootNoteIn, 128);
+{	
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
 }
 
