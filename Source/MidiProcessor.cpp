@@ -14,11 +14,8 @@ SvkMidiProcessor::SvkMidiProcessor()
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
        
-    midiInputFilter.reset(new MidiRemapper(MidiRemapper::getStandardMap()));
-    midiOutputFilter.reset(new MidiRemapper(MidiRemapper::getStandardMap()));
-
-	noteInputMap = midiInputFilter->getNoteMap();
-	noteOutputMap = midiOutputFilter->getNoteMap();
+    midiInputFilter.reset(new MidiRemapper());
+    midiOutputFilter.reset(new MidiRemapper());
     
     //setMidiInput(MidiInput::getDefaultDeviceIndex());
     midiInput = nullptr;
@@ -38,11 +35,11 @@ void SvkMidiProcessor::updateNode()
 {
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
 
-	Array<int> map = Array<int>(noteInputMap, 128);
+	Array<int> map = Array<int>(midiInputFilter->getRemappedNotes(), 128);
     midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiInputMap), nullptr);
     add_array_to_node(midiSettingsNode, map, IDs::midiInputMap, "Note");
     
-	map = Array<int>(noteOutputMap, 128);
+	map = Array<int>(midiOutputFilter->getRemappedNotes(), 128);
     midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiOutputMap), nullptr);
     add_array_to_node(midiSettingsNode, map, IDs::midiOutputMap, "Note");
 }
@@ -135,24 +132,14 @@ int SvkMidiProcessor::getRootNote()
     return rootMidiNote;
 }
 
-int* SvkMidiProcessor::getInputNoteMap()
+NoteMap* SvkMidiProcessor::getInputNoteMap()
 {
-    return noteInputMap;
+	return midiInputFilter->getNoteMap();
 }
 
-int* SvkMidiProcessor::getOutputNoteMap()
+NoteMap* SvkMidiProcessor::getOutputNoteMap()
 {
-    return noteOutputMap;
-}
-
-InjectiveMap* SvkMidiProcessor::getInputInjectiveMap()
-{
-	return midiInputFilter->getInjectiveMap();
-}
-
-InjectiveMap* SvkMidiProcessor::getOutputInjectiveMap()
-{
-	return midiOutputFilter->getInjectiveMap();
+	return midiOutputFilter->getNoteMap();
 }
 
 MidiRemapper* SvkMidiProcessor::getInputRemapper()
@@ -247,9 +234,13 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
     {
         while (midiEvent.getNextEvent(msg, smpl))
         {
-            msg.setTimeStamp(++msgCount);
-            keyboardState->processNextMidiEvent(msg);
-            addMessageToQueue(msg);
+			msg.setNoteNumber(midiInputFilter->getNoteRemapped(msg.getNoteNumber()));
+			if (msg.getNoteNumber() >= 0)
+			{
+				msg.setTimeStamp(++msgCount);
+				keyboardState->processNextMidiEvent(msg);
+				addMessageToQueue(msg);
+			}
         }
     }
     

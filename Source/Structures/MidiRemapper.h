@@ -11,11 +11,11 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "InjectiveMap.h"
+#include "NoteMap.h"
 
 class MidiRemapper
 {
-	std::unique_ptr<InjectiveMap> midiNoteMapping;
+	std::unique_ptr<NoteMap> midiNoteMapping;
 	Point<int> noteRange;
 
 public:
@@ -31,9 +31,10 @@ public:
     int setNote(int noteIn, int noteOut);
     void setNoteRange(int lowestMidiNote, int highestMidiNote);
     
-	InjectiveMap* setNoteMap(Array<int> mapToCopy);
-	InjectiveMap* getInjectiveMap();
-	int* getNoteMap();
+	NoteMap* setNoteMap(Array<int> mapToCopy);
+	NoteMap* getNoteMap();
+	int* getRemappedNotes();
+
 	int size();
 
 	String toString();

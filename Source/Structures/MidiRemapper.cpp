@@ -13,6 +13,7 @@
 MidiRemapper::MidiRemapper()
 {
 	noteRange = Point<int>(-1, 127);
+	midiNoteMapping.reset(new NoteMap(128, true));
 }
 
 MidiRemapper::MidiRemapper(Array<int> mapIn)
@@ -21,9 +22,9 @@ MidiRemapper::MidiRemapper(Array<int> mapIn)
 	setNoteMap(mapIn);
 }
 
-InjectiveMap* MidiRemapper::setNoteMap(Array<int> mapToCopy)
+NoteMap* MidiRemapper::setNoteMap(Array<int> mapToCopy)
 {
-    midiNoteMapping.reset(new InjectiveMap(mapToCopy.getRawDataPointer(), mapToCopy.size()));
+    midiNoteMapping.reset(new NoteMap(mapToCopy.getRawDataPointer(), mapToCopy.size()));
 	return midiNoteMapping.get();
 }
 
@@ -68,14 +69,14 @@ void MidiRemapper::setNoteRange(int lowestMidiNote, int highestMidiNote)
     noteRange = Point<int>(lowestMidiNote, highestMidiNote);
 }
 
-InjectiveMap* MidiRemapper::getInjectiveMap()
+NoteMap* MidiRemapper::getNoteMap()
 {
 	return midiNoteMapping.get();
 }
 
-int* MidiRemapper::getNoteMap()
+int* MidiRemapper::getRemappedNotes()
 {
-	return midiNoteMapping->getValues();
+	return midiNoteMapping->getKeys();
 }
 
 int MidiRemapper::size()
