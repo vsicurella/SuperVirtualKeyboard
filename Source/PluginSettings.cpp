@@ -84,3 +84,25 @@ String SvkPluginSettings::getPresetPath()
 {
 	return currentPresetLocation.getFullPathName();
 }
+
+bool SvkPluginSettings::getCreatePresetFolder()
+{
+	return createPresetFolder;
+}
+
+bool SvkPluginSettings::getSaveFactoryPresets()
+{
+	return saveFactoryPresets;
+}
+
+void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
+{
+	createPresetFolder = shouldCreateFolder;
+	pluginSettingsNode.setProperty(IDs::createPresetFolder, createPresetFolder, nullptr);
+}
+
+void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
+{
+	saveFactoryPresets = shouldSavePresets;
+	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+}
