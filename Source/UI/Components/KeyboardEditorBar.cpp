@@ -31,7 +31,7 @@ KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginSta
     : pluginState(pluginStateIn), appCmdMgr(managerIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	presets = pluginState->get_presets();
+	presets = pluginState->getPresets();
 	presetsSorted = pluginState->get_presets_sorted();
     //[/Constructor_pre]
 
@@ -212,7 +212,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-		pluginState->getMidiProcessor()->setRootNote((int)offsetSld->getValue());
+		pluginState->setMidiRootNote((int)offsetSld->getValue());
 		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
     }

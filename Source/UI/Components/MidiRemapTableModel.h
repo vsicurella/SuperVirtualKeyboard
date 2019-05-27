@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "../CommonFunctions.h"
-#include "../Structures/MidiRemapper.h"
+#include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../../CommonFunctions.h"
+#include "../../Structures/MidiRemapper.h"
 
 //==============================================================================
 /*

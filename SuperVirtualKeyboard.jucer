@@ -5,9 +5,6 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
-    <FILE id="VI9lFR" name="MidiProcessor.cpp" compile="1" resource="0"
-          file="Source/MidiProcessor.cpp"/>
-    <FILE id="DPYCxv" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
     <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
       <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
             file="Source/File IO/ReaperWriter.cpp"/>
@@ -29,41 +26,47 @@
       <FILE id="ORt6g1" name="MidiRemapper.h" compile="0" resource="0" file="Source/Structures/MidiRemapper.h"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
-      <FILE id="w0yMkS" name="MidiRemapTableModel.cpp" compile="1" resource="0"
-            file="Source/UI/MidiRemapTableModel.cpp"/>
-      <FILE id="Nsj1MR" name="MidiRemapTableModel.h" compile="0" resource="0"
-            file="Source/UI/MidiRemapTableModel.h"/>
+      <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">
+        <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
+          <FILE id="zI44G5" name="Keyboard.cpp" compile="1" resource="0" file="Source/UI/Components/VirtualKeyboard/Keyboard.cpp"/>
+          <FILE id="kxFSq5" name="Keyboard.h" compile="0" resource="0" file="Source/UI/Components/VirtualKeyboard/Keyboard.h"/>
+          <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
+          <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.h"/>
+          <FILE id="iTruVv" name="VirtualKeyboardKey.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.cpp"/>
+          <FILE id="nrWH1a" name="VirtualKeyboardKey.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.h"/>
+        </GROUP>
+        <FILE id="B3vqXM" name="KeyboardEditorBar.cpp" compile="1" resource="0"
+              file="Source/UI/Components/KeyboardEditorBar.cpp"/>
+        <FILE id="pnNKOq" name="KeyboardEditorBar.h" compile="0" resource="0"
+              file="Source/UI/Components/KeyboardEditorBar.h"/>
+        <FILE id="MWQPKn" name="MidiRemapTableModel.cpp" compile="1" resource="0"
+              file="Source/UI/Components/MidiRemapTableModel.cpp"/>
+        <FILE id="wf4Gan" name="MidiRemapTableModel.h" compile="0" resource="0"
+              file="Source/UI/Components/MidiRemapTableModel.h"/>
+        <FILE id="sFAed2" name="PresetLibraryBox.cpp" compile="1" resource="0"
+              file="Source/UI/Components/PresetLibraryBox.cpp"/>
+        <FILE id="bPWHZY" name="PresetLibraryBox.h" compile="0" resource="0"
+              file="Source/UI/Components/PresetLibraryBox.h"/>
+      </GROUP>
       <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
         <FILE id="xH4xEW" name="ColorChoosingWindow.cpp" compile="1" resource="0"
               file="Source/UI/Dialogs/ColorChoosingWindow.cpp"/>
         <FILE id="OW7jdx" name="ColorChoosingWindow.h" compile="0" resource="0"
               file="Source/UI/Dialogs/ColorChoosingWindow.h"/>
-        <FILE id="KNufAG" name="MidiRemapperDialog.cpp" compile="1" resource="0"
-              file="Source/UI/Dialogs/MidiRemapperDialog.cpp"/>
-        <FILE id="Pt2NrT" name="MidiRemapperDialog.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/MidiRemapperDialog.h"/>
-        <FILE id="aea56S" name="MidiRemapperWindow.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/MidiRemapperWindow.h"/>
+        <FILE id="KNufAG" name="MidiSettingsComponent.cpp" compile="1" resource="0"
+              file="Source/UI/Dialogs/MidiSettingsComponent.cpp"/>
+        <FILE id="Pt2NrT" name="MidiSettingsComponent.h" compile="0" resource="0"
+              file="Source/UI/Dialogs/MidiSettingsComponent.h"/>
+        <FILE id="aea56S" name="MidiSettingsWindow.h" compile="0" resource="0"
+              file="Source/UI/Dialogs/MidiSettingsWindow.h"/>
       </GROUP>
-      <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
-        <FILE id="iSjBmx" name="Keyboard.cpp" compile="1" resource="0" file="Source/UI/VirtualKeyboard/Keyboard.cpp"/>
-        <FILE id="Om3FED" name="Keyboard.h" compile="0" resource="0" file="Source/UI/VirtualKeyboard/Keyboard.h"/>
-        <FILE id="VrS1Wy" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
-        <FILE id="C8YEWL" name="VirtualKeyboardGrid.h" compile="0" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboardGrid.h"/>
-        <FILE id="T2KdRe" name="VirtualKeyboardKey.cpp" compile="1" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboardKey.cpp"/>
-        <FILE id="ApOBl5" name="VirtualKeyboardKey.h" compile="0" resource="0"
-              file="Source/UI/VirtualKeyboard/VirtualKeyboardKey.h"/>
-      </GROUP>
-      <FILE id="aP536B" name="PluginEditor.cpp" compile="1" resource="0"
+      <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
-      <FILE id="E04sU2" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
-      <FILE id="VSP7ge" name="KeyboardEditorBar.cpp" compile="1" resource="0"
-            file="Source/UI/KeyboardEditorBar.cpp"/>
-      <FILE id="GBz5d1" name="KeyboardEditorBar.h" compile="0" resource="0"
-            file="Source/UI/KeyboardEditorBar.h"/>
+      <FILE id="gGW61u" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
     </GROUP>
     <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
           file="Source/CommonFunctions.h"/>
@@ -74,6 +77,13 @@
           file="Source/PluginProcessor.cpp"/>
     <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
           file="Source/PluginProcessor.h"/>
+    <FILE id="VI9lFR" name="MidiProcessor.cpp" compile="1" resource="0"
+          file="Source/MidiProcessor.cpp"/>
+    <FILE id="DPYCxv" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
+    <FILE id="RXVf6v" name="PluginSettings.cpp" compile="1" resource="0"
+          file="Source/PluginSettings.cpp"/>
+    <FILE id="a1oozu" name="PluginSettings.h" compile="0" resource="0"
+          file="Source/PluginSettings.h"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">

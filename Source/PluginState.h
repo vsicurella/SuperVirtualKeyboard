@@ -10,11 +10,12 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "MidiProcessor.h"
-#include "PluginIDs.h"
-#include "Structures/Preset.h"
-#include "Structures/MidiRemapper.h"
+
 #include "CommonFunctions.h"
+#include "PluginIDs.h"
+#include "PluginSettings.h"
+#include "Structures/Preset.h"
+#include "MidiProcessor.h"
 
 struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 {
@@ -32,7 +33,7 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 
 	//==============================================================================
 
-	OwnedArray<Mode>* get_presets();
+	OwnedArray<Mode>* getPresets();
 	Array<Array<Mode*>>* get_presets_sorted();
 	UndoManager* getUndoManager();
 
@@ -48,6 +49,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 
 	void setCurrentMode(int presetIndexIn);
 	void setCurrentMode(Mode* modeIn);
+
+	void setMidiRootNote(int rootNoteIn);
     
 	void updateKeyboardSettingsPreset();
 	void updateMidiSettingsNode();
@@ -58,6 +61,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	//==============================================================================
 	
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
+	std::unique_ptr<SvkPluginSettings> pluginSettings;
+
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
 

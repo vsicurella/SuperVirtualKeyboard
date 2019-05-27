@@ -20,9 +20,16 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
-	static Identifier pluginSettingsNode("Preferences");
 
-	// Settings
+	// Plugin Settings
+	static Identifier pluginSettingsNode("Preferences");
+	static Identifier settingsDirectory("SettingsDirectory");
+	static Identifier presetDirectory("PresetDirectory");
+	static Identifier createPresetFolder("CreatePresetFolder");
+	static Identifier saveFactoryPresets("SaveFactoryPresets");
+
+
+	// Midi Settings
     static Identifier midiSettingsNode("MidiSettings");
 	static Identifier rootMidiNote("RootNote");
     static Identifier midiInputMap("InputMapping");
@@ -97,7 +104,8 @@ namespace IDs
 
 enum SortType
 {
-	scaleSizeSort,
-	modeSizeSort,
-	familySort
+	scaleSize = 0,
+	modeSize,
+	familyName,
+	user
 };

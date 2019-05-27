@@ -24,7 +24,7 @@
 
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
-#include "../MidiRemapTableModel.h"
+#include "../Components/MidiRemapTableModel.h"
 //[/Headers]
 
 
@@ -37,21 +37,18 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class MidiRemapperDialog  : public Component,
-                            public ComboBox::Listener,
-                            public Slider::Listener,
-                            public Button::Listener
+class MidiSettingsComponent  : public Component,
+                               public ComboBox::Listener,
+                               public Slider::Listener,
+                               public Button::Listener
 {
 public:
     //==============================================================================
-    MidiRemapperDialog (SuperVirtualKeyboardPluginState* pluginStateIn);
-    ~MidiRemapperDialog();
+    MidiSettingsComponent (SuperVirtualKeyboardPluginState* pluginStateIn);
+    ~MidiSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void initializeTextEditors();
-
-	void visibilityChanged() override;
 
     //[/UserMethods]
 
@@ -59,7 +56,9 @@ public:
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-	void buttonClicked(Button* buttonThatWasClicked) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
+
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -76,9 +75,9 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ComboBox> comboBox;
-    std::unique_ptr<Label> midiInuptLable;
-    std::unique_ptr<Slider> slider;
+    std::unique_ptr<ComboBox> midiInputBox;
+    std::unique_ptr<Label> midiInputLabel;
+    std::unique_ptr<Slider> noteRangeSld;
     std::unique_ptr<Label> noteRangeLabel;
     std::unique_ptr<ToggleButton> manualMapToggle;
     std::unique_ptr<ToggleButton> modeMapToggle;
@@ -92,7 +91,7 @@ private:
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiRemapperDialog)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiSettingsComponent)
 };
 
 //[EndFile] You can add extra defines here...

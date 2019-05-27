@@ -14,20 +14,25 @@ SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
 {
     appCmdMgr.reset(new ApplicationCommandManager());
     undoManager.reset(new UndoManager());
+
+	pluginSettings.reset(new SvkPluginSettings());
     presetCurrent.reset(new SvkPreset());
     midiProcessor.reset(new SvkMidiProcessor());
+
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
 
     // setup data nodes
     pluginStateNode = ValueTree(IDs::pluginStateNode);
     modeLibraryNode = ValueTree(IDs::modeLibraryNode);
-    pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
     modePresetNode = ValueTree(IDs::modePresetNode);
+
+	pluginSettingsNode = pluginSettings->pluginSettingsNode;
+	midiSettingsNode = midiProcessor->midiSettingsNode;
     
     pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
     pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
-    pluginStateNode.addChild(midiProcessor->midiSettingsNode, -1, nullptr);
+    pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
 
     createPresets();
 }
@@ -42,7 +47,7 @@ UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
 	return undoManager.get();
 }
 
-OwnedArray<Mode>* SuperVirtualKeyboardPluginState::get_presets()
+OwnedArray<Mode>* SuperVirtualKeyboardPluginState::getPresets()
 {
 	return &presets;
 }
@@ -137,6 +142,13 @@ void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
 		modePresetNode = modeCurrent->modeNode;
         sendChangeMessage();
 	}
+}
+
+void SuperVirtualKeyboardPluginState::setMidiRootNote(int rootNoteIn)
+{
+	rootNoteIn = totalModulus(rootNoteIn, 128);
+	midiProcessor->setRootNote(rootNoteIn);
+	modeCurrent->setRootNote(rootNoteIn);
 }
 
 void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
@@ -270,7 +282,7 @@ void SuperVirtualKeyboardPluginState::createPresets()
 	for (int i = 0; i < presets.size(); i++)
 	{
 		modeLibraryNode.addChild(presets.getUnchecked(i)->modeNode, i, nullptr);
-		presets.getUnchecked(i)->modeNode.setProperty(IDs::factoryPreset, true, nullptr);
+		presets.getUnchecked(i)->modeNode.setProperty(IDs::factoryPreset, i+1, nullptr);
 	}
 
 	presetsSorted.clear();

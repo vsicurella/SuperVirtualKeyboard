@@ -13,7 +13,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "UI/PluginEditor.h"
 #include "PluginState.h"
-#include "Structures/MidiRemapper.h"
 
 //==============================================================================
 /**
