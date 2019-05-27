@@ -42,4 +42,10 @@ public:
 	String getSettingsPath();
 	String getPresetPath();
 
+	bool getCreatePresetFolder();
+	bool getSaveFactoryPresets();
+
+	void setCreatePresetFolder(bool shouldCreateFolder);
+	void setSaveFactoryPresets(bool shouldSavePresets);
+
 };

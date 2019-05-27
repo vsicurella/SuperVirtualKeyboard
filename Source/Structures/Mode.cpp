@@ -33,7 +33,7 @@ Mode::Mode()
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
-	init_node();
+	initializeNode();
 }
 
 Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
@@ -56,7 +56,7 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
-	init_node();
+	initializeNode();
 }
 
 Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
@@ -79,13 +79,19 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
     
-	init_node();
+	initializeNode();
+}
+
+Mode::Mode(ValueTree modeNodeIn)
+{
+	Mode();
+	restoreNode(modeNodeIn);
 }
 
 Mode::~Mode() {}
 
 
-void Mode::init_node()
+void Mode::initializeNode()
 {
 	modeNode = ValueTree(IDs::modePresetNode);
 
@@ -97,7 +103,7 @@ void Mode::init_node()
 	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
 }
 
-void Mode::restore_from_node(ValueTree nodeIn, int rootNoteIn)
+void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 {
 	if (nodeIn.hasType(IDs::modePresetNode))
 	{
@@ -120,6 +126,44 @@ void Mode::restore_from_node(ValueTree nodeIn, int rootNoteIn)
 		scaleDegrees = scale_degrees(scaleSize, offset);
 		updateStepsOfOrders();
 	}
+}
+
+ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
+{
+	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
+	Array<int> steps = parse_steps(stepsIn);
+	Array<int> orders = steps_to_orders(steps);
+	Array<int> mosClass = interval_sizes(steps);
+
+	modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
+	modeNodeOut.setProperty(IDs::modeSize, steps.size(), nullptr);
+	modeNodeOut.setProperty(IDs::stepString, stepsIn, nullptr);
+	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
+	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
+
+	String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
+	modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+
+	return modeNodeOut;
+}
+
+ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, bool factoryPreset)
+{
+	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
+	Array<int> orders = steps_to_orders(stepsIn);
+	Array<int> mosClass = interval_sizes(stepsIn);
+	String stepsStr = steps_to_string(stepsIn);
+
+	modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
+	modeNodeOut.setProperty(IDs::modeSize, stepsIn.size(), nullptr);
+	modeNodeOut.setProperty(IDs::stepString, stepsStr, nullptr);
+	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
+	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
+
+	String modeName = familyIn + "[" + String(stepsIn.size()) + "] " + String(orders.size());
+	modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+
+	return modeNodeOut;
 }
 
 String Mode::setFamily(String nameIn)
@@ -163,8 +207,6 @@ Array<int> Mode::parse_steps(String stepsIn)
 	Array<int> stepsOut;
 
 	std::string theSteps = stepsIn.toStdString();
-	//char* check;
-	//long intCheck;
 
 	char c;
 	int step;
@@ -176,13 +218,11 @@ Array<int> Mode::parse_steps(String stepsIn)
 		digits = 0;
 		c = stepsIn[i];
 
-		//strtol(&theSteps[i], &check, 10);
 
-		while ((c != ' ' && c != '\t') && (i + digits) < stepsIn.length())
+		while ((c >= 48 && c < 58) && (i + digits) < stepsIn.length())
 		{
 			digits++;
 			c = stepsIn[i + digits];
-			//strtol(&theSteps[i + digits], &check, 10);
 		}
 
 		if (digits > 0)

@@ -22,16 +22,17 @@ struct Mode
 	ValueTree modeNode;
 
 	Mode();
-
 	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60);
-
 	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60);
+	Mode(ValueTree modeNodeIn);
 
 	~Mode();
 
-	void init_node();
+	void initializeNode();
+	void restoreNode(ValueTree nodeIn, int rootNoteIn=60);
 
-	void restore_from_node(ValueTree nodeIn, int rootNoteIn=60);
+	static ValueTree createNode(String stepsIn, String familyIn = "undefined", bool factoryPreset = false);
+	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", bool factoryPreset = false);
 
 	/*
 		Sets custom name of the mode. 

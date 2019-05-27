@@ -76,7 +76,6 @@ private:
     std::unique_ptr<SvkPreset> presetCurrent;
 	std::unique_ptr<UndoManager> undoManager;
 	
-    OwnedArray<Mode> presets;
 	Array<Array<Mode*>> presetsSorted;
 
 	Mode* modeCurrent;
