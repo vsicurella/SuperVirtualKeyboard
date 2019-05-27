@@ -1,16 +1,16 @@
 /*
   ==============================================================================
 
-    InjectiveMap.cpp
+    NoteMap.cpp
     Created: 25 May 2019 10:34:43pm
     Author:  Vincenzo
 
   ==============================================================================
 */
 
-#include "InjectiveMap.h"
+#include "NoteMap.h"
 
-InjectiveMap::InjectiveMap(int sizeIn, bool useIdentity, int nullValIn)
+NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 {
 	size = sizeIn;
 
@@ -30,14 +30,14 @@ InjectiveMap::InjectiveMap(int sizeIn, bool useIdentity, int nullValIn)
 	}
 }
 
-InjectiveMap::InjectiveMap(int* valuesIn, int sizeIn, int nullValIn)
+NoteMap::NoteMap(int* valuesIn, int sizeIn, int nullValIn)
 {
 	nullVal = nullValIn;
 	setValues(valuesIn, sizeIn);
 }
 
 
-InjectiveMap::InjectiveMap(InjectiveMap& mapToCopy)
+NoteMap::NoteMap(NoteMap& mapToCopy)
 {
 	keys.reset(mapToCopy.getKeys());
 	values.reset(mapToCopy.getValues());
@@ -45,27 +45,25 @@ InjectiveMap::InjectiveMap(InjectiveMap& mapToCopy)
 	nullVal = mapToCopy.getNullVal();
 }
 
-InjectiveMap::~InjectiveMap()
+NoteMap::~NoteMap()
 {
 	keys.release();
 	values.release();
 }
 
-int* InjectiveMap::setValue(int keyNum, int valIn)
+int* NoteMap::setValue(int keyNum, int valIn)
 {
+	
 	int oldVal = keys.get()[keyNum];
 	values.get()[oldVal] = nullVal;
-
-	int oldKey = values.get()[valIn];
-	keys.get()[oldKey] = nullVal;
-
+	
 	keys.get()[keyNum] = valIn;
 	values.get()[valIn] = keyNum;
 
 	return keys.get() + keyNum;
 }
 
-void InjectiveMap::setValues(int* valuesIn, int sizeIn)
+void NoteMap::setValues(int* valuesIn, int sizeIn)
 {
 	size = sizeIn;
 
@@ -89,36 +87,36 @@ void InjectiveMap::setValues(int* valuesIn, int sizeIn)
 	}
 }
 
-int* InjectiveMap::setNullVal(int nullValIn)
+int* NoteMap::setNullVal(int nullValIn)
 {
 	nullVal = nullValIn;
 	return &nullVal;
 }
 
-int InjectiveMap::getSize()
+int NoteMap::getSize()
 {
 	return size;
 }
 
-int InjectiveMap::getKey(int valIn)
+int NoteMap::getKey(int valIn)
 {
 	return values.get()[valIn];
 }
-int InjectiveMap::getValue(int keyNum)
+int NoteMap::getValue(int keyNum)
 {
 	return keys.get()[keyNum];
 }
 
-int* InjectiveMap::getKeys()
+int* NoteMap::getKeys()
 {
 	return keys.get();
 }
-int* InjectiveMap::getValues()
+int* NoteMap::getValues()
 {
 	return values.get();
 }
 
-int InjectiveMap::getNullVal()
+int NoteMap::getNullVal()
 {
 	return nullVal;
 }

@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    InjectiveMap.h
+    NoteMap.h
     Created: 25 May 2019 10:34:43pm
     Author:  Vincenzo
 
@@ -13,7 +13,7 @@
 #pragma once
 #include <memory>
 
-class InjectiveMap
+class NoteMap
 {
 	int size;
 
@@ -24,10 +24,10 @@ class InjectiveMap
 
 public:
 
-	InjectiveMap(int sizeIn, bool useIdentity = false, int nullValIn = -1);
-	InjectiveMap(int* valuesIn, int sizeIn, int nullValIn = -1);
-	InjectiveMap(InjectiveMap& mapToCopy);
-	~InjectiveMap();
+	NoteMap(int sizeIn, bool useIdentity = false, int nullValIn = -1);
+	NoteMap(int* valuesIn, int sizeIn, int nullValIn = -1);
+	NoteMap(NoteMap& mapToCopy);
+	~NoteMap();
 	
 	int* setValue(int keyNum, int valIn);
 	void setValues(int* valuesIn, int sizeIn);

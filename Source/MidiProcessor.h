@@ -29,9 +29,6 @@ class SvkMidiProcessor : public MidiMessageCollector
     int msgCount = 0;
     
     int rootMidiNote = 60;
-    
-    int* noteInputMap;
-    int* noteOutputMap;
 
     std::unique_ptr<MidiRemapper> midiInputFilter;
     std::unique_ptr<MidiRemapper> midiOutputFilter;
@@ -60,11 +57,8 @@ public:
     
     int getRootNote();
 
-    int* getInputNoteMap();
-    int* getOutputNoteMap();
-
-	InjectiveMap* getInputInjectiveMap();
-	InjectiveMap* getOutputInjectiveMap();
+	NoteMap* getInputNoteMap();
+	NoteMap* getOutputNoteMap();
 
 	MidiRemapper* getInputRemapper();
 	MidiRemapper* getOutputRemapper();
@@ -90,7 +84,6 @@ public:
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
-    
     
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
