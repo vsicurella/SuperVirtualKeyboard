@@ -15,7 +15,7 @@
 
 using namespace VirtualKeyboard;
 
-Keyboard::Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn)
+Keyboard::Keyboard(SvkPluginState* pluginStateIn)
 {
     removeMouseListener(this);
     

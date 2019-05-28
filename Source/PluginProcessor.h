@@ -61,13 +61,13 @@ public:
 
 	//==============================================================================
 
-	SuperVirtualKeyboardPluginState* getPluginState();
+	SvkPluginState* getPluginState();
 
 	//==============================================================================
 
 private:
 
-	std::unique_ptr<SuperVirtualKeyboardPluginState> pluginState;
+	std::unique_ptr<SvkPluginState> pluginState;
 	//MidiKeyboardState* midiStateInput;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)

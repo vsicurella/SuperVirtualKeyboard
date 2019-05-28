@@ -18,7 +18,7 @@
 
 class PresetLibraryBox : public ComboBox
 {
-	SuperVirtualKeyboardPluginState* pluginState;
+	SvkPluginState* pluginState;
 	OwnedArray<Mode>* presets;
 	OwnedArray<PopupMenu> menus;
 	Array<Mode*> menuIdToPreset;
@@ -29,7 +29,7 @@ class PresetLibraryBox : public ComboBox
 
 public:
 
-	PresetLibraryBox(SuperVirtualKeyboardPluginState* pluginStateIn, String nameIn=String());
+	PresetLibraryBox(SvkPluginState* pluginStateIn, String nameIn=String());
 	~PresetLibraryBox();
 
 	void sortMenus();

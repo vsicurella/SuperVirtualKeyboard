@@ -94,7 +94,7 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     SuperVirtualKeyboardAudioProcessor& processor;
-	SuperVirtualKeyboardPluginState* pluginState;
+	SvkPluginState* pluginState;
 	MidiKeyboardState externalMidi;
     ValueTree keyboardWindowNode;
 

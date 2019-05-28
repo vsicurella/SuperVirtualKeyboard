@@ -17,7 +17,7 @@
 #include "Structures/Preset.h"
 #include "MidiProcessor.h"
 
-struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
+struct SvkPluginState : public ChangeBroadcaster
 {
 	ValueTree pluginStateNode;
 	ValueTree presetLibraryNode;
@@ -28,8 +28,8 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 	ValueTree modePresetNode;
 	ValueTree pianoNode;
     
-    SuperVirtualKeyboardPluginState();
-	~SuperVirtualKeyboardPluginState() {}
+    SvkPluginState();
+	~SvkPluginState() {}
 
 	//==============================================================================
 

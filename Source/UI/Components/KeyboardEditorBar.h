@@ -44,7 +44,7 @@ class KeyboardEditorBar  : public Component,
 {
 public:
     //==============================================================================
-    KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn);
+    KeyboardEditorBar (SvkPluginState* pluginStateIn, ApplicationCommandManager* managerIn);
     ~KeyboardEditorBar();
 
     //==============================================================================
@@ -98,7 +98,7 @@ private:
 	};
 
 	std::unique_ptr<KeyboardMenu> pianoMenu;
-	SuperVirtualKeyboardPluginState* pluginState;
+	SvkPluginState* pluginState;
 	ApplicationCommandManager* appCmdMgr;
 
 	// Preset Menus
