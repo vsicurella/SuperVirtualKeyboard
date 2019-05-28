@@ -12,7 +12,7 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
+SvkAudioProcessor::SvkAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -29,18 +29,18 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
     
 }
 
-SuperVirtualKeyboardAudioProcessor::~SuperVirtualKeyboardAudioProcessor()
+SvkAudioProcessor::~SvkAudioProcessor()
 {
 	
 }
 
 //==============================================================================
-const String SuperVirtualKeyboardAudioProcessor::getName() const
+const String SvkAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool SuperVirtualKeyboardAudioProcessor::acceptsMidi() const
+bool SvkAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -49,7 +49,7 @@ bool SuperVirtualKeyboardAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool SuperVirtualKeyboardAudioProcessor::producesMidi() const
+bool SvkAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -58,7 +58,7 @@ bool SuperVirtualKeyboardAudioProcessor::producesMidi() const
    #endif
 }
 
-bool SuperVirtualKeyboardAudioProcessor::isMidiEffect() const
+bool SvkAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -67,37 +67,37 @@ bool SuperVirtualKeyboardAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double SuperVirtualKeyboardAudioProcessor::getTailLengthSeconds() const
+double SvkAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int SuperVirtualKeyboardAudioProcessor::getNumPrograms()
+int SvkAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
                 // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int SuperVirtualKeyboardAudioProcessor::getCurrentProgram()
+int SvkAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void SuperVirtualKeyboardAudioProcessor::setCurrentProgram (int index)
+void SvkAudioProcessor::setCurrentProgram (int index)
 {
 }
 
-const String SuperVirtualKeyboardAudioProcessor::getProgramName (int index)
+const String SvkAudioProcessor::getProgramName (int index)
 {
     return {};
 }
 
-void SuperVirtualKeyboardAudioProcessor::changeProgramName (int index, const String& newName)
+void SvkAudioProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
 //==============================================================================
-void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void SvkAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -106,14 +106,14 @@ void SuperVirtualKeyboardAudioProcessor::prepareToPlay (double sampleRate, int s
     sendChangeMessage();
 }
 
-void SuperVirtualKeyboardAudioProcessor::releaseResources()
+void SvkAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool SuperVirtualKeyboardAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool SvkAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -136,7 +136,7 @@ bool SuperVirtualKeyboardAudioProcessor::isBusesLayoutSupported (const BusesLayo
 }
 #endif
 
-void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void SvkAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data
@@ -147,18 +147,18 @@ void SuperVirtualKeyboardAudioProcessor::processBlock (AudioBuffer<float>& buffe
 }
 
 //==============================================================================
-bool SuperVirtualKeyboardAudioProcessor::hasEditor() const
+bool SvkAudioProcessor::hasEditor() const
 {
 	return true; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* SuperVirtualKeyboardAudioProcessor::createEditor()
+AudioProcessorEditor* SvkAudioProcessor::createEditor()
 {
     return new SuperVirtualKeyboardAudioProcessorEditor(*this, pluginState->appCmdMgr.get());
 }
 
 //==============================================================================
-void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destData)
+void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
@@ -169,7 +169,7 @@ void SuperVirtualKeyboardAudioProcessor::getStateInformation (MemoryBlock& destD
 	//destData.append(memOut.getData(), memOut.getDataSize());
 }
 
-void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -180,7 +180,7 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 
 //==============================================================================
 
-SvkPluginState* SuperVirtualKeyboardAudioProcessor::getPluginState()
+SvkPluginState* SvkAudioProcessor::getPluginState()
 {
 	return pluginState.get();
 }
@@ -189,7 +189,7 @@ SvkPluginState* SuperVirtualKeyboardAudioProcessor::getPluginState()
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new SuperVirtualKeyboardAudioProcessor();
+    return new SvkAudioProcessor();
 }
 
 //==============================================================================
