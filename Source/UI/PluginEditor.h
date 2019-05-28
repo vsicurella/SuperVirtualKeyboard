@@ -28,14 +28,14 @@ using namespace VirtualKeyboard;
 //==============================================================================
 /**
 */
-class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
-													public ApplicationCommandTarget,
-													private ChangeListener,
-													private Timer
+class SvkPluginEditor : public AudioProcessorEditor,
+						public ApplicationCommandTarget,
+						private ChangeListener,
+						private Timer
 {
 public:
-    SuperVirtualKeyboardAudioProcessorEditor (SvkAudioProcessor&, ApplicationCommandManager*);
-    ~SuperVirtualKeyboardAudioProcessorEditor();
+    SvkPluginEditor (SvkAudioProcessor&, ApplicationCommandManager*);
+    ~SvkPluginEditor();
 
     //==============================================================================
    
@@ -110,5 +110,5 @@ private:
 	std::unique_ptr<MidiSettingsWindow> midiSettingsWindow;
     std::unique_ptr<MidiSettingsComponent> midiSettingsComponent;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };
