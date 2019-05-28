@@ -19,7 +19,8 @@
 class PresetLibraryBox : public ComboBox
 {
 	SvkPluginState* pluginState;
-	OwnedArray<Mode>* presets;
+	ValueTree presetsLibraryNode;
+
 	OwnedArray<PopupMenu> menus;
 	Array<Mode*> menuIdToPreset;
 

@@ -11,6 +11,9 @@
       <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
     </GROUP>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
+      <FILE id="YMhOFD" name="PresetManager.cpp" compile="1" resource="0"
+            file="Source/Structures/PresetManager.cpp"/>
+      <FILE id="LojL8r" name="PresetManager.h" compile="0" resource="0" file="Source/Structures/PresetManager.h"/>
       <FILE id="vATes6" name="NoteMap.cpp" compile="1" resource="0" file="Source/Structures/NoteMap.cpp"/>
       <FILE id="uK2AIM" name="NoteMap.h" compile="0" resource="0" file="Source/Structures/NoteMap.h"/>
       <FILE id="VyoYfT" name="FractionalGrid.cpp" compile="1" resource="0"

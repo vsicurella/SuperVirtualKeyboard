@@ -100,7 +100,6 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
 
     //[Constructor] You can add your own custom stuff here..
-	populate_preset_menu();
     mapButton->setClickingTogglesState(true);
     //[/Constructor]
 }
@@ -365,7 +364,7 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 }
 
 //==============================================================================
-
+/*
 void KeyboardEditorBar::populate_preset_menu()
 {
 	modeLibraryBox->clear();
@@ -385,7 +384,7 @@ void KeyboardEditorBar::populate_preset_menu()
 
 	for (int i = 0; i < presets->size() - 1; i++)
 	{
-		mode = presetsSorted->getUnchecked(SortType::scaleSizeSort).getUnchecked(i);
+		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
 		name = mode->getScaleDescription();
 		presetIndex = presets->indexOf(mode);
 
@@ -437,7 +436,7 @@ void KeyboardEditorBar::populate_preset_menu()
 	modeLibraryBox->getRootMenu()->addSubMenu("by Mode Size", *menuSortByMode.get());
 	modeLibraryBox->getRootMenu()->addSubMenu("by Family", *menuSortByFamily.get());
 }
-
+*/
 //[/MiscUserCode]
 
 

@@ -14,6 +14,7 @@
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
 #include "PluginSettings.h"
+#include "Structures/PresetManager.h"
 #include "Structures/Preset.h"
 #include "MidiProcessor.h"
 
@@ -33,7 +34,6 @@ struct SvkPluginState : public ChangeBroadcaster
 
 	//==============================================================================
 
-	Array<Array<ValueTree>>* get_presets_sorted();
 	UndoManager* getUndoManager();
 
     SvkMidiProcessor* getMidiProcessor();
@@ -43,10 +43,7 @@ struct SvkPluginState : public ChangeBroadcaster
     int* getMidiInputMap();
     int* getMidiOutputMap();
 
-	int is_mode_in_presets(String stepsStringIn);
-
 	void loadMode(int presetIndexIn);
-	void loadMode(Mode* modeIn);
 	void loadMode(ValueTree modeNodeIn);
 
 	void setMidiRootNote(int rootNoteIn);
@@ -60,6 +57,7 @@ struct SvkPluginState : public ChangeBroadcaster
 	
 	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
 	std::unique_ptr<SvkPluginSettings> pluginSettings;
+	std::unique_ptr<SvkPresetManager> presetManager;
 
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
@@ -78,7 +76,7 @@ private:
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
-	Array<Array<ValueTree>> presetsSorted;
+	Array<Array<int>> presetsSorted;
 
-	std::unique_ptr<Mode> modeLoaded;
+	Mode* modeLoaded;
 };

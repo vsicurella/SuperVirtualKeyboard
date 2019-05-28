@@ -97,8 +97,6 @@ bool SvkPreset::writeToFile(String absoluteFilePath)
 		fileOut = chooser.getResult();
 	}
 
-	DBG(parentNode.toXmlString());
-
 	if (fileOut.getParentDirectory().exists())
 	{
 		std::unique_ptr<XmlElement> xml(parentNode.createXml());
@@ -106,36 +104,6 @@ bool SvkPreset::writeToFile(String absoluteFilePath)
 	}
 
 	return false;
-}
-
-SvkPreset* SvkPreset::loadFromFile(String absoluteFilePath)
-{
-	ValueTree nodeIn;
-	File fileIn = File(absoluteFilePath);
-    SvkPreset* presetOut = nullptr;
-
-	if (!fileIn.exists())
-	{
-		FileChooser chooser("Open preset",
-			File::getSpecialLocation(File::userDocumentsDirectory),
-			"*.svk");
-
-		chooser.browseForFileToOpen();
-		fileIn = chooser.getResult();
-	}
-
-	if (fileIn.exists())
-	{
-		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
-		nodeIn = ValueTree::fromXml(*(xml.get()));
-
-		if (nodeIn.hasType(IDs::presetNode))
-		{
-			presetOut = new SvkPreset(nodeIn);
-		}
-	}
-    
-    return presetOut;
 }
 
 String SvkPreset::toString()
