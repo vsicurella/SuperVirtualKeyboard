@@ -31,9 +31,6 @@ struct SvkPreset
 	bool updateKeyboardNode(ValueTree keyboardNodeIn);
 
 	bool writeToFile(String absoluteFilePath="");
-    
-    // make sure this is deleted when not needed
-	static SvkPreset* loadFromFile(String absoluteFilePath="");
-   
+       
 	String toString();	
 };

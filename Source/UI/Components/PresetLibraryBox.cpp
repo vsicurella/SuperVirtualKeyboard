@@ -13,14 +13,13 @@
 PresetLibraryBox::PresetLibraryBox(SvkPluginState* pluginStateIn, String nameIn)
 	: ComboBox(nameIn), pluginState(pluginStateIn)
 {
-	presets = pluginState->getPresets();
+	presetsLibraryNode = pluginState->presetLibraryNode;
 	sortMenus();
 }
 
 PresetLibraryBox::~PresetLibraryBox()
 {
 	pluginState = nullptr;
-	presets = nullptr;
 }
 
 void PresetLibraryBox::sortMenus()
@@ -29,8 +28,8 @@ void PresetLibraryBox::sortMenus()
 	ModeModeSorter modeSort;
 	ModeFamilySorter famSort;
 
-	Array<Mode*> sorting;
-	for (int i = 1; i < presets->size(); i++)
+	Array<ValueTree> sorting;
+	for (int i = 1; i < presetsLibraryNode.getNumChildren(); i++)
 	{
 		sorting.add(presets->getUnchecked(i));
 	}
@@ -47,7 +46,7 @@ void PresetLibraryBox::sortMenus()
 		{
 		case scaleSize:
 			sorting.sort(scaleSort, false);
-			for (int p = 0; p < presets->size(); p++)
+			for (int p = 0; p <  presetsLibraryNode.getNumChildren(); p++)
 			{
 				theMenu = menus.getUnchecked(scaleSize);
 				theMode = sorting[p];
@@ -61,7 +60,7 @@ void PresetLibraryBox::sortMenus()
 			break;
 		case modeSize:
 			sorting.sort(modeSort, false);
-			for (int p = 0; p < presets->size(); p++)
+			for (int p = 0; p <  presetsLibraryNode.getNumChildren(); p++)
 			{
 				theMenu = menus.getUnchecked(modeSize);
 				theMode = sorting[p];
@@ -75,7 +74,7 @@ void PresetLibraryBox::sortMenus()
 			break;
 		case familyName:
 			sorting.sort(famSort, false);
-			for (int p = 0; p < presets->size(); p++)
+			for (int p = 0; p <  presetsLibraryNode.getNumChildren(); p++)
 			{
 				theMenu = menus.getUnchecked(modeSize);
 				theMode = sorting[p];
@@ -90,7 +89,7 @@ void PresetLibraryBox::sortMenus()
 		case user:
 			sorting.sort(scaleSort, false);
 			sorting.sort(modeSort, false);
-			for (int p = 0; p < presets->size(); p++)
+			for (int p = 0; p <  presetsLibraryNode.getNumChildren(); p++)
 			{
 				theMenu = menus.getUnchecked(scaleSize);
 				theMode = sorting[p];
