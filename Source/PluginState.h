@@ -20,7 +20,7 @@
 struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 {
 	ValueTree pluginStateNode;
-	ValueTree modeLibraryNode;
+	ValueTree presetLibraryNode;
 	ValueTree keyboardWindowNode;
 
 	ValueTree pluginSettingsNode;
@@ -33,27 +33,25 @@ struct SuperVirtualKeyboardPluginState : public ChangeBroadcaster
 
 	//==============================================================================
 
-	OwnedArray<Mode>* getPresets();
-	Array<Array<Mode*>>* get_presets_sorted();
+	Array<Array<ValueTree>>* get_presets_sorted();
 	UndoManager* getUndoManager();
 
     SvkMidiProcessor* getMidiProcessor();
-	SvkPreset* getCurrentPreset();
-	int get_current_preset_index();
-	Mode* getCurrentMode();
+	SvkPreset* getPresetLoaded();
+	Mode* getModeLoaded();
     
     int* getMidiInputMap();
     int* getMidiOutputMap();
 
 	int is_mode_in_presets(String stepsStringIn);
 
-	void setCurrentMode(int presetIndexIn);
-	void setCurrentMode(Mode* modeIn);
+	void loadMode(int presetIndexIn);
+	void loadMode(Mode* modeIn);
+	void loadMode(ValueTree modeNodeIn);
 
 	void setMidiRootNote(int rootNoteIn);
     
 	void updateKeyboardSettingsPreset();
-	void updateMidiSettingsNode();
 
 	bool savePreset();
 	bool loadPreset();
@@ -72,11 +70,15 @@ private:
 
 	//==============================================================================
 
-    std::unique_ptr<SvkMidiProcessor> midiProcessor;
-    std::unique_ptr<SvkPreset> presetCurrent;
 	std::unique_ptr<UndoManager> undoManager;
+    std::unique_ptr<SvkMidiProcessor> midiProcessor;
+    
+	std::unique_ptr<SvkPreset> presetCurrent;
 	
-	Array<Array<Mode*>> presetsSorted;
+	Array<ValueTree> loadedFactoryPresets;
+	Array<ValueTree> loadedUserPresets;
 
-	Mode* modeCurrent;
+	Array<Array<ValueTree>> presetsSorted;
+
+	std::unique_ptr<Mode> modeLoaded;
 };

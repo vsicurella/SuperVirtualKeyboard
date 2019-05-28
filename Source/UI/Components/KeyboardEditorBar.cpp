@@ -183,18 +183,18 @@ void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_modeLibraryBox] -- add your combo box handling code here..
 		if (comboBoxThatHasChanged->getSelectedId() > 0)
-			pluginState->setCurrentMode(menuToPresetIndex[modeLibraryBox->getText()]);
+			pluginState->loadMode(menuToPresetIndex[modeLibraryBox->getText()]);
 		else
 		{
 			String newModeName;
 			// Preset is a user preset
-			if ((int)pluginState->getCurrentPreset()->parentNode.getProperty(IDs::libraryIndexOfMode) == 0)
+			if ((int)pluginState->getPresetLoaded()->parentNode.getProperty(IDs::libraryIndexOfMode) == 0)
 			{
-				pluginState->getCurrentMode()->setFamily(comboBoxThatHasChanged->getText());
+				pluginState->getModeLoaded()->setFamily(comboBoxThatHasChanged->getText());
 			}
 
 			// If it's a default preset, it reverts to original name
-			newModeName = pluginState->getCurrentMode()->getDescription();
+			newModeName = pluginState->getModeLoaded()->getDescription();
 			comboBoxThatHasChanged->setText(newModeName, dontSendNotification);
 		}
         //[/UserComboBoxCode_modeLibraryBox]
@@ -281,9 +281,9 @@ void KeyboardEditorBar::createAndSendMode()
 	int index = pluginState->is_mode_in_presets(steps);
 
 	if (index)
-		pluginState->setCurrentMode(index);
+		pluginState->loadMode(index);
 	else
-		pluginState->setCurrentMode(new Mode(steps, "Custom"));
+		pluginState->loadMode(new Mode(steps, "Custom"));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)

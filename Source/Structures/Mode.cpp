@@ -82,10 +82,29 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 	initializeNode();
 }
 
-Mode::Mode(ValueTree modeNodeIn)
+Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 {
-	Mode();
-	restoreNode(modeNodeIn);
+	if (modeNodeIn.hasType(IDs::modePresetNode))
+	{
+		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+
+		name = modeNode[IDs::modeName];
+		scaleSize = modeNode[IDs::scaleSize];
+		modeSize = modeNode[IDs::modeSize];
+		stepsString = modeNode[IDs::stepString];
+		family = modeNode[IDs::family];
+
+		rootNote = rootNoteIn;
+		offset = getOffset() * -1;
+
+		steps = parse_steps(stepsString);
+		mosClass = interval_sizes(steps);
+		ordersDefault = steps_to_orders(steps);
+		orders = expand_orders(ordersDefault, offset);
+		modeDegrees = orders_to_modeDegrees(orders);
+		scaleDegrees = scale_degrees(scaleSize, offset);
+		updateStepsOfOrders();
+	}
 }
 
 Mode::~Mode() {}

@@ -24,13 +24,13 @@ SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
 
     // setup data nodes
     pluginStateNode = ValueTree(IDs::pluginStateNode);
-    modeLibraryNode = ValueTree(IDs::modeLibraryNode);
+    presetLibraryNode = ValueTree(IDs::presetLibraryNode);
     modePresetNode = ValueTree(IDs::modePresetNode);
 
 	pluginSettingsNode = pluginSettings->pluginSettingsNode;
 	midiSettingsNode = midiProcessor->midiSettingsNode;
     
-    pluginStateNode.addChild(modeLibraryNode, 0, nullptr);
+    pluginStateNode.addChild(presetLibraryNode, 0, nullptr);
     pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
     pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
 
@@ -47,39 +47,19 @@ UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
 	return undoManager.get();
 }
 
-OwnedArray<Mode>* SuperVirtualKeyboardPluginState::getPresets()
-{
-	return &presets;
-}
-
-Array<Array<Mode*>>* SuperVirtualKeyboardPluginState::get_presets_sorted()
+Array<Array<ValueTree>>* SuperVirtualKeyboardPluginState::get_presets_sorted()
 {
 	return &presetsSorted;
 }
 
-SvkPreset* SuperVirtualKeyboardPluginState::getCurrentPreset()
+SvkPreset* SuperVirtualKeyboardPluginState::getPresetLoaded()
 {
 	return presetCurrent.get();
 }
 
-int SuperVirtualKeyboardPluginState::get_current_preset_index()
+Mode* SuperVirtualKeyboardPluginState::getModeLoaded()
 {
-	Mode* mode;
-
-	for (int i = 0; i < presets.size(); i++)
-	{
-		mode = presets.getUnchecked(i);
-
-		if (mode == modeCurrent)
-			return i;
-	}
-
-	return -1;
-}
-
-Mode* SuperVirtualKeyboardPluginState::getCurrentMode()
-{
-	return modeCurrent;
+	return modeLoaded.get();
 }
 
 int* SuperVirtualKeyboardPluginState::getMidiInputMap()
@@ -93,6 +73,7 @@ int* SuperVirtualKeyboardPluginState::getMidiOutputMap()
 
 int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 {
+	/*
 	int index = 0;
 
 	for (auto mode : presets)
@@ -101,46 +82,61 @@ int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 			return index;
 		index++;
 	}
-
+	*/
 	return 0;
 }
 
-void SuperVirtualKeyboardPluginState::setCurrentMode(int presetIndexIn)
+void SuperVirtualKeyboardPluginState::loadMode(int presetIndexIn)
 {
-	Mode* mode = presets.getUnchecked(presetIndexIn);
+	std::unique_ptr<Mode> mode(new Mode(presetLibraryNode.getChild(presetIndexIn), midiProcessor->getRootNote()));
 	
-	if (mode)
+	if (mode->modeNode.isValid())
 	{
-		modeCurrent = mode;
-		modeCurrent->setRootNote(midiProcessor->getRootNote());
+		modeLoaded.swap(mode);
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 
-		presetCurrent->updateModeNode(modeCurrent->modeNode);
+		presetCurrent->updateModeNode(modeLoaded->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
 
-		modePresetNode.copyPropertiesAndChildrenFrom(modeCurrent->modeNode, nullptr);
+		modePresetNode.copyPropertiesAndChildrenFrom(modeLoaded->modeNode, nullptr);
         sendChangeMessage();
 	}
 }
 
-void SuperVirtualKeyboardPluginState::setCurrentMode(Mode* modeIn)
+void SuperVirtualKeyboardPluginState::loadMode(Mode* modeIn)
 {
-	if (modeIn)
+	if (modeIn && modeIn->modeNode.isValid())
 	{
-		modeCurrent = modeIn;
-		modeCurrent->setRootNote(midiProcessor->getRootNote());
-		presets.set(0, modeCurrent, true);
+		modeLoaded.reset(modeIn);
+		modeLoaded->setRootNote(midiProcessor->getRootNote());
 
 		if (presetCurrent->theKeyboardNode.isValid())
 			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
 
-		presetCurrent->updateModeNode(modeCurrent->modeNode);
+		presetCurrent->updateModeNode(modeLoaded->modeNode);
 		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
 
-		modePresetNode = modeCurrent->modeNode;
+		modePresetNode = modeLoaded->modeNode;
         sendChangeMessage();
+	}
+}
+
+void SuperVirtualKeyboardPluginState::loadMode(ValueTree modeNodeIn)
+{
+	if (modeNodeIn.hasType(IDs::modePresetNode))
+	{
+		modeLoaded.reset(new Mode(modeNodeIn, midiProcessor->getRootNote()));
+
+		if (presetCurrent->theKeyboardNode.isValid())
+			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+		
+		presetCurrent->updateModeNode(modeLoaded->modeNode);
+		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
+
+		modePresetNode = modeLoaded->modeNode;
+		sendChangeMessage();
 	}
 }
 
@@ -148,7 +144,7 @@ void SuperVirtualKeyboardPluginState::setMidiRootNote(int rootNoteIn)
 {
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	midiProcessor->setRootNote(rootNoteIn);
-	modeCurrent->setRootNote(rootNoteIn);
+	modeLoaded->setRootNote(rootNoteIn);
 }
 
 void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
@@ -163,7 +159,7 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 bool SuperVirtualKeyboardPluginState::savePreset()
 {
     midiProcessor->updateNode();
-	modePresetNode = modeCurrent->modeNode;
+	modePresetNode = modeLoaded->modeNode;
 	presetCurrent->updateParentNode(pluginStateNode);
 
 	return presetCurrent->writeToFile();
@@ -191,8 +187,8 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 		if (presetCurrent->theModeNode.isValid())
 		{
-			modeCurrent->restoreNode(presetCurrent->theModeNode, midiProcessor->getRootNote());
-			modePresetNode = modeCurrent->modeNode;
+			modeLoaded->restoreNode(presetCurrent->theModeNode, midiProcessor->getRootNote());
+			modePresetNode = modeLoaded->modeNode;
 		}
 		
 		if (presetCurrent->theKeyboardNode.isValid())
@@ -211,77 +207,77 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 
 void SuperVirtualKeyboardPluginState::createPresets()
 {
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1 }), "Custom", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1 }), "Mavila", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 2, 1 }), "Father", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 2, 1 }), "Dicot", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 1 }), "Machine", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2 }), "Orgone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1 }), "Augmented", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 2, 1 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }), "Diminished", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }), "Father", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Orwell", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 1, 3, 1 }), "Hanson", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 4, 1, 4, 1, 4, 1 }), "Magic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Superpyth", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 1, 4, 4, 1 }), "Bicycle", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }), "Father", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 1, 4, 1, 4, 1, 4 }), "Hanson", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 1, 4, 4, 4, 1 }), "Superpyth", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }), "Hedgehog", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }), "Orwell", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }), "Mavila", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }), "Sephiroth", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 4, 5, 5 }), "Godzilla", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 3, 5, 3, 5, 3 }), "Triforce", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 3, 4, 3, 3, 4 }), "Dastgah-e Sehgah / Maqam Nairuz", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 2, 4, 4, 4, 2 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 3 }), "Mohajira", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }), "Injera", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 1, 5, 5, 5, 1 }), "Superpyth", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 4, 4, 4, 4, 7 }), "Nusecond", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2 }), "Meantone", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3 }), "Orwell", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 1 }), "Mothra", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 4, 5, 4, 5, 4, 4 }), "Mohajira", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Miracle", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 7, 7, 3, 7, 7, 7, 3 }), "Schismatic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 3, 4, 3, 4, 3, 4, 3, 3 }), "Schismatic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3 }), "Miracle", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1 }), "Magic", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 5 }), "Hanson", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3 }), "Tricot", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }), "BP Lambda", true), -1, nullptr);
-		modeLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1 }), "Custom", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1 }), "Mavila", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 2, 1 }), "Father", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 1, 2, 1, 1, 1, 2 }), "Mavila", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 2, 1 }), "Dicot", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 1 }), "Machine", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2 }), "Orgone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1 }), "Augmented", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 2, 1 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1 }), "Diminished", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 1, 2, 1 }), "Father", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Orwell", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 1, 2, 2, 1 }), "Hedgehog", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 1, 2, 1, 2, 1 }), "Titanium", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 3, 3 }), "Blackwood", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 1, 3, 1 }), "Hanson", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3 }), "Orgone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 2, 2, 1 }), "Porcupine", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 1, 2, 1, 1, 2, 1 }), "Orgone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 4, 1, 4, 1, 4, 1 }), "Magic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 3, 3 }), "Gorgo", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 1, 2, 2, 2, 2, 1 }), "Mavila", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 2, 1, 2, 1, 2 }), "Lemba", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 1, 3, 3, 3, 1 }), "Superpyth", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 2, 3, 2, 3, 2, 2 }), "Maqamic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 1, 2, 2, 1, 2, 2, 2, 1 }), "Maqamic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 2 }), "Machine", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 1, 4, 4, 1 }), "Bicycle", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 3, 1, 3, 3, 1 }), "Father", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 2, 3, 3, 3, 2 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2 }), "Keemun", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 3, 2, 2, 2, 2 }), "Negri", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 1, 4, 1, 4, 1, 4 }), "Hanson", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 2, 2, 5, 2, 2, 2 }), "Mavila", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1 }), "Blackwood", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 2, 3, 2 }), "Miracle", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 1, 4, 4, 4, 1 }), "Superpyth", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 3, 2, 3, 3, 2 }), "Hedgehog", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 2, 3, 2, 3, 2, 3, 2, 2 }), "Orwell", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 1, 3, 3, 3, 3, 1 }), "Mavila", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 3, 2, 2, 3, 2, 2, 3 }), "Sephiroth", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 4, 5, 5 }), "Godzilla", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 3, 5, 3, 5, 3 }), "Triforce", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 3, 4, 3, 3, 4 }), "Dastgah-e Sehgah / Maqam Nairuz", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 2, 4, 4, 4, 2 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 3 }), "Mohajira", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 3, 4, 4, 4, 3 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 3, 2, 2, 3, 2, 3, 2, 2, 3, 2 }), "Orgone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 3 }), "Injera", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 1, 5, 5, 5, 1 }), "Superpyth", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 4, 4, 4, 4, 4, 7 }), "Nusecond", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 5, 3, 5, 5, 5, 3 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 2, 3, 2, 3, 3, 2, 3, 2, 3, 2 }), "Meantone", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3 }), "Orwell", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 1, 5, 1, 5, 1, 5, 1, 5, 1, 1 }), "Mothra", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 5, 4, 5, 4, 5, 4, 4 }), "Mohajira", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1 }), "Miracle", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 7, 7, 3, 7, 7, 7, 3 }), "Schismatic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 3, 4, 3, 4, 3, 4, 3, 3 }), "Schismatic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 4, 3, 4, 3, 4, 3, 3 }), "Miracle", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 3, 1, 1 }), "Magic", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 3, 5, 3, 3, 5 }), "Hanson", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 4, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 3, 3, 3, 3, 3, 3 }), "Tricot", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 2, 1 }), "BP Lambda", true), -1, nullptr);
+		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 2, 1, 1, 2, 1, 2, 1, 1, 2 }), "BP Dur II", true), -1, nullptr);
 
 	
 	if (pluginSettings->getCreatePresetFolder())
 	{
 		File presetDirectory = File(pluginSettings->getPresetPath());
-		Array<File> filesToLoad = presetDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, "*.svk");
+		Array<File> filesToLoad = presetDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.svk");
 
 		std::unique_ptr<XmlElement> xml;
 		ValueTree loadedModeNode;
@@ -294,7 +290,7 @@ void SuperVirtualKeyboardPluginState::createPresets()
 
 			if (loadedModeNode.hasType(IDs::modePresetNode))
 			{
-				modeLibraryNode.addChild(loadedModeNode, -1, nullptr);
+				presetLibraryNode.addChild(loadedModeNode, -1, nullptr);
 			}
 		}
 	}
