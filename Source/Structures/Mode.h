@@ -24,7 +24,7 @@ struct Mode
 	Mode();
 	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60);
 	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60);
-	Mode(ValueTree modeNodeIn);
+	Mode(ValueTree modeNodeIn, int rootNoteIn=60);
 
 	~Mode();
 

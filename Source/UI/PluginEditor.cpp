@@ -88,7 +88,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::initNodeData()
 	{
 		keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
 		
-		pluginState->setCurrentMode(8);
+		pluginState->loadMode(8);
 		updateNodeData();
 
 		keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
@@ -110,13 +110,13 @@ void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
 
 void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 {
-	Mode* modeCurrent = pluginState->getCurrentMode();
+	Mode* modeLoaded = pluginState->getModeLoaded();
 		
-	piano->applyMode(modeCurrent);
+	piano->applyMode(modeLoaded);
 
-	keyboardEditorBar->setModeReadoutText(modeCurrent->getStepsString());
-	keyboardEditorBar->setModeLibraryText(modeCurrent->getDescription());
-    keyboardEditorBar->setOffsetReadout(modeCurrent->getRootNote());
+	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
+	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
+    keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 	DBG("Children Updated");
 }
 
@@ -149,7 +149,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
 
 	if (loaded)
 	{
-		piano->restoreDataNode(pluginState->getCurrentPreset()->theKeyboardNode);
+		piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
 		update_children_to_preset();
 	}
 
@@ -158,7 +158,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
 
 bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 {
-	ReaperWriter rpp = ReaperWriter(pluginState->getCurrentMode());
+	ReaperWriter rpp = ReaperWriter(pluginState->getModeLoaded());
 	return rpp.write_file();
 }
 
@@ -363,7 +363,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 			piano->updatePianoNode();
 			pluginState->updateKeyboardSettingsPreset();
 
-			piano->applyMode(pluginState->getCurrentMode());
+			piano->applyMode(pluginState->getModeLoaded());
 			piano->setUIMode(UIMode::playMode);
 			keyboardEditorBar->allowUserInput();
 		}
