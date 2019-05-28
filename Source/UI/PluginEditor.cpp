@@ -14,7 +14,7 @@
 using namespace VirtualKeyboard;
 
 //==============================================================================
-SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SvkAudioProcessor& p, ApplicationCommandManager* cmdMgr)
+SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager* cmdMgr)
 	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.getPluginState())
 {
 	setName("Super Virtual Keyboard");
@@ -65,7 +65,7 @@ SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEdit
 	startTimerHz(20);
 }
 
-SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEditor()
+SvkPluginEditor::~SvkPluginEditor()
 {
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
@@ -75,7 +75,7 @@ SuperVirtualKeyboardAudioProcessorEditor::~SuperVirtualKeyboardAudioProcessorEdi
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::initNodeData()
+void SvkPluginEditor::initNodeData()
 {
 	if (pluginState->keyboardWindowNode.isValid())
 	{
@@ -99,7 +99,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::initNodeData()
 	}
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
+void SvkPluginEditor::updateNodeData()
 {
 	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
@@ -108,7 +108,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::updateNodeData()
 
 
 
-void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
+void SvkPluginEditor::update_children_to_preset()
 {
 	Mode* modeLoaded = pluginState->getModeLoaded();
 		
@@ -120,7 +120,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::update_children_to_preset()
 	DBG("Children Updated");
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::beginColorEditing()
+void SvkPluginEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
 	piano->setUIMode(UIMode::colorMode);
@@ -130,7 +130,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::beginColorEditing()
 //==============================================================================
 
 
-bool SuperVirtualKeyboardAudioProcessorEditor::save_preset()
+bool SvkPluginEditor::save_preset()
 {
 	piano->updatePianoNode();
 	pluginState->updateKeyboardSettingsPreset();
@@ -143,7 +143,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::save_preset()
 	return written;
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
+bool SvkPluginEditor::load_preset()
 {
 	bool loaded = pluginState->loadPreset();
 
@@ -156,7 +156,7 @@ bool SuperVirtualKeyboardAudioProcessorEditor::load_preset()
 	return loaded;
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
+bool SvkPluginEditor::write_reaper_file()
 {
 	ReaperWriter rpp = ReaperWriter(pluginState->getModeLoaded());
 	return rpp.write_file();
@@ -164,12 +164,12 @@ bool SuperVirtualKeyboardAudioProcessorEditor::write_reaper_file()
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::paint(Graphics& g)
+void SvkPluginEditor::paint(Graphics& g)
 {
 	g.fillAll(Colours::darkgrey);
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::resized()
+void SvkPluginEditor::resized()
 {
 	int viewPositionKeyboardX = view->getViewPositionX();
 	AudioProcessorEditor::resized();
@@ -190,7 +190,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::resized()
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
+void SvkPluginEditor::timerCallback()
 {
 	//piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
 	//	*processor.get_midi_buffer(), 0, 4096, true);
@@ -200,7 +200,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::timerCallback()
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
+void SvkPluginEditor::userTriedToCloseWindow()
 {
 	if (colorChooserWindow->isVisible())
 		colorChooserWindow->closeButtonPressed();
@@ -210,7 +210,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::userTriedToCloseWindow()
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
+void SvkPluginEditor::mouseDown(const MouseEvent& e)
 {
     Key* key = piano->getKeyFromPosition(e);
 
@@ -284,7 +284,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDown(const MouseEvent& e)
     }
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::mouseDrag(const MouseEvent& e)
+void SvkPluginEditor::mouseDrag(const MouseEvent& e)
 {
 	if (piano->getUIMode() == UIMode::playMode)
 	{
@@ -308,7 +308,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseDrag(const MouseEvent& e)
 	}
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::mouseUp(const MouseEvent& e)
+void SvkPluginEditor::mouseUp(const MouseEvent& e)
 {
 	if (piano->getUIMode() == UIMode::playMode)
 	{
@@ -326,7 +326,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseUp(const MouseEvent& e)
 	}
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
+void SvkPluginEditor::mouseMove(const MouseEvent& e)
 {
 	if (piano->getUIMode() != UIMode::colorMode)
 	{
@@ -345,7 +345,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::mouseMove(const MouseEvent& e)
 
 //==============================================================================
 
-void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
+void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
     // New Mode loaded
     if (source == pluginState)
@@ -396,7 +396,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::changeListenerCallback(ChangeBroa
 //==============================================================================
 
 
-File SuperVirtualKeyboardAudioProcessorEditor::fileDialog(String message, bool forSaving)
+File SvkPluginEditor::fileDialog(String message, bool forSaving)
 {
 	FileChooser chooser(message, File::getSpecialLocation(File::userDocumentsDirectory), "*.svk");
 
@@ -410,12 +410,12 @@ File SuperVirtualKeyboardAudioProcessorEditor::fileDialog(String message, bool f
 
 //==============================================================================
 
-ApplicationCommandTarget* SuperVirtualKeyboardAudioProcessorEditor::getNextCommandTarget()
+ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 {
 	return piano.get();// findFirstTargetParentComponent();
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID > &c)
+void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
 		IDs::CommandIDs::saveCustomLayout,
@@ -428,7 +428,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::getAllCommands(Array< CommandID >
 	c.addArray(commands);
 }
 
-void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
+void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo &result)
 {
 	switch (commandID)
 	{
@@ -459,7 +459,7 @@ void SuperVirtualKeyboardAudioProcessorEditor::getCommandInfo(CommandID commandI
 	}
 }
 
-bool SuperVirtualKeyboardAudioProcessorEditor::perform(const InvocationInfo &info)
+bool SvkPluginEditor::perform(const InvocationInfo &info)
 {
 	switch (info.commandID)
 	{

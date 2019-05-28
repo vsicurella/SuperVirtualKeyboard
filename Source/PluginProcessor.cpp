@@ -154,7 +154,7 @@ bool SvkAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SvkAudioProcessor::createEditor()
 {
-    return new SuperVirtualKeyboardAudioProcessorEditor(*this, pluginState->appCmdMgr.get());
+    return new SvkPluginEditor(*this, pluginState->appCmdMgr.get());
 }
 
 //==============================================================================
