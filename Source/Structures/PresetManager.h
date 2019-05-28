@@ -15,10 +15,12 @@
 #include "../CommonFunctions.h"
 #include "../PluginIDs.h"
 #include "Preset.h"
+#include "Mode.h"
 
 class SvkPresetManager
 {
 	std::unique_ptr<SvkPreset> presetLoaded;
+	std::unique_ptr<Mode> modeLoaded;
 
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
@@ -33,21 +35,21 @@ public:
 	ValueTree presetLibraryNode;
 	ValueTree pluginSettingsNode;
 	ValueTree presetLoadedNode;
+	ValueTree modeLoadedNode;
 
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
-
 
 	SvkPreset* getPresetLoaded();
 	Mode* getModeLoaded();
 	
 	// Can load either full preset or just Mode
-	bool loadPreset();
-	bool loadPreset(SvkPreset& presetIn);
 	bool loadPreset(ValueTree presetNodeIn);
 	bool loadPreset(int libraryIndexIn);
+	bool loadPreset(SvkPreset* presetIn);
+	bool loadPreset();
 
-	bool savePreset();
+	bool savePreset(String absolutePath="");
 
 	void createFactoryPresets();
 
