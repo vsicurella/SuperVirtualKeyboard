@@ -34,7 +34,7 @@ class SuperVirtualKeyboardAudioProcessorEditor  : public AudioProcessorEditor,
 													private Timer
 {
 public:
-    SuperVirtualKeyboardAudioProcessorEditor (SuperVirtualKeyboardAudioProcessor&, ApplicationCommandManager*);
+    SuperVirtualKeyboardAudioProcessorEditor (SvkAudioProcessor&, ApplicationCommandManager*);
     ~SuperVirtualKeyboardAudioProcessorEditor();
 
     //==============================================================================
@@ -93,7 +93,7 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    SuperVirtualKeyboardAudioProcessor& processor;
+    SvkAudioProcessor& processor;
 	SvkPluginState* pluginState;
 	MidiKeyboardState externalMidi;
     ValueTree keyboardWindowNode;

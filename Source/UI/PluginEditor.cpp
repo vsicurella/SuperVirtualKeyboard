@@ -14,7 +14,7 @@
 using namespace VirtualKeyboard;
 
 //==============================================================================
-SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SuperVirtualKeyboardAudioProcessor& p, ApplicationCommandManager* cmdMgr)
+SuperVirtualKeyboardAudioProcessorEditor::SuperVirtualKeyboardAudioProcessorEditor(SvkAudioProcessor& p, ApplicationCommandManager* cmdMgr)
 	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.getPluginState())
 {
 	setName("Super Virtual Keyboard");

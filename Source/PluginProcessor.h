@@ -17,13 +17,13 @@
 //==============================================================================
 /**
 */
-class SuperVirtualKeyboardAudioProcessor  : public AudioProcessor,
+class SvkAudioProcessor  : public AudioProcessor,
                                             public ChangeBroadcaster
 {
 public:
     //==============================================================================
-    SuperVirtualKeyboardAudioProcessor();
-    ~SuperVirtualKeyboardAudioProcessor();
+    SvkAudioProcessor();
+    ~SvkAudioProcessor();
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -70,5 +70,5 @@ private:
 	std::unique_ptr<SvkPluginState> pluginState;
 	//MidiKeyboardState* midiStateInput;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SuperVirtualKeyboardAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkAudioProcessor)
 };
