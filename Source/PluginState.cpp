@@ -10,7 +10,7 @@
 
 #include "PluginState.h"
 
-SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
+SvkPluginState::SvkPluginState()
 {
     appCmdMgr.reset(new ApplicationCommandManager());
     undoManager.reset(new UndoManager());
@@ -37,41 +37,41 @@ SuperVirtualKeyboardPluginState::SuperVirtualKeyboardPluginState()
     createPresets();
 }
 
-SvkMidiProcessor* SuperVirtualKeyboardPluginState::getMidiProcessor()
+SvkMidiProcessor* SvkPluginState::getMidiProcessor()
 {
     return midiProcessor.get();
 }
 
-UndoManager* SuperVirtualKeyboardPluginState::getUndoManager()
+UndoManager* SvkPluginState::getUndoManager()
 {
 	return undoManager.get();
 }
 
-Array<Array<ValueTree>>* SuperVirtualKeyboardPluginState::get_presets_sorted()
+Array<Array<ValueTree>>* SvkPluginState::get_presets_sorted()
 {
 	return &presetsSorted;
 }
 
-SvkPreset* SuperVirtualKeyboardPluginState::getPresetLoaded()
+SvkPreset* SvkPluginState::getPresetLoaded()
 {
 	return presetCurrent.get();
 }
 
-Mode* SuperVirtualKeyboardPluginState::getModeLoaded()
+Mode* SvkPluginState::getModeLoaded()
 {
 	return modeLoaded.get();
 }
 
-int* SuperVirtualKeyboardPluginState::getMidiInputMap()
+int* SvkPluginState::getMidiInputMap()
 {
     return midiProcessor->getInputRemapper()->getRemappedNotes();
 }
-int* SuperVirtualKeyboardPluginState::getMidiOutputMap()
+int* SvkPluginState::getMidiOutputMap()
 {
     return midiProcessor->getOutputRemapper()->getRemappedNotes();
 }
 
-int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
+int SvkPluginState::is_mode_in_presets(String stepsStringIn)
 {
 	/*
 	int index = 0;
@@ -86,7 +86,7 @@ int SuperVirtualKeyboardPluginState::is_mode_in_presets(String stepsStringIn)
 	return 0;
 }
 
-void SuperVirtualKeyboardPluginState::loadMode(int presetIndexIn)
+void SvkPluginState::loadMode(int presetIndexIn)
 {
 	std::unique_ptr<Mode> mode(new Mode(presetLibraryNode.getChild(presetIndexIn), midiProcessor->getRootNote()));
 	
@@ -105,7 +105,7 @@ void SuperVirtualKeyboardPluginState::loadMode(int presetIndexIn)
 	}
 }
 
-void SuperVirtualKeyboardPluginState::loadMode(Mode* modeIn)
+void SvkPluginState::loadMode(Mode* modeIn)
 {
 	if (modeIn && modeIn->modeNode.isValid())
 	{
@@ -123,7 +123,7 @@ void SuperVirtualKeyboardPluginState::loadMode(Mode* modeIn)
 	}
 }
 
-void SuperVirtualKeyboardPluginState::loadMode(ValueTree modeNodeIn)
+void SvkPluginState::loadMode(ValueTree modeNodeIn)
 {
 	if (modeNodeIn.hasType(IDs::modePresetNode))
 	{
@@ -140,14 +140,14 @@ void SuperVirtualKeyboardPluginState::loadMode(ValueTree modeNodeIn)
 	}
 }
 
-void SuperVirtualKeyboardPluginState::setMidiRootNote(int rootNoteIn)
+void SvkPluginState::setMidiRootNote(int rootNoteIn)
 {
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	midiProcessor->setRootNote(rootNoteIn);
 	modeLoaded->setRootNote(rootNoteIn);
 }
 
-void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
+void SvkPluginState::updateKeyboardSettingsPreset()
 {
 	if (pianoNode.isValid())
 	{
@@ -156,7 +156,7 @@ void SuperVirtualKeyboardPluginState::updateKeyboardSettingsPreset()
 }
 
 
-bool SuperVirtualKeyboardPluginState::savePreset()
+bool SvkPluginState::savePreset()
 {
     midiProcessor->updateNode();
 	modePresetNode = modeLoaded->modeNode;
@@ -166,7 +166,7 @@ bool SuperVirtualKeyboardPluginState::savePreset()
 }
 
 
-bool SuperVirtualKeyboardPluginState::loadPreset()
+bool SvkPluginState::loadPreset()
 {
     std::unique_ptr<SvkPreset> newPreset(SvkPreset::loadFromFile());
     
@@ -205,7 +205,7 @@ bool SuperVirtualKeyboardPluginState::loadPreset()
 //==============================================================================
 
 
-void SuperVirtualKeyboardPluginState::createPresets()
+void SvkPluginState::createPresets()
 {
 		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1 }), "Custom", true), -1, nullptr);
 		presetLibraryNode.addChild(Mode::createNode(Array<int>({ 1, 2, 1, 2, 1 }), "Mavila", true), -1, nullptr);

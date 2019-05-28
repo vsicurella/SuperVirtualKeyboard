@@ -44,7 +44,7 @@ class MidiSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    MidiSettingsComponent (SuperVirtualKeyboardPluginState* pluginStateIn);
+    MidiSettingsComponent (SvkPluginState* pluginStateIn);
     ~MidiSettingsComponent();
 
     //==============================================================================
@@ -68,7 +68,7 @@ private:
 	int boxW = 10;
 	int boxH = 8;
 
-	SuperVirtualKeyboardPluginState* pluginState;
+	SvkPluginState* pluginState;
 	MidiRemapper* inputRemapper;
 	MidiRemapper* outputRemapper;
 

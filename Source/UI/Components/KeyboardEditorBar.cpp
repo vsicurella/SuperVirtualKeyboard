@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-KeyboardEditorBar::KeyboardEditorBar (SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn)
+KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, ApplicationCommandManager* managerIn)
     : pluginState(pluginStateIn), appCmdMgr(managerIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -452,7 +452,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="KeyboardEditorBar" componentName="Keyboard Editor Bar"
                  parentClasses="public Component, private TextEditor::Listener, public ChangeBroadcaster"
-                 constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn, ApplicationCommandManager* managerIn"
+                 constructorParams="SvkPluginState* pluginStateIn, ApplicationCommandManager* managerIn"
                  variableInitialisers="pluginState(pluginStateIn), appCmdMgr(managerIn)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">

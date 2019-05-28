@@ -10,7 +10,7 @@
 
 #include "PresetLibraryBox.h"
 
-PresetLibraryBox::PresetLibraryBox(SuperVirtualKeyboardPluginState* pluginStateIn, String nameIn)
+PresetLibraryBox::PresetLibraryBox(SvkPluginState* pluginStateIn, String nameIn)
 	: ComboBox(nameIn), pluginState(pluginStateIn)
 {
 	presets = pluginState->getPresets();

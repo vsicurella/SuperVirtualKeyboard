@@ -28,7 +28,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-MidiSettingsComponent::MidiSettingsComponent (SuperVirtualKeyboardPluginState* pluginStateIn)
+MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     : pluginState(pluginStateIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -323,7 +323,7 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MidiSettingsComponent" componentName="Midi Remapper Dialog"
-                 parentClasses="public Component" constructorParams="SuperVirtualKeyboardPluginState* pluginStateIn"
+                 parentClasses="public Component" constructorParams="SvkPluginState* pluginStateIn"
                  variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="800" initialHeight="600">

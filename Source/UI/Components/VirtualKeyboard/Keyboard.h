@@ -57,7 +57,7 @@ namespace VirtualKeyboard
     public:
         //===============================================================================================
         
-        Keyboard(SuperVirtualKeyboardPluginState* pluginStateIn);
+        Keyboard(SvkPluginState* pluginStateIn);
         ~Keyboard() {};
         
         //===============================================================================================
@@ -201,7 +201,7 @@ namespace VirtualKeyboard
     private:
         
 		// Application pointers
-        SuperVirtualKeyboardPluginState* pluginState;
+        SvkPluginState* pluginState;
 		UndoManager* undo;
         
 		// Functionality

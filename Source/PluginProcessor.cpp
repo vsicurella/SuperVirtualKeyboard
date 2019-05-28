@@ -22,7 +22,7 @@ SuperVirtualKeyboardAudioProcessor::SuperVirtualKeyboardAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        ),
-	pluginState(new SuperVirtualKeyboardPluginState())
+	pluginState(new SvkPluginState())
 #endif
 {
     //midiStateInput = pluginState->midiStateIn.get();
@@ -180,7 +180,7 @@ void SuperVirtualKeyboardAudioProcessor::setStateInformation (const void* data, 
 
 //==============================================================================
 
-SuperVirtualKeyboardPluginState* SuperVirtualKeyboardAudioProcessor::getPluginState()
+SvkPluginState* SuperVirtualKeyboardAudioProcessor::getPluginState()
 {
 	return pluginState.get();
 }
