@@ -5,6 +5,10 @@
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer" pluginFormats="buildStandalone,buildVST3">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
+    <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
+      <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
+            file="Source/Resources/FactoryModes.txt"/>
+    </GROUP>
     <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
       <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
             file="Source/File IO/ReaperWriter.cpp"/>

@@ -172,5 +172,5 @@ bool SvkPluginState::loadPreset()
 	}
 	*/
 
-	return presetManager->loadPreset();;
+	return presetManager->loadPreset();
 }
