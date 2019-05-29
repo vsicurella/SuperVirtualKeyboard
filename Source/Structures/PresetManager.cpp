@@ -51,7 +51,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 		if (presetLoaded->theModeNode.isValid())
 		{
 			modeLoaded.reset(new Mode(presetLoaded->theModeNode));
-			modeLoadedNode = modeLoaded->modeNode;
+			modeNode = modeLoaded->modeNode;
 		}
 		/*
 		if (presetLoaded->theKeyboardNode.isValid())
@@ -206,4 +206,14 @@ void SvkPresetManager::createFactoryPresets()
 			}
 		}
 	}
+}
+
+void SvkPresetManager::sortPresetLibrary()
+{
+
+}
+
+void SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
+{
+
 }
