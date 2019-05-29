@@ -21,11 +21,14 @@ class SvkPresetManager
 {
 	std::unique_ptr<SvkPreset> presetLoaded;
 	std::unique_ptr<Mode> modeLoaded;
+	
+	ValueTree presetLoadedNode;
+	ValueTree modeLoadedNode;
 
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
-	Array<Array<int>> presetsSorted;
+	Array<Array<ValueTree>> presetsSorted;
 
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
@@ -34,8 +37,8 @@ public:
 
 	ValueTree presetLibraryNode;
 	ValueTree pluginSettingsNode;
-	ValueTree presetLoadedNode;
-	ValueTree modeLoadedNode;
+	ValueTree presetNode;
+	ValueTree modeNode;
 
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
@@ -52,6 +55,8 @@ public:
 	bool savePreset(String absolutePath="");
 
 	void createFactoryPresets();
+	void sortPresetLibrary();
+	void addPresetToLibrary(ValueTree presetNodeIn);
 
 	static SvkPreset* presetFromFile(String absoluteFilePath = "");
 
