@@ -14,26 +14,26 @@
 
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
+#include "../../Structures/PresetManager.h"
 
 
 class PresetLibraryBox : public ComboBox
 {
-	SvkPluginState* pluginState;
+	SvkPresetManager* presetManager;
 	ValueTree presetsLibraryNode;
 
-	OwnedArray<PopupMenu> menus;
-	Array<Mode*> menuIdToPreset;
+	std::unique_ptr<OwnedArray<PopupMenu>> menus;
 
-	bool allSorted = false;
+	Array<Array<ValueTree>>* presetsSorted;
+	Array<Array<int>>* sortedIndicies;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PresetLibraryBox)
 
 public:
 
-	PresetLibraryBox(SvkPluginState* pluginStateIn, String nameIn=String());
+	PresetLibraryBox(SvkPresetManager* presetManagerIn, String nameIn=String());
 	~PresetLibraryBox();
 
-	void sortMenus();
-
+	void populateMenu();
 	void showPopup() override;
 };

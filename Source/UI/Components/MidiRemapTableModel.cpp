@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include "../../../JuceLibraryCode/JuceHeader.h"
 #include "MidiRemapTableModel.h"
 
 //==============================================================================

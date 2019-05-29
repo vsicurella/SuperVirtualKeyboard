@@ -25,7 +25,6 @@ SvkPluginState::SvkPluginState()
 	presetLibraryNode = presetManager->presetLibraryNode;
 	pluginStateNode.addChild(presetLibraryNode, -1, nullptr);
 
-	presetManager->createFactoryPresets();
 	modeLoaded = presetManager->getModeLoaded();
 	modePresetNode = modeLoaded->modeNode;
 
