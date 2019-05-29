@@ -64,10 +64,6 @@ struct SvkPluginState : public ChangeBroadcaster
 
 private:
 
-	void createPresets();
-
-	//==============================================================================
-
 	std::unique_ptr<UndoManager> undoManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
     

@@ -31,8 +31,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     : pluginState(pluginStateIn), appCmdMgr(managerIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	presets = pluginState->getPresets();
-	presetsSorted = pluginState->get_presets_sorted();
+
     //[/Constructor_pre]
 
     setName ("Keyboard Editor Bar");
@@ -277,12 +276,17 @@ void KeyboardEditorBar::setModeLibraryText(String presetName)
 void KeyboardEditorBar::createAndSendMode()
 {
 	String steps = modeTextEditor->getText();
+
+	/*
 	int index = pluginState->is_mode_in_presets(steps);
 
 	if (index)
 		pluginState->loadMode(index);
 	else
 		pluginState->loadMode(new Mode(steps, "Custom"));
+		*/
+
+	pluginState->presetManager->loadPreset(Mode::createNode(steps, "Custom"));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
@@ -363,80 +367,6 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 	return menu;
 }
 
-//==============================================================================
-/*
-void KeyboardEditorBar::populate_preset_menu()
-{
-	modeLibraryBox->clear();
-	menuToPresetIndex.clear();
-
-	menuSortByScale.reset(new PopupMenu());
-	menuSortByMode.reset(new PopupMenu());
-	menuSortByFamily.reset(new PopupMenu());
-
-	Mode* mode;
-	String name;
-	String p_name;
-	int presetIndex;
-	int size = 0;
-	int p_size = 0;
-	int c = 1;
-
-	for (int i = 0; i < presets->size() - 1; i++)
-	{
-		mode = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(i);
-		name = mode->getScaleDescription();
-		presetIndex = presets->indexOf(mode);
-
-		size = mode->getScaleSize();
-		if (i > 0 && p_size != size)
-		{
-			menuSortByScale.get()->addSeparator();
-			p_size = size;
-		}
-
-		menuSortByScale.get()->addItem(c++, name);
-		menuToPresetIndex.set(name, presetIndex);
-	}
-
-	for (int i = 0; i < presets->size() - 1; i++)
-	{
-		mode = presetsSorted->getUnchecked(SortType::modeSizeSort).getUnchecked(i);
-		name = mode->getModeDescription();
-		presetIndex = presets->indexOf(mode);
-
-		size = mode->getModeSize();
-		if (i > 0 && p_size != size)
-		{
-			menuSortByMode.get()->addSeparator();
-			p_size = size;
-		}
-
-		menuSortByMode.get()->addItem(c++, name);
-		menuToPresetIndex.set(name, presetIndex);
-	}
-
-	for (int i = 0; i < presets->size() - 1; i++)
-	{
-		mode = presetsSorted->getUnchecked(SortType::familySort)[i];
-		name = mode->getDescription();
-		presetIndex = presets->indexOf(mode);
-
-		if (i > 0 && p_name != mode->getFamily())
-		{
-			menuSortByFamily.get()->addSeparator();
-			p_name = mode->getFamily();
-		}
-
-		menuSortByFamily.get()->addItem(c++, name);
-		menuToPresetIndex.set(name, presetIndex);
-	}
-
-	modeLibraryBox->getRootMenu()->addSubMenu("by Scale Size", *menuSortByScale.get());
-	modeLibraryBox->getRootMenu()->addSubMenu("by Mode Size", *menuSortByMode.get());
-	modeLibraryBox->getRootMenu()->addSubMenu("by Family", *menuSortByFamily.get());
-}
-*/
 //[/MiscUserCode]
 
 

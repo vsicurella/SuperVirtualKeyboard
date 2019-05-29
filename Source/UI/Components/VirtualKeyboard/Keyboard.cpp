@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "Keyboard.h"
 
 using namespace VirtualKeyboard;
@@ -38,8 +38,6 @@ Keyboard::Keyboard(SvkPluginState* pluginStateIn)
     
     setSize(1000, 250);
     setOpaque(true);
-
-	DBG("piano finished");
 }
 
 //===============================================================================================

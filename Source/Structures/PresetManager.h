@@ -17,7 +17,7 @@
 #include "Preset.h"
 #include "Mode.h"
 
-class SvkPresetManager
+class SvkPresetManager : public ComboBox::Listener
 {
 	std::unique_ptr<SvkPreset> presetLoaded;
 	std::unique_ptr<Mode> modeLoaded;
@@ -29,7 +29,17 @@ class SvkPresetManager
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<ValueTree>> presetsSorted;
+	Array<Array<int>> presetsSortedIndicies;
 
+	ScaleSizeSorter scaleSizeSort;
+	ModeSizeSorter modeSizeSort;
+	FamilyNameSorter familyNameSort;
+
+	int presetLibrarySize = 0;
+
+	// Methods
+	void createFactoryPresets();
+	void resortPresetLibrary();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 
@@ -45,6 +55,9 @@ public:
 
 	SvkPreset* getPresetLoaded();
 	Mode* getModeLoaded();
+
+	Array<Array<ValueTree>>* getPresetsSorted();
+	Array<Array<int>>* getSortedIndicies();
 	
 	// Can load either full preset or just Mode
 	bool loadPreset(ValueTree presetNodeIn);
@@ -54,9 +67,14 @@ public:
 
 	bool savePreset(String absolutePath="");
 
-	void createFactoryPresets();
-	void sortPresetLibrary();
-	void addPresetToLibrary(ValueTree presetNodeIn);
+	void intializePresets();
+	void loadPresetDirectory();
+
+	int addPresetToLibrary(ValueTree presetNodeIn);
+	void addPresetToSort(ValueTree presetNodeIn);
+	int addAndSortPreset(ValueTree presetNodeIn);
+
+	void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 
 	static SvkPreset* presetFromFile(String absoluteFilePath = "");
 

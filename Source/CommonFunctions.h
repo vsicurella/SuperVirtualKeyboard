@@ -10,97 +10,113 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "Structures/Mode.h"
+#include "PluginIDs.h"
 
-struct ModeScaleSorter
+struct ScaleSizeSorter
 {
 	// Scale first, then mode, then family
 
-	static int compareElements(const Mode* t1, const Mode* t2)
+	static int compareElements(const ValueTree t1, const ValueTree t2)
 	{
-		int sz1 = t1->getScaleSize();
-		int sz2 = t2->getScaleSize();
-
-		int m1 = t1->getModeSize();
-		int m2 = t2->getModeSize();
-
-		String f1 = t1->getFamily();
-		String f2 = t2->getFamily();
-
-		if (sz1 < sz2) return -1;
-		else if (sz1 > sz2) return 1;
-		else
+		if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
+		   (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
 		{
+			int sz1 = (int) t1[IDs::scaleSize];
+			int sz2 = (int) t2[IDs::scaleSize];
+
+			int m1 = (int) t1[IDs::modeSize];
+			int m2 = (int) t2[IDs::modeSize];
+
+			String f1 = t1[IDs::family];
+			String f2 = t2[IDs::family];
+
+			if (sz1 < sz2) return -1;
+			else if (sz1 > sz2) return 1;
+			else
+			{
+				if (m1 < m2) return -1;
+				else if (m1 > m2) return 1;
+				else
+				{
+					if (f1 < f2) return  -1;
+					else if (f1 > f2) return 1;
+					else return 0;
+				}
+			}
+		}
+		else
+			return 0;
+	}
+};
+
+struct ModeSizeSorter
+{
+	// Mode first, then scale, then family
+
+	static int compareElements(const ValueTree t1, const ValueTree t2)
+	{
+		if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
+			(t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+		{
+			int sz1 = (int) t1[IDs::scaleSize];
+			int sz2 = (int) t2[IDs::scaleSize];
+
+			int m1 = (int) t1[IDs::modeSize];
+			int m2 = (int) t2[IDs::modeSize];
+
+			String f1 = t1[IDs::family];
+			String f2 = t2[IDs::family];
+
 			if (m1 < m2) return -1;
 			else if (m1 > m2) return 1;
 			else
 			{
-				if (f1 < f2) return  -1;
-				else if (f1 > f2) return 1;
-				else return 0;
+				if (sz1 < sz2) return -1;
+				else if (sz1 > sz2) return 1;
+				else
+				{
+					if (f1 < f2) return  -1;
+					else if (f1 > f2) return 1;
+					else return 0;
+				}
 			}
 		}
+		return 0;
 	}
 };
-
-struct ModeModeSorter
-{
-	// Mode first, then scale, then family
-
-	static int compareElements(const Mode* t1, const Mode* t2)
-	{
-		int sz1 = t1->getScaleSize();
-		int sz2 = t2->getScaleSize();
-
-		int m1 = t1->getModeSize();
-		int m2 = t2->getModeSize();
-
-		String f1 = t1->getFamily();
-		String f2 = t2->getFamily();
-
-		if (m1 < m2) return -1;
-		else if (m1 > m2) return 1;
-		else
-		{
-			if (sz1 < sz2) return -1;
-			else if (sz1 > sz2) return 1;
-			else
-			{
-				if (f1 < f2) return  -1;
-				else if (f1 > f2) return 1;
-				else return 0;
-			}
-		}
-	}
-};
-struct ModeFamilySorter
+struct FamilyNameSorter
 {
 	// Family first, then scale, then mode
 
-	static int compareElements(const Mode* t1, const Mode* t2)
+	static int compareElements(const ValueTree t1, const ValueTree t2)
 	{
-		int sz1 = t1->getScaleSize();
-		int sz2 = t2->getScaleSize();
-
-		int m1 = t1->getModeSize();
-		int m2 = t2->getModeSize();
-
-		String f1 = t1->getFamily();
-		String f2 = t2->getFamily();
-
-		if (f1 < f2) return -1;
-		else if (f1 > f2) return 1;
-		else
+		if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
+			(t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
 		{
-			if (sz1 < sz2) return -1;
-			else if (sz1 > sz2) return 1;
+			int sz1 = (int) t1[IDs::scaleSize];
+			int sz2 = (int) t2[IDs::scaleSize];
+
+			int m1 = (int) t1[IDs::modeSize];
+			int m2 = (int) t2[IDs::modeSize];
+
+			String f1 = t1[IDs::family];
+			String f2 = t2[IDs::family];
+
+			if (f1 < f2) return -1;
+			else if (f1 > f2) return 1;
 			else
 			{
-				if (m1 < m2) return  -1;
-				else if (m1 > m2) return 1;
-				else return 0;
+				if (sz1 < sz2) return -1;
+				else if (sz1 > sz2) return 1;
+				else
+				{
+					if (m1 < m2) return  -1;
+					else if (m1 > m2) return 1;
+					else return 0;
+				}
 			}
 		}
+		return 0;
 	}
 };
 
