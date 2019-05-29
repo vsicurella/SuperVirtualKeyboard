@@ -29,7 +29,6 @@ class SvkPresetManager : public ComboBox::Listener
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<ValueTree>> presetsSorted;
-	Array<Array<int>> presetsSortedIndicies;
 
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
@@ -57,7 +56,6 @@ public:
 	Mode* getModeLoaded();
 
 	Array<Array<ValueTree>>* getPresetsSorted();
-	Array<Array<int>>* getSortedIndicies();
 	
 	// Can load either full preset or just Mode
 	bool loadPreset(ValueTree presetNodeIn);
