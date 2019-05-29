@@ -23,6 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../PluginState.h"
 #include "../../Structures/Mode.h"
+#include "PresetLibraryBox.h"
 //[/Headers]
 
 
@@ -36,10 +37,10 @@
                                                                     //[/Comments]
 */
 class KeyboardEditorBar  : public Component,
-                           private TextEditor::Listener,
                            public ChangeBroadcaster,
-                           public Button::Listener,
+                           public TextEditor::Listener,
                            public ComboBox::Listener,
+                           public Button::Listener,
                            public Slider::Listener
 {
 public:
@@ -57,6 +58,8 @@ public:
 	int getOffsetReadout();
 
 	void createAndSendMode();
+    
+    void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 
 	//void populate_preset_menu();
 
@@ -71,7 +74,6 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel) override;
 
@@ -117,10 +119,10 @@ private:
     //==============================================================================
     std::unique_ptr<TextEditor> modeTextEditor;
     std::unique_ptr<TextButton> sendScaleBtn;
-    std::unique_ptr<ComboBox> modeLibraryBox;
     std::unique_ptr<Slider> offsetSld;
     std::unique_ptr<Label> offsetLabel;
     std::unique_ptr<TextButton> mapButton;
+    std::unique_ptr<PresetLibraryBox> presetLibraryBox;
 
 
     //==============================================================================

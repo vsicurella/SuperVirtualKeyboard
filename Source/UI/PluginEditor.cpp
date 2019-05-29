@@ -29,7 +29,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	piano.reset(new Keyboard(pluginState));
 	piano->setName("The Piano");
 
-
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano.get());

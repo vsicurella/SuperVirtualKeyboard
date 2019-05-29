@@ -50,14 +50,6 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     sendScaleBtn->setButtonText (TRANS("Send Scale"));
     sendScaleBtn->addListener (this);
 
-    modeLibraryBox.reset (new ComboBox ("Mode Library Box"));
-    addAndMakeVisible (modeLibraryBox.get());
-    modeLibraryBox->setEditableText (true);
-    modeLibraryBox->setJustificationType (Justification::centredLeft);
-    modeLibraryBox->setTextWhenNothingSelected (TRANS("Pick a mode..."));
-    modeLibraryBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    modeLibraryBox->addListener (this);
-
     offsetSld.reset (new Slider ("Offset Slider"));
     addAndMakeVisible (offsetSld.get());
     offsetSld->setRange (0, 127, 1);
@@ -81,6 +73,10 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     mapButton->addListener (this);
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
     mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
+
+    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get(), "PresetLibraryBox"));
+    addAndMakeVisible (presetLibraryBox.get());
+    presetLibraryBox->setName ("PresetLibraryBox");
 
 
     //[UserPreSize]
@@ -110,10 +106,10 @@ KeyboardEditorBar::~KeyboardEditorBar()
 
     modeTextEditor = nullptr;
     sendScaleBtn = nullptr;
-    modeLibraryBox = nullptr;
     offsetSld = nullptr;
     offsetLabel = nullptr;
     mapButton = nullptr;
+    presetLibraryBox = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -140,10 +136,10 @@ void KeyboardEditorBar::resized()
 
     modeTextEditor->setBounds (getWidth() - 381 - 150, 6, 150, 24);
     sendScaleBtn->setBounds (getWidth() - 283 - 88, 6, 88, 24);
-    modeLibraryBox->setBounds (getWidth() - 4 - 150, 6, 150, 24);
     offsetSld->setBounds (getWidth() - 235, 2, 69, 32);
     offsetLabel->setBounds (getWidth() - 280, 6, 47, 24);
     mapButton->setBounds (getWidth() - 542 - 79, 6, 79, 24);
+    presetLibraryBox->setBounds (getWidth() - 9 - 150, 6, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -172,36 +168,6 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void KeyboardEditorBar::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == modeLibraryBox.get())
-    {
-        //[UserComboBoxCode_modeLibraryBox] -- add your combo box handling code here..
-		if (comboBoxThatHasChanged->getSelectedId() > 0)
-			pluginState->loadMode(menuToPresetIndex[modeLibraryBox->getText()]);
-		else
-		{
-			String newModeName;
-			// Preset is a user preset
-			if ((int)pluginState->getPresetLoaded()->parentNode.getProperty(IDs::libraryIndexOfMode) == 0)
-			{
-				pluginState->getModeLoaded()->setFamily(comboBoxThatHasChanged->getText());
-			}
-
-			// If it's a default preset, it reverts to original name
-			newModeName = pluginState->getModeLoaded()->getDescription();
-			comboBoxThatHasChanged->setText(newModeName, dontSendNotification);
-		}
-        //[/UserComboBoxCode_modeLibraryBox]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
-}
-
 void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
@@ -222,9 +188,9 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
 void KeyboardEditorBar::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
 {
     //[UserCode_mouseWheelMove] -- Add your code here...
-	if (modeLibraryBox->isMouseOver())
+	if (presetLibraryBox->isMouseOver())
 	{
-		modeLibraryBox->setSelectedId(modeLibraryBox->getSelectedId() + (wheel.isReversed * 2 - 1));
+		presetLibraryBox->setSelectedId(presetLibraryBox->getSelectedId() + (wheel.isReversed * 2 - 1));
 	}
     //[/UserCode_mouseWheelMove]
 }
@@ -245,7 +211,7 @@ int KeyboardEditorBar::getModePresetIndex(String anyNameIn)
 
 int KeyboardEditorBar::getModeLibraryIndex()
 {
-    return modeLibraryBox->getSelectedId();
+    return presetLibraryBox->getSelectedId();
 }
 
 bool KeyboardEditorBar::isMapButtonOn()
@@ -270,7 +236,7 @@ void KeyboardEditorBar::setModeReadoutText(String steps)
 
 void KeyboardEditorBar::setModeLibraryText(String presetName)
 {
-	modeLibraryBox->setText(presetName, dontSendNotification);
+	presetLibraryBox->setText(presetName, dontSendNotification);
 }
 
 void KeyboardEditorBar::createAndSendMode()
@@ -291,12 +257,23 @@ void KeyboardEditorBar::createAndSendMode()
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
 {
- 	modeLibraryBox->setEnabled(isAllowed);
+ 	presetLibraryBox->setEnabled(isAllowed);
 	offsetSld->setEnabled(isAllowed);
 	sendScaleBtn->setEnabled(isAllowed);
 	modeTextEditor->setEnabled(isAllowed);
 	pianoMenu->setEnabled(isAllowed);
 }
+
+void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
+{
+    PresetLibraryBox* presetBox = dynamic_cast<PresetLibraryBox*>(comboBoxThatHasChanged);
+    
+    if (presetBox)
+    {
+        
+    }
+}
+
 
 //==============================================================================
 
@@ -380,7 +357,7 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="KeyboardEditorBar" componentName="Keyboard Editor Bar"
-                 parentClasses="public Component, private TextEditor::Listener, public ChangeBroadcaster"
+                 parentClasses="public Component, public ChangeBroadcaster, public TextEditor::Listener, public ComboBox::Listener"
                  constructorParams="SvkPluginState* pluginStateIn, ApplicationCommandManager* managerIn"
                  variableInitialisers="pluginState(pluginStateIn), appCmdMgr(managerIn)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
@@ -396,9 +373,6 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="Send Scale Button" id="3a2872f3357f900b" memberName="sendScaleBtn"
               virtualName="" explicitFocusOrder="0" pos="283Rr 6 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <COMBOBOX name="Mode Library Box" id="91d2066d9e23de1c" memberName="modeLibraryBox"
-            virtualName="" explicitFocusOrder="0" pos="4Rr 6 150 24" editable="1"
-            layout="33" items="" textWhenNonSelected="Pick a mode..." textWhenNoItems="(no choices)"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
           virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
@@ -413,6 +387,9 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="542Rr 6 79 24" bgColOff="ff5c6ea4"
               bgColOn="ffa7b438" buttonText="Map Notes" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
+  <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
+                    virtualName="" explicitFocusOrder="0" pos="9Rr 6 150 24" class="PresetLibraryBox"
+                    params="pluginState-&gt;presetManager.get(), &quot;PresetLibraryBox&quot;"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

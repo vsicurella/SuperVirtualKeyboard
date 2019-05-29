@@ -15,8 +15,7 @@ SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
     pluginSettingsNode = pluginSettingsNodeIn;
     intializePresets();
 	
-    if (!loadPreset(8))
-        loadPreset(Mode::createNode("2 2 1 2 2 2 1"));
+    loadPreset(Mode::createNode("2 2 1 2 2 2 1"));
 }
 
 SvkPresetManager::~SvkPresetManager()
