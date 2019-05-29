@@ -12,9 +12,11 @@
 
 SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
-	createFactoryPresets();
-
-	loadPreset(8);
+    pluginSettingsNode = pluginSettingsNodeIn;
+    intializePresets();
+	
+    if (!loadPreset(8))
+        loadPreset(Mode::createNode("2 2 1 2 2 2 1"));
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -41,11 +43,10 @@ Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 {
 	std::unique_ptr<SvkPreset> newPreset(new SvkPreset(presetNodeIn));
-
+    bool shouldLoad = true;
+    
 	if (newPreset.get())
 	{
-		presetLoaded.swap(newPreset);
-
 		/*
 		if (presetCurrent->theMidiSettingsNode.isValid())
 		{
@@ -53,19 +54,26 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 		}
 		*/
 		// this needs to be updated to address the root note
-		if (presetLoaded->theModeNode.isValid())
-		{
-			modeLoaded.reset(new Mode(presetLoaded->theModeNode));
-			modeNode = modeLoaded->modeNode;
-		}
+        
+        shouldLoad *= Mode::isValidMode(newPreset->theModeNode);
+        
 		/*
 		if (presetLoaded->theKeyboardNode.isValid())
 		{
 			pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
 		}
 		*/
+        
+       if (shouldLoad)
+       {
+        presetLoaded.swap(newPreset);
+        modeLoaded.reset(new Mode(presetLoaded->theModeNode));
+        modeNode = modeLoaded->modeNode;
+        
 		return true;
+       }
 	}
+    return false;
 }
 
 bool SvkPresetManager::loadPreset(int libraryIndexIn)
@@ -85,7 +93,7 @@ bool SvkPresetManager::loadPreset()
 
 bool SvkPresetManager::savePreset(String absolutePath)
 {
-	presetLoaded->writeToFile(absolutePath);
+	return presetLoaded->writeToFile(absolutePath);
 }
 
 
@@ -160,10 +168,10 @@ void SvkPresetManager::createFactoryPresets()
 				steps = line.upToFirstOccurrenceOf(", ", false, true);
 				family = line.fromFirstOccurrenceOf(", ", false, true);
 
-				factoryMode = Mode::createNode(steps, family, true);
+                factoryMode = Mode::createNode(steps, family, true);
 				
 				addAndSortPreset(factoryMode);
-				loadedFactoryPresets.add(ValueTree(factoryMode), -1);
+                loadedFactoryPresets.add(factoryMode);
 			}
 		}
 	}
@@ -190,12 +198,12 @@ void SvkPresetManager::loadPresetDirectory()
 				if ((bool)presetInNode[IDs::factoryPreset])
 				{
 					addAndSortPreset(presetInNode);
-					loadedFactoryPresets.add(presetInNode, -1);
+					loadedFactoryPresets.add(presetInNode);
 				}
 				else
 				{
 					addAndSortPreset(presetInNode);
-					loadedUserPresets.add(presetInNode, -1);
+					loadedUserPresets.add(presetInNode);
 				}
 			}
 		}

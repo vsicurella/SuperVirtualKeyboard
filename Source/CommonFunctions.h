@@ -263,7 +263,7 @@ static void get_array_from_node(const ValueTree nodeIn, Array<Point<int>>& array
 
 	if (childArray.isValid())
 		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn[0], childArray.getChild(i).getProperty("Value").toString()));
+			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value").toString()));
 }
 
 static void get_array_from_node(const ValueTree nodeIn, Array<Point<float>>& arrayIn, Identifier arrayID)
@@ -272,7 +272,7 @@ static void get_array_from_node(const ValueTree nodeIn, Array<Point<float>>& arr
 
 	if (childArray.isValid())
 		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn[0], childArray.getChild(i).getProperty("Value")));
+			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
 }
 
 static void get_array_from_node(const ValueTree nodeIn, Array<Point<double>>& arrayIn, Identifier arrayID)
@@ -281,7 +281,7 @@ static void get_array_from_node(const ValueTree nodeIn, Array<Point<double>>& ar
 
 	if (childArray.isValid())
 		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn[0], childArray.getChild(i).getProperty("Value")));
+			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
 }
 
 template <class T>

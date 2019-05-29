@@ -33,7 +33,7 @@ Mode::Mode()
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
-	initializeNode();
+	updateNode(true);
 }
 
 Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
@@ -56,7 +56,7 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
 	keyboardOrdersSizes = interval_sizes(orders);
 	updateStepsOfOrders();
 
-	initializeNode();
+	updateNode(true);
 }
 
 Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
@@ -79,40 +79,56 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 	keyboardOrdersSizes = interval_sizes(orders);
     updateStepsOfOrders();
     
-	initializeNode();
+	updateNode(true);
 }
 
 Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 {
-	if (modeNodeIn.hasType(IDs::modePresetNode))
+	if (isValidMode(modeNodeIn))
 	{
+        modeNode = ValueTree(IDs::modePresetNode);
 		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
 
-		name = modeNode[IDs::modeName];
-		scaleSize = modeNode[IDs::scaleSize];
-		modeSize = modeNode[IDs::modeSize];
-		stepsString = modeNode[IDs::stepString];
+        stepsString = modeNode[IDs::stepString];
+        steps = parse_steps(stepsString);
+        mosClass = interval_sizes(steps);
+        ordersDefault = steps_to_orders(steps);
+        
+        scaleSize = modeNode[IDs::scaleSize];
+        if (scaleSize == 0)
+            scaleSize = ordersDefault.size();
+        
+        modeSize = modeNode[IDs::modeSize];
+        if (modeSize == 0)
+            modeSize = steps.size();
+    
 		family = modeNode[IDs::family];
-
+        if (family == "")
+            family = "undefined";
+        
+        name = modeNode[IDs::modeName];
+        if (name == "")
+            name = getDescription();
+        
 		rootNote = rootNoteIn;
 		offset = getOffset() * -1;
 
-		steps = parse_steps(stepsString);
-		mosClass = interval_sizes(steps);
-		ordersDefault = steps_to_orders(steps);
 		orders = expand_orders(ordersDefault, offset);
 		modeDegrees = orders_to_modeDegrees(orders);
 		scaleDegrees = scale_degrees(scaleSize, offset);
 		updateStepsOfOrders();
+        
+        updateNode();
 	}
 }
 
 Mode::~Mode() {}
 
 
-void Mode::initializeNode()
+void Mode::updateNode(bool initializeNode)
 {
-	modeNode = ValueTree(IDs::modePresetNode);
+    if (initializeNode)
+        modeNode = ValueTree(IDs::modePresetNode);
 
 	modeNode.setProperty(IDs::modeName, name, nullptr);
 	modeNode.setProperty(IDs::scaleSize, scaleSize, nullptr);
@@ -124,28 +140,63 @@ void Mode::initializeNode()
 
 void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 {
-	if (nodeIn.hasType(IDs::modePresetNode))
+	if (isValidMode(nodeIn))
 	{
 		modeNode.copyPropertiesAndChildrenFrom(nodeIn, nullptr);
-
-		name = modeNode[IDs::modeName];
-		scaleSize = modeNode[IDs::scaleSize];
-		modeSize = modeNode[IDs::modeSize];
-		stepsString = modeNode[IDs::stepString];
-		family = modeNode[IDs::family];
-
-		rootNote = rootNoteIn;
-		offset = getOffset() * -1;
-
-		steps = parse_steps(stepsString);
-		mosClass = interval_sizes(steps);
-		ordersDefault = steps_to_orders(steps);
-		orders = expand_orders(ordersDefault, offset);
-		modeDegrees = orders_to_modeDegrees(orders);
-		scaleDegrees = scale_degrees(scaleSize, offset);
-		updateStepsOfOrders();
+        
+        stepsString = modeNode[IDs::stepString];
+        steps = parse_steps(stepsString);
+        mosClass = interval_sizes(steps);
+        ordersDefault = steps_to_orders(steps);
+        
+        scaleSize = modeNode[IDs::scaleSize];
+        if (scaleSize == 0)
+            scaleSize = ordersDefault.size();
+        
+        modeSize = modeNode[IDs::modeSize];
+        if (modeSize == 0)
+            modeSize = steps.size();
+        
+        family = modeNode[IDs::family];
+        if (family == "")
+            family = "undefined";
+        
+        name = modeNode[IDs::modeName];
+        if (name == "")
+            name = getDescription();
+        
+        rootNote = rootNoteIn;
+        offset = getOffset() * -1;
+        
+        orders = expand_orders(ordersDefault, offset);
+        modeDegrees = orders_to_modeDegrees(orders);
+        scaleDegrees = scale_degrees(scaleSize, offset);
+        updateStepsOfOrders();
+        
+        updateNode();
 	}
 }
+
+bool Mode::isValidMode()
+{
+    bool isValid = true;
+    
+    isValid *= modeNode.isValid() * (modeNode.hasType(IDs::modePresetNode) + modeNode.hasType(IDs::presetNode) > 0);
+    isValid *= (modeNode.getProperty(IDs::stepString).size() > 0);
+    
+    return isValid;
+}
+
+bool Mode::isValidMode(ValueTree nodeIn)
+{
+    bool isValid = true;
+    
+    isValid *= nodeIn.isValid() * (nodeIn.hasType(IDs::modePresetNode) + nodeIn.hasType(IDs::presetNode) > 0);
+    isValid *= (nodeIn.getProperty(IDs::stepString).toString().length() > 0);
+    
+    return isValid;
+}
+
 
 ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
 {

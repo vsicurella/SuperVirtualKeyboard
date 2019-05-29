@@ -28,8 +28,11 @@ struct Mode
 
 	~Mode();
 
-	void initializeNode();
+	void updateNode(bool initializeNode=false);
 	void restoreNode(ValueTree nodeIn, int rootNoteIn=60);
+
+    bool isValidMode();
+    static bool isValidMode(ValueTree nodeIn);
 
 	static ValueTree createNode(String stepsIn, String familyIn = "undefined", bool factoryPreset = false);
 	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", bool factoryPreset = false);

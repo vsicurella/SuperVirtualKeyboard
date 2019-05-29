@@ -20,6 +20,10 @@ SvkPluginState::SvkPluginState()
 	pluginSettings.reset(new SvkPluginSettings());
 	pluginSettingsNode = pluginSettings->pluginSettingsNode;
 	pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
+    
+    midiProcessor.reset(new SvkMidiProcessor());
+    midiSettingsNode = midiProcessor->midiSettingsNode;
+    pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
 
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	presetLibraryNode = presetManager->presetLibraryNode;
@@ -27,10 +31,6 @@ SvkPluginState::SvkPluginState()
 
 	modeLoaded = presetManager->getModeLoaded();
 	modePresetNode = modeLoaded->modeNode;
-
-    midiProcessor.reset(new SvkMidiProcessor());
-	midiSettingsNode = midiProcessor->midiSettingsNode;
-	pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
