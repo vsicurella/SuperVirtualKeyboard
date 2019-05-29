@@ -15,7 +15,6 @@ PresetLibraryBox::PresetLibraryBox(SvkPresetManager* presetManagerIn, String nam
 {
 	presetsLibraryNode = presetManager->presetLibraryNode;
 	presetsSorted = presetManager->getPresetsSorted();
-	sortedIndicies = presetManager->getSortedIndicies();
 }
 
 PresetLibraryBox::~PresetLibraryBox()

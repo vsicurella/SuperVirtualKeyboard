@@ -32,6 +32,11 @@ Mode* SvkPresetManager::getModeLoaded()
 	return modeLoaded.get();
 }
 
+Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
+{
+	return &presetsSorted;
+}
+
 
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 {
@@ -124,7 +129,6 @@ void SvkPresetManager::intializePresets()
 	loadedFactoryPresets.clear();
 	loadedUserPresets.clear();
 	presetsSorted.clear();
-	presetsSortedIndicies.clear();
 
 	createFactoryPresets();
 	loadPresetDirectory();
@@ -204,9 +208,6 @@ void SvkPresetManager::resortPresetLibrary()
 	presetsSorted.clear();
 	presetsSorted.resize(3); // NEEDS TO CHANGE IF MORE SUBMENUS ADDED
 
-	presetsSortedIndicies.clear();
-	presetsSortedIndicies.resize(3);
-
 	ValueTree presetToSort;
 
 	for (int i = 0; i < presetLibrarySize; i++)
@@ -234,20 +235,13 @@ void SvkPresetManager::addPresetToSort(ValueTree presetNodeIn)
 {
 	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
 	{
-		int sortIndex;
-		sortIndex = presetsSorted.getUnchecked(SortType::scaleSize).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
-		presetsSortedIndicies.getUnchecked(SortType::scaleSize).insert(sortIndex, (int)presetNodeIn[IDs::libraryIndexOfMode]);
-
-		sortIndex = presetsSorted.getUnchecked(SortType::modeSize).addSorted(modeSizeSort, ValueTree(presetNodeIn));
-		presetsSortedIndicies.getUnchecked(SortType::modeSize).insert(sortIndex, (int)presetNodeIn[IDs::libraryIndexOfMode]);
-
-		sortIndex = presetsSorted.getUnchecked(SortType::familyName).addSorted(familyNameSort, ValueTree(presetNodeIn));
-		presetsSortedIndicies.getUnchecked(SortType::familyName).insert(sortIndex, (int)presetNodeIn[IDs::libraryIndexOfMode]);
+		presetsSorted.getUnchecked(SortType::scaleSize).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
+		presetsSorted.getUnchecked(SortType::modeSize).addSorted(modeSizeSort, ValueTree(presetNodeIn));
+		presetsSorted.getUnchecked(SortType::familyName).addSorted(familyNameSort, ValueTree(presetNodeIn));
 
 		if (!(bool)presetNodeIn[IDs::factoryPreset])
 		{
-			sortIndex = presetsSorted.getUnchecked(SortType::user).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
-			presetsSortedIndicies.getUnchecked(SortType::scaleSize).insert(sortIndex, (int)presetNodeIn[IDs::libraryIndexOfMode]);
+			presetsSorted.getUnchecked(SortType::user).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
 		}
 	}
 }
