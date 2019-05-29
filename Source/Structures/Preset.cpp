@@ -20,14 +20,23 @@ SvkPreset::SvkPreset()
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
 	parentNode = ValueTree(IDs::presetNode);
-	theModeNode = ValueTree(IDs::modePresetNode);
-	theKeyboardNode = ValueTree(IDs::pianoNode);
+    
+    if (!theModeNode.isValid())
+        theModeNode = ValueTree(IDs::modePresetNode);
+    
+    if (!theKeyboardNode.isValid())
+        theKeyboardNode = ValueTree(IDs::pianoNode);
 
-	theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(0), nullptr);
-	theKeyboardNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChild(1), nullptr);
+    if (presetNodeIn.hasType(IDs::modePresetNode))
+        theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
+    else
+        theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChildWithName(IDs::modePresetNode), nullptr);
+    
+    if (presetNodeIn.getChildWithName(IDs::pianoNode).isValid())
+        theKeyboardNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChildWithName(IDs::pianoNode), nullptr);
 
-	parentNode.addChild(theModeNode, 0, nullptr);
-	parentNode.addChild(theKeyboardNode, 1, nullptr);
+	parentNode.addChild(theModeNode, -1, nullptr);
+	parentNode.addChild(theKeyboardNode, -1, nullptr);
 
 	if (presetNodeIn.hasProperty(IDs::rootMidiNote))
 		parentNode.setProperty(IDs::rootMidiNote,(int)presetNodeIn[IDs::rootMidiNote], nullptr);

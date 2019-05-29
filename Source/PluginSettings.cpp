@@ -18,25 +18,26 @@ SvkPluginSettings::SvkPluginSettings()
 	if (settingsDirectory.isDirectory())
 	{
 		std::unique_ptr<XmlElement> xml = parseXML(settingsDirectory.getChildFile(settingsFileName));
-		settingsLoad = ValueTree::fromXml(*(xml.get()));
-
-		restoreNode(settingsLoad);
+       
+        if (xml.get())
+        {
+            settingsLoad = ValueTree::fromXml(*(xml.get()));
+            restoreNode(settingsLoad);
+        }
 	}
 
-	if (currentSettingsLocation == File())
+	if (currentSettingsLocation == File() || !currentSettingsLocation.exists())
 	{
 		currentSettingsLocation = factoryDefaultSettingsLocation;
-		currentSettingsLocation = currentSettingsLocation.getChildFile(appFolderName);
-		currentSettingsLocation.createDirectory();
+        currentSettingsLocation.createDirectory();
 
 		pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
-		updateNode();
+		updateNode(true);
 	}
 
-	if (currentPresetLocation == File())
+	if (currentPresetLocation == File() || !currentPresetLocation.exists())
 	{
 		currentPresetLocation = factoryDefaultPresetLocations;
-		currentPresetLocation = currentSettingsLocation.getChildFile(appFolderName);
 
 		if (createPresetFolder)
 			currentPresetLocation.createDirectory();
@@ -49,12 +50,20 @@ SvkPluginSettings::SvkPluginSettings(SvkPluginSettings& settingsToCopy)
 		SvkPluginSettings();
 }
 
-void SvkPluginSettings::updateNode()
+bool SvkPluginSettings::updateNode(bool writeSettings)
 {
 	pluginSettingsNode.setProperty(IDs::settingsDirectory, currentPresetLocation.getFullPathName(), nullptr);
 	pluginSettingsNode.setProperty(IDs::presetDirectory, currentSettingsLocation.getFullPathName(), nullptr);
 	pluginSettingsNode.setProperty(IDs::createPresetFolder, createPresetFolder, nullptr);
 	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+    
+    if (writeSettings)
+    {
+        std::unique_ptr<XmlElement> xml(pluginSettingsNode.createXml());
+        return xml->writeToFile(currentSettingsLocation.getChildFile(appFolderName), "");
+    }
+    
+    return true;
 }
 
 bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)

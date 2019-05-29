@@ -17,7 +17,7 @@
 class SvkPluginSettings
 {
 	const String appFolderName = "SuperVirtualKeyboard";
-	const String settingsFileName = "SvkPluginSettings";
+	const String settingsFileName = "SvkPluginSettings.settings";
 
 	File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
 	File factoryDefaultPresetLocations = File::getSpecialLocation(File::userDesktopDirectory).getChildFile(appFolderName);
@@ -36,7 +36,7 @@ public:
 
 	ValueTree pluginSettingsNode;
 
-	void updateNode();
+	bool updateNode(bool writeSettings=false);
 	bool restoreNode(ValueTree pluginSettingsNodeIn);
 
 	String getSettingsPath();

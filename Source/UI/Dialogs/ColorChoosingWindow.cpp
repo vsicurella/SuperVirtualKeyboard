@@ -16,13 +16,14 @@ ColorChooserWindow::ColorChooserWindow (String windowName, Colour backgroundColo
 {
 
 	colorChooser.reset(new ColourSelector());
-	setContentComponent(colorChooser.get());
-	colorChooser->setName("Color Chooser");
-	setOpaque(true);
-	setAlwaysOnTop(true);
+    colorChooser->setName("Color Chooser");
+    colorChooser->setBounds(0, 0, 450, 450);
+    //setContentOwned(colorChooser.get(), true);
+
+    setAlwaysOnTop(true);
+    setOpaque(true);
 
     setSize (450, 450);
-
 }
 
 ColorChooserWindow::~ColorChooserWindow()
