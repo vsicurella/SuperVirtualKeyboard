@@ -84,8 +84,13 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 
 Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 {
-	if (isValidMode(modeNodeIn))
+	bool hasModeChild;
+
+	if (isValidMode(modeNodeIn, hasModeChild))
 	{
+		if (hasModeChild)
+			modeNodeIn = modeNodeIn.getChildWithName(IDs::modePresetNode);
+
         modeNode = ValueTree(IDs::modePresetNode);
 		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
 
@@ -140,8 +145,13 @@ void Mode::updateNode(bool initializeNode)
 
 void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 {
-	if (isValidMode(nodeIn))
+	bool hasModeChild;
+
+	if (isValidMode(nodeIn, hasModeChild))
 	{
+		if (hasModeChild)
+			nodeIn = nodeIn.getChildWithName(IDs::modePresetNode);
+
 		modeNode = nodeIn;
         
         stepsString = modeNode[IDs::stepString];
@@ -177,24 +187,35 @@ void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 	}
 }
 
-bool Mode::isValidMode()
+bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 {
+	DBG("Checking this node: " + nodeIn.toXmlString());
     bool isValid = true;
-    
-    isValid *= modeNode.isValid() * (modeNode.hasType(IDs::modePresetNode) + modeNode.hasType(IDs::presetNode) > 0);
-    isValid *= (modeNode.getProperty(IDs::stepString).size() > 0);
-    
-    return isValid;
-}
+	bool isMode = nodeIn.hasType(IDs::modePresetNode);
+	hasModeChild = nodeIn.getChildWithName(IDs::modePresetNode).isValid();
 
-bool Mode::isValidMode(ValueTree nodeIn)
-{
-    bool isValid = true;
+	String steps;
+
+	if (isMode)
+		steps = nodeIn.getProperty(IDs::stepString).toString();
+	else
+		steps = nodeIn.getChildWithName(IDs::modePresetNode).getProperty(IDs::stepString).toString();
+
+	int stepsLength = steps.length();
+	bool hasSteps = stepsLength > 0;
+
+	String out = "That was Valid and its steps are " + steps + " which is " + String(stepsLength) + " characters.";
+	if (isMode)
+		out = out.replaceFirstOccurrenceOf("That", "That mode");
+	else
+		out = out.replaceFirstOccurrenceOf("That", "That preset");
+
+	if (!isValid)
+		out = out.replaceFirstOccurrenceOf("was", "was not");
+
+	DBG(out);
     
-    isValid *= nodeIn.isValid() * (nodeIn.hasType(IDs::modePresetNode) + nodeIn.hasType(IDs::presetNode) > 0);
-    isValid *= (nodeIn.getProperty(IDs::stepString).toString().length() > 0);
-    
-    return isValid;
+    return isValid && (isMode || hasModeChild) && hasSteps;
 }
 
 

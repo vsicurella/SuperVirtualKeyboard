@@ -80,6 +80,8 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
 
     //[UserPreSize]
+	presetLibraryBox->addListener(this);
+
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
 	addAndMakeVisible(pianoMenu.get());
 	pianoMenu->toBack();
@@ -102,6 +104,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 KeyboardEditorBar::~KeyboardEditorBar()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	presetLibraryBox->removeListener(this);
     //[/Destructor_pre]
 
     modeTextEditor = nullptr;
@@ -252,7 +255,7 @@ void KeyboardEditorBar::createAndSendMode()
 		pluginState->loadMode(new Mode(steps, "Custom"));
 		*/
 
-	pluginState->presetManager->loadPreset(Mode::createNode(steps, "Custom"));
+	pluginState->loadMode(Mode::createNode(steps, "Custom"));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
@@ -270,7 +273,10 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
     
     if (presetBox)
     {
-        
+		int id = presetBox->getSelectedId() - 1;
+		int numPresets = pluginState->presetLibraryNode.getNumChildren();
+		int presetNumber = id / numPresets + id % numPresets;
+		pluginState->loadMode(presetNumber);
     }
 }
 

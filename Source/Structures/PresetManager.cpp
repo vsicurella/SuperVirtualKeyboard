@@ -14,6 +14,7 @@ SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
     intializePresets();
+	DBG(presetLibraryNode.toXmlString());
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -48,7 +49,8 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 		*/
 		// this needs to be updated to address the root note
         
-        shouldLoad *= Mode::isValidMode(newPreset->theModeNode);
+		bool dummy;
+        shouldLoad *= Mode::isValidMode(newPreset->theModeNode, dummy);
         
 		/*
 		if (presetLoaded->theKeyboardNode.isValid())
@@ -60,6 +62,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
        if (shouldLoad)
        {
         presetLoaded.swap(newPreset);
+		presetNode.copyPropertiesAndChildrenFrom(presetLoaded->parentNode, nullptr);
 		sendChangeMessage();
 		return true;
        }
@@ -125,6 +128,7 @@ SvkPreset* SvkPresetManager::presetFromFile(String absoluteFilePath)
 void SvkPresetManager::intializePresets()
 {
 	presetLibraryNode = ValueTree(IDs::presetLibraryNode);
+	presetNode = ValueTree(IDs::presetNode);
 	loadedFactoryPresets.clear();
 	loadedUserPresets.clear();
 	presetsSorted.clear();

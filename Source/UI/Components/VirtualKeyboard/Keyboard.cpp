@@ -15,13 +15,12 @@
 
 using namespace VirtualKeyboard;
 
-Keyboard::Keyboard(SvkPluginState* pluginStateIn)
+Keyboard::Keyboard(SvkMidiProcessor* midiProcessorIn)
 {
     removeMouseListener(this);
     
-    pluginState = pluginStateIn;
-    undo = pluginState->getUndoManager();
-    
+	midiProcessor = midiProcessorIn;
+       
     // Create children (piano keys)
     for (int i = 0; i < 128; i++)
     {
@@ -44,13 +43,9 @@ Keyboard::Keyboard(SvkPluginState* pluginStateIn)
 
 void Keyboard::initiateDataNode()
 {
-	if (pluginState->pianoNode.isValid())
-		restoreDataNode(pluginState->pianoNode);
-    
 	if (!pianoNode.isValid())
 	{
 		pianoNode = ValueTree(IDs::pianoNode);
-		pluginState->pianoNode = pianoNode;
 
 		// Initialize default values
 		for (int i = 0; i < 128; i++)
@@ -366,8 +361,8 @@ void Keyboard::applyMode(Mode* modeIn)
 		key->step = mode->getStepsOfOrders()[i];
 		setKeyProportions(key);
 		
-        key->mappedNoteIn = pluginState->getMidiProcessor()->getInputNote(i);
-        key->mappedNoteIn = pluginState->getMidiProcessor()->getOutputNote(i);
+        key->mappedNoteIn = midiProcessor->getInputNote(i);
+        key->mappedNoteIn = midiProcessor->getOutputNote(i);
 
         key->setColour(0, getKeyColor(key));
         key->setColour(1, key->findColour(0).contrasting(0.25));
