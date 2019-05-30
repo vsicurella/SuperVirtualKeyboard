@@ -74,9 +74,8 @@ bool SvkPresetManager::loadPreset(int libraryIndexIn)
     int numPresets = presetLibraryNode.getNumChildren();
     int subMenu = libraryIndexIn / numPresets;
     int index = libraryIndexIn % numPresets;
-    ValueTree presetToLoad = presetsSorted.getReference(subMenu)[index];
-    std::cout << "Preset: " << presetToLoad[IDs::modeName].toString() << std::endl;
-	return loadPreset(presetLibraryNode.getChild(libraryIndexIn));
+    ValueTree presetToLoad = presetsSorted.getUnchecked(subMenu).getUnchecked(index);
+	return loadPreset(presetToLoad);
 }
 
 bool SvkPresetManager::loadPreset(SvkPreset* presetIn)
@@ -228,8 +227,6 @@ void SvkPresetManager::resortPresetLibrary()
 
 int SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
 {
-	DBG("Adding this:\n" + presetNodeIn.toXmlString());
-
 	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
 	{
 		int libraryIndex = presetLibraryNode.getNumChildren();

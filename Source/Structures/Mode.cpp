@@ -189,7 +189,6 @@ void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 
 bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 {
-    std::cout << "Checking Mode: \n" << nodeIn.toXmlString() << std::endl;
     bool isValid = true;
 	bool isMode = nodeIn.hasType(IDs::modePresetNode);
 	hasModeChild = nodeIn.getChildWithName(IDs::modePresetNode).isValid();

@@ -38,6 +38,8 @@ SvkPluginState::SvkPluginState()
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
+    
+    loadMode(8);
 }
 
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()
@@ -89,6 +91,7 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	midiProcessor->setRootNote(rootNoteIn);
 	modeLoaded->setRootNote(rootNoteIn);
+    virtualKeyboard->applyMode(modeLoaded.get());
 }
 
 void SvkPluginState::updateKeyboardSettingsPreset()
@@ -118,5 +121,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	{
 		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
 		virtualKeyboard->applyMode(modeLoaded.get());
+        sendChangeMessage();
 	}
 }
