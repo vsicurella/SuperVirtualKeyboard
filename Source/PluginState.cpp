@@ -32,8 +32,8 @@ SvkPluginState::SvkPluginState()
 
 	modeLoaded.reset(new Mode());
 
-	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(this));
-	virtualKeyboard->addListener(midiProcessor.get());
+	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor.get()));
+	virtualKeyboard->addListener(midiProcessor.get()); // generates MIDI from UI
 	pianoNode = virtualKeyboard->getNode();
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
@@ -117,5 +117,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	if (source = presetManager.get())
 	{
 		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
+		virtualKeyboard->applyMode(modeLoaded.get());
 	}
 }

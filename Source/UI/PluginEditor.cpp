@@ -47,7 +47,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     pluginState->addChangeListener(this);
 	pluginState->presetManager->addChangeListener(this);
     keyboardEditorBar->addChangeListener(this);
-    piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
 	initNodeData();
 
@@ -68,7 +67,6 @@ SvkPluginEditor::~SvkPluginEditor()
 {
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
-    piano->removeListener(pluginState->getMidiProcessor());
     pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano);
 }
 
@@ -107,9 +105,7 @@ void SvkPluginEditor::updateNodeData()
 void SvkPluginEditor::update_children_to_preset()
 {
 	Mode* modeLoaded = pluginState->getModeLoaded();
-		
-	piano->applyMode(modeLoaded);
-
+	
 	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
 	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());

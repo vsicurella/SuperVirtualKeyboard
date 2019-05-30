@@ -11,8 +11,8 @@
 #pragma once
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
-#include "../../../PluginState.h"
 #include "../../../PluginIDs.h"
+#include "../../../MidiProcessor.h"
 #include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
@@ -57,7 +57,7 @@ namespace VirtualKeyboard
     public:
         //===============================================================================================
         
-        Keyboard(SvkPluginState* pluginStateIn);
+        Keyboard(SvkMidiProcessor* midiProcessorIn);
         ~Keyboard() {};
         
         //===============================================================================================
@@ -201,7 +201,7 @@ namespace VirtualKeyboard
     private:
         
 		// Application pointers
-        SvkPluginState* pluginState;
+		SvkMidiProcessor* midiProcessor;
 		UndoManager* undo;
         
 		// Functionality
