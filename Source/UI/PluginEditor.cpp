@@ -142,7 +142,7 @@ bool SvkPluginEditor::load_preset()
 
 	if (loaded)
 	{
-		piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
+		//piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
 		update_children_to_preset();
 	}
 

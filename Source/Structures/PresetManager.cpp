@@ -80,6 +80,7 @@ bool SvkPresetManager::loadPreset(int libraryIndexIn)
 
 bool SvkPresetManager::loadPreset(SvkPreset* presetIn)
 {
+
 	return loadPreset(presetIn->parentNode);
 }
 
@@ -94,14 +95,12 @@ bool SvkPresetManager::savePreset(String absolutePath)
 }
 
 
-SvkPreset* SvkPresetManager::presetFromFile(String absoluteFilePath)
+ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 {
 	ValueTree nodeIn;
-	SvkPreset* presetOut = nullptr;
-
 	File fileIn = File(absoluteFilePath);
 	
-	if (!fileIn.exists())
+	if (!fileIn.existsAsFile())
 	{
 		std::unique_ptr<FileChooser> chooser;
 
@@ -114,18 +113,19 @@ SvkPreset* SvkPresetManager::presetFromFile(String absoluteFilePath)
 		fileIn = chooser->getResult();
 	}
 
-	if (fileIn.exists())
+	if (fileIn.existsAsFile())
 	{
 		std::unique_ptr<XmlElement> xml = parseXML(fileIn);
 		nodeIn = ValueTree::fromXml(*(xml.get()));
 
-		if (nodeIn.hasType(IDs::presetNode))
+        bool hasChild;
+        if (Mode::isValidMode(nodeIn, hasChild))
 		{
-			presetOut = new SvkPreset(nodeIn);
+            return nodeIn;
 		}
 	}
 
-	return presetOut;
+	return ValueTree();
 }
 
 void SvkPresetManager::intializePresets()
