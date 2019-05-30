@@ -74,7 +74,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
     mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
 
-    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get(), "PresetLibraryBox"));
+    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get()));
     addAndMakeVisible (presetLibraryBox.get());
     presetLibraryBox->setName ("PresetLibraryBox");
 

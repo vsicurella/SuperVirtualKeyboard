@@ -25,6 +25,7 @@
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
 #include "../Components/MidiRemapTableModel.h"
+#include "../Components/PresetLibraryBox.h"
 //[/Headers]
 
 
@@ -81,13 +82,13 @@ private:
     std::unique_ptr<Label> noteRangeLabel;
     std::unique_ptr<ToggleButton> manualMapToggle;
     std::unique_ptr<ToggleButton> modeMapToggle;
-    std::unique_ptr<ComboBox> modeLibraryBoxOG;
     std::unique_ptr<Label> modeBoxOriginal;
-    std::unique_ptr<ComboBox> modeLibraryBoxOG2;
     std::unique_ptr<Label> modeBoxRemap;
     std::unique_ptr<Slider> modeOriginalRootSld;
     std::unique_ptr<Slider> modeRemapRootSld;
     std::unique_ptr<Label> rootNoteLabel;
+    std::unique_ptr<PresetLibraryBox> presetBox1;
+    std::unique_ptr<PresetLibraryBox> presetBox2;
 
 
     //==============================================================================
