@@ -26,12 +26,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	keyboardEditorBar.get()->setSize(640, 48);
 	addAndMakeVisible(keyboardEditorBar.get());
     
-	piano.reset(new Keyboard(pluginState));
-	piano->setName("The Piano");
+	piano = pluginState->getKeyboard();
 
 	view.reset(new Viewport("Piano Viewport"));
 	addAndMakeVisible(view.get());
-	view.get()->setViewedComponent(piano.get());
+	view.get()->setViewedComponent(piano, false);
 	view.get()->setTopLeftPosition(1, 49);
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
@@ -46,13 +45,14 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
 
     pluginState->addChangeListener(this);
+	pluginState->presetManager->addChangeListener(this);
     keyboardEditorBar->addChangeListener(this);
     piano->addListener(pluginState->getMidiProcessor()); // generates MIDI from UI
-    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano.get()); // displays MIDI on Keyboard
+    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
 	initNodeData();
 
 	appCmdMgr->registerAllCommandsForTarget(this);
-	appCmdMgr->registerAllCommandsForTarget(piano.get());
+	appCmdMgr->registerAllCommandsForTarget(piano);
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
@@ -69,7 +69,7 @@ SvkPluginEditor::~SvkPluginEditor()
     pluginState->removeChangeListener(this);
     keyboardEditorBar->removeChangeListener(this);
     piano->removeListener(pluginState->getMidiProcessor());
-    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano.get());
+    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano);
 }
 
 //==============================================================================
@@ -86,13 +86,10 @@ void SvkPluginEditor::initNodeData()
 	else
 	{
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
-		
-		pluginState->loadMode(8);
-		updateNodeData();
+		pluginState->pluginEditorNode = pluginEditorNode;
+		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 
 		pluginEditorNode.addChild(pluginState->pianoNode, 0, nullptr);
-		pluginState->pluginEditorNode = pluginEditorNode;
-		pluginState->pluginStateNode.addChild(pluginEditorNode, 2, nullptr);
 
 		view.get()->setViewPositionProportionately(0.52, 0);
 	}
@@ -191,10 +188,10 @@ void SvkPluginEditor::resized()
 
 void SvkPluginEditor::timerCallback()
 {
-	//piano.get()->getMidiKeyboardState()->processNextMidiBuffer(
+	//piano->getMidiKeyboardState()->processNextMidiBuffer(
 	//	*processor.get_midi_buffer(), 0, 4096, true);
 
-	piano.get()->repaint();
+	piano->repaint();
 }
 
 //==============================================================================
@@ -347,7 +344,7 @@ void SvkPluginEditor::mouseMove(const MouseEvent& e)
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
     // New Mode loaded
-    if (source == pluginState)
+    if (source == pluginState->presetManager.get())
     {
         piano->resetKeyColors(true);
         piano->updatePianoNode();
@@ -371,7 +368,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     // Prepare to play
     if (source == &processor)
     {
-        //pluginState->midiStateIn->addListener(piano.get());
+        //pluginState->midiStateIn->addListener(piano);
     }
     
     // Root note or Mapping button toggled 
@@ -411,7 +408,7 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 
 ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 {
-	return piano.get();// findFirstTargetParentComponent();
+	return piano;// findFirstTargetParentComponent();
 }
 
 void SvkPluginEditor::getAllCommands(Array< CommandID > &c)

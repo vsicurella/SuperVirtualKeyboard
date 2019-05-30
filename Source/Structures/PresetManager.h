@@ -17,24 +17,20 @@
 #include "Preset.h"
 #include "Mode.h"
 
-class SvkPresetManager : public ComboBox::Listener
+class SvkPresetManager : public ComboBox::Listener,
+							public ChangeBroadcaster
 {
 	std::unique_ptr<SvkPreset> presetLoaded;
-	std::unique_ptr<Mode> modeLoaded;
-	
-	ValueTree presetLoadedNode;
-	ValueTree modeLoadedNode;
 
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<ValueTree>> presetsSorted;
+	int numSortTypes = 4;
 
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
-
-	int presetLibrarySize = 0;
 
 	// Methods
 	void createFactoryPresets();
@@ -47,13 +43,11 @@ public:
 	ValueTree presetLibraryNode;
 	ValueTree pluginSettingsNode;
 	ValueTree presetNode;
-	ValueTree modeNode;
 
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
 
 	SvkPreset* getPresetLoaded();
-	Mode* getModeLoaded();
 
 	Array<Array<ValueTree>>* getPresetsSorted();
 	

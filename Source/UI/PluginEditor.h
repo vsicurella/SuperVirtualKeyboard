@@ -101,7 +101,7 @@ private:
 	ApplicationCommandManager* appCmdMgr;
 	
 	std::unique_ptr<Viewport> view;
-	std::unique_ptr<Keyboard> piano;
+	Keyboard* piano;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;

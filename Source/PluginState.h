@@ -14,11 +14,13 @@
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
 #include "PluginSettings.h"
+#include "MidiProcessor.h"
 #include "Structures/PresetManager.h"
 #include "Structures/Preset.h"
-#include "MidiProcessor.h"
+#include "UI/Components/VirtualKeyboard/Keyboard.h"
 
-struct SvkPluginState : public ChangeBroadcaster
+struct SvkPluginState : public ChangeBroadcaster,
+						public ChangeListener
 {
 	ValueTree pluginStateNode;
 	ValueTree presetLibraryNode;
@@ -39,6 +41,7 @@ struct SvkPluginState : public ChangeBroadcaster
     SvkMidiProcessor* getMidiProcessor();
 	SvkPreset* getPresetLoaded();
 	Mode* getModeLoaded();
+	VirtualKeyboard::Keyboard* getKeyboard();
     
     int* getMidiInputMap();
     int* getMidiOutputMap();
@@ -52,6 +55,8 @@ struct SvkPluginState : public ChangeBroadcaster
 
 	bool savePreset();
 	bool loadPreset();
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
     
 	//==============================================================================
 	
@@ -66,6 +71,7 @@ private:
 
 	std::unique_ptr<UndoManager> undoManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
+	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
     
 	std::unique_ptr<SvkPreset> presetCurrent;
 	
@@ -74,5 +80,5 @@ private:
 
 	Array<Array<int>> presetsSorted;
 
-	Mode* modeLoaded;
+	std::unique_ptr<Mode> modeLoaded;
 };

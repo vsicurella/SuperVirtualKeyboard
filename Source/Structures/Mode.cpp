@@ -142,7 +142,7 @@ void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 {
 	if (isValidMode(nodeIn))
 	{
-		modeNode.copyPropertiesAndChildrenFrom(nodeIn, nullptr);
+		modeNode = nodeIn;
         
         stepsString = modeNode[IDs::stepString];
         steps = parse_steps(stepsString);

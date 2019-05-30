@@ -14,23 +14,17 @@ SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
     intializePresets();
-	
-    loadPreset(Mode::createNode("2 2 1 2 2 2 1"));
 }
 
 SvkPresetManager::~SvkPresetManager()
 {
 	presetLoaded.release();
+	removeAllChangeListeners();
 }
 
 SvkPreset* SvkPresetManager::getPresetLoaded()
 {
 	return presetLoaded.get();
-}
-
-Mode* SvkPresetManager::getModeLoaded()
-{
-	return modeLoaded.get();
 }
 
 Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
@@ -66,9 +60,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
        if (shouldLoad)
        {
         presetLoaded.swap(newPreset);
-        modeLoaded.reset(new Mode(presetLoaded->theModeNode));
-        modeNode = modeLoaded->modeNode;
-        
+		sendChangeMessage();
 		return true;
        }
 	}
@@ -136,6 +128,8 @@ void SvkPresetManager::intializePresets()
 	loadedFactoryPresets.clear();
 	loadedUserPresets.clear();
 	presetsSorted.clear();
+	for (int m = 0; m < numSortTypes; m++)
+		presetsSorted.add(Array<ValueTree>());
 
 	createFactoryPresets();
 	loadPresetDirectory();
@@ -146,11 +140,10 @@ void SvkPresetManager::createFactoryPresets()
 {
 	// I would like to add some more error checking to this and making it so that
 	//  it creates missing factory presets if it notices them gone from the directory
-	if (!(bool)pluginSettingsNode[IDs::createPresetFolder])
+	if (!(bool) pluginSettingsNode[IDs::saveFactoryPresets] || !(bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
-		const char* factoryPresets;
-		int size;
-		factoryPresets = BinaryData::getNamedResource("Factory Presets.txt", size);
+		const char* factoryPresets = BinaryData::FactoryModes_txt;
+		int size = BinaryData::FactoryModes_txtSize;
 
 		loadedFactoryPresets.clear();
 
@@ -213,11 +206,12 @@ void SvkPresetManager::loadPresetDirectory()
 void SvkPresetManager::resortPresetLibrary()
 {
 	presetsSorted.clear();
-	presetsSorted.resize(3); // NEEDS TO CHANGE IF MORE SUBMENUS ADDED
+	for (int m = 0; m < numSortTypes; m++)
+		presetsSorted.add(Array<ValueTree>());
 
 	ValueTree presetToSort;
 
-	for (int i = 0; i < presetLibrarySize; i++)
+	for (int i = 0; i < presetLibraryNode.getNumChildren(); i++)
 	{
 		presetToSort = presetLibraryNode.getChild(i);
 		addPresetToSort(presetToSort);
@@ -226,6 +220,8 @@ void SvkPresetManager::resortPresetLibrary()
 
 int SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
 {
+	DBG("Adding this:\n" + presetNodeIn.toXmlString());
+
 	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
 	{
 		int libraryIndex = presetLibraryNode.getNumChildren();
@@ -242,20 +238,20 @@ void SvkPresetManager::addPresetToSort(ValueTree presetNodeIn)
 {
 	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
 	{
-		presetsSorted.getUnchecked(SortType::scaleSize).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
-		presetsSorted.getUnchecked(SortType::modeSize).addSorted(modeSizeSort, ValueTree(presetNodeIn));
-		presetsSorted.getUnchecked(SortType::familyName).addSorted(familyNameSort, ValueTree(presetNodeIn));
+		presetsSorted.getReference(SortType::scaleSize).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
+		presetsSorted.getReference(SortType::modeSize).addSorted(modeSizeSort, ValueTree(presetNodeIn));
+		presetsSorted.getReference(SortType::familyName).addSorted(familyNameSort, ValueTree(presetNodeIn));
 
 		if (!(bool)presetNodeIn[IDs::factoryPreset])
 		{
-			presetsSorted.getUnchecked(SortType::user).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
+			presetsSorted.getReference(SortType::user).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
 		}
 	}
 }
 
 int SvkPresetManager::addAndSortPreset(ValueTree presetNodeIn)
 {
-	int ind = addPresetToLibrary(presetNode);
+	int ind = addPresetToLibrary(presetNodeIn);
 	addPresetToSort(presetNodeIn);
 
 	return ind;
