@@ -14,7 +14,6 @@ SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
     intializePresets();
-	DBG(presetLibraryNode.toXmlString());
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -72,6 +71,11 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 
 bool SvkPresetManager::loadPreset(int libraryIndexIn)
 {
+    int numPresets = presetLibraryNode.getNumChildren();
+    int subMenu = libraryIndexIn / numPresets;
+    int index = libraryIndexIn % numPresets;
+    ValueTree presetToLoad = presetsSorted.getReference(subMenu)[index];
+    std::cout << "Preset: " << presetToLoad[IDs::modeName].toString() << std::endl;
 	return loadPreset(presetLibraryNode.getChild(libraryIndexIn));
 }
 

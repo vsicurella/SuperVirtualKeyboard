@@ -189,7 +189,7 @@ void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
 
 bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 {
-	DBG("Checking this node: " + nodeIn.toXmlString());
+    std::cout << "Checking Mode: \n" << nodeIn.toXmlString() << std::endl;
     bool isValid = true;
 	bool isMode = nodeIn.hasType(IDs::modePresetNode);
 	hasModeChild = nodeIn.getChildWithName(IDs::modePresetNode).isValid();
@@ -203,17 +203,6 @@ bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 
 	int stepsLength = steps.length();
 	bool hasSteps = stepsLength > 0;
-
-	String out = "That was Valid and its steps are " + steps + " which is " + String(stepsLength) + " characters.";
-	if (isMode)
-		out = out.replaceFirstOccurrenceOf("That", "That mode");
-	else
-		out = out.replaceFirstOccurrenceOf("That", "That preset");
-
-	if (!isValid)
-		out = out.replaceFirstOccurrenceOf("was", "was not");
-
-	DBG(out);
     
     return isValid && (isMode || hasModeChild) && hasSteps;
 }
