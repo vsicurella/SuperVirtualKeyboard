@@ -270,13 +270,12 @@ void KeyboardEditorBar::allowUserInput(bool isAllowed)
 void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
     PresetLibraryBox* presetBox = dynamic_cast<PresetLibraryBox*>(comboBoxThatHasChanged);
-    
+
     if (presetBox)
     {
-		int id = presetBox->getSelectedId() - 1;
-		int numPresets = pluginState->presetLibraryNode.getNumChildren();
-		int presetNumber = id / numPresets + id % numPresets;
-		pluginState->loadMode(presetNumber);
+        int id = presetBox->getSelectedId() - 1;
+		pluginState->loadMode(id);
+
     }
 }
 

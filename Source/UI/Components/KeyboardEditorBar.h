@@ -24,6 +24,8 @@
 #include "../../PluginState.h"
 #include "../../Structures/Mode.h"
 #include "PresetLibraryBox.h"
+
+#include <iostream>
 //[/Headers]
 
 
@@ -58,7 +60,7 @@ public:
 	int getOffsetReadout();
 
 	void createAndSendMode();
-    
+
     void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 
 	//void populate_preset_menu();
