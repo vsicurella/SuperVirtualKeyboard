@@ -96,7 +96,7 @@ private:
     SvkAudioProcessor& processor;
 	SvkPluginState* pluginState;
 	MidiKeyboardState externalMidi;
-    ValueTree keyboardWindowNode;
+    ValueTree pluginEditorNode;
 
 	ApplicationCommandManager* appCmdMgr;
 	
