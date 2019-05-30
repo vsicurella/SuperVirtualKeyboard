@@ -17,10 +17,10 @@
 class SvkPluginSettings
 {
 	const String appFolderName = "SuperVirtualKeyboard";
-	const String settingsFileName = "SvkPluginSettings.settings";
+	const String settingsFileName = "SuperVirtualKeyboard.settings";
 
 	File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
-	File factoryDefaultPresetLocations = File::getSpecialLocation(File::userDesktopDirectory).getChildFile(appFolderName);
+	File factoryDefaultPresetLocations = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName);
 
 	File currentSettingsLocation;
 	File currentPresetLocation;

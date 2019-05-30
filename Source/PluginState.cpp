@@ -28,9 +28,13 @@ SvkPluginState::SvkPluginState()
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	presetLibraryNode = presetManager->presetLibraryNode;
 	pluginStateNode.addChild(presetLibraryNode, -1, nullptr);
+	presetManager->addChangeListener(this);
 
-	modeLoaded = presetManager->getModeLoaded();
-	modePresetNode = modeLoaded->modeNode;
+	modeLoaded.reset(new Mode());
+
+	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(this));
+	virtualKeyboard->addListener(midiProcessor.get());
+	pianoNode = virtualKeyboard->getNode();
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
@@ -53,7 +57,12 @@ SvkPreset* SvkPluginState::getPresetLoaded()
 
 Mode* SvkPluginState::getModeLoaded()
 {
-	return modeLoaded;
+	return modeLoaded.get();
+}
+
+VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
+{
+	return virtualKeyboard.get();
 }
 
 int* SvkPluginState::getMidiInputMap()
@@ -67,43 +76,11 @@ int* SvkPluginState::getMidiOutputMap()
 
 void SvkPluginState::loadMode(int presetIndexIn)
 {
-	/*
-	std::unique_ptr<Mode> mode(new Mode(presetLibraryNode.getChild(presetIndexIn), midiProcessor->getRootNote()));
-	
-	if (mode->modeNode.isValid())
-	{
-		modeLoaded.swap(mode);
-
-		if (presetCurrent->theKeyboardNode.isValid())
-			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
-
-		presetCurrent->updateModeNode(modeLoaded->modeNode);
-		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, presetIndexIn, undoManager.get());
-
-		modePresetNode.copyPropertiesAndChildrenFrom(modeLoaded->modeNode, nullptr);
-        sendChangeMessage();
-	}
-	*/
 	presetManager->loadPreset(presetIndexIn);
 }
 
 void SvkPluginState::loadMode(ValueTree modeNodeIn)
 {
-	/*
-	if (modeNodeIn.hasType(IDs::modePresetNode))
-	{
-		modeLoaded.reset(new Mode(modeNodeIn, midiProcessor->getRootNote()));
-
-		if (presetCurrent->theKeyboardNode.isValid())
-			presetCurrent->theKeyboardNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
-		
-		presetCurrent->updateModeNode(modeLoaded->modeNode);
-		presetCurrent->parentNode.setProperty(IDs::libraryIndexOfMode, 0, undoManager.get());
-
-		modePresetNode = modeLoaded->modeNode;
-		sendChangeMessage();
-	}
-	*/
 	presetManager->loadPreset(modeNodeIn);
 }
 
@@ -125,51 +102,20 @@ void SvkPluginState::updateKeyboardSettingsPreset()
 
 bool SvkPluginState::savePreset()
 {
-	/*
-    midiProcessor->updateNode();
-	modePresetNode = modeLoaded->modeNode;
-	presetCurrent->updateParentNode(pluginStateNode);
-
-	return presetCurrent->writeToFile();
-	*/
 	return presetManager->savePreset();
 }
 
 
 bool SvkPluginState::loadPreset()
 {
-	/*
-    std::unique_ptr<SvkPreset> newPreset(SvkPreset::loadFromFile());
-    
-	if (newPreset.get())
-	{
-        presetCurrent.swap(newPreset);
-
-		
-		if (presetCurrent->thePluginSettingsNode.isValid())
-		{
-			pluginSettingsNode.copyPropertiesAndChildrenFrom(presetCurrent->thePluginSettingsNode, nullptr);
-		}
-
-		if (presetCurrent->theMidiSettingsNode.isValid())
-		{
-            midiProcessor->restoreFromNode(presetCurrent->theMidiSettingsNode);
-		}
-
-		if (presetCurrent->theModeNode.isValid())
-		{
-			modeLoaded->restoreNode(presetCurrent->theModeNode, midiProcessor->getRootNote());
-			modePresetNode = modeLoaded->modeNode;
-		}
-		
-		if (presetCurrent->theKeyboardNode.isValid())
-		{
-			pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
-		}
-
-		return true;
-	}
-	*/
-
 	return presetManager->loadPreset();
+}
+
+void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
+{
+	// Preset loaded
+	if (source = presetManager.get())
+	{
+		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
+	}
 }
