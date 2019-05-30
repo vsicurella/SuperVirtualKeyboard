@@ -34,40 +34,8 @@ void PresetLibraryBox::populateMenu()
 	
 	ValueTree presetIn;
 	String displayName;
-	var scaleSize, modeSize, family;
-	int subMenuIndex;
-
-		for (int presetNum = 0; presetNum < presetsLibraryNode.getNumChildren(); presetNum++)
-		{
-			presetIn = presetsSorted->getUnchecked(SortType::scaleSize).getUnchecked(presetNum);
-
-			if (scaleSize != presetIn[IDs::scaleSize])
-				addSeparator();
-			scaleSize = presetIn[IDs::scaleSize];
-
-			subMenuIndex = presetNum + presetNum * SortType::scaleSize;
-			scaleSubMenu->addItem(subMenuIndex, displayName);
-
-			presetIn = presetsSorted->getUnchecked(SortType::modeSize).getUnchecked(presetNum);
-
-			if (modeSize != presetIn[IDs::modeSize])
-				addSeparator();
-			modeSize = presetIn[IDs::modeSize];
-
-			subMenuIndex = presetNum + presetNum * SortType::modeSize;
-			modeSubMenu->addItem(subMenuIndex, displayName);
-
-			presetIn = presetsSorted->getUnchecked(SortType::familyName).getUnchecked(presetNum);
-
-			if (family != presetIn[IDs::family])
-				addSeparator();
-			family = presetIn[IDs::family];
-
-			subMenuIndex = presetNum + presetNum * SortType::familyName;
-			familySubMenu->addItem(subMenuIndex, displayName);
-		}
-
-
+	var scaleSize, modeSize, family, separatorProperty;
+	int subMenuIndex = 0;
 
 	for (int subMenu = 0; subMenu < SortType::user; subMenu++)
 	{
@@ -78,27 +46,42 @@ void PresetLibraryBox::populateMenu()
 			switch (subMenu)
 			{
 			case (SortType::scaleSize):
-				if (scaleSize != presetIn[IDs::scaleSize])
+				if (separatorProperty != presetIn[IDs::scaleSize])
 					addSeparator();
-				scaleSize = presetIn[IDs::scaleSize];
+				separatorProperty = presetIn[IDs::scaleSize];
 				break;
 
 			case (SortType::modeSize):
-				if (modeSize != presetIn[IDs::modeSize])
+				if (separatorProperty != presetIn[IDs::modeSize])
 					addSeparator();
-				modeSize = presetIn[IDs::modeSize];
+				separatorProperty = presetIn[IDs::modeSize];
 				break;
 
 			case (SortType::familyName):
-				if (family != presetIn[IDs::family])
+				if (separatorProperty != presetIn[IDs::family])
 					addSeparator();
-				family = presetIn[IDs::family];
+				separatorProperty = presetIn[IDs::family];
+				break;
+
+			case (SortType::user):
+				if (presetIn[IDs::factoryPreset])
+					continue;
+				if (separatorProperty != presetIn[IDs::scaleSize])
+					addSeparator();
+				separatorProperty = presetIn[IDs::scaleSize];
 				break;
 			}
 
+			displayName = presetIn[IDs::modeName];
 			scaleSubMenu->addItem(++subMenuIndex, displayName);
 		}
 	}
+
+	getRootMenu()->addSubMenu("by Scale Size", *scaleSubMenu);
+	getRootMenu()->addSubMenu("by Mode Size", *modeSubMenu);
+	getRootMenu()->addSubMenu("by Family", *familySubMenu);
+	getRootMenu()->addSubMenu("User", *userSubMenu);
+
 }
 
 void PresetLibraryBox::showPopup()

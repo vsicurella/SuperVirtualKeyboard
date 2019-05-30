@@ -213,7 +213,6 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
 
 	String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
 	modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
-
 	return modeNodeOut;
 }
 
