@@ -48,7 +48,7 @@ namespace IDs
 	static Identifier libraryIndexOfMode("IndexOfMode");
 
 	// Keyboard Window
-	static Identifier keyboardWindowNode("KeyboardWindow");
+	static Identifier pluginEditorNode("PluginWindow");
 	static Identifier windowBoundsW("WindowW");
 	static Identifier windowBoundsH("WindowH");
 	static Identifier viewportPosition("ViewportPosition");

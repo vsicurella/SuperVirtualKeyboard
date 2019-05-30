@@ -76,23 +76,23 @@ SvkPluginEditor::~SvkPluginEditor()
 
 void SvkPluginEditor::initNodeData()
 {
-	if (pluginState->keyboardWindowNode.isValid())
+	if (pluginState->pluginEditorNode.isValid())
 	{
-		keyboardWindowNode = pluginState->keyboardWindowNode;
+		pluginEditorNode = pluginState->pluginEditorNode;
 		update_children_to_preset();
-		setSize(keyboardWindowNode[IDs::windowBoundsW], keyboardWindowNode[IDs::windowBoundsH]);
-		view.get()->setViewPosition((int)keyboardWindowNode[IDs::viewportPosition], 0);
+		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
+		view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
 	}
 	else
 	{
-		keyboardWindowNode = ValueTree(IDs::keyboardWindowNode);
+		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		
 		pluginState->loadMode(8);
 		updateNodeData();
 
-		keyboardWindowNode.addChild(pluginState->pianoNode, 0, nullptr);
-		pluginState->keyboardWindowNode = keyboardWindowNode;
-		pluginState->pluginStateNode.addChild(keyboardWindowNode, 2, nullptr);
+		pluginEditorNode.addChild(pluginState->pianoNode, 0, nullptr);
+		pluginState->pluginEditorNode = pluginEditorNode;
+		pluginState->pluginStateNode.addChild(pluginEditorNode, 2, nullptr);
 
 		view.get()->setViewPositionProportionately(0.52, 0);
 	}
@@ -100,9 +100,9 @@ void SvkPluginEditor::initNodeData()
 
 void SvkPluginEditor::updateNodeData()
 {
-	keyboardWindowNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-	keyboardWindowNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	keyboardWindowNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
+	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
+	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
+	pluginEditorNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 }
 
 
@@ -180,7 +180,7 @@ void SvkPluginEditor::resized()
 	view->setViewPosition(viewPositionKeyboardX, 0);
 
 	// update node
-	if (keyboardWindowNode.isValid())
+	if (pluginEditorNode.isValid())
 	{
 		updateNodeData();
 	}

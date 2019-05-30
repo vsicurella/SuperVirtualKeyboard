@@ -22,7 +22,7 @@ struct SvkPluginState : public ChangeBroadcaster
 {
 	ValueTree pluginStateNode;
 	ValueTree presetLibraryNode;
-	ValueTree keyboardWindowNode;
+	ValueTree pluginEditorNode;
 
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;
