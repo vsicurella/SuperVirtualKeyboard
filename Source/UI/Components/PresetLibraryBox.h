@@ -31,7 +31,7 @@ class PresetLibraryBox : public ComboBox
 
 public:
 
-	PresetLibraryBox(SvkPresetManager* presetManagerIn, String nameIn=String());
+	PresetLibraryBox(SvkPresetManager* presetManagerIn);
 	~PresetLibraryBox();
 
 	void populateMenu();

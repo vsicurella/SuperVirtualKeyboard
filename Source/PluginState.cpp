@@ -39,7 +39,7 @@ SvkPluginState::SvkPluginState()
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
-    loadMode(8);
+    loadMode(7);
 }
 
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()

@@ -10,11 +10,12 @@
 
 #include "PresetLibraryBox.h"
 
-PresetLibraryBox::PresetLibraryBox(SvkPresetManager* presetManagerIn, String nameIn)
-	: ComboBox(nameIn), presetManager(presetManagerIn)
+PresetLibraryBox::PresetLibraryBox(SvkPresetManager* presetManagerIn)
+	: ComboBox("PresetLibraryBox"), presetManager(presetManagerIn)
 {
 	presetsLibraryNode = presetManager->presetLibraryNode;
 	presetsSorted = presetManager->getPresetsSorted();
+    populateMenu();
 }
 
 PresetLibraryBox::~PresetLibraryBox()
@@ -93,6 +94,5 @@ void PresetLibraryBox::populateMenu()
 
 void PresetLibraryBox::showPopup()
 {
-	populateMenu();
 	ComboBox::showPopup();
 }

@@ -91,16 +91,6 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
     modeMapToggle->setBounds (160, 128, 150, 24);
 
-    modeLibraryBoxOG.reset (new ComboBox ("Mode Library Original"));
-    addAndMakeVisible (modeLibraryBoxOG.get());
-    modeLibraryBoxOG->setEditableText (false);
-    modeLibraryBoxOG->setJustificationType (Justification::centredLeft);
-    modeLibraryBoxOG->setTextWhenNothingSelected (TRANS("Meantone[7] 12"));
-    modeLibraryBoxOG->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    modeLibraryBoxOG->addListener (this);
-
-    modeLibraryBoxOG->setBounds (472, 72, 150, 24);
-
     modeBoxOriginal.reset (new Label ("Mode Box Original",
                                       TRANS("From Mode:")));
     addAndMakeVisible (modeBoxOriginal.get());
@@ -111,16 +101,6 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     modeBoxOriginal->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     modeBoxOriginal->setBounds (376, 72, 88, 24);
-
-    modeLibraryBoxOG2.reset (new ComboBox ("Mode Library Original"));
-    addAndMakeVisible (modeLibraryBoxOG2.get());
-    modeLibraryBoxOG2->setEditableText (false);
-    modeLibraryBoxOG2->setJustificationType (Justification::centredLeft);
-    modeLibraryBoxOG2->setTextWhenNothingSelected (TRANS("Meantone[7] 12"));
-    modeLibraryBoxOG2->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    modeLibraryBoxOG2->addListener (this);
-
-    modeLibraryBoxOG2->setBounds (472, 118, 150, 24);
 
     modeBoxRemap.reset (new Label ("Mode Box Remap",
                                    TRANS("To Mode:")));
@@ -140,7 +120,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     modeOriginalRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
     modeOriginalRootSld->addListener (this);
 
-    modeOriginalRootSld->setBounds (632, 72, 88, 24);
+    modeOriginalRootSld->setBounds (632, 74, 104, 24);
 
     modeRemapRootSld.reset (new Slider ("Mode Remap Root Slider"));
     addAndMakeVisible (modeRemapRootSld.get());
@@ -149,7 +129,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     modeRemapRootSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
     modeRemapRootSld->addListener (this);
 
-    modeRemapRootSld->setBounds (632, 112, 88, 24);
+    modeRemapRootSld->setBounds (632, 114, 104, 24);
 
     rootNoteLabel.reset (new Label ("Root Note Label",
                                     TRANS("Root Note:")));
@@ -160,11 +140,26 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     rootNoteLabel->setColour (TextEditor::textColourId, Colours::black);
     rootNoteLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    rootNoteLabel->setBounds (640, 40, 80, 24);
+    rootNoteLabel->setBounds (630, 48, 80, 24);
+
+    presetBox1.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    addAndMakeVisible (presetBox1.get());
+    presetBox1->setName ("Preset Box 1");
+
+    presetBox1->setBounds (472, 75, 150, 24);
+
+    presetBox2.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    addAndMakeVisible (presetBox2.get());
+    presetBox2->setName ("Preset Box 2");
+
+    presetBox2->setBounds (472, 115, 150, 24);
 
 
     //[UserPreSize]
-
+    
+    noteRangeSld->setMinValue(0);
+    noteRangeSld->setMaxValue(127);
+    
 	inputRemapper = pluginState->getMidiProcessor()->getInputRemapper();
 	outputRemapper = pluginState->getMidiProcessor()->getOutputRemapper();
 
@@ -186,6 +181,10 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
+    presetBox1->setSelectedId(8);
+    presetBox2->setSelectedId(8);
+    modeOriginalRootSld->setValue(60);
+    modeRemapRootSld->setValue(60);
     //[/Constructor]
 }
 
@@ -202,13 +201,13 @@ MidiSettingsComponent::~MidiSettingsComponent()
     noteRangeLabel = nullptr;
     manualMapToggle = nullptr;
     modeMapToggle = nullptr;
-    modeLibraryBoxOG = nullptr;
     modeBoxOriginal = nullptr;
-    modeLibraryBoxOG2 = nullptr;
     modeBoxRemap = nullptr;
     modeOriginalRootSld = nullptr;
     modeRemapRootSld = nullptr;
     rootNoteLabel = nullptr;
+    presetBox1 = nullptr;
+    presetBox2 = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -246,16 +245,6 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_midiInputBox] -- add your combo box handling code here..
         //[/UserComboBoxCode_midiInputBox]
     }
-    else if (comboBoxThatHasChanged == modeLibraryBoxOG.get())
-    {
-        //[UserComboBoxCode_modeLibraryBoxOG] -- add your combo box handling code here..
-        //[/UserComboBoxCode_modeLibraryBoxOG]
-    }
-    else if (comboBoxThatHasChanged == modeLibraryBoxOG2.get())
-    {
-        //[UserComboBoxCode_modeLibraryBoxOG2] -- add your combo box handling code here..
-        //[/UserComboBoxCode_modeLibraryBoxOG2]
-    }
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
@@ -269,6 +258,9 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == noteRangeSld.get())
     {
         //[UserSliderCode_noteRangeSld] -- add your slider handling code here..
+        Point<int> range = Point<int>(noteRangeSld->getMinimum(), noteRangeSld->getMaximum());
+        inputRemapper->setNoteRange(range.x, range.y);
+        noteRangeSld->updateText();
         //[/UserSliderCode_noteRangeSld]
     }
     else if (sliderThatWasMoved == modeOriginalRootSld.get())
@@ -352,37 +344,37 @@ BEGIN_JUCER_METADATA
   <TOGGLEBUTTON name="Mode Map Toggle" id="bffb6c931fccea1c" memberName="modeMapToggle"
                 virtualName="" explicitFocusOrder="0" pos="160 128 150 24" buttonText="Mode Remapping"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <COMBOBOX name="Mode Library Original" id="5c0ffc83cbe274c1" memberName="modeLibraryBoxOG"
-            virtualName="" explicitFocusOrder="0" pos="472 72 150 24" editable="0"
-            layout="33" items="" textWhenNonSelected="Meantone[7] 12" textWhenNoItems="(no choices)"/>
   <LABEL name="Mode Box Original" id="5b2fda69d594937a" memberName="modeBoxOriginal"
          virtualName="" explicitFocusOrder="0" pos="376 72 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="From Mode:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
-  <COMBOBOX name="Mode Library Original" id="d97fde7b8560b769" memberName="modeLibraryBoxOG2"
-            virtualName="" explicitFocusOrder="0" pos="472 118 150 24" editable="0"
-            layout="33" items="" textWhenNonSelected="Meantone[7] 12" textWhenNoItems="(no choices)"/>
   <LABEL name="Mode Box Remap" id="44d358cbb3982e4" memberName="modeBoxRemap"
          virtualName="" explicitFocusOrder="0" pos="376 118 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="To Mode:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <SLIDER name="Mode Original Root Slider" id="31eb79d952d2e1aa" memberName="modeOriginalRootSld"
-          virtualName="" explicitFocusOrder="0" pos="632 72 88 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="632 74 104 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="Mode Remap Root Slider" id="c98578a060cce67f" memberName="modeRemapRootSld"
-          virtualName="" explicitFocusOrder="0" pos="632 112 88 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="632 114 104 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Root Note Label" id="effe36cc4475b201" memberName="rootNoteLabel"
-         virtualName="" explicitFocusOrder="0" pos="640 40 80 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="630 48 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Root Note:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
+  <GENERICCOMPONENT name="Preset Box 1" id="ee5b2def32e4fdbc" memberName="presetBox1"
+                    virtualName="PresetLibraryBox" explicitFocusOrder="0" pos="472 75 150 24"
+                    class="PresetLibraryBox" params="pluginState-&gt;presetManager.get()"/>
+  <GENERICCOMPONENT name="Preset Box 2" id="eb2e366c9ad8965c" memberName="presetBox2"
+                    virtualName="PresetLibraryBox" explicitFocusOrder="0" pos="472 115 150 24"
+                    class="PresetLibraryBox" params="pluginState-&gt;presetManager.get()"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
