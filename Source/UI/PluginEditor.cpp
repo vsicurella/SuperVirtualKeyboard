@@ -45,7 +45,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
 
     pluginState->addChangeListener(this);
-	pluginState->presetManager->addChangeListener(this);
     keyboardEditorBar->addChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
 	initNodeData();
@@ -77,9 +76,9 @@ void SvkPluginEditor::initNodeData()
 	if (pluginState->pluginEditorNode.isValid())
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
-		update_children_to_preset();
+		
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-		view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
+        view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
 	}
 	else
 	{
@@ -91,6 +90,8 @@ void SvkPluginEditor::initNodeData()
 
 		view.get()->setViewPositionProportionately(0.52, 0);
 	}
+    
+    update_children_to_preset();
 }
 
 void SvkPluginEditor::updateNodeData()
@@ -100,8 +101,6 @@ void SvkPluginEditor::updateNodeData()
 	pluginEditorNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 }
 
-
-
 void SvkPluginEditor::update_children_to_preset()
 {
 	Mode* modeLoaded = pluginState->getModeLoaded();
@@ -109,6 +108,8 @@ void SvkPluginEditor::update_children_to_preset()
 	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
 	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
+    
+    keyboardEditorBar->repaint();
 	DBG("Children Updated");
 }
 
@@ -340,7 +341,7 @@ void SvkPluginEditor::mouseMove(const MouseEvent& e)
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
     // New Mode loaded
-    if (source == pluginState->presetManager.get())
+    if (source == pluginState)
     {
         piano->resetKeyColors(true);
         piano->updatePianoNode();

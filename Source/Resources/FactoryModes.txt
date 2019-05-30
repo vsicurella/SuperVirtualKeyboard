@@ -1,4 +1,3 @@
-1, Custom
 1 2 1 2 1, Mavila
 2 1 2 2 1, Father
 1 1 2 1 1 1 2, Mavila
