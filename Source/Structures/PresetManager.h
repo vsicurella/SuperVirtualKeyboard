@@ -68,7 +68,7 @@ public:
 
 	void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 
-	static SvkPreset* presetFromFile(String absoluteFilePath = "");
+	static ValueTree presetFromFile(String absoluteFilePath = "");
 
 
 };
