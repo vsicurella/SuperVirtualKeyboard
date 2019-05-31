@@ -37,8 +37,8 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo)
 
 NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo)
 {
-	Array<int> midiNotesFrom = mapFrom->getModalMidiNotes(rootNoteFrom);
-	Array<int> midiNotesTo = mapTo->getModalMidiNotes(rootNoteTo);
+	Array<int> midiNotesFrom = mapFrom->getModalMidiNotes(0, rootNoteFrom);
+	Array<int> midiNotesTo = mapTo->getModalMidiNotes(0, rootNoteTo);
 
 	NoteMap mappingOut(midiNotesFrom.size());
 	int degreeCount = 0;
