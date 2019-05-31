@@ -32,6 +32,25 @@ Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 	return &presetsSorted;
 }
 
+ValueTree SvkPresetManager::getPreset(int indexIn)
+{
+	int subMenu = indexIn / numberOfPresets;
+	int index = indexIn % numberOfPresets;
+
+	return presetsSorted.getUnchecked(subMenu).getUnchecked(index);
+}
+
+ValueTree SvkPresetManager::getMode(int indexIn)
+{
+	bool hasModeChild;
+	ValueTree preset = getPreset(indexIn);
+
+	if (Mode::isValidMode(preset, hasModeChild))
+		if (hasModeChild)
+			return preset.getChildWithName(IDs::modePresetNode);
+	
+	return preset;
+}
 
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 {
@@ -69,13 +88,9 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
     return false;
 }
 
-bool SvkPresetManager::loadPreset(int libraryIndexIn)
+bool SvkPresetManager::loadPreset(int indexIn)
 {
-    int numPresets = presetLibraryNode.getNumChildren();
-    int subMenu = libraryIndexIn / numPresets;
-    int index = libraryIndexIn % numPresets;
-    ValueTree presetToLoad = presetsSorted.getUnchecked(subMenu).getUnchecked(index);
-	return loadPreset(presetToLoad);
+	return loadPreset(getPreset(indexIn));
 }
 
 bool SvkPresetManager::loadPreset(SvkPreset* presetIn)
@@ -232,7 +247,8 @@ int SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
 		int libraryIndex = presetLibraryNode.getNumChildren();
 		presetNodeIn.setProperty(IDs::libraryIndexOfMode, libraryIndex, nullptr);
 		presetLibraryNode.appendChild(ValueTree(presetNodeIn), nullptr);
-		
+		numberOfPresets = presetLibraryNode.getNumChildren();
+
 		return libraryIndex;
 	}
 

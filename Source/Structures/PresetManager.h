@@ -25,6 +25,8 @@ class SvkPresetManager : public ComboBox::Listener,
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
+	int numberOfPresets = 0;
+
 	Array<Array<ValueTree>> presetsSorted;
 	int numSortTypes = 4;
 
@@ -50,10 +52,13 @@ public:
 	SvkPreset* getPresetLoaded();
 
 	Array<Array<ValueTree>>* getPresetsSorted();
+
+	ValueTree getPreset(int indexIn);
+	ValueTree getMode(int indexIn);
 	
 	// Can load either full preset or just Mode
 	bool loadPreset(ValueTree presetNodeIn);
-	bool loadPreset(int libraryIndexIn);
+	bool loadPreset(int indexIn);
 	bool loadPreset(SvkPreset* presetIn);
 	bool loadPreset();
 
@@ -69,6 +74,4 @@ public:
 	void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 
 	static ValueTree presetFromFile(String absoluteFilePath = "");
-
-
 };

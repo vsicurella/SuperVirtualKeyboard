@@ -20,9 +20,19 @@ ModeMapper::ModeMapper(Array<Mode>* modesIn)
 	modeChain = modesIn;
 }
 
+NoteMap ModeMapper::mapTo(Mode* modeMapped)
+{
+	mapTo(modeMapped, modeMapped->getRootNote());
+}
+
 NoteMap ModeMapper::mapTo(Mode* modeMapped, int rootNoteTo)
 {
 	return map(mode, modeMapped, mode->getRootNote(), rootNoteTo);
+}
+
+NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo)
+{
+	map(mapFrom, mapTo, mapFrom->getRootNote(), mapTo->getRootNote());
 }
 
 NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo)

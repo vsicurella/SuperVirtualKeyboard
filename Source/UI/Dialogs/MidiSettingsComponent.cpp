@@ -156,10 +156,12 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 
     //[UserPreSize]
-    
-    noteRangeSld->setMinValue(0);
-    noteRangeSld->setMaxValue(127);
-    
+	noteRangeSld->setMinValue(0);
+	noteRangeSld->setMaxValue(127);
+
+	presetBox1->addListener(this);
+	presetBox2->addListener(this);
+   
 	midiInputFilter = pluginState->getMidiProcessor()->getInputRemapper();
 	midiOutputFilter = pluginState->getMidiProcessor()->getOutputRemapper();
 
@@ -193,6 +195,9 @@ MidiSettingsComponent::~MidiSettingsComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     remapTable.release();
 	remapTableModel.release();
+
+	presetBox1->removeListener(this);
+	presetBox2->removeListener(this);
     //[/Destructor_pre]
 
     midiInputBox = nullptr;
@@ -247,6 +252,19 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
 
     //[UsercomboBoxChanged_Post]
+	else if (comboBoxThatHasChanged == presetBox1.get())
+	{
+		modeSelected1.reset(
+			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()),
+						modeOriginalRootSld->getValue()));
+	}
+
+	else if (comboBoxThatHasChanged == presetBox2.get())
+	{
+		modeSelected2.reset(
+			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()),
+				modeRemapRootSld->getValue()));
+	}
     //[/UsercomboBoxChanged_Post]
 }
 
@@ -266,11 +284,15 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == modeOriginalRootSld.get())
     {
         //[UserSliderCode_modeOriginalRootSld] -- add your slider handling code here..
+		if (modeSelected1.get())
+			modeSelected1->setRootNote(modeOriginalRootSld->getValue());
         //[/UserSliderCode_modeOriginalRootSld]
     }
     else if (sliderThatWasMoved == modeRemapRootSld.get())
     {
         //[UserSliderCode_modeRemapRootSld] -- add your slider handling code here..
+		if (modeSelected2.get())
+			modeSelected2->setRootNote(modeRemapRootSld->getValue());
         //[/UserSliderCode_modeRemapRootSld]
     }
 
