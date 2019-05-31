@@ -299,3 +299,14 @@ static int totalModulus(int numIn, int mod)
 {
 	return ((numIn % mod) + mod) % mod;
 }
+
+template <class T>
+static void DBGArray(Array<T>& arrayIn, String arrayName="Array")
+{
+	DBG(arrayName + ":");
+
+	for (int i = 0; i < arrayIn.size(); i++)
+	{
+		DBG(String(i) + ": " + String(arrayIn[i]));
+	}
+}
