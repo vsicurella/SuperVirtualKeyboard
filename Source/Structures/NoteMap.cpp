@@ -14,8 +14,8 @@ NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 {
 	size = sizeIn;
 
-	keys.reset(new int[size]);
-	values.reset(new int[size]);
+	keys.reset(new Array<int>());
+	values.reset(new Array<int>());
 
 	nullVal = nullValIn;
 	int defaultVal = nullVal;
@@ -25,8 +25,8 @@ NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 		if (useIdentity)
 			defaultVal = i;
 
-		keys.get()[i] = defaultVal;
-		values.get()[i] = defaultVal;
+		keys->add(defaultVal);
+		values->add(defaultVal);
 	}
 }
 
@@ -51,24 +51,21 @@ NoteMap::~NoteMap()
 	values.release();
 }
 
-int* NoteMap::setValue(int keyNum, int valIn)
+void NoteMap::setValue(int keyNum, int valIn)
 {
-
-	int oldVal = keys.get()[keyNum];
-	values.get()[oldVal] = nullVal;
+	int oldVal = keys->getUnchecked(keyNum);
+	values->set(oldVal, nullVal);
 
 	keys.get()[keyNum] = valIn;
 	values.get()[valIn] = keyNum;
-
-	return keys.get() + keyNum;
 }
 
 void NoteMap::setValues(int* valuesIn, int sizeIn)
 {
 	size = sizeIn;
 
-	keys.reset(new int[size]);
-	values.reset(new int[size]);
+	keys.reset(new Array<int>());
+	values.reset(new Array<int>());
 
 	for (int i = 0; i < size; i++)
 	{
@@ -100,18 +97,19 @@ int NoteMap::getSize()
 
 int NoteMap::getKey(int valIn)
 {
-	return values.get()[valIn];
+	return values->getUnchecked(valIn);
 }
 int NoteMap::getValue(int keyNum)
 {
-	return keys.get()[keyNum];
+	return keys->getUnchecked(keyNum);
 }
 
-int* NoteMap::getKeys()
+Array<int>* NoteMap::getKeys()
 {
 	return keys.get();
 }
-int* NoteMap::getValues()
+
+Array<int>* NoteMap::getValues()
 {
 	return values.get();
 }

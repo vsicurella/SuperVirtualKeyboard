@@ -11,14 +11,14 @@
 */
 
 #pragma once
-#include <memory>
+#include "../JuceLibraryCode/JuceHeader.h"
 
 class NoteMap
 {
 	int size;
 
-	std::unique_ptr<int> keys;
-	std::unique_ptr<int> values;
+	std::unique_ptr<Array<int>> keys;
+	std::unique_ptr<Array<int>> values;
 
 	int nullVal;
 
@@ -29,7 +29,7 @@ public:
 	NoteMap(NoteMap& mapToCopy);
 	~NoteMap();
 	
-	int* setValue(int keyNum, int valIn);
+	void setValue(int keyNum, int valIn);
 	void setValues(int* valuesIn, int sizeIn);
 	
 	int* setNullVal(int nullValIn);
@@ -39,8 +39,8 @@ public:
 	int getKey(int valIn);
 	int getValue(int keyNum);
 
-	int* getKeys();
-	int* getValues();
+	Array<int>* getKeys();
+	Array<int>* getValues();
 
 	int getNullVal();
 };
