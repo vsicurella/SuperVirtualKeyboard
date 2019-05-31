@@ -28,9 +28,11 @@ public:
 	ModeMapper(Array<Mode>* modesIn);
 	~ModeMapper();
 
+	NoteMap mapTo(Mode* modeMapped);
+	NoteMap mapTo(Mode* modeMapped, int rootNoteTo);
 
-	NoteMap mapTo(Mode* modeMapped, int rootNoteTo = 60);
+	static NoteMap map(Mode* mapFrom, Mode* mapTo);
+	static NoteMap map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo);
 
-	static NoteMap map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom = 60, int rootNoteTo = 60);
 	static NoteMap standardMidiToMode(Mode* modeMapped, int rootNoteStd = 60, int rootNoteTo = 60);
 };

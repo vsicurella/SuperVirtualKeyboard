@@ -24,6 +24,7 @@
 
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
+#include "../../Structures/ModeMapper.h"
 #include "../Components/MidiRemapTableModel.h"
 #include "../Components/PresetLibraryBox.h"
 //[/Headers]
@@ -65,6 +66,10 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	std::unique_ptr<MidiRemapTableModel> remapTableModel;
 	std::unique_ptr<TableListBox> remapTable;
+	std::unique_ptr<ModeMapper> modeMapper;
+
+	std::unique_ptr<Mode> modeSelected1;
+	std::unique_ptr<Mode> modeSelected2;
 
 	int boxW = 10;
 	int boxH = 8;
