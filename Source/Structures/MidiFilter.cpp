@@ -34,6 +34,12 @@ NoteMap* MidiFilter::setNoteMap(Array<int> mapToCopy)
 	return midiNoteMapping.get();
 }
 
+NoteMap* MidiFilter::setNoteMap(NoteMap mapToCopy)
+{
+    midiNoteMapping.reset(new NoteMap(mapToCopy));
+    return midiNoteMapping.get();
+}
+
 int MidiFilter::getNoteRemapped(int midiNoteIn)
 {
     int midiNoteOut = jlimit(noteRange.x, noteRange.y, midiNoteIn);
@@ -41,7 +47,7 @@ int MidiFilter::getNoteRemapped(int midiNoteIn)
     if (midiNoteMapping.get())
         midiNoteOut = midiNoteMapping->getValue(midiNoteOut);
     
-	return jlimit(noteRange.x, noteRange.y, midiNoteOut);
+    return midiNoteOut;//jlimit(noteRange.x, noteRange.y, midiNoteOut);
 }
 
 int MidiFilter::getNoteMidi(int remappedNoteIn)
