@@ -102,6 +102,11 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 
 //==============================================================================
 
+void SvkMidiProcessor::resetWithRate(double sampleRateIn)
+{
+	reset(sampleRateIn);
+}
+
 StringArray SvkMidiProcessor::getAvailableInputs()
 {
     return MidiInput::getDevices();
@@ -204,7 +209,17 @@ void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn)
 	midiInputFilter->setNoteMap(mapIn);
 }
 
+void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn)
+{
+	midiInputFilter->setNoteMap(mapIn);
+}
+
 void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn)
+{
+	midiOutputFilter->setNoteMap(mapIn);
+}
+
+void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn)
 {
 	midiOutputFilter->setNoteMap(mapIn);
 }

@@ -74,7 +74,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
     mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
 
-    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get(), "PresetLibraryBox"));
+    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get()));
     addAndMakeVisible (presetLibraryBox.get());
     presetLibraryBox->setName ("PresetLibraryBox");
 
@@ -179,6 +179,7 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mapStdButton.get())
     {
         //[UserButtonCode_mapStdButton] -- add your button handler code here..
+		pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
         //[/UserButtonCode_mapStdButton]
     }
 
@@ -246,6 +247,12 @@ int KeyboardEditorBar::getOffsetReadout()
 {
 	return offsetSld->getValue();
 }
+
+int KeyboardEditorBar::getPresetSelectedId()
+{
+	return presetLibraryBox->getSelectedId();
+}
+
 
 void KeyboardEditorBar::setModeReadoutText(String steps)
 {

@@ -326,6 +326,12 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mapModesBtn.get())
     {
         //[UserButtonCode_mapModesBtn] -- add your button handler code here..
+		if (modeSelected1.get() && modeSelected2.get())
+		{
+			pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::map(
+				modeSelected1.get(), modeSelected2.get()
+			));
+		}
         //[/UserButtonCode_mapModesBtn]
     }
 
@@ -336,6 +342,10 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void MidiSettingsComponent::setModeSelected2(int selectedIdIn)
+{
+	presetBox2->setSelectedId(selectedIdIn);
+}
 
 //[/MiscUserCode]
 
