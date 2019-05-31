@@ -22,7 +22,7 @@ ModeMapper::ModeMapper(Array<Mode>* modesIn)
 
 NoteMap ModeMapper::mapTo(Mode* modeMapped)
 {
-	mapTo(modeMapped, modeMapped->getRootNote());
+	return mapTo(modeMapped, modeMapped->getRootNote());
 }
 
 NoteMap ModeMapper::mapTo(Mode* modeMapped, int rootNoteTo)
@@ -32,7 +32,7 @@ NoteMap ModeMapper::mapTo(Mode* modeMapped, int rootNoteTo)
 
 NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo)
 {
-	map(mapFrom, mapTo, mapFrom->getRootNote(), mapTo->getRootNote());
+	return map(mapFrom, mapTo, mapFrom->getRootNote(), mapTo->getRootNote());
 }
 
 NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo)
@@ -51,7 +51,7 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
 	return mappingOut;
 }
 
-NoteMap ModeMapper::standardMidiToMode(Mode* modeMapped, int rootNoteStd, int rootNoteMap)
+NoteMap ModeMapper::stdMidiToMode(Mode* modeMapped, int rootNoteStd, int rootNoteMap)
 {
 	Mode meantone7_12 = Mode("2 2 1 2 2 2 1", "Meantone", rootNoteStd);
 	return map(&meantone7_12, modeMapped, rootNoteStd, rootNoteMap);

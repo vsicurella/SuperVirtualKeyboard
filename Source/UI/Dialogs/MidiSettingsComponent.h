@@ -51,7 +51,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-
+	void setModeSelected2(int selectedIdIn);
     //[/UserMethods]
 
     void paint (Graphics& g) override;

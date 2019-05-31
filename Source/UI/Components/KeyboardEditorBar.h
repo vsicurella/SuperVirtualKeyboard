@@ -24,8 +24,7 @@
 #include "../../PluginState.h"
 #include "../../Structures/Mode.h"
 #include "PresetLibraryBox.h"
-
-#include <iostream>
+#include "../../Structures/ModeMapper.h"
 //[/Headers]
 
 
@@ -59,11 +58,11 @@ public:
     void setOffsetReadout(int offIn);
 	int getOffsetReadout();
 
+	int getPresetSelectedId();
+
 	void createAndSendMode();
 
     void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-
-	//void populate_preset_menu();
 
 	void textEditorReturnKeyPressed(TextEditor& editor) override;
 
@@ -134,4 +133,3 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

@@ -44,6 +44,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     midiSettingsComponent->setSize(800, 600);
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
 
+	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
+
     pluginState->addChangeListener(this);
     keyboardEditorBar->addChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
@@ -55,7 +57,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
-
     setSize(1000, 250);
 	setResizeLimits(640, 100, 10e4, 10e4);
 
@@ -108,6 +109,8 @@ void SvkPluginEditor::update_children_to_preset()
 	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
 	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
+
+	midiSettingsComponent->setModeSelected2(keyboardEditorBar->getPresetSelectedId());
     
     keyboardEditorBar->repaint();
 	DBG("Children Updated");

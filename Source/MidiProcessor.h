@@ -47,6 +47,8 @@ public:
     ValueTree midiSettingsNode;
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
+
+	void resetWithRate(double sampleRateIn);
     
     StringArray getAvailableInputs();
     StringArray getAvailableOutputs();
@@ -75,7 +77,9 @@ public:
     void setOutputToRemap(bool doRemap=true);
     
     void setMidiInputMap(Array<int> mapIn);
+	void setMidiInputMap(NoteMap mapIn);
     void setMidiOutputMap(Array<int> mapIn);
+	void setMidiOutputMap(NoteMap mapIn);
     
     int mapInputNote(int noteIn, int noteOut);
     int mapOutputNode(int noteIn, int noteOut);
