@@ -276,7 +276,7 @@ int Mode::getRootNote()
 
 int Mode::getOffset()
 {
-	return ((rootNote % scaleSize) + scaleSize) % scaleSize;
+	return totalModulus(rootNote, scaleSize);
 }
 
 
@@ -553,6 +553,30 @@ int Mode::getMaxStep()
 	}
 
 	return step;
+}
+
+Array<int> Mode::getModalMidiNotes(int order = 0, int rootNoteIn)
+{
+	Array<int> notesOut;
+	std::unique_ptr<Mode> modeWithRoot;
+
+	Mode* modeToUse = this;
+
+	if (rootNote != rootNoteIn)
+	{
+		modeWithRoot.reset(new Mode(modeNode, rootNoteIn));
+		modeToUse = modeWithRoot.get();
+	}
+
+	Array<int> ordersToRead = modeToUse->getOrders();
+
+	for (int i = 0; i < ordersToRead.size(); i++)
+	{
+		if (ordersToRead.getUnchecked(i) == order)
+			notesOut.add(i);
+	}
+
+	return notesOut;
 }
 
 String Mode::steps_to_string(Array<int> stepsIn)

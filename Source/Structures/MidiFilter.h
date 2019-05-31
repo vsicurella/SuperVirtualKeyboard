@@ -1,43 +1,37 @@
 /*
   ==============================================================================
-
     MidiInputFilter.h
     Created: 14 May 2019 10:25:01pm
     Author:  Vincenzo
-
   ==============================================================================
 */
 
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "NoteMap.h"
 
-class MidiRemapper
+struct MidiRemapper
 {
-	std::unique_ptr<NoteMap> midiNoteMapping;
-	Point<int> noteRange;
-
-public:
-
 	MidiRemapper();
-    MidiRemapper(Array<int> mapIn);
+    MidiRemapper(Array<int>* mapIn);
     
-    int getNoteRemapped(int midiNoteIn);
-	int getNoteMidi(int remappedNoteIn);
-
+    int getNote(int midiNoteIn);
     Point<int> getNoteRange();
     
     int setNote(int noteIn, int noteOut);
     void setNoteRange(int lowestMidiNote, int highestMidiNote);
+
+	Array<int> removeDuplicates(int noteToKeep);
     
-	NoteMap* setNoteMap(Array<int> mapToCopy);
-	NoteMap* getNoteMap();
-	int* getRemappedNotes();
-
-	int size();
-
-	String toString();
+    Array<int>* setNoteMap(Array<int>& noteMapIn);
+    Array<int>* getNoteMap();
     
     static Array<int> getStandardMap();
+    
+private:
+    
+    Array<int>* midiNoteMapping;
+    Point<int> noteRange;
+
+
 };

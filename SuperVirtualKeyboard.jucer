@@ -15,6 +15,8 @@
       <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
     </GROUP>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
+      <FILE id="x6boMo" name="ModeMapper.cpp" compile="1" resource="0" file="Source/Structures/ModeMapper.cpp"/>
+      <FILE id="kIMFVq" name="ModeMapper.h" compile="0" resource="0" file="Source/Structures/ModeMapper.h"/>
       <FILE id="YMhOFD" name="PresetManager.cpp" compile="1" resource="0"
             file="Source/Structures/PresetManager.cpp"/>
       <FILE id="LojL8r" name="PresetManager.h" compile="0" resource="0" file="Source/Structures/PresetManager.h"/>
@@ -28,9 +30,8 @@
       <FILE id="ZNc2fR" name="Mode.h" compile="0" resource="0" file="Source/Structures/Mode.h"/>
       <FILE id="ScqT7w" name="Preset.cpp" compile="1" resource="0" file="Source/Structures/Preset.cpp"/>
       <FILE id="nGJjJ7" name="Preset.h" compile="0" resource="0" file="Source/Structures/Preset.h"/>
-      <FILE id="DYjSKl" name="MidiRemapper.cpp" compile="1" resource="0"
-            file="Source/Structures/MidiRemapper.cpp"/>
-      <FILE id="ORt6g1" name="MidiRemapper.h" compile="0" resource="0" file="Source/Structures/MidiRemapper.h"/>
+      <FILE id="uMBTI9" name="MidiFilter.h" compile="0" resource="0" file="Source/Structures/MidiFilter.h"/>
+      <FILE id="DYjSKl" name="MidiFilter.cpp" compile="1" resource="0" file="Source/Structures/MidiFilter.cpp"/>
     </GROUP>
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">

@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "MidiRemapper.h"
+#include "MidiFilter.h"
 
 MidiRemapper::MidiRemapper()
 {
