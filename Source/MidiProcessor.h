@@ -62,8 +62,8 @@ public:
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
 
-	MidiFilter* getInputRemapper();
-	MidiFilter* getOutputRemapper();
+	MidiFilter* getMidiInputFilter();
+	MidiFilter* getMidiOutputFilter();
 
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);

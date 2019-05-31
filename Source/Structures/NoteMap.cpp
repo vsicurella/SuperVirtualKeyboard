@@ -10,6 +10,11 @@
 
 #include "NoteMap.h"
 
+NoteMap::NoteMap()
+    :  NoteMap(128, true, -1)
+{
+}
+
 NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 {
 	size = sizeIn;
@@ -30,20 +35,28 @@ NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 	}
 }
 
-NoteMap::NoteMap(int* valuesIn, int sizeIn, int nullValIn)
+NoteMap::NoteMap(Array<int> valuesIn, int nullValIn)
 {
 	nullVal = nullValIn;
-	setValues(valuesIn, sizeIn);
+	setValues(valuesIn);
 }
 
-
-NoteMap::NoteMap(NoteMap& mapToCopy)
+NoteMap::NoteMap(const NoteMap& mapToCopy)
 {
-	keys.reset(mapToCopy.getKeys());
-	values.reset(mapToCopy.getValues());
+    size = mapToCopy.size;
+    nullVal = mapToCopy.nullVal;
+    
+    keys.reset(new Array<int>());
+    values.reset(new Array<int>());
+    
+    for (int i = 0; i < size; i++)
+    {
+        keys->add(mapToCopy.keys->getUnchecked(i));
+        values->add(mapToCopy.values->getUnchecked(i));
+    }
 
-	nullVal = mapToCopy.getNullVal();
 }
+
 
 NoteMap::~NoteMap()
 {
@@ -54,34 +67,27 @@ NoteMap::~NoteMap()
 void NoteMap::setValue(int keyNum, int valIn)
 {
 	int oldVal = keys->getUnchecked(keyNum);
-	values->set(oldVal, nullVal);
+    if (oldVal >= 0)
+        values->set(oldVal, nullVal);
 
-	keys.get()[keyNum] = valIn;
-	values.get()[valIn] = keyNum;
+	keys->set(keyNum, valIn);
+    if (valIn >= 0)
+        values->set(valIn, keyNum);
 }
 
-void NoteMap::setValues(int* valuesIn, int sizeIn)
+void NoteMap::setValues(Array<int> valuesIn)
 {
-	size = sizeIn;
+	size = valuesIn.size();
 
-	keys.reset(new Array<int>());
+	keys.reset(new Array<int>(valuesIn));
 	values.reset(new Array<int>());
+    values->resize(size);
 
 	for (int i = 0; i < size; i++)
 	{
-		values.get()[i] = nullVal;
+        setValue(i, valuesIn[i]);
 	}
 
-	for (int i = 0; i < size; i++)
-	{
-		int val = valuesIn[i];
-		keys.get()[i] = val;
-		
-		if (val != nullVal)
-		{
-			values.get()[valuesIn[i]] = i;
-		}
-	}
 }
 
 int* NoteMap::setNullVal(int nullValIn)
@@ -104,14 +110,14 @@ int NoteMap::getValue(int keyNum)
 	return keys->getUnchecked(keyNum);
 }
 
-Array<int>* NoteMap::getKeys()
+Array<int> NoteMap::getKeys()
 {
-	return keys.get();
+	return *keys.get();
 }
 
-Array<int>* NoteMap::getValues()
+Array<int> NoteMap::getValues()
 {
-	return values.get();
+	return *values.get();
 }
 
 int NoteMap::getNullVal()

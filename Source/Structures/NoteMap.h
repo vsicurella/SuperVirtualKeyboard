@@ -21,16 +21,17 @@ class NoteMap
 	std::unique_ptr<Array<int>> values;
 
 	int nullVal;
-
+    
 public:
-
-	NoteMap(int sizeIn, bool useIdentity = true, int nullValIn = -1);
-	NoteMap(int* valuesIn, int sizeIn, int nullValIn = -1);
-	NoteMap(NoteMap& mapToCopy);
+    
+    NoteMap();
+	NoteMap(int sizeIn, bool useIdentity, int nullValIn = -1);
+	NoteMap(Array<int> valuesIn, int nullValIn = -1);
+    NoteMap(const NoteMap& mapToCopy);
 	~NoteMap();
 	
 	void setValue(int keyNum, int valIn);
-	void setValues(int* valuesIn, int sizeIn);
+	void setValues(Array<int> valuesIn);
 	
 	int* setNullVal(int nullValIn);
 
@@ -39,8 +40,8 @@ public:
 	int getKey(int valIn);
 	int getValue(int keyNum);
 
-	Array<int>* getKeys();
-	Array<int>* getValues();
+	Array<int> getKeys();
+	Array<int> getValues();
 
 	int getNullVal();
 };
