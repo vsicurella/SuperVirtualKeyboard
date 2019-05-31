@@ -45,17 +45,20 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
      DBGArray(midiNotesFrom, "midi notes from");
      DBGArray(midiNotesTo, "midi notes to");
      */
-    int mapSize = jmin(midiNotesFrom.size(), midiNotesTo.size());
     
-    //int rootIndexOffset = midiNotesTo.indexOf(rootNoteTo) - midiNotesFrom.indexOf(rootNoteFrom);
+    int rootIndexOffset = midiNotesTo.indexOf(rootNoteTo) - midiNotesFrom.indexOf(rootNoteFrom);
     
     NoteMap mappingOut;
     
-    for (int i = 0; i < midiNotesFrom.size(); i++)
+    int mapSize = jmin(midiNotesFrom.size(), midiNotesTo.size(), mappingOut.getSize());
+
+    for (int i = 0; i < mapSize; i++)
     {
-        mappingOut.setValue(midiNotesFrom[i], midiNotesTo[i]);
+        DBG("<MODEMAPPER>");
+        DBG("Note from = " + String(midiNotesFrom[i]) + "\tNote to = " + String(midiNotesTo[i]));
+        DBG("</MODEMAPPER>");
+        mappingOut.setValue(midiNotesFrom.getUnchecked(i), midiNotesTo.getUnchecked(i));
     }
-    
     return mappingOut;
 }
 

@@ -211,7 +211,7 @@ void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn)
 
 void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn)
 {
-	midiInputFilter->setNoteMap(mapIn.getValues());
+	midiInputFilter->setNoteMap(mapIn);
 }
 
 void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn)

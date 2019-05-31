@@ -67,12 +67,20 @@ NoteMap::~NoteMap()
 void NoteMap::setValue(int keyNum, int valIn)
 {
 	int oldVal = keys->getUnchecked(keyNum);
+    
     if (oldVal >= 0)
         values->set(oldVal, nullVal);
 
 	keys->set(keyNum, valIn);
+    
     if (valIn >= 0)
         values->set(valIn, keyNum);
+    
+    DBG("<NOTEMAP>");
+    DBG("keyNum: " + String(keyNum) + "\tvalIn: " + String(valIn));
+    DBG("Retured keynum val = " + String(getValue(keyNum)));
+    DBG("</NOTEMAP>");
+
 }
 
 void NoteMap::setValues(Array<int> valuesIn)
@@ -86,8 +94,7 @@ void NoteMap::setValues(Array<int> valuesIn)
 	for (int i = 0; i < size; i++)
 	{
         setValue(i, valuesIn[i]);
-	}
-
+    }
 }
 
 int* NoteMap::setNullVal(int nullValIn)
@@ -107,7 +114,7 @@ int NoteMap::getKey(int valIn)
 }
 int NoteMap::getValue(int keyNum)
 {
-	return keys->getUnchecked(keyNum);
+    return keys->getUnchecked(keyNum);
 }
 
 Array<int> NoteMap::getKeys()

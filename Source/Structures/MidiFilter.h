@@ -33,6 +33,7 @@ public:
 	void setNoteRange(int lowestMidiNote, int highestMidiNote);
 
 	NoteMap* setNoteMap(Array<int> mapToCopy);
+    NoteMap* setNoteMap(NoteMap mapToCopy);
 
 	int size();
 
