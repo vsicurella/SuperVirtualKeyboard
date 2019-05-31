@@ -53,10 +53,10 @@ NoteMap::~NoteMap()
 
 int* NoteMap::setValue(int keyNum, int valIn)
 {
-	
+
 	int oldVal = keys.get()[keyNum];
 	values.get()[oldVal] = nullVal;
-	
+
 	keys.get()[keyNum] = valIn;
 	values.get()[valIn] = keyNum;
 
