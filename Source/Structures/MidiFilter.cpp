@@ -22,9 +22,21 @@ MidiFilter::MidiFilter(Array<int> mapIn)
 	setNoteMap(mapIn);
 }
 
+MidiFilter::MidiFilter(NoteMap mapIn)
+{
+	noteRange = Point<int>(-1, 127);
+	setNoteMap(mapIn);
+}
+
 NoteMap* MidiFilter::setNoteMap(Array<int> mapToCopy)
 {
     midiNoteMapping.reset(new NoteMap(mapToCopy.getRawDataPointer(), mapToCopy.size()));
+	return midiNoteMapping.get();
+}
+
+NoteMap* MidiFilter::setNoteMap(NoteMap mapIn)
+{
+	midiNoteMapping.reset(new NoteMap(mapIn));
 	return midiNoteMapping.get();
 }
 

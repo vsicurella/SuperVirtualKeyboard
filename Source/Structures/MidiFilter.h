@@ -20,18 +20,20 @@ public:
 
 	MidiFilter();
 	MidiFilter(Array<int> mapIn);
+	MidiFilter(NoteMap mapIn);
 
 	int getNoteRemapped(int midiNoteIn);
 	int getNoteMidi(int remappedNoteIn);
+	int* getRemappedNotes();
 
 	Point<int> getNoteRange();
+	NoteMap* getNoteMap();
 
 	int setNote(int noteIn, int noteOut);
 	void setNoteRange(int lowestMidiNote, int highestMidiNote);
 
 	NoteMap* setNoteMap(Array<int> mapToCopy);
-	NoteMap* getNoteMap();
-	int* getRemappedNotes();
+	NoteMap* setNoteMap(NoteMap mapToCopy);
 
 	int size();
 
