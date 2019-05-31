@@ -125,6 +125,7 @@ private:
     std::unique_ptr<Label> offsetLabel;
     std::unique_ptr<TextButton> mapButton;
     std::unique_ptr<PresetLibraryBox> presetLibraryBox;
+    std::unique_ptr<TextButton> mapStdButton;
 
 
     //==============================================================================

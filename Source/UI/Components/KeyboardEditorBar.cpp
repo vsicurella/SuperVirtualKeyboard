@@ -68,15 +68,23 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
     mapButton.reset (new TextButton ("Map Notes Button"));
     addAndMakeVisible (mapButton.get());
-    mapButton->setButtonText (TRANS("Map Notes"));
+    mapButton->setButtonText (TRANS("Learn Mapping"));
     mapButton->setConnectedEdges (Button::ConnectedOnBottom);
     mapButton->addListener (this);
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
     mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
 
-    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get(), "PresetLibraryBox"));
     addAndMakeVisible (presetLibraryBox.get());
     presetLibraryBox->setName ("PresetLibraryBox");
+
+    mapStdButton.reset (new TextButton ("Std Map Button"));
+    addAndMakeVisible (mapStdButton.get());
+    mapStdButton->setButtonText (TRANS("Map From Standard"));
+    mapStdButton->setConnectedEdges (Button::ConnectedOnBottom);
+    mapStdButton->addListener (this);
+    mapStdButton->setColour (TextButton::buttonColourId, Colour (0xff5c60a4));
+    mapStdButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
 
 
     //[UserPreSize]
@@ -113,6 +121,7 @@ KeyboardEditorBar::~KeyboardEditorBar()
     offsetLabel = nullptr;
     mapButton = nullptr;
     presetLibraryBox = nullptr;
+    mapStdButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -141,8 +150,9 @@ void KeyboardEditorBar::resized()
     sendScaleBtn->setBounds (getWidth() - 283 - 88, 6, 88, 24);
     offsetSld->setBounds (getWidth() - 235, 2, 69, 32);
     offsetLabel->setBounds (getWidth() - 280, 6, 47, 24);
-    mapButton->setBounds (getWidth() - 542 - 79, 6, 79, 24);
+    mapButton->setBounds (getWidth() - 542 - 106, 6, 106, 24);
     presetLibraryBox->setBounds (getWidth() - 9 - 150, 6, 150, 24);
+    mapStdButton->setBounds (getWidth() - 662 - 138, 6, 138, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -165,6 +175,11 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapButton] -- add your button handler code here..
         sendChangeMessage();
         //[/UserButtonCode_mapButton]
+    }
+    else if (buttonThatWasClicked == mapStdButton.get())
+    {
+        //[UserButtonCode_mapStdButton] -- add your button handler code here..
+        //[/UserButtonCode_mapStdButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -389,12 +404,16 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
-              virtualName="" explicitFocusOrder="0" pos="542Rr 6 79 24" bgColOff="ff5c6ea4"
-              bgColOn="ffa7b438" buttonText="Map Notes" connectedEdges="8"
+              virtualName="" explicitFocusOrder="0" pos="542Rr 6 106 24" bgColOff="ff5c6ea4"
+              bgColOn="ffa7b438" buttonText="Learn Mapping" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
                     virtualName="" explicitFocusOrder="0" pos="9Rr 6 150 24" class="PresetLibraryBox"
                     params="pluginState-&gt;presetManager.get(), &quot;PresetLibraryBox&quot;"/>
+  <TEXTBUTTON name="Std Map Button" id="7376bb3f0836f75b" memberName="mapStdButton"
+              virtualName="" explicitFocusOrder="0" pos="662Rr 6 138 24" bgColOff="ff5c60a4"
+              bgColOn="ffa7b438" buttonText="Map From Standard" connectedEdges="8"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
