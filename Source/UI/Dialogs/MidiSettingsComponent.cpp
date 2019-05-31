@@ -169,8 +169,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 	presetBox1->addListener(this);
 	presetBox2->addListener(this);
 
-	midiInputFilter = pluginState->getMidiProcessor()->getInputRemapper();
-	midiOutputFilter = pluginState->getMidiProcessor()->getOutputRemapper();
+	midiInputFilter = pluginState->getMidiProcessor()->getMidiInputFilter();
+	midiOutputFilter = pluginState->getMidiProcessor()->getMidiOutputFilter();
 
 	remapTable.reset(new TableListBox("Midi Remap Table"));
 	remapTableModel.reset(new MidiRemapTableModel(remapTable.get(), midiInputFilter, midiOutputFilter, pluginState->textFilterInt.get()));
@@ -328,9 +328,9 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapModesBtn] -- add your button handler code here..
 		if (modeSelected1.get() && modeSelected2.get())
 		{
-			pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::map(
-				modeSelected1.get(), modeSelected2.get()
-			));
+			pluginState->getMidiProcessor()->setMidiInputMap(
+                ModeMapper::map(modeSelected1.get(), modeSelected2.get())
+			);
 		}
         //[/UserButtonCode_mapModesBtn]
     }

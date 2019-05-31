@@ -63,7 +63,7 @@ public:
 
 	void labelTextChanged(Label* labelThatHasChanged) override;
 
-	void editorShown(Label* label, TextEditor& editor);
+	void editorShown(Label* label, TextEditor& editor) override;
 
-	void editorHidden(Label* label, TextEditor& editor);
+	void editorHidden(Label* label, TextEditor& editor) override;
 };

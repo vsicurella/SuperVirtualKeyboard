@@ -43,8 +43,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	Mode* getModeLoaded();
 	VirtualKeyboard::Keyboard* getKeyboard();
     
-    int* getMidiInputMap();
-    int* getMidiOutputMap();
+    NoteMap* getMidiInputMap();
+    NoteMap* getMidiOutputMap();
 
 	void loadMode(int presetIndexIn);
 	void loadMode(ValueTree modeNodeIn);

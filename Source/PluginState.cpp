@@ -67,13 +67,13 @@ VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
 	return virtualKeyboard.get();
 }
 
-int* SvkPluginState::getMidiInputMap()
+NoteMap* SvkPluginState::getMidiInputMap()
 {
-    return midiProcessor->getInputRemapper()->getRemappedNotes();
+    return midiProcessor->getMidiInputFilter()->getNoteMap();
 }
-int* SvkPluginState::getMidiOutputMap()
+NoteMap* SvkPluginState::getMidiOutputMap()
 {
-    return midiProcessor->getOutputRemapper()->getRemappedNotes();
+    return midiProcessor->getMidiOutputFilter()->getNoteMap();
 }
 
 void SvkPluginState::loadMode(int presetIndexIn)
@@ -117,7 +117,7 @@ bool SvkPluginState::loadPreset()
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {
 	// Preset loaded
-	if (source = presetManager.get())
+	if (source == presetManager.get())
 	{
 		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
 		virtualKeyboard->applyMode(modeLoaded.get());
