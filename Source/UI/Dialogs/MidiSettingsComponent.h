@@ -94,6 +94,7 @@ private:
     std::unique_ptr<Label> rootNoteLabel;
     std::unique_ptr<PresetLibraryBox> presetBox1;
     std::unique_ptr<PresetLibraryBox> presetBox2;
+    std::unique_ptr<TextButton> mapModesBtn;
 
 
     //==============================================================================

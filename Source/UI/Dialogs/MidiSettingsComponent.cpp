@@ -154,6 +154,13 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
     presetBox2->setBounds (472, 115, 150, 24);
 
+    mapModesBtn.reset (new TextButton ("Map Modes Button"));
+    addAndMakeVisible (mapModesBtn.get());
+    mapModesBtn->setButtonText (TRANS("Map!"));
+    mapModesBtn->addListener (this);
+
+    mapModesBtn->setBounds (472, 168, 144, 24);
+
 
     //[UserPreSize]
 	noteRangeSld->setMinValue(0);
@@ -161,7 +168,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 	presetBox1->addListener(this);
 	presetBox2->addListener(this);
-   
+
 	midiInputFilter = pluginState->getMidiProcessor()->getInputRemapper();
 	midiOutputFilter = pluginState->getMidiProcessor()->getOutputRemapper();
 
@@ -213,6 +220,7 @@ MidiSettingsComponent::~MidiSettingsComponent()
     rootNoteLabel = nullptr;
     presetBox1 = nullptr;
     presetBox2 = nullptr;
+    mapModesBtn = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -315,6 +323,11 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_modeMapToggle] -- add your button handler code here..
         //[/UserButtonCode_modeMapToggle]
     }
+    else if (buttonThatWasClicked == mapModesBtn.get())
+    {
+        //[UserButtonCode_mapModesBtn] -- add your button handler code here..
+        //[/UserButtonCode_mapModesBtn]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -397,6 +410,9 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="Preset Box 2" id="eb2e366c9ad8965c" memberName="presetBox2"
                     virtualName="PresetLibraryBox" explicitFocusOrder="0" pos="472 115 150 24"
                     class="PresetLibraryBox" params="pluginState-&gt;presetManager.get()"/>
+  <TEXTBUTTON name="Map Modes Button" id="7a76936bfde482aa" memberName="mapModesBtn"
+              virtualName="" explicitFocusOrder="0" pos="472 168 144 24" buttonText="Map!"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
