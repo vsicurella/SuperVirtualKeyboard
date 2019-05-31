@@ -70,8 +70,8 @@ private:
 	int boxH = 8;
 
 	SvkPluginState* pluginState;
-	MidiFilter* inputRemapper;
-	MidiFilter* outputRemapper;
+	MidiFilter* midiInputFilter;
+	MidiFilter* midiOutputFilter;
 
     //[/UserVariables]
 

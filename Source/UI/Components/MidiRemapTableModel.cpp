@@ -14,9 +14,9 @@
 //==============================================================================
 
 MidiRemapTableModel::MidiRemapTableModel(TableListBox* parentIn, MidiFilter* inputMapIn, MidiFilter* outputMapIn, TextEditor::InputFilter* filterIn)
-	: parent(parentIn), inputRemapper(inputMapIn), outputRemapper(outputMapIn), inputFilter(filterIn)
+	: parent(parentIn), midiInputFilter(inputMapIn), midiOutputFilter(outputMapIn), inputFilter(filterIn)
 {
-	numRows = jmin(inputRemapper->size(), outputRemapper->size());
+	numRows = jmin(midiInputFilter->size(), midiOutputFilter->size());
 }
 
 MidiRemapTableModel::~MidiRemapTableModel()
@@ -52,9 +52,9 @@ Component* MidiRemapTableModel::refreshComponentForCell(int rowNumber, int colum
 		int noteNum = -1;
 
 		if (columnId == 2)
-			noteNum = inputRemapper->getNoteRemapped(rowNumber);
+			noteNum = midiInputFilter->getNoteRemapped(rowNumber);
 		else if (columnId == 3)
-			noteNum = outputRemapper->getNoteRemapped(rowNumber);
+			noteNum = midiOutputFilter->getNoteRemapped(rowNumber);
 
 		if (noteNum >= 0)
 			editor->setText(String(noteNum), dontSendNotification);
@@ -115,15 +115,15 @@ void MidiRemapTableModel::editorHidden(Label* label, TextEditor& editor)
 		if (cell.y == 2)
 		{
 			DBG("Remapping Note " + String(cell.x) + " --> " + String(valNew));
-			inputRemapper->setNote(cell.x, valNew);
-			DBG("Input Remapped, Note " + String(cell.x) + " --> " + String(inputRemapper->getNoteRemapped(cell.x)));
-			DBG("Old note " + String(valOld) + " is triggered by " + String(inputRemapper->getNoteMidi(valOld)));
+			midiInputFilter->setNote(cell.x, valNew);
+			DBG("Input Remapped, Note " + String(cell.x) + " --> " + String(midiInputFilter->getNoteRemapped(cell.x)));
+			DBG("Old note " + String(valOld) + " is triggered by " + String(midiInputFilter->getNoteMidi(valOld)));
 		}
 		else if (cell.y == 3)
 		{
 			DBG("Remapping Note " + String(cell.x) + " --> " + String(valNew));
-			outputRemapper->setNote(cell.x, valNew);
-			DBG("Output Remapped, Note " + String(cell.x) + " --> " + String(outputRemapper->getNoteRemapped(cell.x)));
+			midiOutputFilter->setNote(cell.x, valNew);
+			DBG("Output Remapped, Note " + String(cell.x) + " --> " + String(midiOutputFilter->getNoteRemapped(cell.x)));
 		}
 	}
 }
