@@ -41,8 +41,8 @@ class MidiRemapTableModel : public TableListBoxModel,
 
 	TableListBox* parent;
 
-	MidiFilter* inputRemapper;
-	MidiFilter* outputRemapper;
+	MidiFilter* midiInputFilter;
+	MidiFilter* midiOutputFilter;
 
 	int valOld = -1; // used to store old NoteMapBox value, might only be for debugging purposes
 

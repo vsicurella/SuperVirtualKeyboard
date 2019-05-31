@@ -160,11 +160,11 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     noteRangeSld->setMinValue(0);
     noteRangeSld->setMaxValue(127);
     
-	inputRemapper = pluginState->getMidiProcessor()->getInputRemapper();
-	outputRemapper = pluginState->getMidiProcessor()->getOutputRemapper();
+	midiInputFilter = pluginState->getMidiProcessor()->getInputRemapper();
+	midiOutputFilter = pluginState->getMidiProcessor()->getOutputRemapper();
 
 	remapTable.reset(new TableListBox("Midi Remap Table"));
-	remapTableModel.reset(new MidiRemapTableModel(remapTable.get(), inputRemapper, outputRemapper, pluginState->textFilterInt.get()));
+	remapTableModel.reset(new MidiRemapTableModel(remapTable.get(), midiInputFilter, midiOutputFilter, pluginState->textFilterInt.get()));
 	remapTable->setModel(remapTableModel.get());
 	remapTable->setBounds(8, 184, 352, 264);
 
@@ -259,7 +259,7 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_noteRangeSld] -- add your slider handling code here..
         Point<int> range = Point<int>(noteRangeSld->getMinimum(), noteRangeSld->getMaximum());
-        inputRemapper->setNoteRange(range.x, range.y);
+        midiInputFilter->setNoteRange(range.x, range.y);
         noteRangeSld->updateText();
         //[/UserSliderCode_noteRangeSld]
     }
