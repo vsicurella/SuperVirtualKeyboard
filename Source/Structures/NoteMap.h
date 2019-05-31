@@ -24,7 +24,7 @@ class NoteMap
 
 public:
 
-	NoteMap(int sizeIn, bool useIdentity = false, int nullValIn = -1);
+	NoteMap(int sizeIn, bool useIdentity = true, int nullValIn = -1);
 	NoteMap(int* valuesIn, int sizeIn, int nullValIn = -1);
 	NoteMap(NoteMap& mapToCopy);
 	~NoteMap();
