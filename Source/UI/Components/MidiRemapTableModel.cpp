@@ -13,7 +13,7 @@
 
 //==============================================================================
 
-MidiRemapTableModel::MidiRemapTableModel(TableListBox* parentIn, MidiRemapper* inputMapIn, MidiRemapper* outputMapIn, TextEditor::InputFilter* filterIn)
+MidiRemapTableModel::MidiRemapTableModel(TableListBox* parentIn, MidiFilter* inputMapIn, MidiFilter* outputMapIn, TextEditor::InputFilter* filterIn)
 	: parent(parentIn), inputRemapper(inputMapIn), outputRemapper(outputMapIn), inputFilter(filterIn)
 {
 	numRows = jmin(inputRemapper->size(), outputRemapper->size());

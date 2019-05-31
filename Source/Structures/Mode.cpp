@@ -555,7 +555,7 @@ int Mode::getMaxStep()
 	return step;
 }
 
-Array<int> Mode::getModalMidiNotes(int order = 0, int rootNoteIn)
+Array<int> Mode::getModalMidiNotes(int order, int rootNoteIn)
 {
 	Array<int> notesOut;
 	std::unique_ptr<Mode> modeWithRoot;

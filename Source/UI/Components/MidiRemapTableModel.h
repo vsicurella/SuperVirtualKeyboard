@@ -12,7 +12,7 @@
 
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../../CommonFunctions.h"
-#include "../../Structures/MidiRemapper.h"
+#include "../../Structures/MidiFilter.h"
 
 //==============================================================================
 /*
@@ -41,8 +41,8 @@ class MidiRemapTableModel : public TableListBoxModel,
 
 	TableListBox* parent;
 
-	MidiRemapper* inputRemapper;
-	MidiRemapper* outputRemapper;
+	MidiFilter* inputRemapper;
+	MidiFilter* outputRemapper;
 
 	int valOld = -1; // used to store old NoteMapBox value, might only be for debugging purposes
 
@@ -50,7 +50,7 @@ class MidiRemapTableModel : public TableListBoxModel,
 
 public:
 
-	MidiRemapTableModel(TableListBox* parentIn, MidiRemapper* inputRemapperIn, MidiRemapper* outputRemapperIn, TextEditor::InputFilter* filterIn = nullptr);
+	MidiRemapTableModel(TableListBox* parentIn, MidiFilter* inputRemapperIn, MidiFilter* outputRemapperIn, TextEditor::InputFilter* filterIn = nullptr);
 	~MidiRemapTableModel();
 
 	int getNumRows() override;

@@ -10,25 +10,25 @@
 
 #include "MidiFilter.h"
 
-MidiRemapper::MidiRemapper()
+MidiFilter::MidiFilter()
 {
 	noteRange = Point<int>(-1, 127);
 	midiNoteMapping.reset(new NoteMap(128, true));
 }
 
-MidiRemapper::MidiRemapper(Array<int> mapIn)
+MidiFilter::MidiFilter(Array<int> mapIn)
 {
 	noteRange = Point<int>(-1, 127);
 	setNoteMap(mapIn);
 }
 
-NoteMap* MidiRemapper::setNoteMap(Array<int> mapToCopy)
+NoteMap* MidiFilter::setNoteMap(Array<int> mapToCopy)
 {
     midiNoteMapping.reset(new NoteMap(mapToCopy.getRawDataPointer(), mapToCopy.size()));
 	return midiNoteMapping.get();
 }
 
-int MidiRemapper::getNoteRemapped(int midiNoteIn)
+int MidiFilter::getNoteRemapped(int midiNoteIn)
 {
     int midiNoteOut = jlimit(noteRange.x, noteRange.y, midiNoteIn);
     
@@ -38,7 +38,7 @@ int MidiRemapper::getNoteRemapped(int midiNoteIn)
 	return jlimit(noteRange.x, noteRange.y, midiNoteOut);
 }
 
-int MidiRemapper::getNoteMidi(int remappedNoteIn)
+int MidiFilter::getNoteMidi(int remappedNoteIn)
 {
 	int remappedNote = jlimit(noteRange.x, noteRange.y, remappedNoteIn);
 	
@@ -51,12 +51,12 @@ int MidiRemapper::getNoteMidi(int remappedNoteIn)
 }
 
 
-Point<int> MidiRemapper::getNoteRange()
+Point<int> MidiFilter::getNoteRange()
 {
     return noteRange;
 }
 
-int MidiRemapper::setNote(int noteIn, int noteOut)
+int MidiFilter::setNote(int noteIn, int noteOut)
 {
     if (midiNoteMapping.get())
         midiNoteMapping->setValue(noteIn, noteOut);
@@ -64,22 +64,22 @@ int MidiRemapper::setNote(int noteIn, int noteOut)
     return noteOut;
 }
 
-void MidiRemapper::setNoteRange(int lowestMidiNote, int highestMidiNote)
+void MidiFilter::setNoteRange(int lowestMidiNote, int highestMidiNote)
 {
     noteRange = Point<int>(lowestMidiNote, highestMidiNote);
 }
 
-NoteMap* MidiRemapper::getNoteMap()
+NoteMap* MidiFilter::getNoteMap()
 {
 	return midiNoteMapping.get();
 }
 
-int* MidiRemapper::getRemappedNotes()
+int* MidiFilter::getRemappedNotes()
 {
 	return midiNoteMapping->getKeys();
 }
 
-int MidiRemapper::size()
+int MidiFilter::size()
 {
 	int sizeOut = 0;
 	if (midiNoteMapping.get())
@@ -88,7 +88,7 @@ int MidiRemapper::size()
 	return sizeOut;
 }
 
-String MidiRemapper::toString()
+String MidiFilter::toString()
 {
 	String out;
 
@@ -100,7 +100,7 @@ String MidiRemapper::toString()
 	return out;
 }
 
-Array<int> MidiRemapper::getStandardMap()
+Array<int> MidiFilter::getStandardMap()
 {
     Array <int> mapOut;
     

@@ -14,8 +14,8 @@ SvkMidiProcessor::SvkMidiProcessor()
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
        
-    midiInputFilter.reset(new MidiRemapper());
-    midiOutputFilter.reset(new MidiRemapper());
+    midiInputFilter.reset(new MidiFilter());
+    midiOutputFilter.reset(new MidiFilter());
     
     //setMidiInput(MidiInput::getDefaultDeviceIndex());
     midiInput = nullptr;
@@ -142,12 +142,12 @@ NoteMap* SvkMidiProcessor::getOutputNoteMap()
 	return midiOutputFilter->getNoteMap();
 }
 
-MidiRemapper* SvkMidiProcessor::getInputRemapper()
+MidiFilter* SvkMidiProcessor::getInputRemapper()
 {
 	return midiInputFilter.get();
 }
 
-MidiRemapper* SvkMidiProcessor::getOutputRemapper()
+MidiFilter* SvkMidiProcessor::getOutputRemapper()
 {
 	return midiOutputFilter.get();
 }

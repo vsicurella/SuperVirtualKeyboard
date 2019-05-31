@@ -11,7 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Structures/MidiRemapper.h"
+#include "Structures/MidiFilter.h"
 #include "CommonFunctions.h"
 
 class SvkMidiProcessor : public MidiMessageCollector
@@ -30,8 +30,8 @@ class SvkMidiProcessor : public MidiMessageCollector
     
     int rootMidiNote = 60;
 
-    std::unique_ptr<MidiRemapper> midiInputFilter;
-    std::unique_ptr<MidiRemapper> midiOutputFilter;
+    std::unique_ptr<MidiFilter> midiInputFilter;
+    std::unique_ptr<MidiFilter> midiOutputFilter;
     
     bool midiInputPaused = false;
     bool isInputRemapped = false;
@@ -60,8 +60,8 @@ public:
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
 
-	MidiRemapper* getInputRemapper();
-	MidiRemapper* getOutputRemapper();
+	MidiFilter* getInputRemapper();
+	MidiFilter* getOutputRemapper();
 
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
