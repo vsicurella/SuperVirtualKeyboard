@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../PluginIDs.h"
+#include "../CommonFunctions.h"
 
 /*
 	A class for representing the layout of a piano
@@ -84,6 +85,8 @@ struct Mode
 	String getScaleDescription();
 
 	String getModeDescription();
+
+	Array<int> getModalMidiNotes(int order = 0, int rootNoteIn = -1);
 
 	/*
 	Simply parses a string reprsenting step sizes and returns a vector

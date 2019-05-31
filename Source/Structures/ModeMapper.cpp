@@ -1,11 +1,11 @@
 /*
   ==============================================================================
 
-    MidiInputFilter.cpp
-    Created: 14 May 2019 10:25:01pm
+    ModeMapper.cpp
+    Created: 30 May 2019 8:02:42pm
     Author:  Vincenzo
 
   ==============================================================================
 */
 
-#include "MidiInputFilter.h"
+#include "ModeMapper.h"
