@@ -46,6 +46,8 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
      DBGArray(midiNotesTo, "midi notes to");
      */
     
+    DBG("ModeFrom has " + String(midiNotesFrom.size()) + " modal notes and ModeTo has " + String(midiNotesTo.size()) + " modal notes.");
+    
     int rootIndexFrom = midiNotesFrom.indexOf(rootNoteFrom);
     int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
     
@@ -58,14 +60,17 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
     DBG(txt);
 
     int rootIndexOffset = rootIndexTo - rootIndexFrom;
+    //int sgn = rootIndexOffset / abs(rootIndexOffset);
+    //rootIndexOffset = totalModulus(abs(rootIndexOffset), mapFrom->getScaleSize());
+    //rootIndexOffset *= sgn;
+
     
     DBG("Offset is " + String(rootIndexOffset));
     
     
     NoteMap mappingOut;
     
-    int mapSize = jmin(midiNotesFrom.size(), midiNotesTo.size(), mappingOut.getSize());
-/*
+    /*
     for (int i = 0; i < mapSize; i++)
     {
         int indexTo = i - rootIndexOffset;
@@ -74,23 +79,33 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
             mappingOut.setValue(midiNotesFrom.getUnchecked(i), midiNotesTo.getUnchecked(indexTo));
     }
     */
-    int degCount = 0;
+    int degCountFrom = 0;
+    int degCountTo = 0;
     for (int m = 0; m < mappingOut.getSize(); m++)
     {
-        
-        if (degCount < mapSize && m == midiNotesFrom.getUnchecked(degCount))
+        if (m == midiNotesFrom.getUnchecked(degCountFrom))
         {
-            int indexTo = degCount - rootIndexOffset;
+            degCountFrom++;
+            degCountTo++;
             
-            if (indexTo >= 0 && indexTo < mapSize && indexTo < mappingOut.getSize())
-                mappingOut.setValue(midiNotesFrom.getUnchecked(degCount), midiNotesTo.getUnchecked(indexTo));
+            int indexTo = degCountTo + rootIndexOffset - 1;
+            
+            if (indexTo > -1 && indexTo < midiNotesTo.size())
+            {
+                mappingOut.setValue(m, midiNotesTo.getUnchecked(indexTo));
+            }
             else
                 mappingOut.setValue(m, -1);
             
-            degCount++;
         }
         else
             mappingOut.setValue(m, -1);
+        
+        if (m == rootNoteFrom)
+        {
+            DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) +")");
+            jassert(mappingOut.getValue(rootNoteFrom) == rootNoteTo);
+        }
     }
     
     return mappingOut;
