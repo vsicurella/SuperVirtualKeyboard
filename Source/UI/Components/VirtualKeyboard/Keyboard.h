@@ -97,6 +97,8 @@ namespace VirtualKeyboard
 		//===============================================================================================
 
 		int getUIMode();
+        
+        void updateKeyMidiNotes();
 
         void setUIMode(UIMode uiModeIn);
         

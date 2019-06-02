@@ -110,7 +110,7 @@ void SvkPluginEditor::update_children_to_preset()
 	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 
-	midiSettingsComponent->setModeSelected2(keyboardEditorBar->getPresetSelectedId());
+	midiSettingsComponent->setMode2SelectedId(keyboardEditorBar->getPresetSelectedId());
     
     keyboardEditorBar->repaint();
 	DBG("Children Updated");
@@ -385,6 +385,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
             piano->setUIMode(UIMode::playMode);
         }
 
+        midiSettingsComponent->setMode2RootNote(keyboardEditorBar->getOffsetReadout());
 		update_children_to_preset();
     }
 }
@@ -473,6 +474,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		break;
 	case IDs::CommandIDs::remapMidiNotes:
 		midiSettingsWindow->setVisible(true);
+            midiSettingsComponent->refreshTables();
 		break;
 	default:
 		return false;

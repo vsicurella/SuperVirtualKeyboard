@@ -249,6 +249,18 @@ int Keyboard::getUIMode()
 	return uiModeSelected;
 }
 
+void Keyboard::updateKeyMidiNotes()
+{
+    Key* key;
+    for (int i = 0; i < keys.size(); i++)
+    {
+        key = keys.getUnchecked(i);
+        
+        key->mappedNoteIn = midiProcessor->getInputNote(i);
+        key->mappedNoteIn = midiProcessor->getOutputNote(i);
+    }
+}
+
 void Keyboard::setUIMode(UIMode uiModeIn)
 {
     uiModeSelected = uiModeIn;
@@ -994,16 +1006,6 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     {
         key = keys.getUnchecked(lastKeyClicked);
         key->mappedNoteIn = midiNote;
-        /*
-		Array<int> keysToNull = pluginState->mapInputNote(midiNote, key->keyNumber);
-		
-		Key* toNull;
-		for (int i = 0; i < keysToNull.size(); i++)
-		{
-			toNull = keys.getUnchecked(keysToNull[i]);
-			toNull->mappedNoteIn = -1;
-		}
-         */
     }
 }
 

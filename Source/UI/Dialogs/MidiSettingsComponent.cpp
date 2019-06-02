@@ -342,9 +342,29 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void MidiSettingsComponent::setModeSelected2(int selectedIdIn)
+void MidiSettingsComponent::setMode1SelectedId(int selectedIdIn)
+{
+    presetBox1->setSelectedId(selectedIdIn);
+}
+
+void MidiSettingsComponent::setMode2SelectedId(int selectedIdIn)
 {
 	presetBox2->setSelectedId(selectedIdIn);
+}
+
+void MidiSettingsComponent::setMode1RootNote(int rootNoteIn)
+{
+    modeSelected1->setRootNote(rootNoteIn);
+}
+
+void MidiSettingsComponent::setMode2RootNote(int rootNoteIn)
+{
+    modeSelected2->setRootNote(rootNoteIn);
+}
+
+void MidiSettingsComponent::refreshTables()
+{
+    remapTable->updateContent();
 }
 
 //[/MiscUserCode]

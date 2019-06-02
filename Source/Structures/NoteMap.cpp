@@ -76,11 +76,12 @@ void NoteMap::setValue(int keyNum, int valIn)
     if (valIn >= 0)
         values->set(valIn, keyNum);
     
+    /*
     DBG("<NOTEMAP>");
     DBG("keyNum: " + String(keyNum) + "\tvalIn: " + String(valIn));
     DBG("Retured keynum val = " + String(getValue(keyNum)));
     DBG("</NOTEMAP>");
-
+*/
 }
 
 void NoteMap::setValues(Array<int> valuesIn)
