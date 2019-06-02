@@ -46,19 +46,53 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
      DBGArray(midiNotesTo, "midi notes to");
      */
     
-    int rootIndexOffset = midiNotesTo.indexOf(rootNoteTo) - midiNotesFrom.indexOf(rootNoteFrom);
+    int rootIndexFrom = midiNotesFrom.indexOf(rootNoteFrom);
+    int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
+    
+    String txt = "Root note from is " + String(rootNoteFrom) + " and index is " + String(rootIndexFrom);
+    
+    DBG(txt);
+    
+    txt = "Root note to is " + String(rootNoteTo) + " and index is " + String(rootIndexTo);
+    
+    DBG(txt);
+
+    int rootIndexOffset = rootIndexTo - rootIndexFrom;
+    
+    DBG("Offset is " + String(rootIndexOffset));
+    
     
     NoteMap mappingOut;
     
     int mapSize = jmin(midiNotesFrom.size(), midiNotesTo.size(), mappingOut.getSize());
-
+/*
     for (int i = 0; i < mapSize; i++)
     {
-        DBG("<MODEMAPPER>");
-        DBG("Note from = " + String(midiNotesFrom[i]) + "\tNote to = " + String(midiNotesTo[i]));
-        DBG("</MODEMAPPER>");
-        mappingOut.setValue(midiNotesFrom.getUnchecked(i), midiNotesTo.getUnchecked(i));
+        int indexTo = i - rootIndexOffset;
+        
+        if (indexTo >= 0 && indexTo < mapSize)
+            mappingOut.setValue(midiNotesFrom.getUnchecked(i), midiNotesTo.getUnchecked(indexTo));
     }
+    */
+    int degCount = 0;
+    for (int m = 0; m < mappingOut.getSize(); m++)
+    {
+        
+        if (degCount < mapSize && m == midiNotesFrom.getUnchecked(degCount))
+        {
+            int indexTo = degCount - rootIndexOffset;
+            
+            if (indexTo >= 0 && indexTo < mapSize && indexTo < mappingOut.getSize())
+                mappingOut.setValue(midiNotesFrom.getUnchecked(degCount), midiNotesTo.getUnchecked(indexTo));
+            else
+                mappingOut.setValue(m, -1);
+            
+            degCount++;
+        }
+        else
+            mappingOut.setValue(m, -1);
+    }
+    
     return mappingOut;
 }
 

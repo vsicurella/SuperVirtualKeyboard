@@ -51,7 +51,13 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void setModeSelected2(int selectedIdIn);
+    void setMode1SelectedId(int selectedIdIn);
+	void setMode2SelectedId(int selectedIdIn);
+    void setMode1RootNote(int rootNoteIn);
+    void setMode2RootNote(int rootNoteIn);
+    
+    void refreshTables();
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;

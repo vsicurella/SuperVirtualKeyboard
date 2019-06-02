@@ -180,6 +180,7 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_mapStdButton] -- add your button handler code here..
 		pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
+        pluginState->getKeyboard()->updateKeyMidiNotes();
         //[/UserButtonCode_mapStdButton]
     }
 

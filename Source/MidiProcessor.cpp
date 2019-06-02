@@ -249,7 +249,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
         while (midiEvent.getNextEvent(msg, smpl))
         {
 			msg.setNoteNumber(midiInputFilter->getNoteRemapped(msg.getNoteNumber()));
-			if (msg.getNoteNumber() >= 0)
+			if (msg.getNoteNumber() >= 0 && msg.getNoteNumber() < 128)
 			{
 				msg.setTimeStamp(++msgCount);
 				keyboardState->processNextMidiEvent(msg);
