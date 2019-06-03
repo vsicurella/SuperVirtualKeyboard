@@ -167,6 +167,12 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
     return midiOutputFilter->getNoteRemapped(midiNoteIn);
 }
 
+bool SvkMidiProcessor::isAutoRemapping()
+{
+    return autoRemap;
+}
+
+
 //==============================================================================
 
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
@@ -223,6 +229,13 @@ void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn)
 {
 	midiOutputFilter->setNoteMap(mapIn.getValues());
 }
+
+void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
+{
+    autoRemap = remapIn;
+    midiSettingsNode.setProperty(IDs::autoRemapOn, autoRemap, nullptr);
+}
+
 
 int SvkMidiProcessor::mapInputNote(int noteIn, int noteOut)
 {

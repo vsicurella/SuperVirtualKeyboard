@@ -18,19 +18,16 @@ class ModeMapper
 {
 	Mode* mode;
 	Array<Mode>* modeChain;
-
-
+    
 public:
 
 	ModeMapper(Mode* modeIn);
 	ModeMapper(Array<Mode>* modesIn);
 	~ModeMapper() {}
 
-	NoteMap mapTo(Mode* modeMapped);
-	NoteMap mapTo(Mode* modeMapped, int rootNoteTo);
+	NoteMap mapTo(const Mode& modeMapped);
 
-	static NoteMap map(Mode* mapFrom, Mode* mapTo);
-    static NoteMap map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo);
+	static NoteMap map(const Mode& mapFrom, const Mode& mapTo);
     
-    static NoteMap stdMidiToMode(Mode* modeMapped, int rootNoteStd = 60, int rootNoteTo = 60);
+    static NoteMap stdMidiToMode(const Mode& modeMapped, int rootNoteStd = 60);
 };

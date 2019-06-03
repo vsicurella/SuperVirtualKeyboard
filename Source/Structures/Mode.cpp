@@ -267,12 +267,12 @@ void Mode::setRootNote(int rootNoteIn)
 	}
 }
 
-int Mode::getRootNote()
+int Mode::getRootNote() const
 {
 	return rootNote;
 }
 
-int Mode::getOffset()
+int Mode::getOffset() const
 {
 	return totalModulus(rootNote, scaleSize);
 }
@@ -488,7 +488,7 @@ int Mode::getModeSize() const
 	return modeSize;
 }
 
-Array<int> Mode::getStepsOfOrders()
+Array<int> Mode::getStepsOfOrders()  const
 {
     return stepsOfOrders;
 }
@@ -498,12 +498,12 @@ String Mode::getFamily() const
 	return family;
 }
 
-Array<int> Mode::getSteps()
+Array<int> Mode::getSteps()  const
 {
 	return steps;
 }
 
-String Mode::getStepsString()
+String Mode::getStepsString()  const
 {
 	return stepsString;
 }
@@ -513,34 +513,34 @@ Array<int>* Mode::getKeyboardOrdersSizes()
 	return &keyboardOrdersSizes;
 }
 
-int Mode::getKeyboardOrdersSize(int ordersIn)
+int Mode::getKeyboardOrdersSize(int ordersIn) const
 {
 	int o = ordersIn % getMaxStep();
 	return keyboardOrdersSizes[o];
 } 
 
-Array<int> Mode::getOrdersDefault()
+Array<int> Mode::getOrdersDefault() const
 {
 	return ordersDefault;
 }
 
-Array<int> Mode::getOrders()
+Array<int> Mode::getOrders() const
 {
 	return orders;
 }
 
-Array<float> Mode::getModalDegrees()
+Array<float> Mode::getModalDegrees() const
 {
 	return modeDegrees;
 }
 
-Array<int> Mode::getScaleDegrees()
+Array<int> Mode::getScaleDegrees() const
 {
 	return scaleDegrees;
 }
 
 
-int Mode::getMaxStep()
+int Mode::getMaxStep() const
 {
 	int step = 1;
 
@@ -553,24 +553,13 @@ int Mode::getMaxStep()
 	return step;
 }
 
-Array<int> Mode::getModalMidiNotes(int order, int rootNoteIn)
+Array<int> Mode::getNotesOfOrder(int order) const
 {
 	Array<int> notesOut;
-	std::unique_ptr<Mode> modeWithRoot;
 
-	Mode* modeToUse = this;
-
-	if (rootNote != rootNoteIn)
+	for (int i = 0; i < orders.size(); i++)
 	{
-		modeWithRoot.reset(new Mode(modeNode, rootNoteIn));
-		modeToUse = modeWithRoot.get();
-	}
-
-	Array<int> ordersToRead = modeToUse->getOrders();
-
-	for (int i = 0; i < ordersToRead.size(); i++)
-	{
-		if (ordersToRead.getUnchecked(i) == order)
+		if (orders.getUnchecked(i) == order)
 			notesOut.add(i);
 	}
 
@@ -592,22 +581,22 @@ String Mode::steps_to_string(Array<int> stepsIn)
 	return out;
 }
 
-Array<int> Mode::getMOSClass()
+Array<int> Mode::getMOSClass() const
 {
 	return mosClass;
 }
 
-String Mode::getDescription()
+String Mode::getDescription()  const
 {
 	return family + "[" + String(modeSize) + "] " + String(scaleSize);
 }
 
-String Mode::getScaleDescription()
+String Mode::getScaleDescription()  const
 {
 	return String(scaleSize) + " " + getDescription().dropLastCharacters(2);
 }
 
-String Mode::getModeDescription()
+String Mode::getModeDescription()  const
 {
 	return String(modeSize) + " " + family + " " + String(scaleSize);
 }

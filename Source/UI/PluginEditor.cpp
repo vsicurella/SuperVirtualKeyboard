@@ -451,6 +451,10 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	case IDs::CommandIDs::remapMidiNotes:
 		result.setInfo("Set midi note mapping", "Allows you to remap your keyboard to trigger modal notes.", "Midi", 0);
 		break;
+    case IDs::CommandIDs::autoRemap:
+        result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
+        result.setTicked(pluginState->getMidiProcessor()->isAutoRemapping());
+        break;
 	default:
 		break;
 	}
@@ -476,6 +480,10 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		midiSettingsWindow->setVisible(true);
             midiSettingsComponent->refreshTables();
 		break;
+    case IDs::CommandIDs::autoRemap:
+            pluginState->getMidiProcessor()->setAutoRemapOn(
+            !pluginState->getMidiProcessor()->isAutoRemapping());
+        break;
 	default:
 		return false;
 	}

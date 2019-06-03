@@ -70,6 +70,8 @@ public:
 
     bool isMapButtonOn();
 
+    void doStdMap();
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;
