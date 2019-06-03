@@ -179,7 +179,7 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mapStdButton.get())
     {
         //[UserButtonCode_mapStdButton] -- add your button handler code here..
-		pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
+        doStdMap();
         pluginState->getKeyboard()->updateKeyMidiNotes();
         //[/UserButtonCode_mapStdButton]
     }
@@ -281,6 +281,11 @@ void KeyboardEditorBar::createAndSendMode()
 	pluginState->loadMode(Mode::createNode(steps, "Custom"));
 }
 
+void KeyboardEditorBar::doStdMap()
+{
+    pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
+}
+
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
 {
  	presetLibraryBox->setEnabled(isAllowed);
@@ -299,6 +304,8 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
         int id = presetBox->getSelectedId() - 1;
 		pluginState->loadMode(id);
 
+        if (pluginState->getMidiProcessor()->isAutoRemapping())
+            pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
     }
 }
 
@@ -358,6 +365,7 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoPlayMode, "Play Mode");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoEditMode, "Edit Mode");
         menu.addCommandItem(appCmdMgr, IDs::CommandIDs::remapMidiNotes, "Edit Note Mapping");
+        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::autoRemap, "Auto-Remap From Standard Layout");
 	}
 	else if (topLevelMenuIndex == 2)
 	{
@@ -417,7 +425,7 @@ BEGIN_JUCER_METADATA
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
                     virtualName="" explicitFocusOrder="0" pos="9Rr 6 150 24" class="PresetLibraryBox"
-                    params="pluginState-&gt;presetManager.get(), &quot;PresetLibraryBox&quot;"/>
+                    params="pluginState-&gt;presetManager.get()"/>
   <TEXTBUTTON name="Std Map Button" id="7376bb3f0836f75b" memberName="mapStdButton"
               virtualName="" explicitFocusOrder="0" pos="662Rr 6 138 24" bgColOff="ff5c60a4"
               bgColOn="ffa7b438" buttonText="Map From Standard" connectedEdges="8"

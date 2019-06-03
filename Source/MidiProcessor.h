@@ -36,6 +36,7 @@ class SvkMidiProcessor : public MidiMessageCollector
     bool midiInputPaused = false;
     bool isInputRemapped = false;
     bool isOutputRemapped = false;
+    bool autoRemap = true;
     
     std::unique_ptr<MidiKeyboardState> keyboardState; // used for displaying on VirtualKeyboard
     
@@ -68,6 +69,8 @@ public:
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
     
+    bool isAutoRemapping();
+    
     String setMidiInput(int deviceIndex);
     String setMidiOutput(int deviceIndex);
 
@@ -80,6 +83,8 @@ public:
 	void setMidiInputMap(NoteMap mapIn);
     void setMidiOutputMap(Array<int> mapIn);
 	void setMidiOutputMap(NoteMap mapIn);
+    
+    void setAutoRemapOn(bool remapIn=true);
     
     int mapInputNote(int noteIn, int noteOut);
     int mapOutputNode(int noteIn, int noteOut);

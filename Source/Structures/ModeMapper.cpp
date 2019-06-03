@@ -20,65 +20,42 @@ ModeMapper::ModeMapper(Array<Mode>* modesIn)
 	modeChain = modesIn;
 }
 
-NoteMap ModeMapper::mapTo(Mode* modeMapped)
+NoteMap ModeMapper::mapTo(const Mode& modeMapped)
 {
-    return mapTo(modeMapped, modeMapped->getRootNote());
-}
-
-NoteMap ModeMapper::mapTo(Mode* modeMapped, int rootNoteTo)
-{
-	return map(mode, modeMapped, mode->getRootNote(), rootNoteTo);
-}
-
-//static
-NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo)
-{
-    return map(mapFrom, mapTo, mapFrom->getRootNote(), mapTo->getRootNote());
+    return map(*mode, modeMapped);
 }
 
 // static
-NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNoteTo)
+NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
 {
-    Array<int> midiNotesFrom = mapFrom->getModalMidiNotes(0, rootNoteFrom);
-    Array<int> midiNotesTo = mapTo->getModalMidiNotes(0, rootNoteTo);
+    Array<int> midiNotesFrom = mapFrom.getNotesOfOrder();
+    Array<int> midiNotesTo = mapTo.getNotesOfOrder();
+    
+    int rootNoteFrom = mapFrom.getRootNote();
+    int rootNoteTo = mapTo.getRootNote();
+
+    int rootIndexFrom = midiNotesFrom.indexOf(rootNoteFrom);
+    int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
+    int rootIndexOffset = rootIndexTo - rootIndexFrom;
+
     /*
      DBGArray(midiNotesFrom, "midi notes from");
      DBGArray(midiNotesTo, "midi notes to");
      */
     
     DBG("ModeFrom has " + String(midiNotesFrom.size()) + " modal notes and ModeTo has " + String(midiNotesTo.size()) + " modal notes.");
-    
-    int rootIndexFrom = midiNotesFrom.indexOf(rootNoteFrom);
-    int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
-    
     String txt = "Root note from is " + String(rootNoteFrom) + " and index is " + String(rootIndexFrom);
-    
     DBG(txt);
-    
     txt = "Root note to is " + String(rootNoteTo) + " and index is " + String(rootIndexTo);
-    
     DBG(txt);
+    DBG("Offset is " + String(rootIndexOffset));
 
-    int rootIndexOffset = rootIndexTo - rootIndexFrom;
     //int sgn = rootIndexOffset / abs(rootIndexOffset);
     //rootIndexOffset = totalModulus(abs(rootIndexOffset), mapFrom->getScaleSize());
     //rootIndexOffset *= sgn;
-
-    
-    DBG("Offset is " + String(rootIndexOffset));
-    
     
     NoteMap mappingOut;
     
-    /*
-    for (int i = 0; i < mapSize; i++)
-    {
-        int indexTo = i - rootIndexOffset;
-        
-        if (indexTo >= 0 && indexTo < mapSize)
-            mappingOut.setValue(midiNotesFrom.getUnchecked(i), midiNotesTo.getUnchecked(indexTo));
-    }
-    */
     int degCountFrom = 0;
     int degCountTo = 0;
     for (int m = 0; m < mappingOut.getSize(); m++)
@@ -112,8 +89,8 @@ NoteMap ModeMapper::map(Mode* mapFrom, Mode* mapTo, int rootNoteFrom, int rootNo
 }
 
 // static
-NoteMap ModeMapper::stdMidiToMode(Mode* modeMapped, int rootNoteStd, int rootNoteMap)
+NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
 {
     Mode meantone7_12 = Mode("2 2 1 2 2 2 1", "Meantone", rootNoteStd);
-    return map(&meantone7_12, modeMapped, rootNoteStd, rootNoteMap);
+    return map(meantone7_12, modeMapped);
 }

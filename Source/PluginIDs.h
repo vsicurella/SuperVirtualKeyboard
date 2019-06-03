@@ -36,6 +36,7 @@ namespace IDs
     static Identifier midiOutputMap("OutputMappint");
     static Identifier midiInputName("InputDevice");
     static Identifier midiOutputName("OutputDevice");
+    static Identifier autoRemapOn("AutoRemapOn");
 
 	// ModeLayout
 	static Identifier scaleSize("ScaleSize");
@@ -98,7 +99,8 @@ namespace IDs
 		setKeysNestedCenter,
 		setKeysAdjacent,
 		showMidiNoteNumbers,
-		remapMidiNotes
+		remapMidiNotes,
+        autoRemap
 	};
 }
 

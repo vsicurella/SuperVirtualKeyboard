@@ -48,9 +48,9 @@ struct Mode
 	*/
 	void setRootNote(int rootNoteIn);
 
-	int getRootNote();
+	int getRootNote() const;
 
-	int getOffset();
+	int getOffset()  const;
 
 	int getScaleSize() const;
 
@@ -60,33 +60,33 @@ struct Mode
 
 	Array<int>* getKeyboardOrdersSizes();
 
-	int getKeyboardOrdersSize(int ordersIn);
+	int getKeyboardOrdersSize(int ordersIn) const;
     
-    Array<int> getStepsOfOrders();
+    Array<int> getStepsOfOrders() const;
 
-	Array<int> getSteps();
+	Array<int> getSteps() const;
 
-	String getStepsString();
+	String getStepsString() const;
 
-	Array<int> getOrdersDefault();
+	Array<int> getOrdersDefault() const;
 
-	Array<int> getOrders();
+	Array<int> getOrders() const;
 
-	Array<float> getModalDegrees();
+	Array<float> getModalDegrees() const;
 
-	Array<int> getScaleDegrees();
+	Array<int> getScaleDegrees() const;
 
-	int getMaxStep();
+	int getMaxStep() const;
 
-	Array<int> getMOSClass();
+	Array<int> getMOSClass() const;
 
-	String getDescription();
+	String getDescription() const;
 
-	String getScaleDescription();
+	String getScaleDescription() const;
 
-	String getModeDescription();
+	String getModeDescription() const;
 
-	Array<int> getModalMidiNotes(int order = 0, int rootNoteIn = -1);
+	Array<int> getNotesOfOrder(int order = 0) const;
 
 	/*
 	Simply parses a string reprsenting step sizes and returns a vector
