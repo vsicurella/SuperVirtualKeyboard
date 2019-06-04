@@ -283,7 +283,7 @@ void KeyboardEditorBar::createAndSendMode()
 
 void KeyboardEditorBar::doStdMap()
 {
-    pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
+    pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
@@ -305,7 +305,10 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 		pluginState->loadMode(id);
 
         if (pluginState->getMidiProcessor()->isAutoRemapping())
-            pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(pluginState->getModeLoaded()));
+        {
+            pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
+    
+        }
     }
 }
 
