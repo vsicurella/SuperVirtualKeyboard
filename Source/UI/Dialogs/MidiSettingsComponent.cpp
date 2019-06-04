@@ -190,10 +190,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
-    presetBox1->setSelectedId(8);
-    presetBox2->setSelectedId(8);
-    modeOriginalRootSld->setValue(60);
-    modeRemapRootSld->setValue(60);
+
     //[/Constructor]
 }
 
@@ -270,7 +267,7 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 	else if (comboBoxThatHasChanged == presetBox2.get())
 	{
 		modeSelected2.reset(
-			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()),
+			new Mode(pluginState->presetManager->getMode(presetBox2->getSelectedId()),
 				modeRemapRootSld->getValue()));
 	}
     //[/UsercomboBoxChanged_Post]
@@ -354,12 +351,12 @@ void MidiSettingsComponent::setMode2SelectedId(int selectedIdIn)
 
 void MidiSettingsComponent::setMode1RootNote(int rootNoteIn)
 {
-    modeSelected1->setRootNote(rootNoteIn);
+    modeOriginalRootSld->setValue(rootNoteIn);
 }
 
 void MidiSettingsComponent::setMode2RootNote(int rootNoteIn)
 {
-    modeSelected2->setRootNote(rootNoteIn);
+    modeRemapRootSld->setValue(rootNoteIn);
 }
 
 void MidiSettingsComponent::refreshTables()
