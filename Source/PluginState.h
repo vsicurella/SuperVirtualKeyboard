@@ -74,11 +74,11 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
     
 	std::unique_ptr<SvkPreset> presetCurrent;
+    std::unique_ptr<Mode> modeLoaded;
 	
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<int>> presetsSorted;
 
-	std::unique_ptr<Mode> modeLoaded;
 };
