@@ -52,6 +52,12 @@ ValueTree SvkPresetManager::getMode(int indexIn)
 	return preset;
 }
 
+// Put inside a shared pointer
+PopupMenu* SvkPresetManager::getPresetMenu()
+{
+    return presetMenuMain.get();
+}
+
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
 {
 	std::unique_ptr<SvkPreset> newPreset(new SvkPreset(presetNodeIn));
@@ -155,6 +161,9 @@ void SvkPresetManager::intializePresets()
 
 	createFactoryPresets();
 	loadPresetDirectory();
+    
+    // I can actually make this functionality built into this class, not yet sure if that's a better move
+    presetMenuMain = PresetLibraryBox::createMenu(this);
 }
 
 
