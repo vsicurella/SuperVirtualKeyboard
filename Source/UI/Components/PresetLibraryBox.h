@@ -14,7 +14,7 @@
 
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
-#include "../../Structures/PresetManager.h"
+#include "../../PresetManager.h"
 
 
 class PresetLibraryBox : public ComboBox
@@ -22,7 +22,7 @@ class PresetLibraryBox : public ComboBox
 	SvkPresetManager* presetManager;
 	ValueTree presetsLibraryNode;
 
-	std::unique_ptr<OwnedArray<PopupMenu>> menus;
+    std::shared_ptr<PopupMenu> rootMenu;
 
 	Array<Array<ValueTree>>* presetsSorted;
 	Array<Array<int>>* sortedIndicies;
@@ -35,5 +35,9 @@ public:
 	~PresetLibraryBox();
 
 	void populateMenu();
-	void showPopup() override;
+    void populateMenu(const PopupMenu& menuToReference);
+    
+    static PopupMenu createMenu(SvkPresetManager* presetManagerIn);
+    
+    void showPopup() override;
 };

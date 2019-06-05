@@ -15,7 +15,7 @@
 #include "PluginIDs.h"
 #include "PluginSettings.h"
 #include "MidiProcessor.h"
-#include "Structures/PresetManager.h"
+#include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "UI/Components/VirtualKeyboard/Keyboard.h"
 

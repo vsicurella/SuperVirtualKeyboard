@@ -17,9 +17,6 @@
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
       <FILE id="x6boMo" name="ModeMapper.cpp" compile="1" resource="0" file="Source/Structures/ModeMapper.cpp"/>
       <FILE id="kIMFVq" name="ModeMapper.h" compile="0" resource="0" file="Source/Structures/ModeMapper.h"/>
-      <FILE id="YMhOFD" name="PresetManager.cpp" compile="1" resource="0"
-            file="Source/Structures/PresetManager.cpp"/>
-      <FILE id="LojL8r" name="PresetManager.h" compile="0" resource="0" file="Source/Structures/PresetManager.h"/>
       <FILE id="vATes6" name="NoteMap.cpp" compile="1" resource="0" file="Source/Structures/NoteMap.cpp"/>
       <FILE id="uK2AIM" name="NoteMap.h" compile="0" resource="0" file="Source/Structures/NoteMap.h"/>
       <FILE id="VyoYfT" name="FractionalGrid.cpp" compile="1" resource="0"
@@ -92,6 +89,9 @@
           file="Source/PluginSettings.cpp"/>
     <FILE id="a1oozu" name="PluginSettings.h" compile="0" resource="0"
           file="Source/PluginSettings.h"/>
+    <FILE id="go0rYg" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
+    <FILE id="CD8Pzj" name="PresetManager.cpp" compile="1" resource="0"
+          file="Source/PresetManager.cpp"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">

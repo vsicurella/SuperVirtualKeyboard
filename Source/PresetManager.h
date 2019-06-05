@@ -12,10 +12,10 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "../CommonFunctions.h"
-#include "../PluginIDs.h"
-#include "Preset.h"
-#include "Mode.h"
+#include "CommonFunctions.h"
+#include "PluginIDs.h"
+#include "Structures/Preset.h"
+#include "Structures/Mode.h"
 
 class SvkPresetManager : public ComboBox::Listener,
 							public ChangeBroadcaster
@@ -33,6 +33,8 @@ class SvkPresetManager : public ComboBox::Listener,
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
+    
+    std::shared_ptr<PopupMenu> presetMenuMain;
 
 	// Methods
 	void createFactoryPresets();
@@ -55,6 +57,8 @@ public:
 
 	ValueTree getPreset(int indexIn);
 	ValueTree getMode(int indexIn);
+    
+    PopupMenu* getPresetMenu();
 	
 	// Can load either full preset or just Mode
 	bool loadPreset(ValueTree presetNodeIn);
