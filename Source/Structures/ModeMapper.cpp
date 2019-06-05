@@ -60,7 +60,7 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
     int degCountTo = 0;
     for (int m = 0; m < mappingOut.getSize(); m++)
     {
-        if (m == midiNotesFrom.getUnchecked(degCountFrom))
+        if (m == midiNotesFrom[degCountFrom])
         {
             degCountFrom++;
             degCountTo++;

@@ -34,7 +34,8 @@ class SvkPresetManager : public ComboBox::Listener,
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
     
-    std::shared_ptr<PopupMenu> presetMenuMain;
+    std::unique_ptr<PopupMenu> presetMenu;
+    OwnedArray<PopupMenu> presetSubMenus;
 
 	// Methods
 	void createFactoryPresets();
@@ -74,6 +75,8 @@ public:
 	int addPresetToLibrary(ValueTree presetNodeIn);
 	void addPresetToSort(ValueTree presetNodeIn);
 	int addAndSortPreset(ValueTree presetNodeIn);
+    
+    void buildPresetMenu();
 
 	void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
 

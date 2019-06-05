@@ -43,10 +43,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	midiSettingsComponent.reset(new MidiSettingsComponent(pluginState));
     midiSettingsComponent->setSize(800, 600);
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
+    midiSettingsWindow->setAlwaysOnTop(true);
     
-    midiSettingsComponent->setMode1SelectedId(7);
+    midiSettingsComponent->setMode1SelectedId(8);
     midiSettingsComponent->setMode1RootNote(60);
-    midiSettingsComponent->setMode2SelectedId(7);
+    midiSettingsComponent->setMode2SelectedId(8);
     midiSettingsComponent->setMode2RootNote(60);
     
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());

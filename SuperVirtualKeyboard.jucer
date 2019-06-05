@@ -52,10 +52,10 @@
               file="Source/UI/Components/MidiRemapTableModel.cpp"/>
         <FILE id="wf4Gan" name="MidiRemapTableModel.h" compile="0" resource="0"
               file="Source/UI/Components/MidiRemapTableModel.h"/>
-        <FILE id="sFAed2" name="PresetLibraryBox.cpp" compile="1" resource="0"
-              file="Source/UI/Components/PresetLibraryBox.cpp"/>
-        <FILE id="bPWHZY" name="PresetLibraryBox.h" compile="0" resource="0"
-              file="Source/UI/Components/PresetLibraryBox.h"/>
+        <FILE id="gtGOgZ" name="ReferencedComboBox.cpp" compile="1" resource="0"
+              file="Source/UI/Components/ReferencedComboBox.cpp"/>
+        <FILE id="el2G9f" name="ReferencedComboBox.h" compile="0" resource="0"
+              file="Source/UI/Components/ReferencedComboBox.h"/>
       </GROUP>
       <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
         <FILE id="xH4xEW" name="ColorChoosingWindow.cpp" compile="1" resource="0"

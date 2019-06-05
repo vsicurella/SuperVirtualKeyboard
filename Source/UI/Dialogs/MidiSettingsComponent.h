@@ -26,7 +26,7 @@
 #include "../../PluginState.h"
 #include "../../Structures/ModeMapper.h"
 #include "../Components/MidiRemapTableModel.h"
-#include "../Components/PresetLibraryBox.h"
+#include "../Components/ReferencedComboBox.h"
 //[/Headers]
 
 
@@ -55,7 +55,7 @@ public:
 	void setMode2SelectedId(int selectedIdIn);
     void setMode1RootNote(int rootNoteIn);
     void setMode2RootNote(int rootNoteIn);
-    
+
     void refreshTables();
 
     //[/UserMethods]
@@ -98,8 +98,8 @@ private:
     std::unique_ptr<Slider> modeOriginalRootSld;
     std::unique_ptr<Slider> modeRemapRootSld;
     std::unique_ptr<Label> rootNoteLabel;
-    std::unique_ptr<PresetLibraryBox> presetBox1;
-    std::unique_ptr<PresetLibraryBox> presetBox2;
+    std::unique_ptr<ReferencedComboBox> presetBox1;
+    std::unique_ptr<ReferencedComboBox> presetBox2;
     std::unique_ptr<TextButton> mapModesBtn;
 
 

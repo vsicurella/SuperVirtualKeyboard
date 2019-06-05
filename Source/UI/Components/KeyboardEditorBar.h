@@ -23,7 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../PluginState.h"
 #include "../../Structures/Mode.h"
-#include "PresetLibraryBox.h"
+#include "ReferencedComboBox.h"
 #include "../../Structures/ModeMapper.h"
 //[/Headers]
 
@@ -125,7 +125,7 @@ private:
     std::unique_ptr<Slider> offsetSld;
     std::unique_ptr<Label> offsetLabel;
     std::unique_ptr<TextButton> mapButton;
-    std::unique_ptr<PresetLibraryBox> presetLibraryBox;
+    std::unique_ptr<ReferencedComboBox> presetLibraryBox;
     std::unique_ptr<TextButton> mapStdButton;
 
 
