@@ -74,7 +74,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
     mapButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
 
-    presetLibraryBox.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    presetLibraryBox.reset (new ReferencedComboBox ("Preset Box Main"));
     addAndMakeVisible (presetLibraryBox.get());
     presetLibraryBox->setName ("PresetLibraryBox");
 
@@ -88,6 +88,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
 
     //[UserPreSize]
+    presetLibraryBox->setMenu(*pluginState->presetManager->getPresetMenu());
 	presetLibraryBox->addListener(this);
 
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
@@ -297,11 +298,10 @@ void KeyboardEditorBar::allowUserInput(bool isAllowed)
 
 void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
-    PresetLibraryBox* presetBox = dynamic_cast<PresetLibraryBox*>(comboBoxThatHasChanged);
 
-    if (presetBox)
+    if (comboBoxThatHasChanged)
     {
-        int id = presetBox->getSelectedId() - 1;
+        int id = comboBoxThatHasChanged->getSelectedId() - 1;
 		pluginState->loadMode(id);
 
         if (pluginState->getMidiProcessor()->isAutoRemapping())
@@ -427,8 +427,8 @@ BEGIN_JUCER_METADATA
               bgColOn="ffa7b438" buttonText="Learn Mapping" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
-                    virtualName="" explicitFocusOrder="0" pos="9Rr 6 150 24" class="PresetLibraryBox"
-                    params="pluginState-&gt;presetManager.get()"/>
+                    virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="9Rr 6 150 24"
+                    class="ComboBox" params="&quot;Preset Box Main&quot;"/>
   <TEXTBUTTON name="Std Map Button" id="7376bb3f0836f75b" memberName="mapStdButton"
               virtualName="" explicitFocusOrder="0" pos="662Rr 6 138 24" bgColOff="ff5c60a4"
               bgColOn="ffa7b438" buttonText="Map From Standard" connectedEdges="8"

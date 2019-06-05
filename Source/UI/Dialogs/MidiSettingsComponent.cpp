@@ -142,13 +142,13 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
     rootNoteLabel->setBounds (630, 48, 80, 24);
 
-    presetBox1.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    presetBox1.reset (new ReferencedComboBox());
     addAndMakeVisible (presetBox1.get());
     presetBox1->setName ("Preset Box 1");
 
     presetBox1->setBounds (472, 75, 150, 24);
 
-    presetBox2.reset (new PresetLibraryBox (pluginState->presetManager.get()));
+    presetBox2.reset (new ReferencedComboBox());
     addAndMakeVisible (presetBox2.get());
     presetBox2->setName ("Preset Box 2");
 
@@ -166,7 +166,9 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 	noteRangeSld->setMinValue(0);
 	noteRangeSld->setMaxValue(127);
 
+    presetBox1->setMenu(*pluginState->presetManager->getPresetMenu());
 	presetBox1->addListener(this);
+    presetBox2->setMenu(*pluginState->presetManager->getPresetMenu());
 	presetBox2->addListener(this);
 
 	midiInputFilter = pluginState->getMidiProcessor()->getMidiInputFilter();
@@ -260,14 +262,14 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 	else if (comboBoxThatHasChanged == presetBox1.get())
 	{
 		modeSelected1.reset(
-			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()),
+			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()-1),
 						modeOriginalRootSld->getValue()));
 	}
 
 	else if (comboBoxThatHasChanged == presetBox2.get())
 	{
 		modeSelected2.reset(
-			new Mode(pluginState->presetManager->getMode(presetBox2->getSelectedId()),
+			new Mode(pluginState->presetManager->getMode(presetBox2->getSelectedId()-1),
 				modeRemapRootSld->getValue()));
 	}
     //[/UsercomboBoxChanged_Post]
@@ -432,11 +434,11 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <GENERICCOMPONENT name="Preset Box 1" id="ee5b2def32e4fdbc" memberName="presetBox1"
-                    virtualName="PresetLibraryBox" explicitFocusOrder="0" pos="472 75 150 24"
-                    class="PresetLibraryBox" params="pluginState-&gt;presetManager.get()"/>
+                    virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="472 75 150 24"
+                    class="ComboBox" params=""/>
   <GENERICCOMPONENT name="Preset Box 2" id="eb2e366c9ad8965c" memberName="presetBox2"
-                    virtualName="PresetLibraryBox" explicitFocusOrder="0" pos="472 115 150 24"
-                    class="PresetLibraryBox" params="pluginState-&gt;presetManager.get()"/>
+                    virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="472 115 150 24"
+                    class="ComboBox" params=""/>
   <TEXTBUTTON name="Map Modes Button" id="7a76936bfde482aa" memberName="mapModesBtn"
               virtualName="" explicitFocusOrder="0" pos="472 168 144 24" buttonText="Map!"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
