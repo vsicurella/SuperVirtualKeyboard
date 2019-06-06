@@ -261,16 +261,20 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[UsercomboBoxChanged_Post]
 	else if (comboBoxThatHasChanged == presetBox1.get())
 	{
-		modeSelected1.reset(
-			new Mode(pluginState->presetManager->getMode(presetBox1->getSelectedId()-1),
-						modeOriginalRootSld->getValue()));
+        if (presetBox1->getSelectedId() > 0)
+        {
+            ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
+            modeSelected1.reset(new Mode(modeToLoad, modeOriginalRootSld->getValue()));
+        }
 	}
 
 	else if (comboBoxThatHasChanged == presetBox2.get())
 	{
-		modeSelected2.reset(
-			new Mode(pluginState->presetManager->getMode(presetBox2->getSelectedId()-1),
-				modeRemapRootSld->getValue()));
+        if (presetBox2->getSelectedId() > 0)
+        {
+            ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
+            modeSelected2.reset(new Mode(modeToLoad, modeRemapRootSld->getValue()));
+        }
 	}
     //[/UsercomboBoxChanged_Post]
 }

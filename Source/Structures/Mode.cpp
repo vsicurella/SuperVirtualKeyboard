@@ -341,6 +341,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 	{
 		index = (off + i) % period;
 
+        
 		// adjust first few notes if it starts in the middle of a whole step
 		if (i == 0 && ordersIn[index] != 0)
 		{
@@ -353,6 +354,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 				index = (off + i) % period;
 			}
 		}
+        
 
 		ordersOut.add(ordersIn[index]);
 	}
@@ -386,7 +388,7 @@ Array<int> Mode::orders_to_steps(Array<int> layoutIn)
 
 	while (i < layoutIn.size())
 	{
-		if (layoutIn[i] == 0)
+		if (layoutIn[i] == 0 || i == 0)
 		{
 			j = i + 1;
 			step = 1;

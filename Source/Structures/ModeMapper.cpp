@@ -20,14 +20,15 @@ ModeMapper::ModeMapper(Array<Mode>* modesIn)
 	modeChain = modesIn;
 }
 
-NoteMap ModeMapper::mapTo(const Mode& modeMapped)
+NoteMap ModeMapper::mapTo(const Mode& modeMapped, Array<int> degreeMapIn)
 {
     return map(*mode, modeMapped);
 }
 
 // static
-NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
+NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn)
 {
+    
     Array<int> midiNotesFrom = mapFrom.getNotesOfOrder();
     Array<int> midiNotesTo = mapTo.getNotesOfOrder();
     
@@ -38,10 +39,6 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
     int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
     int rootIndexOffset = rootIndexTo - rootIndexFrom;
 
-    /*
-     DBGArray(midiNotesFrom, "midi notes from");
-     DBGArray(midiNotesTo, "midi notes to");
-     */
     
     DBG("ModeFrom has " + String(midiNotesFrom.size()) + " modal notes and ModeTo has " + String(midiNotesTo.size()) + " modal notes.");
     String txt = "Root note from is " + String(rootNoteFrom) + " and index is " + String(rootIndexFrom);
@@ -49,23 +46,43 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
     txt = "Root note to is " + String(rootNoteTo) + " and index is " + String(rootIndexTo);
     DBG(txt);
     DBG("Offset is " + String(rootIndexOffset));
+    
 
-    //int sgn = rootIndexOffset / abs(rootIndexOffset);
-    //rootIndexOffset = totalModulus(abs(rootIndexOffset), mapFrom->getScaleSize());
-    //rootIndexOffset *= sgn;
     
     NoteMap mappingOut;
+    /*
+    Array<float> modeFromDegrees = mapFrom.getModalDegrees();
+    Array<float> modeToDegrees = mapTo.getModalDegrees();
+    Array<int> modeFromOrders = mapFrom.getOrders();
+    Array<int> modeToOrders = mapTo.getOrders();
+    Array<int> modeToSteps = mapTo.getStepsOfOrders();
+    Array<int> modeFromSteps = mapFrom.getStepsOfOrders();
     
+    float degFrom, degTo;
+    int orderFrom, orderTo;
+    int stepFrom, stepTo;
+    
+    for (int m = 0; m < mappingOut.getSize(); m++)
+    {
+        degFrom = modeFromDegrees[m];
+        degTo = modeToDegrees[m];
+        orderFrom = modeFromOrders[m];
+        orderTo = modeToOrders[m];
+        stepFrom = modeToSteps[m];
+        stepTo = modeToSteps[m];
+        
+        
+    }
+    
+    */
     int degCountFrom = 0;
     int degCountTo = 0;
+    
     for (int m = 0; m < mappingOut.getSize(); m++)
     {
         if (m == midiNotesFrom[degCountFrom])
         {
-            degCountFrom++;
-            degCountTo++;
-            
-            int indexTo = degCountTo + rootIndexOffset - 1;
+            int indexTo = degCountTo + rootIndexOffset;
             
             if (indexTo > -1 && indexTo < midiNotesTo.size())
             {
@@ -74,6 +91,8 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
             else
                 mappingOut.setValue(m, -1);
             
+            degCountFrom++;
+            degCountTo++;
         }
         else
             mappingOut.setValue(m, -1);
@@ -89,7 +108,7 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo)
 }
 
 // static
-NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
+NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd, Array<int> degreeMapIn)
 {
     Mode meantone7_12 = Mode("2 2 1 2 2 2 1", "Meantone", rootNoteStd);
     return map(meantone7_12, modeMapped);
