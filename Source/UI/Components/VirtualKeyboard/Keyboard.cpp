@@ -348,6 +348,7 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
 
 //===============================================================================================
 
+// NEED TO MAKE THIS MORE EFFICIENT
 void Keyboard::applyMode(Mode* modeIn)
 {
     mode = modeIn;
