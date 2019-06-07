@@ -10,22 +10,6 @@
 
 #include "ModeMapper.h"
 
-ModeMapper::ModeMapper(Mode* modeIn)
-{
-	mode = modeIn;
-}
-
-ModeMapper::ModeMapper(Array<Mode>* modesIn)
-{
-	modeChain = modesIn;
-}
-
-NoteMap ModeMapper::mapTo(const Mode& modeMapped, Array<int> degreeMapIn)
-{
-    return map(*mode, modeMapped);
-}
-
-// static
 NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn)
 {
     
@@ -107,9 +91,43 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
     return mappingOut;
 }
 
-// static
 NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd, Array<int> degreeMapIn)
 {
     Mode meantone7_12 = Mode("2 2 1 2 2 2 1", "Meantone", rootNoteStd);
     return map(meantone7_12, modeMapped);
+}
+
+Array<int> ModeMapper::autoDegreeMap(const Mode& mode1, const Mode& mode2)
+{
+    Array<int> degreeMapOut;
+    
+    Array<int> mode1MidiNotes = mode1.getNotesOfOrder();
+    Array<int> mode2MidiNotes = mode2.getNotesOfOrder();
+    
+    int mode1ScaleSize = mode1.getScaleSize();
+    int mode2ScaleSize = mode2.getScaleSize();
+    int mode1ModeSize = mode1.getModeSize();
+    int mode2ModeSize = mode2.getModeSize();
+    
+    float modeMultiplier = (float) mode2ModeSize / mode1ModeSize;
+    
+    int mode1RootNote = mode1.getRootNote();
+    int mode2RootNote = mode2.getRootNote();
+    
+    int mode1RootIndex = mode1MidiNotes.indexOf(mode1RootNote);
+    int mode2RootIndex = mode2MidiNotes.indexOf(mode2RootNote);
+    int rootOffset = mode2RootIndex - mode1RootIndex;
+    
+    int mode1Deg = 0;
+    int mode2Deg = 0;
+    
+    int midiNote;
+    
+    for (int m = 0; m < mode2ScaleSize; m++)
+    {
+        midiNote = m + mode1RootNote;
+        
+        if (midiNote)
+    }
+    
 }
