@@ -76,6 +76,14 @@ struct Mode
 
 	Array<int> getScaleDegrees() const;
 
+	int getScaleDegree(int midiNoteIn) const;
+
+	float getModeDegree(int midiNoteIn) const;
+
+	int getMidiNote(int scaleDegreeIn) const;
+
+	int getMidiNote(int periodIn, int scaleDegreeIn) const;
+
 	int getMaxStep() const;
 
 	Array<int> getMOSClass() const;
