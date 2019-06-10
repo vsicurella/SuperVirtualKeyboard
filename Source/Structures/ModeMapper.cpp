@@ -75,7 +75,7 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 
 	int rootNoteFrom = mapFrom.getRootNote();
 	int rootNoteTo = mapTo.getRootNote();
-	int rootNoteOffset = rootNoteTo - rootNoteFrom;
+    int rootNoteOffset = rootNoteTo % degreeMapIn.size();
 
 	int rootIndexFrom = midiNotesFrom.indexOf(rootNoteFrom);
 	int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
@@ -87,21 +87,30 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 	DBG(txt);
 	txt = "Root note to is " + String(rootNoteTo) + " and index is " + String(rootIndexTo);
 	DBG(txt);
-	DBG("Offset is " + String(rootIndexOffset));
+	DBG("Offset is " + String(rootNoteOffset));
+    DBG("Degree Map Size is " + String(degreeMapIn.size()));
 
 	NoteMap mappingOut;
 
 	int degTo;
-	int index;
+	int mapIndex;
 	int periods = 0;
+    int midiNote;
 
 	for (int m = 0; m < mappingOut.getSize(); m++)
 	{
-		index = totalModulus(m + rootNoteOffset, degreeMapIn.size());
-		periods = m / degreeMapIn.size();
-		degTo = degreeMapIn[index] + periods*mapTo.getScaleSize();
-		mappingOut.setValue(m, mapTo.getMidiNote(degTo));
-
+        mapIndex = m;// + rootNoteOffset;
+        
+        if (mapIndex >= 0)
+        {
+            periods = mapIndex / degreeMapIn.size();
+            midiNote = degreeMapIn[mapIndex % degreeMapIn.size()] + periods * mapTo.getScaleSize();
+        }
+        else
+            midiNote = -1;
+        
+        mappingOut.setValue(m, midiNote);
+        
 		if (m == rootNoteFrom)
 			DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) + ")");
 	}
@@ -121,71 +130,59 @@ Array<int> ModeMapper::autoDegreeMap(const Mode& mode1, const Mode& mode2)
     Array<int> degreeMapOut;
     
     Array<int> mode1MidiNotes = mode1.getNotesOfOrder();
-    Array<int> mode2MidiNotes = mode2.getNotesOfOrder();
-	Array<float> mode2ModalDegrees = mode2.getModalDegrees();
+    Array<int> mode1Steps = mode1.getSteps();
+    Array<float> mode1ModalDegrees = mode1.getModalDegrees();
     
-    int mode1ScaleSize = mode1.getScaleSize();
-    int mode2ScaleSize = mode2.getScaleSize();
-    int mode1ModeSize = mode1.getModeSize();
+    Array<int> mode2MidiNotes = mode2.getNotesOfOrder();
+    Array<int> mode2Steps = mode2.getSteps();
+    Array<float> mode2ModalDegrees = mode2.getModalDegrees();
+    
     int mode2ModeSize = mode2.getModeSize();
     
-    float modeMultiplier = (float) mode2ModeSize / mode1ModeSize;
+    int mode1ModeIndex = 0;
+    int mode2ScaleIndex = 0;
+    int mode2ModeIndex = 0;
     
-    int mode1RootNote = mode1.getRootNote();
-    int mode2RootNote = mode2.getRootNote();
-    
-    int mode1RootIndex = mode1MidiNotes.indexOf(mode1RootNote);
-    int mode2RootIndex = mode2MidiNotes.indexOf(mode2RootNote);
-    int rootOffset = mode2RootIndex - mode1RootIndex;
-    
-	int mapSize;
-
-	if (mode1ModeSize == mode2ModeSize)
-		mapSize = mode1ScaleSize;
-	else
-		mapSize = sumUpToRingIndex(mode1.getSteps(), mode2ModeSize - 1);
-	
-	int mode1Index = 0;
-    int mode2Index = 0;
-    
-    int midiNote;
 	int degToAdd;
-	float modalDegree;
-
-    for (int m = 0; m < mapSize; m++)
+    int degSub;
+	float stepFraction;
+    
+    float mode1Step;
+    float mode2Step;
+    
+    
+    while (mode2ModeIndex < mode2ModeSize)
     {
-        midiNote = m + mode1RootNote;
+        mode1Step = mode1Steps[mode1ModeIndex];
+        mode2Step = mode2Steps[mode2ModeIndex];
         
-		if (mode1MidiNotes.contains(midiNote))
-		{
-			degToAdd = mode2.getScaleDegree(mode2MidiNotes[mode2RootIndex + mode2Index]);
-			degreeMapOut.add(degToAdd);
-			mode1Index++;
-			mode2Index++;
-		}
-		else
-		{
-			DefaultElementComparator<float> sorter;
-			float modalDegree = mode1.getModeDegree(m) * modeMultiplier;
-			
-			// find closest degree
-			int degFloor = mode2ModalDegrees.indexOfSorted(sorter, floor(modalDegree));
-			int degCeil = mode2ModalDegrees.indexOfSorted(sorter, ceil(modalDegree));
-
-			int closestDeg = degCeil;
-			int d;
-
-			for (int i = 0; i < (degCeil - degFloor); i++)
-			{
-				d = degFloor + i;
-				if (abs(mode2ModalDegrees[d] - modalDegree) < abs(mode2ModalDegrees[closestDeg] - modalDegree))
-					closestDeg = d;
-			}
-
-			degreeMapOut.add(closestDeg);
-		}
+        degreeMapOut.add(mode2ScaleIndex);
+        
+        for (int d1 = 1; d1 < mode1Step; d1++)
+        {
+            stepFraction = d1 / mode1Step;
+            
+            // round up to the next mode degree
+            degSub = mode2Step;
+            
+            // find closest degree
+            for (int d2 = 1; d2 < mode2Step; d2++)
+            {
+                if (abs(d2 / mode2Step - stepFraction) < abs(degSub / mode2Step - stepFraction))
+                    degSub = d2;
+            }
+            
+            // resulting degree is the sum of previous steps, plus the next closest sub degree within the modal step
+            int degSum = mode2ScaleIndex;
+            degToAdd = degSum + degSub;
+            degreeMapOut.add(degToAdd);
+        }
+        
+        mode2ScaleIndex += mode2Step;
+        mode1ModeIndex++;
+        mode2ModeIndex++;
     }
-
+    
 	DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
 	return degreeMapOut;
 }
