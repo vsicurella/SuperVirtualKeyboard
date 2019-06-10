@@ -303,8 +303,8 @@ static int totalModulus(int numIn, int mod)
 template <class T>
 static T sumUpToIndex(Array<T> arrayIn, int indexIn)
 {
-	indexIn = totalModulus(indexin, arrayIn.size());
-	T sum;
+	indexIn = totalModulus(indexIn, arrayIn.size());
+	T sum = 0;
 
 	for (int i = 0; i < indexIn; i++)
 	{
@@ -317,7 +317,7 @@ static T sumUpToIndex(Array<T> arrayIn, int indexIn)
 template <class T>
 static T sumUpToRingIndex(Array<T> arrayIn, int indexIn)
 {
-	T sum;
+	T sum = 0;
 
 	for (int i = 0; i < indexIn; i++)
 	{
