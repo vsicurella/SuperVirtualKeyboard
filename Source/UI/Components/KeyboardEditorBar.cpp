@@ -284,7 +284,11 @@ void KeyboardEditorBar::createAndSendMode()
 
 void KeyboardEditorBar::doStdMap()
 {
-    pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
+    //pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
+	Mode stdMode = Mode("2 2 1 2 2 2 1");
+	const Mode modeLoaded = *pluginState->getModeLoaded();
+	pluginState->getMidiProcessor()->setMidiInputMap(
+		ModeMapper::map(stdMode, modeLoaded, ModeMapper::autoDegreeMap(stdMode, modeLoaded)));
 }
 
 void KeyboardEditorBar::allowUserInput(bool isAllowed)

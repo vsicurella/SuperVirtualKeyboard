@@ -541,6 +541,30 @@ Array<int> Mode::getScaleDegrees() const
 	return scaleDegrees;
 }
 
+int Mode::getScaleDegree(int midiNoteIn) const
+{
+	return totalModulus(midiNoteIn - rootNote, scaleSize);
+}
+
+float Mode::getModeDegree(int midiNoteIn) const
+{
+	return modeDegrees[getScaleDegree(midiNoteIn)];
+}
+
+int Mode::getMidiNote(int scaleDegreeIn) const
+{
+	int periods = scaleDegreeIn / scaleSize;
+	int offsetDeg = totalModulus(scaleDegreeIn - rootNote, scaleSize);
+
+	return periods * scaleSize + offsetDeg;
+}
+
+int Mode::getMidiNote(int periodIn, int scaleDegreeIn) const
+{
+	scaleDegreeIn = totalModulus(scaleDegreeIn - rootNote, scaleSize);
+
+	return periodIn * scaleSize + scaleDegreeIn;
+}
 
 int Mode::getMaxStep() const
 {

@@ -19,7 +19,9 @@ class ModeMapper
     
 public:
 
-	static NoteMap map(const Mode& mapFrom, const Mode& mapTom, Array<int> degreeMapIn=Array<int>());
+	static NoteMap map(const Mode& mapFrom, const Mode& mapTo);
+
+	static NoteMap map(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn);
     
     static NoteMap stdMidiToMode(const Mode& modeMapped, int rootNoteStd = 60, Array<int> degreeMapIn=Array<int>());
     

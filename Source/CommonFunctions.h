@@ -301,6 +301,33 @@ static int totalModulus(int numIn, int mod)
 }
 
 template <class T>
+static T sumUpToIndex(Array<T> arrayIn, int indexIn)
+{
+	indexIn = totalModulus(indexin, arrayIn.size());
+	T sum;
+
+	for (int i = 0; i < indexIn; i++)
+	{
+		sum += arrayIn[i];
+	}
+
+	return sum;
+}
+
+template <class T>
+static T sumUpToRingIndex(Array<T> arrayIn, int indexIn)
+{
+	T sum;
+
+	for (int i = 0; i < indexIn; i++)
+	{
+		sum += arrayIn[i % arrayIn.size()];
+	}
+
+	return sum;
+}
+
+template <class T>
 static void DBGArray(Array<T>& arrayIn, String arrayName="Array")
 {
 	DBG(arrayName + ":");
