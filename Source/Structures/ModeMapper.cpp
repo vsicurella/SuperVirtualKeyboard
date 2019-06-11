@@ -81,8 +81,8 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 	int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
 	int rootIndexOffset = rootIndexTo - rootIndexFrom;
 
-    int degreeOffset = rootNoteTo / degreeMapIn.size() * mapTo.getScaleSize() - rootNoteFrom / degreeMapIn.size() * mapFrom.getScaleSize();
-    int midiOffset = rootNoteTo - rootNoteFrom;
+    int degreeOffset = rootNoteTo - (ceil(rootNoteTo / mapTo.getScaleSize()) + 1) * degreeMapIn.size();
+    int midiOffset = (int) (ceil(rootNoteTo / mapTo.getScaleSize()) + 1) * mapTo.getScaleSize() - (2 * rootNoteTo - rootNoteFrom);
 
 /*
 	DBG("ModeFrom has " + String(midiNotesFrom.size()) + " modal notes and ModeTo has " + String(midiNotesTo.size()) + " modal notes.");
@@ -105,7 +105,7 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 
 	for (int m = 0; m < mappingOut.getSize(); m++)
 	{
-		mapIndex = m - degreeOffset;
+        mapIndex = m - degreeOffset;
         
         if (mapIndex >= 0)
         {
