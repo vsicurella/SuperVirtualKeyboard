@@ -83,7 +83,9 @@ void SvkPluginEditor::initNodeData()
 	if (pluginState->pluginEditorNode.isValid())
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
-		
+		pluginState->getKeyboard()->applyMode(pluginState->getModeLoaded());
+		pluginState->getMidiProcessor()->setMidiInputMap(*pluginState->getMidiInputMap()); //hmmm
+
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
         view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
 	}
