@@ -17,8 +17,8 @@ class NoteMap
 {
 	int size;
 
-	std::unique_ptr<Array<int>> keys;
-	std::unique_ptr<Array<int>> values;
+	std::unique_ptr<Array<int>> keys; // Midi Note In, Key Number Out
+	std::unique_ptr<Array<int>> values; // Key Number In, Midi Note Out
 
 	int nullVal;
     
@@ -40,8 +40,10 @@ public:
 	int getKey(int valIn);
 	int getValue(int keyNum);
 
-	Array<int> getKeys();
-	Array<int> getValues();
+	const Array<int>& getKeys() const;
+	const Array<int>& getValues() const;
 
 	int getNullVal();
+    
+    String toString();
 };

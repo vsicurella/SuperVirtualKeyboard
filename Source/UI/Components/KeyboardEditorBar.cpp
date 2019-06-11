@@ -310,8 +310,7 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 
         if (pluginState->getMidiProcessor()->isAutoRemapping())
         {
-            pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
-
+            doStdMap();
         }
     }
 }
