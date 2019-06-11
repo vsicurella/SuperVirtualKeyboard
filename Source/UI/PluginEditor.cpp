@@ -83,8 +83,6 @@ void SvkPluginEditor::initNodeData()
 	if (pluginState->pluginEditorNode.isValid())
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
-		pluginState->getKeyboard()->applyMode(pluginState->getModeLoaded());
-		pluginState->getMidiProcessor()->setMidiInputMap(*pluginState->getMidiInputMap()); //hmmm
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
         view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
@@ -98,6 +96,7 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode.addChild(pluginState->pianoNode, 0, nullptr);
 
 		view.get()->setViewPositionProportionately(0.52, 0);
+        pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
     
     update_children_to_preset();

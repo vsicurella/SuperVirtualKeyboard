@@ -81,17 +81,20 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 	int rootIndexTo = midiNotesTo.indexOf(rootNoteTo);
 	int rootIndexOffset = rootIndexTo - rootIndexFrom;
 
-	int degreeOffset = rootNoteFrom / mapTo.getScaleSize() * (degreeMapIn.size() - mapTo.getScaleSize());
-	int midiOffset = rootNoteTo / degreeMapIn.size() * (mapTo.getScaleSize() - mapFrom.getScaleSize());
+    int degreeOffset = rootNoteTo / degreeMapIn.size() * mapTo.getScaleSize() - rootNoteFrom / degreeMapIn.size() * mapFrom.getScaleSize();
+    int midiOffset = rootNoteTo - rootNoteFrom;
 
-
+/*
 	DBG("ModeFrom has " + String(midiNotesFrom.size()) + " modal notes and ModeTo has " + String(midiNotesTo.size()) + " modal notes.");
 	String txt = "Root note from is " + String(rootNoteFrom) + " and index is " + String(rootIndexFrom);
 	DBG(txt);
 	txt = "Root note to is " + String(rootNoteTo) + " and index is " + String(rootIndexTo);
 	DBG(txt);
 	DBG("Offset is " + String(rootNoteOffset));
+ */
     DBG("Degree Map Size is " + String(degreeMapIn.size()));
+    DBG("Degree Offset is " + String(degreeOffset));
+    DBG("Midi Offset is " + String(midiOffset));
 
 	NoteMap mappingOut;
 
@@ -107,8 +110,7 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
         if (mapIndex >= 0)
         {
 			periods = mapIndex / degreeMapIn.size();
-			midiNote = degreeMapIn[mapIndex % degreeMapIn.size()] + periods * mapTo.getScaleSize();
-			midiNote = midiNote + (periods * mapTo.getScaleSize()) - midiOffset;
+			midiNote = degreeMapIn[mapIndex % degreeMapIn.size()] + periods * mapTo.getScaleSize() - midiOffset;
         }
         else
             midiNote = -1;
@@ -118,6 +120,8 @@ NoteMap ModeMapper::map(const Mode& mapFrom, const Mode& mapTo, Array<int> degre
 		if (m == rootNoteFrom)
 			DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) + ")");
 	}
+    
+    //DBG("Note Mapping:\n" + mappingOut.toString());
 
 	return mappingOut;
 }
