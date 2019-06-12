@@ -14,6 +14,7 @@ SvkPreset::SvkPreset()
 {
 	parentNode = ValueTree(IDs::presetNode);
 	theModeNode = ValueTree(IDs::modePresetNode);
+	theKeyboardNode = ValueTree(IDs::pianoNode);
 	parentNode.addChild(theModeNode, 0, nullptr);
 }
 
@@ -87,7 +88,7 @@ bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
 		parentNode.addChild(theKeyboardNode, 1, nullptr);
 	}
 
-	theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
+	theKeyboardNode = ValueTree(keyboardNodeIn);
 	
 	return theKeyboardNode.isValid();
 }

@@ -79,15 +79,16 @@ public:
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);
     
-    void setMidiInputMap(Array<int> mapIn);
-	void setMidiInputMap(NoteMap mapIn);
-    void setMidiOutputMap(Array<int> mapIn);
-	void setMidiOutputMap(NoteMap mapIn);
+    void setMidiInputMap(Array<int> mapIn, bool updateNode=true);
+	void setMidiInputMap(NoteMap mapIn, bool updateNode = true);
+    void setMidiOutputMap(Array<int> mapIn, bool updateNode = true);
+	void setMidiOutputMap(NoteMap mapIn, bool updateNode = true);
     
-    void setAutoRemapOn(bool remapIn=true);
-    
-    int mapInputNote(int noteIn, int noteOut);
-    int mapOutputNode(int noteIn, int noteOut);
+    void mapInputNote(int noteIn, int noteOut, bool updateNode = true);
+    void mapOutputNode(int noteIn, int noteOut, bool updateNode = true);
+
+	void setAutoRemapOn(bool remapIn = true);
+
     
     void processMidi(MidiBuffer& midiMessages);
     

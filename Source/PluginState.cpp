@@ -28,6 +28,7 @@ SvkPluginState::SvkPluginState()
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	presetLibraryNode = presetManager->presetLibraryNode;
 	pluginStateNode.addChild(presetLibraryNode, -1, nullptr);
+	presetCurrent = presetManager->getPresetLoaded();
 	presetManager->addChangeListener(this);
 
 	modeLoaded.reset(new Mode());
@@ -54,7 +55,7 @@ UndoManager* SvkPluginState::getUndoManager()
 
 SvkPreset* SvkPluginState::getPresetLoaded()
 {
-	return presetCurrent.get();
+	return presetCurrent;
 }
 
 Mode* SvkPluginState::getModeLoaded()
@@ -97,8 +98,8 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 void SvkPluginState::updateKeyboardSettingsPreset()
 {
 	if (pianoNode.isValid())
-	{
-		presetCurrent->updateKeyboardNode(pianoNode);
+	{	
+		//presetCurrent->updateKeyboardNode(pianoNode);
 	}
 }
 
