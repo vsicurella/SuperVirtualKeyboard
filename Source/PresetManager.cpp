@@ -13,6 +13,8 @@
 SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
+	presetLoaded = std::make_unique<SvkPreset>();
+
     intializePresets();
 }
 

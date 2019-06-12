@@ -87,13 +87,15 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         
         // Note maps
 		Array<int> map;
+
         get_array_from_node(midiSettingsNode, map, IDs::midiInputMap);
-		midiInputFilter->setNoteMap(map);
+		setMidiInputMap(map, false);
         
 		map.clear();
-        get_array_from_node(midiSettingsNode, map, IDs::midiOutputMap);
-		midiOutputFilter->setNoteMap(map);
         
+		get_array_from_node(midiSettingsNode, map, IDs::midiOutputMap);
+		setMidiOutputMap(map, false);
+
         return true;
     }
     
@@ -210,24 +212,48 @@ void SvkMidiProcessor::setOutputToRemap(bool doRemap)
     isOutputRemapped = doRemap;
 }
 
-void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn)
+void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn, bool updateNode)
 {
 	midiInputFilter->setNoteMap(mapIn);
+
+	if (updateNode)
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiInputMap), nullptr);
+		add_array_to_node(midiSettingsNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
+	}
 }
 
-void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn)
+void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn, bool updateNode)
 {
 	midiInputFilter->setNoteMap(mapIn);
+
+	if (updateNode)
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiInputMap), nullptr);
+		add_array_to_node(midiSettingsNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
+	}
 }
 
-void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn)
+void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn, bool updateNode)
 {
 	midiOutputFilter->setNoteMap(mapIn);
+
+	if (updateNode)
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiOutputMap), nullptr);
+		add_array_to_node(midiSettingsNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
+	}
 }
 
-void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn)
+void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn, bool updateNode)
 {
 	midiOutputFilter->setNoteMap(mapIn.getValues());
+
+	if (updateNode)
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiOutputMap), nullptr);
+		add_array_to_node(midiSettingsNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
+	}
 }
 
 void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
@@ -237,14 +263,20 @@ void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
 }
 
 
-int SvkMidiProcessor::mapInputNote(int noteIn, int noteOut)
+void SvkMidiProcessor::mapInputNote(int noteIn, int noteOut, bool updateNode)
 {
-    return midiInputFilter->setNote(noteIn, noteOut);
+    midiInputFilter->setNote(noteIn, noteOut);
+
+	if (updateNode)
+		set_value_in_array(midiSettingsNode, IDs::midiInputMap, noteIn, noteOut);
 }
 
-int SvkMidiProcessor::mapOutputNode(int noteIn, int noteOut)
+void SvkMidiProcessor::mapOutputNode(int noteIn, int noteOut, bool updateNode)
 {
-    return midiOutputFilter->setNote(noteIn, noteOut);
+    midiOutputFilter->setNote(noteIn, noteOut);
+
+	if (updateNode)
+		set_value_in_array(midiSettingsNode, IDs::midiInputMap, noteIn, noteOut);
 }
 
 //==============================================================================

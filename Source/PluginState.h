@@ -73,7 +73,7 @@ private:
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
     
-	std::unique_ptr<SvkPreset> presetCurrent;
+	SvkPreset* presetCurrent;
     std::unique_ptr<Mode> modeLoaded;
 	
 	Array<ValueTree> loadedFactoryPresets;
