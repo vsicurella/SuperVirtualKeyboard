@@ -86,9 +86,11 @@ public:
     
     void mapInputNote(int noteIn, int noteOut, bool updateNode = true);
     void mapOutputNode(int noteIn, int noteOut, bool updateNode = true);
+    
+    void resetInputMap(bool updateNode=true);
+    void resetOutputMap(bool updateNode=true);
 
 	void setAutoRemapOn(bool remapIn = true);
-
     
     void processMidi(MidiBuffer& midiMessages);
     
