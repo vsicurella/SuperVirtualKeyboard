@@ -262,6 +262,15 @@ void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
     midiSettingsNode.setProperty(IDs::autoRemapOn, autoRemap, nullptr);
 }
 
+void SvkMidiProcessor::resetInputMap(bool updateNode)
+{
+    setMidiInputMap(NoteMap(), updateNode);
+}
+
+void SvkMidiProcessor::resetOutputMap(bool updateNode)
+{
+    setMidiOutputMap(NoteMap(), updateNode);
+}
 
 void SvkMidiProcessor::mapInputNote(int noteIn, int noteOut, bool updateNode)
 {

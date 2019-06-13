@@ -19,11 +19,14 @@ class ModeMapper
     
 public:
 
-	static NoteMap map(const Mode& mapFrom, const Mode& mapTo);
+	static NoteMap mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order=0, int mode2Order=0, int mode1Offset=0, int mode2Offset=0);
 
-	static NoteMap map(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn);
+	static NoteMap mapToMode1Period(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn);
     
     static NoteMap stdMidiToMode(const Mode& modeMapped, int rootNoteStd = 60, Array<int> degreeMapIn=Array<int>());
     
-    static Array<int> autoDegreeMap(const Mode& mode1, const Mode& mode2);
+    static Array<int> autoDegreeMapPeriod(const Mode& mode1, const Mode& mode2);
+    
+    static Array<int> autoDegreeMapFull(const Mode& mode1, const Mode& mode2);
+
 };

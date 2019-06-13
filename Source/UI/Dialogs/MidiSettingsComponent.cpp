@@ -332,7 +332,7 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		if (modeSelected1.get() && modeSelected2.get())
 		{
 			pluginState->getMidiProcessor()->setMidiInputMap(
-                ModeMapper::map(*modeSelected1.get(), *modeSelected2.get())
+                ModeMapper::mapByOrder(*modeSelected1.get(), *modeSelected2.get())
 			);
 		}
         //[/UserButtonCode_mapModesBtn]
