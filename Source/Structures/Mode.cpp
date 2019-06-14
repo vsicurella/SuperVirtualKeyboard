@@ -333,7 +333,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 {
 	Array<int> ordersOut;
 	int period = ordersIn.size();
-	int off = ((offsetIn % ordersIn.size()) + ordersIn.size()) % ordersIn.size();
+	int off = totalModulus(offsetIn, ordersIn.size());
 
 	int index;
 
