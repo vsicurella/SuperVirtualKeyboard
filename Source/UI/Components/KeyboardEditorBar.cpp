@@ -180,7 +180,9 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mapStdButton.get())
     {
         //[UserButtonCode_mapStdButton] -- add your button handler code here..
-        doStdMap();
+		pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(
+			*pluginState->getModeLoaded()));
+
         pluginState->getKeyboard()->updateKeyMidiNotes();
         //[/UserButtonCode_mapStdButton]
     }
@@ -282,15 +284,6 @@ void KeyboardEditorBar::createAndSendMode()
 	pluginState->loadMode(Mode::createNode(steps, "Custom"));
 }
 
-void KeyboardEditorBar::doStdMap()
-{
-    //pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
-	Mode stdMode = Mode("2 2 1 2 2 2 1");
-	const Mode modeLoaded = *pluginState->getModeLoaded();
-	pluginState->getMidiProcessor()->setMidiInputMap(
-		ModeMapper::mapToMode1Period(stdMode, modeLoaded, ModeMapper::autoDegreeMapPeriod(stdMode, modeLoaded)));
-}
-
 void KeyboardEditorBar::allowUserInput(bool isAllowed)
 {
  	presetLibraryBox->setEnabled(isAllowed);
@@ -310,7 +303,9 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 
         if (pluginState->getMidiProcessor()->isAutoRemapping())
         {
-            doStdMap();
+			
+			pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(
+				*pluginState->getModeLoaded()));
         }
     }
 }

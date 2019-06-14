@@ -205,7 +205,8 @@ void SvkPresetManager::createFactoryPresets()
 
 void SvkPresetManager::loadPresetDirectory()
 {
-	// Add checking for duplicate modes
+	// TODO: Add checking for duplicate modes
+
 	if ((bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
 		File presetDirectory = File(pluginSettingsNode[IDs::presetDirectory]);
@@ -221,14 +222,14 @@ void SvkPresetManager::loadPresetDirectory()
 
 			if (presetInNode.hasType(IDs::modePresetNode))
 			{
+				addAndSortPreset(presetInNode);
+
 				if ((bool)presetInNode[IDs::factoryPreset])
 				{
-					addAndSortPreset(presetInNode);
 					loadedFactoryPresets.add(presetInNode);
 				}
 				else
 				{
-					addAndSortPreset(presetInNode);
 					loadedUserPresets.add(presetInNode);
 				}
 			}
