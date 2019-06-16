@@ -148,6 +148,12 @@ struct Mode
 	*/
 	static Array<int> interval_sizes(Array<int> stepsIn);
 
+	/*
+	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
+	And returns a sum of the previous indicies at each index like {0, 2, 4, 5, 7, 9, 11}
+	*/
+	static Array<int> sum_of_steps(Array<int> stepsIn, int offsetIn = 0, bool includePeriod = false);
+
 
 private:
     
