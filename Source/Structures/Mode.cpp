@@ -277,6 +277,142 @@ int Mode::getOffset() const
 	return totalModulus(rootNote, scaleSize);
 }
 
+int Mode::getScaleSize() const
+{
+	return scaleSize;
+}
+
+int Mode::getModeSize() const
+{
+	return modeSize;
+}
+
+Array<int> Mode::getStepsOfOrders()  const
+{
+	return stepsOfOrders;
+}
+
+String Mode::getFamily() const
+{
+	return family;
+}
+
+Array<int> Mode::getSteps()  const
+{
+	return steps;
+}
+
+String Mode::getStepsString()  const
+{
+	return stepsString;
+}
+
+Array<int>* Mode::getKeyboardOrdersSizes()
+{
+	return &keyboardOrdersSizes;
+}
+
+int Mode::getKeyboardOrdersSize(int ordersIn) const
+{
+	int o = ordersIn % getMaxStep();
+	return keyboardOrdersSizes[o];
+}
+
+Array<int> Mode::getOrdersDefault() const
+{
+	return ordersDefault;
+}
+
+Array<int> Mode::getOrders() const
+{
+	return orders;
+}
+
+Array<float> Mode::getModalDegrees() const
+{
+	return modeDegrees;
+}
+
+Array<int> Mode::getScaleDegrees() const
+{
+	return scaleDegrees;
+}
+
+int Mode::getScaleDegree(int midiNoteIn) const
+{
+	return totalModulus(midiNoteIn - rootNote, scaleSize);
+}
+
+float Mode::getModeDegree(int midiNoteIn) const
+{
+	return modeDegrees[getScaleDegree(midiNoteIn)];
+}
+
+int Mode::getMidiNote(int scaleDegreeIn) const
+{
+	int periods = scaleDegreeIn / scaleSize;
+	int offsetDeg = totalModulus(scaleDegreeIn - rootNote, scaleSize);
+
+	return periods * scaleSize + offsetDeg;
+}
+
+int Mode::getMidiNote(int periodIn, int scaleDegreeIn) const
+{
+	scaleDegreeIn = totalModulus(scaleDegreeIn - rootNote, scaleSize);
+
+	return periodIn * scaleSize + scaleDegreeIn;
+}
+
+int Mode::getMaxStep() const
+{
+	int step = 1;
+
+	for (int i = 0; i < steps.size(); i++)
+	{
+		if (steps[i] > step)
+			step = steps[i];
+	}
+
+	return step;
+}
+
+Array<int> Mode::getNotesOfOrder(int order) const
+{
+	Array<int> notesOut;
+
+	for (int i = 0; i < orders.size(); i++)
+	{
+		if (orders.getUnchecked(i) == order)
+			notesOut.add(i);
+	}
+
+	return notesOut;
+}
+
+Array<int> Mode::getMOSClass() const
+{
+	return mosClass;
+}
+
+String Mode::getDescription()  const
+{
+	return family + "[" + String(modeSize) + "] " + String(scaleSize);
+}
+
+String Mode::getScaleDescription()  const
+{
+	return String(scaleSize) + " " + getDescription().dropLastCharacters(2);
+}
+
+String Mode::getModeDescription()  const
+{
+	return String(modeSize) + " " + family + " " + String(scaleSize);
+}
+
+void Mode::updateStepsOfOrders()
+{
+	stepsOfOrders = expand_steps(orders_to_steps(orders));
+}
 
 Array<int> Mode::parse_steps(String stepsIn)
 {
@@ -315,6 +451,35 @@ Array<int> Mode::parse_steps(String stepsIn)
 	return stepsOut;
 }
 
+Array<int> Mode::expand_steps(Array<int> stepsIn)
+{
+    Array<int> stepsOut;
+    
+    for (int i = 0; i < stepsIn.size(); i++)
+    {
+        for (int s = 0; s < stepsIn[i]; s++)
+            stepsOut.add(stepsIn[i]);
+    }
+    
+    stepsOut.minimiseStorageOverheads();
+    return stepsOut;
+}
+
+String Mode::steps_to_string(Array<int> stepsIn)
+{
+	String out;
+
+	for (int i = 0; i < stepsIn.size(); i++)
+	{
+		out += String(stepsIn[i]);
+
+		if (i < stepsIn.size() - 1)
+			out += ' ';
+	}
+
+	return out;
+}
+
 Array<int> Mode::steps_to_orders(Array<int> stepsIn)
 {
 	Array<int> ordersOut;
@@ -341,7 +506,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 	{
 		index = (off + i) % period;
 
-        
+
 		// adjust first few notes if it starts in the middle of a whole step
 		if (i == 0 && ordersIn[index] != 0)
 		{
@@ -354,7 +519,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 				index = (off + i) % period;
 			}
 		}
-        
+
 
 		ordersOut.add(ordersIn[index]);
 	}
@@ -362,20 +527,6 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 	jassert(ordersOut.size() == 128);
 	ordersOut.minimiseStorageOverheads();
 	return ordersOut;
-}
-
-Array<int> Mode::expand_steps(Array<int> stepsIn)
-{
-    Array<int> stepsOut;
-    
-    for (int i = 0; i < stepsIn.size(); i++)
-    {
-        for (int s = 0; s < stepsIn[i]; s++)
-            stepsOut.add(stepsIn[i]);
-    }
-    
-    stepsOut.minimiseStorageOverheads();
-    return stepsOut;
 }
 
 Array<int> Mode::orders_to_steps(Array<int> layoutIn)
@@ -479,155 +630,24 @@ Array<int> Mode::interval_sizes(Array<int> stepsIn)
 	return intervalsOut;
 }
 
-
-int Mode::getScaleSize() const
+Array<int> Mode::sum_of_steps(Array<int> stepsIn, int offsetIn, bool includePeriod)
 {
-	return scaleSize;
-}
+	Array<int> sumsOut;
+	int sum = 0;
 
-int Mode::getModeSize() const
-{
-	return modeSize;
-}
+	sumsOut.add(sum);
 
-Array<int> Mode::getStepsOfOrders()  const
-{
-    return stepsOfOrders;
-}
-
-String Mode::getFamily() const
-{
-	return family;
-}
-
-Array<int> Mode::getSteps()  const
-{
-	return steps;
-}
-
-String Mode::getStepsString()  const
-{
-	return stepsString;
-}
-
-Array<int>* Mode::getKeyboardOrdersSizes()
-{
-	return &keyboardOrdersSizes;
-}
-
-int Mode::getKeyboardOrdersSize(int ordersIn) const
-{
-	int o = ordersIn % getMaxStep();
-	return keyboardOrdersSizes[o];
-} 
-
-Array<int> Mode::getOrdersDefault() const
-{
-	return ordersDefault;
-}
-
-Array<int> Mode::getOrders() const
-{
-	return orders;
-}
-
-Array<float> Mode::getModalDegrees() const
-{
-	return modeDegrees;
-}
-
-Array<int> Mode::getScaleDegrees() const
-{
-	return scaleDegrees;
-}
-
-int Mode::getScaleDegree(int midiNoteIn) const
-{
-	return totalModulus(midiNoteIn - rootNote, scaleSize);
-}
-
-float Mode::getModeDegree(int midiNoteIn) const
-{
-	return modeDegrees[getScaleDegree(midiNoteIn)];
-}
-
-int Mode::getMidiNote(int scaleDegreeIn) const
-{
-	int periods = scaleDegreeIn / scaleSize;
-	int offsetDeg = totalModulus(scaleDegreeIn - rootNote, scaleSize);
-
-	return periods * scaleSize + offsetDeg;
-}
-
-int Mode::getMidiNote(int periodIn, int scaleDegreeIn) const
-{
-	scaleDegreeIn = totalModulus(scaleDegreeIn - rootNote, scaleSize);
-
-	return periodIn * scaleSize + scaleDegreeIn;
-}
-
-int Mode::getMaxStep() const
-{
-	int step = 1;
-
-	for (int i = 0; i < steps.size(); i++)
+	for (int i = 1; i < stepsIn.size(); i++)
 	{
-		if (steps[i] > step)
-			step = steps[i];
+		sum += stepsIn[i - 1];
+		sumsOut.add(sum);
 	}
 
-	return step;
-}
+	if (includePeriod)
+		sumsOut.add(sum + stepsIn[stepsIn.size() - 1]);
 
-Array<int> Mode::getNotesOfOrder(int order) const
-{
-	Array<int> notesOut;
+	DBGArray(sumsOut, "Sums Out");
 
-	for (int i = 0; i < orders.size(); i++)
-	{
-		if (orders.getUnchecked(i) == order)
-			notesOut.add(i);
-	}
-
-	return notesOut;
-}
-
-String Mode::steps_to_string(Array<int> stepsIn)
-{
-	String out;
-
-	for (int i = 0; i < stepsIn.size(); i++)
-	{
-		out += String(stepsIn[i]);
-
-		if (i < stepsIn.size() - 1)
-			out += ' ';
-	}
-
-	return out;
-}
-
-Array<int> Mode::getMOSClass() const
-{
-	return mosClass;
-}
-
-String Mode::getDescription()  const
-{
-	return family + "[" + String(modeSize) + "] " + String(scaleSize);
-}
-
-String Mode::getScaleDescription()  const
-{
-	return String(scaleSize) + " " + getDescription().dropLastCharacters(2);
-}
-
-String Mode::getModeDescription()  const
-{
-	return String(modeSize) + " " + family + " " + String(scaleSize);
-}
-
-void Mode::updateStepsOfOrders()
-{
-    stepsOfOrders = expand_steps(orders_to_steps(orders));
+	sumsOut.minimiseStorageOverheads();
+	return sumsOut;
 }

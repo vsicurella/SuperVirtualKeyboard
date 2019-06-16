@@ -188,16 +188,23 @@ Array<int> ModeMapper::autoDegreeMapPeriod(const Mode& mode1, const Mode& mode2)
 Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
+
+	int mode1Root = mode1.getRootNote();
+	int mode2Root = mode2.getRootNote();
+	int rootOffset = mode2Root - mode1Root;
     
 	Array<int> mode1Steps = Mode::orders_to_steps(mode1.getOrders());
     Array<int> mode2Steps = Mode::orders_to_steps(mode2.getOrders());
 
-    int mode1RootIndex = ceil(mode1.getRootNote() / (float) mode1.getScaleSize()) * mode1.getModeSize();
-    int mode2RootIndex = ceil(mode2.getRootNote() / (float) mode2.getScaleSize()) * mode2.getModeSize();
-	int rootIndexOffset = mode1RootIndex - mode2RootIndex;
+	Array<int> mode1MidiNotes = Mode::sum_of_steps(mode1Steps, 0, true);
+	Array<int> mode2MidiNotes = Mode::sum_of_steps(mode2Steps, 0, true);
+
+	int mode1RootIndex = mode1MidiNotes.indexOf(mode1Root);
+	int mode2RootIndex = mode2MidiNotes.indexOf(mode2Root);
+	int rootIndexOffset = mode2RootIndex - mode1RootIndex;
     
-    DBG("Mode1 Root Index: " + String(mode1RootIndex));
-    DBG("Mode2 Root Index: " + String(mode2RootIndex));
+    DBG("Mode1 Root (" + String(mode1Root) + ") Index: " + String(mode1RootIndex));
+    DBG("Mode2 Root (" + String(mode2Root) + ") Index: " + String(mode2RootIndex));
     DBG("Root Index Offset: " + String(rootIndexOffset));
     
     int mode2ScaleIndex = 0;
@@ -214,7 +221,7 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
     
     for (int m = 0; m < mode1Steps.size(); m++)
 	{
-        mode2ModeIndex = m - rootIndexOffset;
+        mode2ModeIndex = m + rootIndexOffset;
         
 		// this is assuming that the order will always start at 0
 		mode1Step = mode1Steps[m];
@@ -222,7 +229,7 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
         if (mode2ModeIndex < 0)
         {
             mode2Step = 0;
-            degToAdd = -1;
+            degToAdd = mode2ModeIndex;
         }
         else
         {
@@ -251,7 +258,7 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
             degToAdd = mode2ScaleIndex + degSub;
             
             if (mode2ModeIndex < 0)
-                degreeMapOut.add(-1);
+                degreeMapOut.add(mode2ModeIndex);
             else
                 degreeMapOut.add(degToAdd);
 		}
