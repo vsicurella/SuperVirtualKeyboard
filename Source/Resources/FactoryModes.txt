@@ -40,8 +40,13 @@
 3 1 3 1 3 1 3 1 3 1, Blackwood
 2 3 2 2 3 2 2 3 2, Miracle
 4 4 1 4 4 4 1, Superpyth
+1 3 1 3 1 1 3 1 3 1 3 1, Superpyth
+3 3 3 3 3 3 3 1, Porcupine
+5 1 1 5 1 1 5 1 1 1, Magic
+3 1 3 1 3 3 1 3 1 3, Astrology
 3 3 3 3 2 3 3 2, Hedgehog
 3 2 3 2 3 2 3 2 2, Orwell
+2 2 2 2 2 1 2 2 2 2 2 1, Pajara
 3 3 3 1 3 3 3 3 1, Mavila
 2 2 2 3 2 2 3 2 2 3, Sephiroth
 5 5 4 5 5, Godzilla
