@@ -154,6 +154,63 @@ ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 	return ValueTree();
 }
 
+bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
+{
+    if (nodeIn.hasType(IDs::presetNode))
+    {
+        ValueTree nodeChild;
+        
+        // MODE SETTINGS
+        nodeChild = nodeIn.getChildWithName(IDs::modePresetNode);
+        commitModeNode(nodeChild);
+        
+        // KEYBOARD SETTINGS
+        nodeChild = nodeIn.getChildWithName(IDs::pianoNode);
+        commitModeNode(nodeChild);
+        
+        // MIDI MAPS
+        nodeChild = nodeIn.getChildWithName(IDs::midiMapNode);
+        commitMapNode(nodeChild);
+        
+        return true;
+    }
+    
+    return false;
+}
+
+bool SvkPresetManager::commitModeNode(ValueTree modeNodeIn)
+{
+    if (modeNodeIn.hasType(IDs::modePresetNode))
+    {
+        presetLoaded->updateModeNode(modeNodeIn);
+        return true;
+    }
+    
+    return false;
+}
+
+bool SvkPresetManager::commitKeyboardNode(ValueTree keyboardNodeIn)
+{
+    if (keyboardNodeIn.hasType(IDs::pianoNode))
+    {
+        presetLoaded->updateKeyboardNode(keyboardNodeIn);
+        return true;
+    }
+    
+    return false;
+}
+
+bool SvkPresetManager::commitMapNode(ValueTree mapNodeIn)
+{
+    if (mapNodeIn.hasType(IDs::mapNodeIn))
+    {
+        presetLoaded->updateMapNode(mapNodeIn);
+        return true;
+    }
+    
+    return false;
+}
+
 void SvkPresetManager::intializePresets()
 {
 	presetLibraryNode = ValueTree(IDs::presetLibraryNode);
