@@ -209,6 +209,11 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
     
     int mode2ScaleIndex = 0;
     
+    if (rootIndexOffset > 0)
+    {
+        mode2ScaleIndex = sumUpToIndex(mode2Steps, rootIndexOffset);
+    }
+    
     int degToAdd, degSub;
     float stepFraction;
     
@@ -266,6 +271,6 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
         mode2ScaleIndex += mode2Step;
 	}
     
-    DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
+    //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
     return degreeMapOut;
 }
