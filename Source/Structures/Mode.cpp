@@ -646,7 +646,7 @@ Array<int> Mode::sum_of_steps(Array<int> stepsIn, int offsetIn, bool includePeri
 	if (includePeriod)
 		sumsOut.add(sum + stepsIn[stepsIn.size() - 1]);
 
-	DBGArray(sumsOut, "Sums Out");
+	//DBGArray(sumsOut, "Sums Out");
 
 	sumsOut.minimiseStorageOverheads();
 	return sumsOut;
