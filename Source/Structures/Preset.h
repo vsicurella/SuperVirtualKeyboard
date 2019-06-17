@@ -18,17 +18,18 @@ struct SvkPreset
 	ValueTree parentNode;
 	ValueTree theModeNode;
 	ValueTree theKeyboardNode;
-    ValueTree thePluginSettingsNode;
-    ValueTree theMidiSettingsNode;
+    ValueTree theMapNode;
 
 	SvkPreset();
 	SvkPreset(ValueTree presetNodeIn);
 	SvkPreset(SvkPreset& presetToCopy);
 	~SvkPreset();
 
-    bool updateParentNode(ValueTree pluginStateIn);
-	bool updateModeNode(ValueTree modeNodeIn);
-	bool updateKeyboardNode(ValueTree keyboardNodeIn);
+    bool updateModeNode(ValueTree modeNodeIn);
+    
+    bool updateKeyboardNode(ValueTree modeNodeIn);
+    
+    bool updateMapNode(ValueTree mapNodeIn);
 
 	bool writeToFile(String absoluteFilePath="");
        

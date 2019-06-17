@@ -184,6 +184,18 @@ static Point<double> pointFromString(Point<double>& p, String pointToStringIn)
 	return p;
 }
 
+ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
+{
+    ValueTree nodeOut;
+    
+    if (nodeOrigin.hasType(nodeType)
+        nodeOut = nodeOrigin;
+    else
+        nodeOut = nodeOrigin.getChildWithName(nodeType);
+        
+    return nodeOut;
+}
+
 template <class T>
 static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
 {

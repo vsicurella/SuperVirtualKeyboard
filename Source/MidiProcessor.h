@@ -46,6 +46,8 @@ public:
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
+    ValueTree midiMapNode;
+    
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
 

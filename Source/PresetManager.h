@@ -68,6 +68,11 @@ public:
 	bool loadPreset();
 
 	bool savePreset(String absolutePath="");
+    
+    bool commitPresetNode(ValueTree nodeIn);
+    bool commitModeNode(ValueTree modeNodeIn);
+    bool commitKeyboardNode(ValueTree keyboardNodeIn);
+    bool commitMapNode(ValueTree mapNodeIn);
 
 	void intializePresets();
 	void loadPresetDirectory();
