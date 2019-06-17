@@ -13,7 +13,7 @@
 NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn)
 {
 	if (degreeMapIn.size() != mode1.getOrders().size())
-		degreeMapIn = autoDegreeMapFull(mode1, mode2);
+		degreeMapIn = degreeMapFullMode(mode1, mode2);
 
 	NoteMap mappingOut;
 	
@@ -83,7 +83,7 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
 {
     // ensure degree map is the same size as Mode1 Period
     if (degreeMapIn.size() != mode1.getScaleSize())
-        degreeMapIn = autoDegreeMapPeriod(mode1, mode2);
+        degreeMapIn = degreeMapPeriod(mode1, mode2);
     
 	int rootNoteFrom = mode1.getRootNote();
 	int rootNoteTo = mode2.getRootNote();
@@ -122,6 +122,45 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
 	return mappingOut;
 }
 
+NoteMap ModeMapper::mapToMode1Scale(const Mode& mode1, const Mode& mode2, int mode2Order)
+{
+    Array<int> mode2ModalNotes = mode2.getNotesOfOrder(mode2Order);
+    
+    int mode1RootIndex = mode1.getRootNote();
+    int mode2RootIndex = mode2ModalNotes.indexOf(mode2.getRootNote());
+    int rootIndexOffset = mode2RootIndex - mode1RootIndex;
+    
+    NoteMap mappingOut;
+    
+    int degToAdd;
+    int mode2ModeIndex = 0;
+    
+    for (int m = 0; m < mode1.getOrders().size(); m++)
+    {
+        mode2ModeIndex = m + rootIndexOffset;
+        
+        if (mode2ModeIndex < 0)
+        {
+            degToAdd = mode2ModeIndex;
+        }
+        else if (mode2ModeIndex >= mode2ModalNotes.size())
+        {
+            degToAdd = 128;
+        }
+        else
+        {
+            degToAdd = mode2ModalNotes[mode2ModeIndex];
+        }
+        
+        mappingOut.setValue(m, degToAdd);
+        
+        if (m == mode1.getRootNote())
+            DBG("Root Note From (" + String(mode1.getRootNote()) + ") produces note " + String(mappingOut.getValue(mode1.getRootNote())) + " and comapre that to the Root note to (" + String(mode2.getRootNote()) + ")");
+    }
+    
+    return mappingOut;
+}
+
 
 NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
 {
@@ -133,7 +172,7 @@ NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
 		return mapFull(meantone7_12, modeMapped);
 }
 
-Array<int> ModeMapper::autoDegreeMapPeriod(const Mode& mode1, const Mode& mode2)
+Array<int> ModeMapper::degreeMapPeriod(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
     
@@ -181,17 +220,13 @@ Array<int> ModeMapper::autoDegreeMapPeriod(const Mode& mode1, const Mode& mode2)
         mode2ScaleIndex += mode2Step;
     }
 
-	DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
+	//DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
 	return degreeMapOut;
 }
 
-Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
+Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
-
-	int mode1Root = mode1.getRootNote();
-	int mode2Root = mode2.getRootNote();
-	int rootOffset = mode2Root - mode1Root;
     
 	Array<int> mode1Steps = Mode::orders_to_steps(mode1.getOrders());
     Array<int> mode2Steps = Mode::orders_to_steps(mode2.getOrders());
@@ -199,13 +234,9 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
 	Array<int> mode1MidiNotes = Mode::sum_of_steps(mode1Steps, 0, true);
 	Array<int> mode2MidiNotes = Mode::sum_of_steps(mode2Steps, 0, true);
 
-	int mode1RootIndex = mode1MidiNotes.indexOf(mode1Root);
-	int mode2RootIndex = mode2MidiNotes.indexOf(mode2Root);
+	int mode1RootIndex = mode1MidiNotes.indexOf(mode1.getRootNote());
+	int mode2RootIndex = mode2MidiNotes.indexOf(mode2.getRootNote());
 	int rootIndexOffset = mode2RootIndex - mode1RootIndex;
-    
-    DBG("Mode1 Root (" + String(mode1Root) + ") Index: " + String(mode1RootIndex));
-    DBG("Mode2 Root (" + String(mode2Root) + ") Index: " + String(mode2RootIndex));
-    DBG("Root Index Offset: " + String(rootIndexOffset));
     
     int mode2ScaleIndex = 0;
     
@@ -218,9 +249,6 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
     float stepFraction;
     
     float mode1Step, mode2Step;
-    
-    Array<int> mode1ModalNotes = mode1.getNotesOfOrder();
-    Array<int> mode2ModalNotes = mode2.getNotesOfOrder();
     
     int mode2ModeIndex = 0;
     
@@ -235,6 +263,11 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
         {
             mode2Step = 0;
             degToAdd = mode2ModeIndex;
+        }
+        else if (mode2ModeIndex >= mode2Steps.size())
+        {
+            mode2Step = 0;
+            degToAdd = 128;
         }
         else
         {
@@ -259,7 +292,6 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
 			}
 
 			// resulting degree is the sum of previous steps, plus the next closest sub degree within the modal step
-            
             degToAdd = mode2ScaleIndex + degSub;
             
             if (mode2ModeIndex < 0)
@@ -271,6 +303,5 @@ Array<int> ModeMapper::autoDegreeMapFull(const Mode& mode1, const Mode& mode2)
         mode2ScaleIndex += mode2Step;
 	}
     
-    //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
     return degreeMapOut;
 }
