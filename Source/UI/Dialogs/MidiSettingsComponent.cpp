@@ -331,9 +331,14 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapModesBtn] -- add your button handler code here..
 		if (modeSelected1.get() && modeSelected2.get())
 		{
+            /*
 			pluginState->getMidiProcessor()->setMidiInputMap(
                 ModeMapper::mapByOrder(*modeSelected1.get(), *modeSelected2.get())
 			);
+             */
+            
+            pluginState->getMidiProcessor()->setMidiInputMap(
+                                                             ModeMapper::mapToMode1Scale(*modeSelected1.get(), *modeSelected2.get()));
 		}
         //[/UserButtonCode_mapModesBtn]
     }
