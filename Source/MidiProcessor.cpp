@@ -215,6 +215,21 @@ void SvkMidiProcessor::setOutputToRemap(bool doRemap)
     isOutputRemapped = doRemap;
 }
 
+void SvkMidiProcessor::setMidiMaps(ValueTree midiMapIn)
+{
+    if (midiMapIn.hasType(IDs::midiMapNode))
+    {
+        Array<int> map;
+        
+        get_array_from_node(midiMapIn, map, IDs::midiInputMap);
+        setMidiInputMap(map);
+        
+        map.clear();
+        get_array_from_node(midiMapIn, map, IDs::midiOutputMap);
+        setMidiOutputMap(map);
+    }
+}
+
 void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn, bool updateNode)
 {
 	midiInputFilter->setNoteMap(mapIn);

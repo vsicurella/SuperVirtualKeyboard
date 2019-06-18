@@ -106,7 +106,6 @@ bool SvkPresetManager::loadPreset(int indexIn)
 
 bool SvkPresetManager::loadPreset(SvkPreset* presetIn)
 {
-
 	return loadPreset(presetIn->parentNode);
 }
 
@@ -202,7 +201,7 @@ bool SvkPresetManager::commitKeyboardNode(ValueTree keyboardNodeIn)
 
 bool SvkPresetManager::commitMapNode(ValueTree mapNodeIn)
 {
-    if (mapNodeIn.hasType(IDs::mapNodeIn))
+    if (mapNodeIn.hasType(IDs::midiMapNode))
     {
         presetLoaded->updateMapNode(mapNodeIn);
         return true;
@@ -239,7 +238,7 @@ void SvkPresetManager::createFactoryPresets()
 		loadedFactoryPresets.clear();
 
 		if (factoryPresets && size > 0)
-		{	// (const void*)
+		{
 			MemoryInputStream instream(factoryPresets, size, false);
 
 			String line, steps, family, name;

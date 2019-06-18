@@ -81,6 +81,8 @@ public:
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);
     
+    void setMidiMaps(ValueTree midiMapIn);
+    
     void setMidiInputMap(Array<int> mapIn, bool updateNode=true);
 	void setMidiInputMap(NoteMap mapIn, bool updateNode = true);
     void setMidiOutputMap(Array<int> mapIn, bool updateNode = true);

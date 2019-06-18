@@ -139,9 +139,10 @@ void Mode::updateNode(bool initializeNode)
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
 	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
+    modeNode.setProperty(IDs::rootMidiNote, false, nullptr);
 }
 
-void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
+void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 {
 	bool hasModeChild;
 
@@ -173,8 +174,10 @@ void Mode::restoreNode(ValueTree nodeIn, int rootNoteIn)
         if (name == "")
             name = getDescription();
         
-        rootNote = rootNoteIn;
-        offset = getOffset() * -1;
+        if (useNodeRoot)
+            rootNote = modeNode[IDs::rootMidiNote];
+        
+        offset = getOffset();
         
         orders = expand_orders(ordersDefault, offset);
         modeDegrees = orders_to_modeDegrees(orders);
