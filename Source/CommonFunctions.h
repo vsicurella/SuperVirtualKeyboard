@@ -184,11 +184,11 @@ static Point<double> pointFromString(Point<double>& p, String pointToStringIn)
 	return p;
 }
 
-ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
+static ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
 {
     ValueTree nodeOut;
     
-    if (nodeOrigin.hasType(nodeType)
+    if (nodeOrigin.hasType(nodeType))
         nodeOut = nodeOrigin;
     else
         nodeOut = nodeOrigin.getChildWithName(nodeType);

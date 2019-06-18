@@ -53,7 +53,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void setMidiRootNote(int rootNoteIn);
     
-	void updateKeyboardSettingsPreset();
+    void updatePluginToPresetLoaded();
+    void updatePluginFromParentNode();
 
 	bool savePreset();
 	bool loadPreset();
@@ -83,6 +84,4 @@ private:
 	Array<Array<int>> presetsSorted;
     bool presetEdited = false;
     
-    void connectPreset();
-
 };

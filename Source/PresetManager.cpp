@@ -63,55 +63,57 @@ PopupMenu* SvkPresetManager::getPresetMenu()
     return presetMenu.get();
 }
 
-bool SvkPresetManager::loadPreset(ValueTree presetNodeIn)
+bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 {
-	std::unique_ptr<SvkPreset> newPreset(new SvkPreset(presetNodeIn));
+    std::unique_ptr<SvkPreset> newPreset(new SvkPreset(presetNodeIn));
     bool shouldLoad = true;
     
-	if (newPreset.get())
-	{
-		/*
-		if (presetCurrent->theMidiSettingsNode.isValid())
-		{
-			midiProcessor->restoreFromNode(presetCurrent->theMidiSettingsNode);
-		}
-		*/
-		// this needs to be updated to address the root note
+    if (newPreset.get())
+    {
+        /*
+         if (presetCurrent->theMidiSettingsNode.isValid())
+         {
+         midiProcessor->restoreFromNode(presetCurrent->theMidiSettingsNode);
+         }
+         */
+        // this needs to be updated to address the root note
         
-		bool dummy;
+        bool dummy;
         shouldLoad *= Mode::isValidMode(newPreset->theModeNode, dummy);
         
-		/*
-		if (presetLoaded->theKeyboardNode.isValid())
-		{
-			pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
-		}
-		*/
+        /*
+         if (presetLoaded->theKeyboardNode.isValid())
+         {
+         pianoNode.copyPropertiesAndChildrenFrom(presetCurrent->theKeyboardNode, nullptr);
+         }
+         */
         
-       if (shouldLoad)
-       {
-        presetLoaded.swap(newPreset);
-		presetNode.copyPropertiesAndChildrenFrom(presetLoaded->parentNode, nullptr);
-		sendChangeMessage();
-		return true;
-       }
-	}
+        if (shouldLoad)
+        {
+            presetLoaded.swap(newPreset);
+            presetNode.copyPropertiesAndChildrenFrom(presetLoaded->parentNode, nullptr);
+            
+            if (sendChangeSignal)
+                sendChangeMessage();
+            return true;
+        }
+    }
     return false;
 }
 
-bool SvkPresetManager::loadPreset(int indexIn)
+bool SvkPresetManager::loadPreset(int indexIn, bool sendChangeSignal)
 {
-	return loadPreset(getPreset(indexIn));
+	return loadPreset(getPreset(indexIn), sendChangeSignal);
 }
 
-bool SvkPresetManager::loadPreset(SvkPreset* presetIn)
+bool SvkPresetManager::loadPreset(SvkPreset* presetIn, bool sendChangeSignal)
 {
-	return loadPreset(presetIn->parentNode);
+	return loadPreset(presetIn->parentNode, sendChangeSignal);
 }
 
-bool SvkPresetManager::loadPreset()
+bool SvkPresetManager::loadPreset(bool sendChangeSignal)
 {
-	return loadPreset(presetFromFile(pluginSettingsNode[IDs::presetDirectory]));
+	return loadPreset(presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
 }
 
 bool SvkPresetManager::savePreset(String absolutePath)
@@ -165,7 +167,7 @@ bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
         
         // KEYBOARD SETTINGS
         nodeChild = nodeIn.getChildWithName(IDs::pianoNode);
-        commitModeNode(nodeChild);
+        commitKeyboardNode(nodeChild);
         
         // MIDI MAPS
         nodeChild = nodeIn.getChildWithName(IDs::midiMapNode);

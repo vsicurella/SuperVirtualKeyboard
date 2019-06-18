@@ -30,7 +30,7 @@ struct Mode
 	~Mode();
 
 	void updateNode(bool initializeNode=false);
-	void restoreNode(ValueTree nodeIn, bool useNodeRoot=true);
+	void restoreNode(ValueTree nodeIn, bool useNodeRoot=false);
 
     static bool isValidMode(ValueTree nodeIn, bool& hasModeChild);
 

@@ -62,10 +62,10 @@ public:
     PopupMenu* getPresetMenu();
 	
 	// Can load either full preset or just Mode
-	bool loadPreset(ValueTree presetNodeIn);
-	bool loadPreset(int indexIn);
-	bool loadPreset(SvkPreset* presetIn);
-	bool loadPreset();
+	bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
+	bool loadPreset(int indexIn, bool sendChangeSignal=true);
+	bool loadPreset(SvkPreset* presetIn, bool sendChangeSignal=true);
+	bool loadPreset(bool sendChangeSignal=true);
 
 	bool savePreset(String absolutePath="");
     

@@ -51,7 +51,9 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 {
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
-        midiSettingsNode.copyPropertiesFrom(midiSettingsNodeIn, nullptr);
+        midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
+
+        /*
         
         // Open Input Device
         int deviceIndex = MidiInput::getDefaultDeviceIndex();
@@ -84,20 +86,14 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         }
         
         setMidiOutput(deviceIndex);
+         
+        */
         
         // Root note
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
         // Note maps
-		Array<int> map;
-
-        get_array_from_node(midiMapNode, map, IDs::midiInputMap);
-		setMidiInputMap(map, false);
-        
-		map.clear();
-        
-		get_array_from_node(midiMapNode, map, IDs::midiOutputMap);
-		setMidiOutputMap(map, false);
+        setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
 
         return true;
     }
@@ -222,11 +218,21 @@ void SvkMidiProcessor::setMidiMaps(ValueTree midiMapIn)
         Array<int> map;
         
         get_array_from_node(midiMapIn, map, IDs::midiInputMap);
-        setMidiInputMap(map);
+        
+        if (map.size() > 0)
+            setMidiInputMap(map);
+        else
+            setMidiInputMap(NoteMap());
         
         map.clear();
         get_array_from_node(midiMapIn, map, IDs::midiOutputMap);
-        setMidiOutputMap(map);
+        
+        if (map.size() > 0)
+            setMidiOutputMap(map);
+        else
+            setMidiOutputMap(NoteMap());
+        
+        midiMapNode.copyPropertiesAndChildrenFrom(midiMapIn, nullptr);
     }
 }
 

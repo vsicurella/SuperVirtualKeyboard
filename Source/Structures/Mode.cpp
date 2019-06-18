@@ -139,7 +139,7 @@ void Mode::updateNode(bool initializeNode)
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
 	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
-    modeNode.setProperty(IDs::rootMidiNote, false, nullptr);
+    modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
 }
 
 void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
@@ -174,8 +174,9 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         if (name == "")
             name = getDescription();
         
+        
         if (useNodeRoot)
-            rootNote = modeNode[IDs::rootMidiNote];
+            rootNote = totalModulus(modeNode[IDs::rootMidiNote], 128);
         
         offset = getOffset();
         
@@ -636,7 +637,7 @@ Array<int> Mode::interval_sizes(Array<int> stepsIn)
 Array<int> Mode::sum_of_steps(Array<int> stepsIn, int offsetIn, bool includePeriod)
 {
 	Array<int> sumsOut;
-	int sum = 0;
+	int sum = -offsetIn;
 
 	sumsOut.add(sum);
 
