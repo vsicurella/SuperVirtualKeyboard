@@ -228,6 +228,8 @@ Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
     
+    DBG("Mode1 Root: " + String(mode1.getRootNote()) + "\tMode2Root: " + String(mode2.getRootNote()));
+    
 	Array<int> mode1Steps = Mode::orders_to_steps(mode1.getOrders());
     Array<int> mode2Steps = Mode::orders_to_steps(mode2.getOrders());
 
@@ -237,6 +239,11 @@ Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
 	int mode1RootIndex = mode1MidiNotes.indexOf(mode1.getRootNote());
 	int mode2RootIndex = mode2MidiNotes.indexOf(mode2.getRootNote());
 	int rootIndexOffset = mode2RootIndex - mode1RootIndex;
+    
+    DBG("Mode1 Root Index: " + String(mode1RootIndex) + "\tMode2Root: " + String(mode2RootIndex));
+    
+    DBGArray(mode2MidiNotes, "Mode2 Midi Notes");
+
     
     int mode2ScaleIndex = 0;
     

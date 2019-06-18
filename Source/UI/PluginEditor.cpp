@@ -135,9 +135,7 @@ void SvkPluginEditor::beginColorEditing()
 
 bool SvkPluginEditor::save_preset()
 {
-	piano->updatePianoNode();
-	pluginState->updateKeyboardSettingsPreset();
-	bool written = pluginState->savePreset();
+    bool written = pluginState->savePreset();
 	if (written)
 		DBG("file was saved");
 	else
@@ -364,7 +362,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		if (piano->getUIMode() == UIMode::colorMode)
 		{
 			piano->updatePianoNode();
-			pluginState->updateKeyboardSettingsPreset();
 
 			piano->applyMode(pluginState->getModeLoaded());
 			piano->setUIMode(UIMode::playMode);
@@ -485,7 +482,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		break;
 	case IDs::CommandIDs::remapMidiNotes:
 		midiSettingsWindow->setVisible(true);
-            midiSettingsComponent->refreshTables();
+        midiSettingsComponent->refreshTables();
 		break;
     case IDs::CommandIDs::autoRemap:
             pluginState->getMidiProcessor()->setAutoRemapOn(

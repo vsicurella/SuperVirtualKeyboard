@@ -338,7 +338,7 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
              */
             
             pluginState->getMidiProcessor()->setMidiInputMap(
-                                                             ModeMapper::mapToMode1Scale(*modeSelected1.get(), *modeSelected2.get()));
+                ModeMapper::mapToMode1Scale(*modeSelected1.get(), *modeSelected2.get()));
 		}
         //[/UserButtonCode_mapModesBtn]
     }

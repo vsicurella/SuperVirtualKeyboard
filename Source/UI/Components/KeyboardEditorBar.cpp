@@ -271,16 +271,6 @@ void KeyboardEditorBar::setModeLibraryText(String presetName)
 void KeyboardEditorBar::createAndSendMode()
 {
 	String steps = modeTextEditor->getText();
-
-	/*
-	int index = pluginState->is_mode_in_presets(steps);
-
-	if (index)
-		pluginState->loadMode(index);
-	else
-		pluginState->loadMode(new Mode(steps, "Custom"));
-		*/
-
 	pluginState->loadMode(Mode::createNode(steps, "Custom"));
 }
 

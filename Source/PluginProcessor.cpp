@@ -176,6 +176,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	
 	MemoryInputStream memIn(data, sizeInBytes, false);
 	pluginState->pluginStateNode.readFromStream(memIn);
+    pluginState->updatePluginFromParentNode();
 }
 
 //==============================================================================

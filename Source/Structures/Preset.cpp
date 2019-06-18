@@ -17,7 +17,7 @@ SvkPreset::SvkPreset()
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMapNode = ValueTree(IDs::midiMapNode);
     
-	parentNode.addChild(theModeNode, 0, nullptr);
+	parentNode.addChild(theModeNode, -1, nullptr);
 }
 
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
@@ -26,6 +26,7 @@ SvkPreset::SvkPreset(ValueTree presetNodeIn)
 
     theModeNode = ValueTree(IDs::modePresetNode);
     theKeyboardNode = ValueTree(IDs::pianoNode);
+    theMapNode = ValueTree(IDs::midiMapNode);
     
     ValueTree nodeToCommit;
     
@@ -38,14 +39,20 @@ SvkPreset::SvkPreset(ValueTree presetNodeIn)
 
     if (nodeToCommit.isValid())
         theKeyboardNode.copyPropertiesAndChildrenFrom(nodeToCommit, nullptr);
+    
+    nodeToCommit = extractNode(presetNodeIn, IDs::midiMapNode);
+    
+    if (nodeToCommit.isValid())
+        theMapNode.copyPropertiesAndChildrenFrom(nodeToCommit, nullptr);
 
 	parentNode.addChild(theModeNode, -1, nullptr);
 	parentNode.addChild(theKeyboardNode, -1, nullptr);
+    parentNode.addChild(theMapNode, -1, nullptr);
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
+:     SvkPreset(presetToCopy.parentNode)
 {
-	SvkPreset(presetToCopy.parentNode);
 }
 
 SvkPreset::~SvkPreset() {}
@@ -58,7 +65,7 @@ bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
         parentNode.addChild(theModeNode, 0, nullptr);
     }
     
-	theModeNode = ValueTree(modeNodeIn);
+    theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
     
 	return theModeNode.isValid();
 }
@@ -71,8 +78,8 @@ bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
 		parentNode.addChild(theKeyboardNode, -1, nullptr);
 	}
 
-	theKeyboardNode = ValueTree(keyboardNodeIn);
-	
+    theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
+
 	return theKeyboardNode.isValid();
 }
 
@@ -84,8 +91,8 @@ bool SvkPreset::updateMapNode(ValueTree mapNodeIn)
         parentNode.addChild(theMapNode, -1, nullptr);
     }
     
-    theMapNode = ValueTree(mapNodeIn);
-    
+    theMapNode.copyPropertiesAndChildrenFrom(mapNodeIn, nullptr);
+
     return theMapNode.isValid();
 }
 

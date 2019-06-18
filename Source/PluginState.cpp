@@ -101,24 +101,51 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
     presetEdited = true;
 }
 
+void SvkPluginState::updatePluginToPresetLoaded()
+{
+    midiProcessor->setMidiMaps(presetManager->presetNode.getChildWithName(IDs::midiMapNode));
+    
+    modeLoaded->restoreNode(presetManager->presetNode, false);
+    modeLoaded->setRootNote(midiProcessor->getRootNote()); // SHOULDN"T BE NECESSARY
+    virtualKeyboard->applyMode(modeLoaded.get());
+    
+    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetEdited = false;
+    
+    sendChangeMessage();
+}
+
+void SvkPluginState::updatePluginFromParentNode()
+{
+    presetManager->loadPreset(modePresetNode, false);
+    midiProcessor->restoreFromNode(midiSettingsNode);
+
+    modeLoaded->restoreNode(modePresetNode, false);
+    modeLoaded->setRootNote(midiProcessor->getRootNote()); // SHOULDN"T BE NECESSARY
+    virtualKeyboard->applyMode(modeLoaded.get());
+    
+    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetEdited = false;
+    
+    sendChangeMessage();
+}
+
 bool SvkPluginState::savePreset()
 {
+    presetWorking->updateModeNode(modeLoaded->modeNode);
+    presetWorking->updateKeyboardNode(pianoNode);
+    presetWorking->updateMapNode(midiProcessor->midiMapNode);
+    
+    presetManager->commitPresetNode(presetWorking->parentNode);
+    presetEdited = false;
+    
 	return presetManager->savePreset();
 }
 
 
 bool SvkPluginState::loadPreset()
 {
-    bool loaded = presetManager->loadPreset();
-    
-    return loaded;
-}
-
-void SvkPluginState::connectPreset()
-{
-    presetWorking->theKeyboardNode = pianoNode;
-    presetWorking->theModeNode = modeLoaded->modeNode;
-    presetWorking->theMapNode = midiProcessor->midiMapNode;
+    return presetManager->loadPreset();
 }
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
@@ -126,15 +153,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	// Preset loaded
 	if (source == presetManager.get())
 	{
-		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
-		virtualKeyboard->applyMode(modeLoaded.get());
-        midiProcessor->setMidiMaps(presetManager->presetNode.getChildWithName(IDs::midiMapNode));
-        
-        // copy preset to work off of
-        presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
-        connectPreset();
-        presetEdited = false;
-        
-        sendChangeMessage();
+        updatePluginToPresetLoaded();
 	}
 }
