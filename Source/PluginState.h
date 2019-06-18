@@ -45,6 +45,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     NoteMap* getMidiInputMap();
     NoteMap* getMidiOutputMap();
+    
+    bool isPresetEdited();
 
 	void loadMode(int presetIndexIn);
 	void loadMode(ValueTree modeNodeIn);
@@ -72,13 +74,15 @@ private:
 	std::unique_ptr<UndoManager> undoManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
-    
-	SvkPreset* presetCurrent;
+    std::unique_ptr<SvkPreset> presetWorking;
     std::unique_ptr<Mode> modeLoaded;
 	
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<int>> presetsSorted;
+    bool presetEdited = false;
+    
+    void connectPreset();
 
 };

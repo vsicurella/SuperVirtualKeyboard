@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginIDs.h"
+#include "../CommonFunctions.h"
 
 struct SvkPreset
 {

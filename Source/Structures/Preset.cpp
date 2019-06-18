@@ -23,26 +23,24 @@ SvkPreset::SvkPreset()
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
 {
 	parentNode = ValueTree(IDs::presetNode);
-    
-    if (!theModeNode.isValid())
-        theModeNode = ValueTree(IDs::modePresetNode);
-    
-    if (!theKeyboardNode.isValid())
-        theKeyboardNode = ValueTree(IDs::pianoNode);
 
-    if (presetNodeIn.hasType(IDs::modePresetNode))
-        theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
-    else
-        theModeNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChildWithName(IDs::modePresetNode), nullptr);
+    theModeNode = ValueTree(IDs::modePresetNode);
+    theKeyboardNode = ValueTree(IDs::pianoNode);
     
-    if (presetNodeIn.getChildWithName(IDs::pianoNode).isValid())
-        theKeyboardNode.copyPropertiesAndChildrenFrom(presetNodeIn.getChildWithName(IDs::pianoNode), nullptr);
+    ValueTree nodeToCommit;
+    
+    nodeToCommit = extractNode(presetNodeIn, IDs::modePresetNode);
+
+    if (nodeToCommit.isValid())
+        theModeNode.copyPropertiesAndChildrenFrom(nodeToCommit, nullptr);
+    
+    nodeToCommit = extractNode(presetNodeIn, IDs::pianoNode);
+
+    if (nodeToCommit.isValid())
+        theKeyboardNode.copyPropertiesAndChildrenFrom(nodeToCommit, nullptr);
 
 	parentNode.addChild(theModeNode, -1, nullptr);
 	parentNode.addChild(theKeyboardNode, -1, nullptr);
-
-	if (presetNodeIn.hasProperty(IDs::rootMidiNote))
-		parentNode.setProperty(IDs::rootMidiNote,(int)presetNodeIn[IDs::rootMidiNote], nullptr);
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
@@ -60,7 +58,7 @@ bool SvkPreset::updateModeNode(ValueTree modeNodeIn)
         parentNode.addChild(theModeNode, 0, nullptr);
     }
     
-	theModeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+	theModeNode = ValueTree(modeNodeIn);
     
 	return theModeNode.isValid();
 }

@@ -28,7 +28,6 @@ SvkPluginState::SvkPluginState()
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	presetLibraryNode = presetManager->presetLibraryNode;
 	pluginStateNode.addChild(presetLibraryNode, -1, nullptr);
-	presetCurrent = presetManager->getPresetLoaded();
 	presetManager->addChangeListener(this);
 
 	modeLoaded.reset(new Mode());
@@ -55,7 +54,7 @@ UndoManager* SvkPluginState::getUndoManager()
 
 SvkPreset* SvkPluginState::getPresetLoaded()
 {
-	return presetCurrent;
+	return presetWorking.get();
 }
 
 Mode* SvkPluginState::getModeLoaded()
@@ -77,6 +76,11 @@ NoteMap* SvkPluginState::getMidiOutputMap()
     return midiProcessor->getMidiOutputFilter()->getNoteMap();
 }
 
+bool SvkPluginState::isPresetEdited()
+{
+    return presetEdited;
+}
+
 void SvkPluginState::loadMode(int presetIndexIn)
 {
 	presetManager->loadPreset(presetIndexIn);
@@ -93,16 +97,9 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 	midiProcessor->setRootNote(rootNoteIn);
 	modeLoaded->setRootNote(rootNoteIn);
     virtualKeyboard->applyMode(modeLoaded.get());
+    
+    presetEdited = true;
 }
-
-void SvkPluginState::updateKeyboardSettingsPreset()
-{
-	if (pianoNode.isValid())
-	{	
-		//presetCurrent->updateKeyboardNode(pianoNode);
-	}
-}
-
 
 bool SvkPluginState::savePreset()
 {
@@ -112,7 +109,16 @@ bool SvkPluginState::savePreset()
 
 bool SvkPluginState::loadPreset()
 {
-	return presetManager->loadPreset();
+    bool loaded = presetManager->loadPreset();
+    
+    return loaded;
+}
+
+void SvkPluginState::connectPreset()
+{
+    presetWorking->theKeyboardNode = pianoNode;
+    presetWorking->theModeNode = modeLoaded->modeNode;
+    presetWorking->theMapNode = midiProcessor->midiMapNode;
 }
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
@@ -122,6 +128,13 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	{
 		modeLoaded->restoreNode(presetManager->presetNode, midiProcessor->getRootNote());
 		virtualKeyboard->applyMode(modeLoaded.get());
+        midiProcessor->setMidiMaps(presetManager->presetNode.getChildWithName(IDs::midiMapNode));
+        
+        // copy preset to work off of
+        presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+        connectPreset();
+        presetEdited = false;
+        
         sendChangeMessage();
 	}
 }
