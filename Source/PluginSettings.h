@@ -25,7 +25,7 @@ class SvkPluginSettings
 	File currentSettingsLocation;
 	File currentPresetLocation;
 
-	bool createPresetFolder = true;
+	bool createPresetFolder = false;
 	bool saveFactoryPresets = false;
 
 public:

@@ -60,11 +60,6 @@ String ReaperWriter::ask_for_location()
     return "";
 }
 
-Mode* ReaperWriter::get_mode()
-{
-    return mode;
-}
-
 Array<String> ReaperWriter::get_symbols()
 {
     return orderSymbols;
@@ -87,7 +82,7 @@ void ReaperWriter::setup_default_symbols()
 	CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
 	String symbol;
 	int orderMax = mode->getMaxStep();
-	int repeats = 20;
+	int repeats = 11;
 
 	for (int i = 0; i < repeats; i++)
 	{
@@ -104,6 +99,8 @@ void ReaperWriter::setup_default_symbols()
 
 bool ReaperWriter::write_file()
 {
+    Array<int> modeOrders = mode->getOrders();
+    Array<float> modeDegrees = Mode::orders_to_modeDegrees(modeOrders);
     
     if (!fileOut.getParentDirectory().exists())
         return false;
@@ -119,19 +116,30 @@ bool ReaperWriter::write_file()
 	// Header
 	outStream->writeText("# MIDI note / CC name map\n", false, false, nullptr);
 
+    int scaleSize = mode->getScaleSize();
+    int modeSize = mode->getModeSize();
+    
 	int order;
 	int index;
+    float degree;
+    String noteName;
+    
     for (int i = 0; i < 128; i++)
     {
 		index = 127 - i;
-		order = mode->getOrders()[index];
+		order = modeOrders[index];
+        degree = modeDegrees[index];
+        noteName = String(degree - ((int) degree / modeSize) * modeSize);
+
+        outStream->writeText(String(index) + " ", false, false, nullptr);
 
 		if (order != 0)
 		{
-			outStream->writeText(String(index) + " ", false, false, nullptr);
 			outStream->writeText(orderSymbols[order-1], false, false, nullptr);
-			outStream->write("\n", 1);
 		}
+        
+        outStream->writeText(" " + noteName, false, false, nullptr);
+        outStream->write("\n", 1);
     }
 
 	outStream->flush();
