@@ -33,11 +33,13 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	view.get()->setViewedComponent(piano, false);
 	view.get()->setTopLeftPosition(1, 49);
     
+    /*
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
 	colorChooserWindow->addChangeListener(this);
 	colorChooserWindow->addToDesktop();
-
+     */
+    
     midiSettingsWindow.reset(new MidiSettingsWindow());
     midiSettingsWindow->setSize(800, 600);
 	midiSettingsComponent.reset(new MidiSettingsComponent(pluginState));
@@ -440,6 +442,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 		break;
 	case IDs::CommandIDs::setKeyColor:
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
+            result.setActive(false);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
 	case IDs::CommandIDs::remapMidiNotes:

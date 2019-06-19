@@ -1084,6 +1084,7 @@ void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &resul
 	case IDs::CommandIDs::setKeysAdjacent:
 		result.setInfo("Keys Adjacent", "The keys outside of the mode will placed adjacent to each other.", "Piano", 0);
 		result.setTicked(keyPlacementSelected == KeyPlacementType::adjacent);
+        result.setActive(false);
 		break;
 	default:
 		break;
