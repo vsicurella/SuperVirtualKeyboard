@@ -49,7 +49,7 @@ ValueTree SvkPresetManager::getPreset(int indexIn)
 	int index = indexIn % numberOfPresets;
     
     if (subMenu < presetsSorted.size())
-        if (index < presetsSorted.size())
+        if (index < presetsSorted.getUnchecked(subMenu).size())
             return presetsSorted.getUnchecked(subMenu).getUnchecked(index);
     
     return ValueTree();
