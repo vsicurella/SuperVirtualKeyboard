@@ -95,6 +95,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
             
             if (sendChangeSignal)
                 sendChangeMessage();
+            
             return true;
         }
     }
