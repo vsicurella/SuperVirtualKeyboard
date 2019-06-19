@@ -67,7 +67,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     
     setSize(1000, 250);
 	setResizeLimits(986, 100, 10e4, 10e4);
-
+    
 	startTimerHz(20);
 }
 
