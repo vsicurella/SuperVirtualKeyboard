@@ -237,8 +237,8 @@ namespace VirtualKeyboard
 
 		Array<int> keyMidiNoteMappings;
                 
-		Array<Colour> keyColorsOrder = { Colours::white, Colours::black, Colours::maroon, Colours::darkslateblue, Colours::forestgreen,
-            Colours::darkgoldenrod, Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
+		Array<Colour> keyColorsOrder = { Colours::white, Colours::black, Colours::crimson.withSaturation(1.0f), Colours::cornflowerblue.withSaturation(0.8f), Colours::mediumseagreen.withSaturation(0.85f),
+            Colours::gold.withBrightness(0.75f), Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
 		
 		Array<Colour> keyColorsDegree;
 		Array<Colour> keyColorsSingle; // organized by (keyNumber - Mode offset)
