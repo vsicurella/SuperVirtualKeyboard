@@ -31,6 +31,8 @@ SvkPluginState::SvkPluginState()
 	presetManager->addChangeListener(this);
 
 	modeLoaded.reset(new Mode());
+    modePresetNode = modeLoaded->modeNode;
+    pluginStateNode.addChild(modePresetNode, -1, nullptr);
 
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor.get()));
 	virtualKeyboard->addListener(midiProcessor.get()); // generates MIDI from UI
@@ -40,6 +42,7 @@ SvkPluginState::SvkPluginState()
 	textFilterInt.reset(new TextFilterInt());
     
     loadMode(7);
+    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
 }
 
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()
@@ -106,7 +109,6 @@ void SvkPluginState::updatePluginToPresetLoaded()
     midiProcessor->setMidiMaps(presetManager->presetNode.getChildWithName(IDs::midiMapNode));
     
     modeLoaded->restoreNode(presetManager->presetNode, false);
-    modeLoaded->setRootNote(midiProcessor->getRootNote()); // SHOULDN"T BE NECESSARY
     virtualKeyboard->applyMode(modeLoaded.get());
     
     presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
@@ -121,7 +123,6 @@ void SvkPluginState::updatePluginFromParentNode()
     midiProcessor->restoreFromNode(midiSettingsNode);
 
     modeLoaded->restoreNode(modePresetNode, false);
-    modeLoaded->setRootNote(midiProcessor->getRootNote()); // SHOULDN"T BE NECESSARY
     virtualKeyboard->applyMode(modeLoaded.get());
     
     presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
@@ -130,15 +131,20 @@ void SvkPluginState::updatePluginFromParentNode()
     sendChangeMessage();
 }
 
-bool SvkPluginState::savePreset()
+void SvkPluginState::commitPresetChanges()
 {
     presetWorking->updateModeNode(modeLoaded->modeNode);
     presetWorking->updateKeyboardNode(pianoNode);
     presetWorking->updateMapNode(midiProcessor->midiMapNode);
-    
     presetManager->commitPresetNode(presetWorking->parentNode);
-    presetEdited = false;
     
+    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetEdited = false;
+}
+
+bool SvkPluginState::savePreset()
+{
+    commitPresetChanges();
 	return presetManager->savePreset();
 }
 

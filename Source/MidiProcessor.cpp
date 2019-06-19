@@ -27,6 +27,8 @@ SvkMidiProcessor::SvkMidiProcessor()
     keyboardState.reset(new MidiKeyboardState());
     // default sample rate
     reset(41000);
+    
+    setRootNote(60);
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
