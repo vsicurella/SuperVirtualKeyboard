@@ -135,7 +135,7 @@ struct Mode
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "0, 0.5, 1, 1.5,..."
 	*/
-	static Array<float> orders_to_modeDegrees(Array<int> stepsIn);
+	static Array<float> orders_to_modeDegrees(Array<int> ordersIn);
 
 	/*
 	Simply creates an array of scale degrees based off of scale size and offset

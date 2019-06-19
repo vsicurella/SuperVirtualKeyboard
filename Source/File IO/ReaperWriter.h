@@ -35,7 +35,6 @@ public:
     
     String ask_for_location();
     
-    Mode* get_mode();
     Array<String> get_symbols();
 	String get_symbol(int orderIndexIn);
     String get_path();
