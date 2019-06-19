@@ -54,7 +54,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     addAndMakeVisible (offsetSld.get());
     offsetSld->setRange (0, 127, 1);
     offsetSld->setSliderStyle (Slider::IncDecButtons);
-    offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 64, 20);
     offsetSld->addListener (this);
 
     offsetLabel.reset (new Label ("Offset Label",
@@ -93,7 +93,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
 	addAndMakeVisible(pianoMenu.get());
-	pianoMenu->toBack();
+    pianoMenu->toBack();
 
 	modeTextEditor->setInputFilter(pluginState->textFilterIntOrSpace.get(), false);
     modeTextEditor->setMouseClickGrabsKeyboardFocus(true);
@@ -102,7 +102,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (600, 24);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -144,16 +144,16 @@ void KeyboardEditorBar::paint (Graphics& g)
 void KeyboardEditorBar::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-	pianoMenu->setBounds(1, 5, proportionOfWidth(1.0f), 24);
+	pianoMenu->setBounds(1, 0, getWidth(), getHeight()-1);
     //[/UserPreResize]
 
-    modeTextEditor->setBounds (getWidth() - 381 - 150, 6, 150, 24);
-    sendScaleBtn->setBounds (getWidth() - 283 - 88, 6, 88, 24);
-    offsetSld->setBounds (getWidth() - 235, 2, 69, 32);
-    offsetLabel->setBounds (getWidth() - 280, 6, 47, 24);
-    mapButton->setBounds (getWidth() - 542 - 106, 6, 106, 24);
-    presetLibraryBox->setBounds (getWidth() - 9 - 150, 6, 150, 24);
-    mapStdButton->setBounds (getWidth() - 662 - 138, 6, 138, 24);
+    modeTextEditor->setBounds (getWidth() - 404 - 150, 1, 150, 24);
+    sendScaleBtn->setBounds (getWidth() - 308 - 88, 1, 88, 24);
+    offsetSld->setBounds (getWidth() - 269, 1, 110, 24);
+    offsetLabel->setBounds (getWidth() - 309, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
+    mapButton->setBounds (getWidth() - 561 - 106, 1, 106, 24);
+    presetLibraryBox->setBounds (getWidth() - 5 - 150, 1, 150, 24);
+    mapStdButton->setBounds (getWidth() - 676 - 138, 1, 138, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -289,13 +289,15 @@ void KeyboardEditorBar::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged)
     {
         int id = comboBoxThatHasChanged->getSelectedId() - 1;
-		pluginState->loadMode(id);
 
-        if (pluginState->getMidiProcessor()->isAutoRemapping())
+        if (id != pluginState->presetManager->getPresetLoadedId())
         {
-			
-			pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(
-				*pluginState->getModeLoaded()));
+            pluginState->loadMode(id);
+
+            if (pluginState->getMidiProcessor()->isAutoRemapping())
+            {
+                pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(*pluginState->getModeLoaded()));
+            }
         }
     }
 }
@@ -325,7 +327,7 @@ KeyboardEditorBar::KeyboardMenu::~KeyboardMenu()
 
 void KeyboardEditorBar::KeyboardMenu::resized()
 {
-	menuParent->setBounds(0, 0, 350, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight());
+	menuParent->setBounds(0, 0, getParentWidth(), getParentHeight()*0.8f);
 }
 //==============================================================================
 
@@ -394,31 +396,31 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Custom Mode Entry" id="8c559f3dc17dcbb0" memberName="modeTextEditor"
-              virtualName="" explicitFocusOrder="0" pos="381Rr 6 150 24" initialText="2 2 1 2 2 2 1"
+              virtualName="" explicitFocusOrder="0" pos="404Rr 1 150 24" initialText="2 2 1 2 2 2 1"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Send Scale Button" id="3a2872f3357f900b" memberName="sendScaleBtn"
-              virtualName="" explicitFocusOrder="0" pos="283Rr 6 88 24" buttonText="Send Scale"
+              virtualName="" explicitFocusOrder="0" pos="308Rr 1 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="235R 2 69 32" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="269R 1 110 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          textBoxEditable="1" textBoxWidth="64" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
-         virtualName="" explicitFocusOrder="0" pos="280R 6 47 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Root:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="309R 50%c 47 24" posRelativeY="c1c294edca92ea2f"
+         edTextCol="ff000000" edBkgCol="0" labelText="Root:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
-              virtualName="" explicitFocusOrder="0" pos="542Rr 6 106 24" bgColOff="ff5c6ea4"
+              virtualName="" explicitFocusOrder="0" pos="561Rr 1 106 24" bgColOff="ff5c6ea4"
               bgColOn="ffa7b438" buttonText="Learn Mapping" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
-                    virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="9Rr 6 150 24"
+                    virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="5Rr 1 150 24"
                     class="ComboBox" params="&quot;Preset Box Main&quot;"/>
   <TEXTBUTTON name="Std Map Button" id="7376bb3f0836f75b" memberName="mapStdButton"
-              virtualName="" explicitFocusOrder="0" pos="662Rr 6 138 24" bgColOff="ff5c60a4"
+              virtualName="" explicitFocusOrder="0" pos="676Rr 1 138 24" bgColOff="ff5c60a4"
               bgColOn="ffa7b438" buttonText="Map From Standard" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>

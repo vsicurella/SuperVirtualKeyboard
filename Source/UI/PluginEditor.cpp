@@ -64,7 +64,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	addMouseListener(this, true);
     
     setSize(1000, 250);
-	setResizeLimits(640, 100, 10e4, 10e4);
+	setResizeLimits(986, 100, 10e4, 10e4);
 
 	startTimerHz(20);
 }
@@ -175,27 +175,17 @@ void SvkPluginEditor::resized()
 	int viewPositionKeyboardX = view->getViewPositionX();
 	AudioProcessorEditor::resized();
 
-	keyboardEditorBar->setBounds(0, 6, getWidth(), 36);
-	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight() - view.get()->getScrollBarThickness());
+	keyboardEditorBar->setBounds(0, 0, getWidth(), 36);
+	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
 	piano->setBounds(0, 0, piano->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
 	
 	view->setViewPosition(viewPositionKeyboardX, 0);
-
-	// update node
-	if (pluginEditorNode.isValid())
-	{
-		updateNodeData();
-	}
-	
 }
 
 //==============================================================================
 
 void SvkPluginEditor::timerCallback()
 {
-	//piano->getMidiKeyboardState()->processNextMidiBuffer(
-	//	*processor.get_midi_buffer(), 0, 4096, true);
-
 	piano->repaint();
 }
 
