@@ -56,6 +56,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     void updatePluginToPresetLoaded();
     void updatePluginFromParentNode();
 
+    void commitPresetChanges();
 	bool savePreset();
 	bool loadPreset();
 

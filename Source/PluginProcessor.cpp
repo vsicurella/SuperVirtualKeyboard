@@ -165,8 +165,8 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 	
 	MemoryOutputStream memOut(destData, true);
-	pluginState->pluginStateNode.writeToStream(memOut);
-	//destData.append(memOut.getData(), memOut.getDataSize());
+    pluginState->commitPresetChanges();
+    pluginState->getPresetLoaded()->parentNode.writeToStream(memOut);
 }
 
 void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -175,8 +175,8 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     // whose contents will have been created by the getStateInformation() call.
 	
 	MemoryInputStream memIn(data, sizeInBytes, false);
-	pluginState->pluginStateNode.readFromStream(memIn);
-    pluginState->updatePluginFromParentNode();
+    ValueTree presetRecall = ValueTree::readFromStream(memIn);
+    pluginState->presetManager->loadPreset(presetRecall);
 }
 
 //==============================================================================

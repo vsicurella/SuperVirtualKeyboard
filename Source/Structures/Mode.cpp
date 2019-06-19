@@ -178,7 +178,7 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         if (useNodeRoot)
             rootNote = totalModulus(modeNode[IDs::rootMidiNote], 128);
         
-        offset = getOffset();
+        offset = -getOffset();
         
         orders = expand_orders(ordersDefault, offset);
         modeDegrees = orders_to_modeDegrees(orders);
