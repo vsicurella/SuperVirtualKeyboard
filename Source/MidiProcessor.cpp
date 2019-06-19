@@ -17,9 +17,9 @@ SvkMidiProcessor::SvkMidiProcessor()
     
     midiSettingsNode.addChild(midiMapNode, -1, nullptr);
        
-    midiInputFilter.reset(new MidiFilter());
-    midiOutputFilter.reset(new MidiFilter());
-    
+    midiInputFilter = std::make_unique<MidiFilter>();
+    midiOutputFilter = std::make_unique<MidiFilter>();
+
     //setMidiInput(MidiInput::getDefaultDeviceIndex());
     midiInput = nullptr;
     midiOutput = nullptr;
