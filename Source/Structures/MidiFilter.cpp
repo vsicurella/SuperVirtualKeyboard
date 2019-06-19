@@ -13,7 +13,7 @@
 MidiFilter::MidiFilter()
 {
 	noteRange = Point<int>(-1, 127);
-	midiNoteMapping.reset(new NoteMap(128, true));
+    midiNoteMapping = std::make_unique<NoteMap>(128, true);
 }
 
 MidiFilter::MidiFilter(Array<int> mapIn)
@@ -30,13 +30,13 @@ MidiFilter::MidiFilter(NoteMap mapIn)
 
 NoteMap* MidiFilter::setNoteMap(Array<int> mapToCopy)
 {
-    midiNoteMapping.reset(new NoteMap(mapToCopy));
+    midiNoteMapping = std::make_unique<NoteMap>(mapToCopy);
 	return midiNoteMapping.get();
 }
 
 NoteMap* MidiFilter::setNoteMap(NoteMap mapToCopy)
 {
-    midiNoteMapping.reset(new NoteMap(mapToCopy));
+    midiNoteMapping = std::make_unique<NoteMap>(mapToCopy);
     return midiNoteMapping.get();
 }
 

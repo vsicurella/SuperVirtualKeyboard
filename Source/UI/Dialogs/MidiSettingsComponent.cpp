@@ -173,7 +173,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 	midiInputFilter = pluginState->getMidiProcessor()->getMidiInputFilter();
 	midiOutputFilter = pluginState->getMidiProcessor()->getMidiOutputFilter();
-
+    
+    /*
 	remapTable.reset(new TableListBox("Midi Remap Table"));
 	remapTableModel.reset(new MidiRemapTableModel(remapTable.get(), midiInputFilter, midiOutputFilter, pluginState->textFilterInt.get()));
 	remapTable->setModel(remapTableModel.get());
@@ -185,7 +186,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 	remapTable->getHeader().addColumn("Output Note", 3, remapTable->getWidth() * 0.35);
 
 	addAndMakeVisible(remapTable.get());
-
+     */
+    
     //[/UserPreSize]
 
     setSize (800, 600);
@@ -199,8 +201,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 MidiSettingsComponent::~MidiSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    remapTable.release();
-	remapTableModel.release();
+    //remapTable.release();
+	//remapTableModel.release();
 
 	presetBox1->removeListener(this);
 	presetBox2->removeListener(this);
@@ -372,7 +374,7 @@ void MidiSettingsComponent::setMode2RootNote(int rootNoteIn)
 
 void MidiSettingsComponent::refreshTables()
 {
-    remapTable->updateContent();
+    //remapTable->updateContent();
 }
 
 //[/MiscUserCode]
