@@ -53,7 +53,8 @@ public:
 	~SvkPresetManager();
 
 	SvkPreset* getPresetLoaded();
-
+    int getPresetLoadedId();
+    
 	Array<Array<ValueTree>>* getPresetsSorted();
 
 	ValueTree getPreset(int indexIn);

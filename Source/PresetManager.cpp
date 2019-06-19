@@ -29,6 +29,12 @@ SvkPreset* SvkPresetManager::getPresetLoaded()
 	return presetLoaded.get();
 }
 
+int SvkPresetManager::getPresetLoadedId()
+{
+    return presetLoaded->parentNode[IDs::libraryIndexOfMode];
+}
+
+
 Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 {
 	return &presetsSorted;
