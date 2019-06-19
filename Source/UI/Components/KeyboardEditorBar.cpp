@@ -89,6 +89,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
     //[UserPreSize]
     presetLibraryBox->setMenu(*pluginState->presetManager->getPresetMenu());
+    presetLibraryBox->setEditableText(false);
 	presetLibraryBox->addListener(this);
 
 	pianoMenu.reset(new KeyboardMenu(appCmdMgr));
@@ -102,7 +103,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     offsetSld->setValue(pluginState->getMidiProcessor()->getRootNote(), dontSendNotification);
     //[/UserPreSize]
 
-    setSize (600, 24);
+    setSize (600, 400);
 
 
     //[Constructor] You can add your own custom stuff here..

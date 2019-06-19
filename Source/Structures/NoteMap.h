@@ -17,18 +17,18 @@ class NoteMap
 {
 	int size;
 
-	std::unique_ptr<Array<int>> keys; // Midi Note In, Key Number Out
-	std::unique_ptr<Array<int>> values; // Key Number In, Midi Note Out
+	Array<int> keys; // Midi Note In, Key Number Out
+	Array<int> values; // Key Number In, Midi Note Out
 
 	int nullVal;
-    
+        
 public:
     
     NoteMap();
 	NoteMap(int sizeIn, bool useIdentity, int nullValIn = -1);
 	NoteMap(Array<int> valuesIn, int nullValIn = -1);
     NoteMap(const NoteMap& mapToCopy);
-	~NoteMap();
+    ~NoteMap() {}
 	
 	void setValue(int keyNum, int valIn);
 	void setValues(Array<int> valuesIn);
