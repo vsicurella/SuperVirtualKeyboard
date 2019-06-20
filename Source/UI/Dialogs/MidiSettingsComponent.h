@@ -56,8 +56,8 @@ public:
     void setMode1RootNote(int rootNoteIn);
     void setMode2RootNote(int rootNoteIn);
 
-    void refreshTables();
     void updateModeMapper();
+    void setOrderMappingVisibility(bool isVisible);
 
     //[/UserMethods]
 

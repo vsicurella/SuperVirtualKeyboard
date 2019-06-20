@@ -18,11 +18,18 @@ class ModeMapper
 {
     int mapType;
     
+    int mapByOrderNum1 = 0;
+    int mapByOrderNum2 = 0;
+    int mapByOrderOffset1 = 0;
+    int mapByOrderOffset2 = 0;
+    
 public:
     
     ModeMapper() {};
     
     void setMapType(int mapTypeIn);
+    
+    void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);
     
     NoteMap map(const Mode& mode1, const Mode& mode2, int order1=0, int order2=0, int offset1=0, int offset2=0);
 
