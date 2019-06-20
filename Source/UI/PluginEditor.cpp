@@ -21,14 +21,14 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
 	
-	keyboardEditorBar.reset(new KeyboardEditorBar(pluginState, appCmdMgr));
+	keyboardEditorBar = std::make_unique<KeyboardEditorBar>(pluginState, appCmdMgr);
 	keyboardEditorBar.get()->setName("Keyboard Editor Bar");
 	keyboardEditorBar.get()->setSize(640, 48);
 	addAndMakeVisible(keyboardEditorBar.get());
     
 	piano = pluginState->getKeyboard();
 
-	view.reset(new Viewport("Piano Viewport"));
+	view = std::make_unique<Viewport>("Piano Viewport");
 	addAndMakeVisible(view.get());
 	view.get()->setViewedComponent(piano, false);
 	view.get()->setTopLeftPosition(1, 49);
@@ -40,9 +40,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorChooserWindow->addToDesktop();
      */
     
-    midiSettingsWindow.reset(new MidiSettingsWindow());
+    midiSettingsWindow = std::make_unique<MidiSettingsWindow>();
     midiSettingsWindow->setSize(800, 600);
-	midiSettingsComponent.reset(new MidiSettingsComponent(pluginState));
+    midiSettingsComponent = std::make_unique<MidiSettingsComponent>(pluginState);
     midiSettingsComponent->setSize(800, 600);
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
     midiSettingsWindow->setAlwaysOnTop(true);

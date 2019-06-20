@@ -124,7 +124,8 @@ private:
     std::unique_ptr<Label> offsetLabel;
     std::unique_ptr<TextButton> mapButton;
     std::unique_ptr<ReferencedComboBox> presetLibraryBox;
-    std::unique_ptr<TextButton> mapStdButton;
+    std::unique_ptr<Slider> periodTransposeSld;
+    std::unique_ptr<Label> shiftLabel;
 
 
     //==============================================================================
