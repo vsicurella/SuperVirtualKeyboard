@@ -41,8 +41,8 @@
 */
 class MidiSettingsComponent  : public Component,
                                public ComboBox::Listener,
-                               public Slider::Listener,
-                               public Button::Listener
+                               public Button::Listener,
+                               public Slider::Listener
 {
 public:
     //==============================================================================
@@ -59,14 +59,13 @@ public:
     void refreshTables();
     void updateModeMapper();
 
-    void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -95,17 +94,23 @@ private:
     //==============================================================================
     std::unique_ptr<Label> modeFromLbl;
     std::unique_ptr<Label> modeToLbl;
-    std::unique_ptr<Slider> rootFromSld;
-    std::unique_ptr<Slider> rootToSld;
     std::unique_ptr<Label> rootNoteLabel;
     std::unique_ptr<ReferencedComboBox> presetBox1;
     std::unique_ptr<ReferencedComboBox> presetBox2;
     std::unique_ptr<TextButton> mapModesBtn;
-    std::unique_ptr<Label> midiStdNoteLabel;
-    std::unique_ptr<Label> midiStdNoteLabel2;
     std::unique_ptr<ToggleButton> mapFullBtn;
     std::unique_ptr<ToggleButton> mapModeToScaleBtn;
     std::unique_ptr<ToggleButton> mapModeOrdersBtn;
+    std::unique_ptr<Slider> rootFromSld1;
+    std::unique_ptr<Slider> rootToSld2;
+    std::unique_ptr<Label> rootNoteToLbl1;
+    std::unique_ptr<Label> rootNoteToLbl2;
+    std::unique_ptr<Label> ModeMapTypeLbl;
+    std::unique_ptr<ComboBox> mode1OrderBox;
+    std::unique_ptr<ComboBox> mode2OrderBox;
+    std::unique_ptr<Label> orderSelectionLbl;
+    std::unique_ptr<Slider> orderOffsetSld1;
+    std::unique_ptr<Slider> orderOffsetSld2;
 
 
     //==============================================================================
