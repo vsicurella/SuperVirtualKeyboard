@@ -40,9 +40,9 @@
                                                                     //[/Comments]
 */
 class MidiSettingsComponent  : public Component,
-                               public ComboBox::Listener,
                                public Button::Listener,
-                               public Slider::Listener
+                               public Slider::Listener,
+                               public ComboBox::Listener
 {
 public:
     //==============================================================================
@@ -101,10 +101,10 @@ private:
     std::unique_ptr<ToggleButton> mapFullBtn;
     std::unique_ptr<ToggleButton> mapModeToScaleBtn;
     std::unique_ptr<ToggleButton> mapModeOrdersBtn;
-    std::unique_ptr<Slider> rootFromSld1;
-    std::unique_ptr<Slider> rootToSld2;
-    std::unique_ptr<Label> rootNoteToLbl1;
-    std::unique_ptr<Label> rootNoteToLbl2;
+    std::unique_ptr<Slider> rootFromSld;
+    std::unique_ptr<Slider> rootToSld;
+    std::unique_ptr<Label> rootNoteFromLbl;
+    std::unique_ptr<Label> rootNoteToLbl;
     std::unique_ptr<Label> ModeMapTypeLbl;
     std::unique_ptr<ComboBox> mode1OrderBox;
     std::unique_ptr<ComboBox> mode2OrderBox;

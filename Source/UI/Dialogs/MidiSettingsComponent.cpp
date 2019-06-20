@@ -103,45 +103,45 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     mapModeOrdersBtn->setRadioGroupId (10);
     mapModeOrdersBtn->addListener (this);
 
-    rootFromSld1.reset (new Slider ("Root To Slidrer"));
-    addAndMakeVisible (rootFromSld1.get());
-    rootFromSld1->setRange (0, 127, 1);
-    rootFromSld1->setSliderStyle (Slider::IncDecButtons);
-    rootFromSld1->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
-    rootFromSld1->addListener (this);
+    rootFromSld.reset (new Slider ("Root To Slidrer"));
+    addAndMakeVisible (rootFromSld.get());
+    rootFromSld->setRange (0, 127, 1);
+    rootFromSld->setSliderStyle (Slider::IncDecButtons);
+    rootFromSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
+    rootFromSld->addListener (this);
 
-    rootFromSld1->setBounds (247, 32, 136, 24);
+    rootFromSld->setBounds (247, 32, 136, 24);
 
-    rootToSld2.reset (new Slider ("Root To Slidrer"));
-    addAndMakeVisible (rootToSld2.get());
-    rootToSld2->setRange (0, 127, 1);
-    rootToSld2->setSliderStyle (Slider::IncDecButtons);
-    rootToSld2->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
-    rootToSld2->addListener (this);
+    rootToSld.reset (new Slider ("Root To Slidrer"));
+    addAndMakeVisible (rootToSld.get());
+    rootToSld->setRange (0, 127, 1);
+    rootToSld->setSliderStyle (Slider::IncDecButtons);
+    rootToSld->setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
+    rootToSld->addListener (this);
 
-    rootToSld2->setBounds (247, 64, 136, 24);
+    rootToSld->setBounds (247, 64, 136, 24);
 
-    rootNoteToLbl1.reset (new Label ("new label",
-                                     TRANS("C4")));
-    addAndMakeVisible (rootNoteToLbl1.get());
-    rootNoteToLbl1->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    rootNoteToLbl1->setJustificationType (Justification::centredLeft);
-    rootNoteToLbl1->setEditable (false, false, false);
-    rootNoteToLbl1->setColour (TextEditor::textColourId, Colours::black);
-    rootNoteToLbl1->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    rootNoteFromLbl.reset (new Label ("new label",
+                                      TRANS("C4")));
+    addAndMakeVisible (rootNoteFromLbl.get());
+    rootNoteFromLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    rootNoteFromLbl->setJustificationType (Justification::centredLeft);
+    rootNoteFromLbl->setEditable (false, false, false);
+    rootNoteFromLbl->setColour (TextEditor::textColourId, Colours::black);
+    rootNoteFromLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    rootNoteToLbl1->setBounds (384, 30, 48, 24);
+    rootNoteFromLbl->setBounds (384, 30, 48, 24);
 
-    rootNoteToLbl2.reset (new Label ("new label",
-                                     TRANS("C4")));
-    addAndMakeVisible (rootNoteToLbl2.get());
-    rootNoteToLbl2->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    rootNoteToLbl2->setJustificationType (Justification::centredLeft);
-    rootNoteToLbl2->setEditable (false, false, false);
-    rootNoteToLbl2->setColour (TextEditor::textColourId, Colours::black);
-    rootNoteToLbl2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    rootNoteToLbl.reset (new Label ("new label",
+                                       TRANS("C4")));
+    addAndMakeVisible (rootNoteToLbl.get());
+    rootNoteToLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    rootNoteToLbl->setJustificationType (Justification::centredLeft);
+    rootNoteToLbl->setEditable (false, false, false);
+    rootNoteToLbl->setColour (TextEditor::textColourId, Colours::black);
+    rootNoteToLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    rootNoteToLbl2->setBounds (384, 64, 48, 24);
+    rootNoteToLbl->setBounds (384, 64, 48, 24);
 
     ModeMapTypeLbl.reset (new Label ("Mode Map Type Label",
                                      TRANS("Mapping Type:")));
@@ -162,7 +162,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     mode1OrderBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     mode1OrderBox->addListener (this);
 
-    mode1OrderBox->setBounds (640, 7, 63, 24);
+    mode1OrderBox->setBounds (618, 7, 63, 24);
 
     mode2OrderBox.reset (new ComboBox ("Mode 2 Order Box"));
     addAndMakeVisible (mode2OrderBox.get());
@@ -172,7 +172,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     mode2OrderBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     mode2OrderBox->addListener (this);
 
-    mode2OrderBox->setBounds (720, 7, 63, 24);
+    mode2OrderBox->setBounds (698, 7, 63, 24);
 
     orderSelectionLbl.reset (new Label ("Order Label",
                                         TRANS("Order:")));
@@ -183,7 +183,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     orderSelectionLbl->setColour (TextEditor::textColourId, Colours::black);
     orderSelectionLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    orderSelectionLbl->setBounds (584, 6, 48, 24);
+    orderSelectionLbl->setBounds (562, 6, 48, 24);
 
     orderOffsetSld1.reset (new Slider ("Order Offset Slider 1"));
     addAndMakeVisible (orderOffsetSld1.get());
@@ -192,7 +192,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     orderOffsetSld1->setTextBoxStyle (Slider::TextBoxAbove, false, 80, 30);
     orderOffsetSld1->addListener (this);
 
-    orderOffsetSld1->setBounds (640, 48, 64, 56);
+    orderOffsetSld1->setBounds (618, 48, 64, 56);
 
     orderOffsetSld2.reset (new Slider ("Order Offset Slider 2"));
     addAndMakeVisible (orderOffsetSld2.get());
@@ -201,7 +201,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     orderOffsetSld2->setTextBoxStyle (Slider::TextBoxAbove, false, 80, 30);
     orderOffsetSld2->addListener (this);
 
-    orderOffsetSld2->setBounds (720, 48, 64, 56);
+    orderOffsetSld2->setBounds (698, 48, 64, 56);
 
 
     //[UserPreSize]
@@ -244,10 +244,10 @@ MidiSettingsComponent::~MidiSettingsComponent()
     mapFullBtn = nullptr;
     mapModeToScaleBtn = nullptr;
     mapModeOrdersBtn = nullptr;
-    rootFromSld1 = nullptr;
-    rootToSld2 = nullptr;
-    rootNoteToLbl1 = nullptr;
-    rootNoteToLbl2 = nullptr;
+    rootFromSld = nullptr;
+    rootToSld = nullptr;
+    rootNoteFromLbl = nullptr;
+    rootNoteToLbl = nullptr;
     ModeMapTypeLbl = nullptr;
     mode1OrderBox = nullptr;
     mode2OrderBox = nullptr;
@@ -277,10 +277,10 @@ void MidiSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    modeFromLbl->setBounds (0, proportionOfHeight (0.0608f) - (21 / 2), 88, 21);
-    modeToLbl->setBounds (16, proportionOfHeight (0.1044f) - (24 / 2), 72, 24);
-    rootNoteLabel->setBounds (88 + 152, 5, 80, 24);
-    mapModesBtn->setBounds (88 + 0, 101, proportionOfWidth (0.1763f), 24);
+    modeFromLbl->setBounds (0, 76 - (21 / 2), 88, 21);
+    modeToLbl->setBounds (16, 43 - (24 / 2), 72, 24);
+    rootNoteLabel->setBounds (88 + 160, 5, 80, 24);
+    mapModesBtn->setBounds (88 + 0, 101, proportionOfWidth (0.1787f), 24);
     mapModeToScaleBtn->setBounds (432 + 0, 29 + 24, 128, 24);
     mapModeOrdersBtn->setBounds (432 + 0, 29 + 48, 128, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -330,19 +330,19 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == rootFromSld1.get())
+    if (sliderThatWasMoved == rootFromSld.get())
     {
-        //[UserSliderCode_rootFromSld1] -- add your slider handling code here..
-        rootNoteToLbl1->setText(MidiMessage::getMidiNoteName(rootFromSld1->getValue(), true, true, 4), dontSendNotification);
-        modeSelected1->setRootNote(rootFromSld1->getValue());
-        //[/UserSliderCode_rootFromSld1]
+        //[UserSliderCode_rootFromSld] -- add your slider handling code here..
+        rootNoteFromLbl->setText(MidiMessage::getMidiNoteName(rootFromSld->getValue(), true, true, 4), dontSendNotification);
+        modeSelected1->setRootNote(rootFromSld->getValue());
+        //[/UserSliderCode_rootFromSld]
     }
-    else if (sliderThatWasMoved == rootToSld2.get())
+    else if (sliderThatWasMoved == rootToSld.get())
     {
-        //[UserSliderCode_rootToSld2] -- add your slider handling code here..
-        rootNoteToLbl2->setText(MidiMessage::getMidiNoteName(rootToSld2->getValue(), true, true, 4), dontSendNotification);
-        modeSelected2->setRootNote(rootToSld2->getValue());
-        //[/UserSliderCode_rootToSld2]
+        //[UserSliderCode_rootToSld] -- add your slider handling code here..
+        rootNoteToLbl->setText(MidiMessage::getMidiNoteName(rootToSld->getValue(), true, true, 4), dontSendNotification);
+        modeSelected2->setRootNote(rootToSld->getValue());
+        //[/UserSliderCode_rootToSld]
     }
     else if (sliderThatWasMoved == orderOffsetSld1.get())
     {
@@ -368,18 +368,18 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         {
             ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
             modeSelected1 = std::make_unique<Mode>(modeToLoad);
-            modeSelected1->setRootNote(rootFromSld1->getValue());
-            
+            modeSelected1->setRootNote(rootFromSld->getValue());
+
         }
     }
-    
+
     else if (comboBoxThatHasChanged == presetBox2.get())
     {
         if (presetBox2->getSelectedId() > 0)
         {
             ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
             modeSelected2 = std::make_unique<Mode>(modeToLoad);
-            modeSelected2->setRootNote(rootToSld2->getValue());
+            modeSelected2->setRootNote(rootToSld->getValue());
         }
         else
         {
@@ -433,12 +433,12 @@ void MidiSettingsComponent::setMode2SelectedId(int selectedIdIn)
 
 void MidiSettingsComponent::setMode1RootNote(int rootNoteIn)
 {
-    rootFromSld1->setValue(rootNoteIn);
+    rootFromSld->setValue(rootNoteIn);
 }
 
 void MidiSettingsComponent::setMode2RootNote(int rootNoteIn)
 {
-    rootToSld2->setValue(rootNoteIn);
+    rootToSld->setValue(rootNoteIn);
 }
 
 void MidiSettingsComponent::refreshTables()
@@ -459,23 +459,23 @@ void MidiSettingsComponent::refreshTables()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="MidiSettingsComponent" componentName="Midi Remapper Dialog"
-                 parentClasses="public Component, public ComboBox::Listener" constructorParams="SvkPluginState* pluginStateIn"
+                 parentClasses="public Component" constructorParams="SvkPluginState* pluginStateIn"
                  variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="800" initialHeight="600">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="Mode From Label" id="5b2fda69d594937a" memberName="modeFromLbl"
-         virtualName="" explicitFocusOrder="0" pos="0 9.863%c 88 21" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="0 76.5c 88 21" edTextCol="ff000000"
          edBkgCol="0" labelText="From Mode:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <LABEL name="Mode To Label" id="44d358cbb3982e4" memberName="modeToLbl"
-         virtualName="" explicitFocusOrder="0" pos="16 16.876%c 72 24"
-         edTextCol="ff000000" edBkgCol="0" labelText="To Mode:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="34"/>
+         virtualName="" explicitFocusOrder="0" pos="16 43c 72 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="To Mode:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <LABEL name="Root Note Label" id="effe36cc4475b201" memberName="rootNoteLabel"
-         virtualName="" explicitFocusOrder="0" pos="64 5 80 24" posRelativeX="ee5b2def32e4fdbc"
+         virtualName="" explicitFocusOrder="0" pos="160 5 80 24" posRelativeX="ee5b2def32e4fdbc"
          edTextCol="ff000000" edBkgCol="0" labelText="Root Note:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -486,7 +486,7 @@ BEGIN_JUCER_METADATA
                     virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="88 64 150 24"
                     class="ComboBox" params=""/>
   <TEXTBUTTON name="Map Modes Button" id="7a76936bfde482aa" memberName="mapModesBtn"
-              virtualName="" explicitFocusOrder="0" pos="0 101 31.319% 24"
+              virtualName="" explicitFocusOrder="0" pos="0 101 17.861% 24"
               posRelativeX="eb2e366c9ad8965c" buttonText="Map!" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TOGGLEBUTTON name="Map Full Button" id="13073042620ecb96" memberName="mapFullBtn"
@@ -505,22 +505,22 @@ BEGIN_JUCER_METADATA
                 tooltip="Maps the notes belonging to one modal order to another order."
                 buttonText="Mode by Order" connectedEdges="0" needsCallback="1"
                 radioGroupId="10" state="0"/>
-  <SLIDER name="Root To Slidrer" id="e054f1f854595a3f" memberName="rootFromSld1"
+  <SLIDER name="Root To Slidrer" id="e054f1f854595a3f" memberName="rootFromSld"
           virtualName="" explicitFocusOrder="0" pos="247 32 136 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <SLIDER name="Root To Slidrer" id="c149a995958ccfb0" memberName="rootToSld2"
+  <SLIDER name="Root To Slidrer" id="c149a995958ccfb0" memberName="rootToSld"
           virtualName="" explicitFocusOrder="0" pos="247 64 136 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="new label" id="527ed968b95a71d8" memberName="rootNoteToLbl1"
+  <LABEL name="new label" id="527ed968b95a71d8" memberName="rootNoteFromLbl"
          virtualName="" explicitFocusOrder="0" pos="384 30 48 24" edTextCol="ff000000"
          edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="d317d95427cdd2e3" memberName="rootNoteToLbl2"
+  <LABEL name="new label" id="d317d95427cdd2e3" memberName="rootNoteToLbl"
          virtualName="" explicitFocusOrder="0" pos="384 64 48 24" edTextCol="ff000000"
          edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -531,23 +531,23 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Mode 1 Order Box" id="a6f2553e2e1863be" memberName="mode1OrderBox"
-            virtualName="" explicitFocusOrder="0" pos="640 7 63 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="618 7 63 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <COMBOBOX name="Mode 2 Order Box" id="7532edff0093d46e" memberName="mode2OrderBox"
-            virtualName="" explicitFocusOrder="0" pos="720 7 63 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="698 7 63 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <LABEL name="Order Label" id="29afd7379cf490f4" memberName="orderSelectionLbl"
-         virtualName="" explicitFocusOrder="0" pos="584 6 48 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="562 6 48 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Order:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="Order Offset Slider 1" id="e9b30506aa92202b" memberName="orderOffsetSld1"
-          virtualName="" explicitFocusOrder="0" pos="640 48 64 56" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="618 48 64 56" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxAbove"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="30" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="Order Offset Slider 2" id="4e17d241f1693224" memberName="orderOffsetSld2"
-          virtualName="" explicitFocusOrder="0" pos="720 48 64 56" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="698 48 64 56" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxAbove"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="30" skewFactor="1.0"
           needsCallback="1"/>
