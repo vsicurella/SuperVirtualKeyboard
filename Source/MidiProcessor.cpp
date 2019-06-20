@@ -140,6 +140,11 @@ int SvkMidiProcessor::getRootNote()
     return rootMidiNote;
 }
 
+int SvkMidiProcessor::getPeriodShift()
+{
+    return periodShift;
+}
+
 NoteMap* SvkMidiProcessor::getInputNoteMap()
 {
 	return midiInputFilter->getNoteMap();
@@ -198,9 +203,21 @@ String SvkMidiProcessor::setMidiOutput(int deviceIndex)
     return midiOutput->getName();
 }
 
+void SvkMidiProcessor::setScaleSize(int scaleSizeIn)
+{
+    scaleSize = scaleSizeIn;
+}
+
 void SvkMidiProcessor::setRootNote(int rootNoteIn)
 {	
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+    rootMidiNote = rootNoteIn;
+}
+
+void SvkMidiProcessor::setPeriodShift(int shiftIn)
+{
+    midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
+    periodShift = shiftIn;
 }
 
 void SvkMidiProcessor::setInputToRemap(bool doRemap)
@@ -323,13 +340,22 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
     auto midiEvent = MidiBuffer::Iterator(midiMessages);
     MidiMessage msg;
     int smpl;
+    int midiNote;
     
     if (midiInput == nullptr)
     {
         while (midiEvent.getNextEvent(msg, smpl))
         {
-			msg.setNoteNumber(midiInputFilter->getNoteRemapped(msg.getNoteNumber()));
-			if (msg.getNoteNumber() >= 0 && msg.getNoteNumber() < 128)
+            midiNote = msg.getNoteNumber();
+            
+            if (isInputRemapped)
+                midiNote =midiInputFilter->getNoteRemapped(msg.getNoteNumber());
+            
+            midiNote += scaleSize * periodShift;
+            
+            msg.setNoteNumber(midiNote);
+            
+			if (midiNote >= 0 && midiNote < 128)
 			{
 				msg.setTimeStamp(++msgCount);
 				keyboardState->processNextMidiEvent(msg);

@@ -81,6 +81,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
 }
 
 Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
+: Mode()
 {
 	bool hasModeChild;
 

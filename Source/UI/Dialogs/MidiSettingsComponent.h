@@ -57,6 +57,9 @@ public:
     void setMode2RootNote(int rootNoteIn);
 
     void refreshTables();
+    void updateModeMapper();
+
+    void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 
     //[/UserMethods]
 
@@ -74,6 +77,8 @@ private:
 	std::unique_ptr<TableListBox> remapTable;
 	std::unique_ptr<ModeMapper> modeMapper;
      */
+
+    std::unique_ptr<ModeMapper> modeMapper;
 
 	std::unique_ptr<Mode> modeSelected1;
 	std::unique_ptr<Mode> modeSelected2;

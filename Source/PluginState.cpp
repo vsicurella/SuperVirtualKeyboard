@@ -110,6 +110,7 @@ void SvkPluginState::updatePluginToPresetLoaded()
     
     modeLoaded->restoreNode(presetManager->presetNode, false);
     virtualKeyboard->applyMode(modeLoaded.get());
+    midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
     presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
     presetEdited = false;
@@ -124,6 +125,7 @@ void SvkPluginState::updatePluginFromParentNode()
 
     modeLoaded->restoreNode(modePresetNode, false);
     virtualKeyboard->applyMode(modeLoaded.get());
+    midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
     presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
     presetEdited = false;
