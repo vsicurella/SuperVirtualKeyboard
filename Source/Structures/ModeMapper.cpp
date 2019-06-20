@@ -14,6 +14,8 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
 {
 	if (degreeMapIn.size() != mode1.getOrders().size())
 		degreeMapIn = degreeMapFullMode(mode1, mode2);
+    else
+        degreeMapIn = degreeMapPeriod(mode1, mode2);
 
 	NoteMap mappingOut;
 	

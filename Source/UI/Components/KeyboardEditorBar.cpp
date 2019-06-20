@@ -54,7 +54,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     addAndMakeVisible (offsetSld.get());
     offsetSld->setRange (0, 127, 1);
     offsetSld->setSliderStyle (Slider::IncDecButtons);
-    offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 64, 20);
+    offsetSld->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
     offsetSld->addListener (this);
 
     offsetLabel.reset (new Label ("Offset Label",
@@ -68,7 +68,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
 
     mapButton.reset (new TextButton ("Map Notes Button"));
     addAndMakeVisible (mapButton.get());
-    mapButton->setButtonText (TRANS("Learn Mapping"));
+    mapButton->setButtonText (TRANS("Edit Mapping"));
     mapButton->setConnectedEdges (Button::ConnectedOnBottom);
     mapButton->addListener (this);
     mapButton->setColour (TextButton::buttonColourId, Colour (0xff5c6ea4));
@@ -78,13 +78,23 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     addAndMakeVisible (presetLibraryBox.get());
     presetLibraryBox->setName ("PresetLibraryBox");
 
-    mapStdButton.reset (new TextButton ("Std Map Button"));
-    addAndMakeVisible (mapStdButton.get());
-    mapStdButton->setButtonText (TRANS("Map From Standard"));
-    mapStdButton->setConnectedEdges (Button::ConnectedOnBottom);
-    mapStdButton->addListener (this);
-    mapStdButton->setColour (TextButton::buttonColourId, Colour (0xff5c60a4));
-    mapStdButton->setColour (TextButton::buttonOnColourId, Colour (0xffa7b438));
+    periodTransposeSld.reset (new Slider ("Transpose Period Slider"));
+    addAndMakeVisible (periodTransposeSld.get());
+    periodTransposeSld->setRange (-10, 10, 1);
+    periodTransposeSld->setSliderStyle (Slider::IncDecButtons);
+    periodTransposeSld->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
+    periodTransposeSld->addListener (this);
+
+    periodTransposeSld->setBounds (427, 1, 115, 24);
+
+    shiftLabel.reset (new Label ("Shift Label",
+                                 TRANS("Shift:")));
+    addAndMakeVisible (shiftLabel.get());
+    shiftLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    shiftLabel->setJustificationType (Justification::centredLeft);
+    shiftLabel->setEditable (false, false, false);
+    shiftLabel->setColour (TextEditor::textColourId, Colours::black);
+    shiftLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -123,7 +133,8 @@ KeyboardEditorBar::~KeyboardEditorBar()
     offsetLabel = nullptr;
     mapButton = nullptr;
     presetLibraryBox = nullptr;
-    mapStdButton = nullptr;
+    periodTransposeSld = nullptr;
+    shiftLabel = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -148,13 +159,13 @@ void KeyboardEditorBar::resized()
 	pianoMenu->setBounds(1, 0, getWidth(), getHeight()-1);
     //[/UserPreResize]
 
-    modeTextEditor->setBounds (getWidth() - 404 - 150, 1, 150, 24);
-    sendScaleBtn->setBounds (getWidth() - 308 - 88, 1, 88, 24);
-    offsetSld->setBounds (getWidth() - 269, 1, 110, 24);
-    offsetLabel->setBounds (getWidth() - 309, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
-    mapButton->setBounds (getWidth() - 561 - 106, 1, 106, 24);
+    modeTextEditor->setBounds (getWidth() - 560 - 150, 1, 150, 24);
+    sendScaleBtn->setBounds (getWidth() - 464 - 88, 1, 88, 24);
+    offsetSld->setBounds (getWidth() - 272, 1, 115, 24);
+    offsetLabel->setBounds ((getWidth() - 272) + -40, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
+    mapButton->setBounds (getWidth() - 717 - 106, 1, 106, 24);
     presetLibraryBox->setBounds (getWidth() - 5 - 150, 1, 150, 24);
-    mapStdButton->setBounds (getWidth() - 676 - 138, 1, 138, 24);
+    shiftLabel->setBounds (427 + -39, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -178,15 +189,6 @@ void KeyboardEditorBar::buttonClicked (Button* buttonThatWasClicked)
         sendChangeMessage();
         //[/UserButtonCode_mapButton]
     }
-    else if (buttonThatWasClicked == mapStdButton.get())
-    {
-        //[UserButtonCode_mapStdButton] -- add your button handler code here..
-		pluginState->getMidiProcessor()->setMidiInputMap(ModeMapper::stdMidiToMode(
-			*pluginState->getModeLoaded()));
-
-        pluginState->getKeyboard()->updateKeyMidiNotes();
-        //[/UserButtonCode_mapStdButton]
-    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -203,6 +205,11 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
 		pluginState->setMidiRootNote((int)offsetSld->getValue());
 		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
+    }
+    else if (sliderThatWasMoved == periodTransposeSld.get())
+    {
+        //[UserSliderCode_periodTransposeSld] -- add your slider handling code here..
+        //[/UserSliderCode_periodTransposeSld]
     }
 
     //[UsersliderValueChanged_Post]
@@ -397,33 +404,41 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Custom Mode Entry" id="8c559f3dc17dcbb0" memberName="modeTextEditor"
-              virtualName="" explicitFocusOrder="0" pos="404Rr 1 150 24" initialText="2 2 1 2 2 2 1"
+              virtualName="" explicitFocusOrder="0" pos="560Rr 1 150 24" initialText="2 2 1 2 2 2 1"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Send Scale Button" id="3a2872f3357f900b" memberName="sendScaleBtn"
-              virtualName="" explicitFocusOrder="0" pos="308Rr 1 88 24" buttonText="Send Scale"
+              virtualName="" explicitFocusOrder="0" pos="464Rr 1 88 24" buttonText="Send Scale"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Offset Slider" id="c1c294edca92ea2f" memberName="offsetSld"
-          virtualName="" explicitFocusOrder="0" pos="269R 1 110 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="272R 1 115 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="64" textBoxHeight="20" skewFactor="1.0"
+          textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Offset Label" id="1389380960314b49" memberName="offsetLabel"
-         virtualName="" explicitFocusOrder="0" pos="309R 50%c 47 24" posRelativeY="c1c294edca92ea2f"
-         edTextCol="ff000000" edBkgCol="0" labelText="Root:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="-40 50%c 47 24" posRelativeX="c1c294edca92ea2f"
+         posRelativeY="c1c294edca92ea2f" edTextCol="ff000000" edBkgCol="0"
+         labelText="Root:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Notes Button" id="bd06ada115b52b19" memberName="mapButton"
-              virtualName="" explicitFocusOrder="0" pos="561Rr 1 106 24" bgColOff="ff5c6ea4"
-              bgColOn="ffa7b438" buttonText="Learn Mapping" connectedEdges="8"
+              virtualName="" explicitFocusOrder="0" pos="717Rr 1 106 24" bgColOff="ff5c6ea4"
+              bgColOn="ffa7b438" buttonText="Edit Mapping" connectedEdges="8"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="PresetLibraryBox" id="f920735f425400ca" memberName="presetLibraryBox"
                     virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="5Rr 1 150 24"
                     class="ComboBox" params="&quot;Preset Box Main&quot;"/>
-  <TEXTBUTTON name="Std Map Button" id="7376bb3f0836f75b" memberName="mapStdButton"
-              virtualName="" explicitFocusOrder="0" pos="676Rr 1 138 24" bgColOff="ff5c60a4"
-              bgColOn="ffa7b438" buttonText="Map From Standard" connectedEdges="8"
-              needsCallback="1" radioGroupId="0"/>
+  <SLIDER name="Transpose Period Slider" id="98a42ddab038f13" memberName="periodTransposeSld"
+          virtualName="" explicitFocusOrder="0" pos="427 1 115 24" min="-10.0"
+          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="Shift Label" id="80d521f3eec02525" memberName="shiftLabel"
+         virtualName="" explicitFocusOrder="0" pos="-39 50%c 47 24" posRelativeX="98a42ddab038f13"
+         posRelativeY="98a42ddab038f13" edTextCol="ff000000" edBkgCol="0"
+         labelText="Shift:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
