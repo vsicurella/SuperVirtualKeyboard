@@ -85,8 +85,6 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     periodTransposeSld->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
     periodTransposeSld->addListener (this);
 
-    periodTransposeSld->setBounds (427, 1, 115, 24);
-
     shiftLabel.reset (new Label ("Shift Label",
                                  TRANS("Shift:")));
     addAndMakeVisible (shiftLabel.get());
@@ -165,7 +163,8 @@ void KeyboardEditorBar::resized()
     offsetLabel->setBounds ((getWidth() - 272) + -40, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
     mapButton->setBounds (getWidth() - 717 - 106, 1, 106, 24);
     presetLibraryBox->setBounds (getWidth() - 5 - 150, 1, 150, 24);
-    shiftLabel->setBounds (427 + -39, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
+    periodTransposeSld->setBounds ((getWidth() - 464 - 88) + 88 - -155 - 115, 1, 115, 24);
+    shiftLabel->setBounds (((getWidth() - 464 - 88) + 88 - -155 - 115) + -39, 1 + roundToInt (24 * 0.5000f) - (24 / 2), 47, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -209,6 +208,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == periodTransposeSld.get())
     {
         //[UserSliderCode_periodTransposeSld] -- add your slider handling code here..
+        pluginState->getMidiProcessor()->setPeriodShift(periodTransposeSld->getValue());
         //[/UserSliderCode_periodTransposeSld]
     }
 
@@ -429,8 +429,8 @@ BEGIN_JUCER_METADATA
                     virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="5Rr 1 150 24"
                     class="ComboBox" params="&quot;Preset Box Main&quot;"/>
   <SLIDER name="Transpose Period Slider" id="98a42ddab038f13" memberName="periodTransposeSld"
-          virtualName="" explicitFocusOrder="0" pos="427 1 115 24" min="-10.0"
-          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          virtualName="" explicitFocusOrder="0" pos="-155Rr 1 115 24" posRelativeX="3a2872f3357f900b"
+          min="-10.0" max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Shift Label" id="80d521f3eec02525" memberName="shiftLabel"

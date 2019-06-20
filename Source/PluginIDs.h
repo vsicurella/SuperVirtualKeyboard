@@ -33,6 +33,7 @@ namespace IDs
     static Identifier midiSettingsNode("MidiSettings");
     static Identifier midiMapNode("MidiMappings");
 	static Identifier rootMidiNote("RootNote");
+    static Identifier periodShift("PeriodShift");
     static Identifier midiInputMap("InputMapping");
     static Identifier midiOutputMap("OutputMappint");
     static Identifier midiInputName("InputDevice");

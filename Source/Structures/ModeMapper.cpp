@@ -10,6 +10,33 @@
 
 #include "ModeMapper.h"
 
+void ModeMapper::setMapType(int mapTypeIn)
+{
+    mapType = mapTypeIn;
+}
+
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2)
+{
+    NoteMap mapOut;
+    
+    switch (mapType)
+    {
+        case ModeToScale:
+            mapOut = mapToMode1Scale(mode1, mode2);
+            break;
+            
+        case ModeByOrder:
+            mapOut = mapByOrder(mode1, mode2, order1, order2, offset1, offset2);
+            break;
+            
+        default:
+            mapOut = mapFull(mode1, mode2);
+            break;
+    }
+    
+    return mapOut;
+}
+
 NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn)
 {
 	if (degreeMapIn.size() != mode1.getOrders().size())

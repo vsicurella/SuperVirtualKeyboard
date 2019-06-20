@@ -16,8 +16,15 @@
 
 class ModeMapper
 {
+    int mapType;
     
 public:
+    
+    ModeMapper() {};
+    
+    void setMapType(int mapTypeIn);
+    
+    NoteMap map(const Mode& mode1, const Mode& mode2, int order1=0, int order2=0, int offset1=0, int offset2=0);
 
 	static NoteMap mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn = Array<int>());
 
@@ -32,4 +39,11 @@ public:
     static Array<int> degreeMapPeriod(const Mode& mode1, const Mode& mode2);
     
     static Array<int> degreeMapFullMode(const Mode& mode1, const Mode& mode2);
+    
+    enum MapType
+    {
+        ModeToMode = 0,
+        ModeToScale,
+        ModeByOrder
+    };
 };

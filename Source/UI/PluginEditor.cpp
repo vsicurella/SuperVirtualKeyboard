@@ -41,16 +41,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
      */
     
     midiSettingsWindow = std::make_unique<MidiSettingsWindow>();
-    midiSettingsWindow->setSize(800, 600);
+    midiSettingsWindow->setSize(560, 150);
     midiSettingsComponent = std::make_unique<MidiSettingsComponent>(pluginState);
-    midiSettingsComponent->setSize(800, 600);
+    midiSettingsComponent->setSize(560, 150);
     midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
     midiSettingsWindow->setAlwaysOnTop(true);
-    
-    midiSettingsComponent->setMode1SelectedId(8);
-    midiSettingsComponent->setMode1RootNote(60);
-    midiSettingsComponent->setMode2SelectedId(8);
-    midiSettingsComponent->setMode2RootNote(60);
     
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
 
@@ -58,6 +53,12 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     keyboardEditorBar->addChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
 	initNodeData();
+    
+    midiSettingsComponent->setMode1SelectedId(8);
+    midiSettingsComponent->setMode2SelectedId(8);
+
+    midiSettingsComponent->setMode1RootNote(60);
+    midiSettingsComponent->setMode2RootNote(60);
 
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano);

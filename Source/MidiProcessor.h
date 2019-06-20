@@ -28,14 +28,16 @@ class SvkMidiProcessor : public MidiMessageCollector
     MidiBuffer midiBuffer;
     int msgCount = 0;
     
+    int scaleSize = 12;
     int rootMidiNote = 60;
+    int periodShift = 0;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;
     
     bool midiInputPaused = false;
-    bool isInputRemapped = false;
-    bool isOutputRemapped = false;
+    bool isInputRemapped = true;
+    bool isOutputRemapped = true;
     bool autoRemap = true;
     
     std::unique_ptr<MidiKeyboardState> keyboardState; // used for displaying on VirtualKeyboard
@@ -61,6 +63,7 @@ public:
     MidiKeyboardState* getKeyboardState();
     
     int getRootNote();
+    int getPeriodShift();
 
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
@@ -75,8 +78,10 @@ public:
     
     String setMidiInput(int deviceIndex);
     String setMidiOutput(int deviceIndex);
-
+    
+    void setScaleSize(int scaleSizeIn);
     void setRootNote(int rootNoteIn);
+    void setPeriodShift(int shiftIn);
     
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);
