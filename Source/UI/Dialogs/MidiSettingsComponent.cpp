@@ -79,6 +79,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     mapModesBtn->setButtonText (TRANS("Map!"));
     mapModesBtn->addListener (this);
 
+    mapModesBtn->setBounds (88, 101, 152, 24);
+
     mapFullBtn.reset (new ToggleButton ("Map Full Button"));
     addAndMakeVisible (mapFullBtn.get());
     mapFullBtn->setTooltip (TRANS("Maps each new modal note to original modal notes, and approximates the notes in between."));
@@ -133,7 +135,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     rootNoteFromLbl->setBounds (384, 30, 48, 24);
 
     rootNoteToLbl.reset (new Label ("new label",
-                                       TRANS("C4")));
+                                    TRANS("C4")));
     addAndMakeVisible (rootNoteToLbl.get());
     rootNoteToLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     rootNoteToLbl->setJustificationType (Justification::centredLeft);
@@ -215,6 +217,7 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
     modeMapper = std::make_unique<ModeMapper>();
 
+    setOrderMappingVisibility(false);
     //[/UserPreSize]
 
     setSize (800, 600);
@@ -228,9 +231,6 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 MidiSettingsComponent::~MidiSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    //remapTable.release();
-	//remapTableModel.release();
-
 	presetBox1->removeListener(this);
 	presetBox2->removeListener(this);
     //[/Destructor_pre]
@@ -280,7 +280,6 @@ void MidiSettingsComponent::resized()
     modeFromLbl->setBounds (0, 76 - (21 / 2), 88, 21);
     modeToLbl->setBounds (16, 43 - (24 / 2), 72, 24);
     rootNoteLabel->setBounds (88 + 160, 5, 80, 24);
-    mapModesBtn->setBounds (88 + 0, 101, proportionOfWidth (0.1787f), 24);
     mapModeToScaleBtn->setBounds (432 + 0, 29 + 24, 128, 24);
     mapModeOrdersBtn->setBounds (432 + 0, 29 + 48, 128, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -297,7 +296,9 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapModesBtn] -- add your button handler code here..
 		if (modeSelected1.get() && modeSelected2.get())
 		{
-            NoteMap mapToUse = modeMapper->map(*modeSelected1.get(), *modeSelected2.get());
+            NoteMap mapToUse = modeMapper->map(*modeSelected1.get(), *modeSelected2.get(),
+                    mode1OrderBox->getSelectedId() - 1, mode2OrderBox->getSelectedId() - 1,
+                    orderOffsetSld1->getValue(), orderOffsetSld2->getValue());
             pluginState->getMidiProcessor()->setMidiInputMap(mapToUse);
 		}
         //[/UserButtonCode_mapModesBtn]
@@ -347,6 +348,7 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == orderOffsetSld1.get())
     {
         //[UserSliderCode_orderOffsetSld1] -- add your slider handling code here..
+        
         //[/UserSliderCode_orderOffsetSld1]
     }
     else if (sliderThatWasMoved == orderOffsetSld2.get())
@@ -369,7 +371,11 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
             modeSelected1 = std::make_unique<Mode>(modeToLoad);
             modeSelected1->setRootNote(rootFromSld->getValue());
-
+            
+            mode1OrderBox->getRootMenu()->clear();
+            
+            for (int i = 0; i < modeSelected1->getMaxStep(); i++)
+                mode1OrderBox->addItem(String(i), i+1);
         }
     }
 
@@ -387,6 +393,11 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             modeSelected2 = std::make_unique<Mode>(modeToLoad);
             presetBox2->setText(modeSelected2->getDescription());
         }
+        
+        mode2OrderBox->getRootMenu()->clear();
+        
+        for (int i = 0; i < modeSelected2->getMaxStep(); i++)
+            mode2OrderBox->addItem(String(i), i+1);
     }
     //[/UsercomboBoxChanged_Pre]
 
@@ -419,6 +430,8 @@ void MidiSettingsComponent::updateModeMapper()
 
     else if (mapModeOrdersBtn->getToggleState())
         modeMapper->setMapType(ModeMapper::ModeByOrder);
+
+    setOrderMappingVisibility(mapModeOrdersBtn->getToggleState());
 }
 
 void MidiSettingsComponent::setMode1SelectedId(int selectedIdIn)
@@ -441,9 +454,17 @@ void MidiSettingsComponent::setMode2RootNote(int rootNoteIn)
     rootToSld->setValue(rootNoteIn);
 }
 
-void MidiSettingsComponent::refreshTables()
+void MidiSettingsComponent::setOrderMappingVisibility(bool isVisible)
 {
-    //remapTable->updateContent();
+    mode1OrderBox->setVisible(isVisible);
+    mode2OrderBox->setVisible(isVisible);
+    orderOffsetSld1->setVisible(isVisible);
+    orderOffsetSld2->setVisible(isVisible);
+
+    if (isVisible)
+        setSize(785, getHeight());
+    else
+        setSize(560, getHeight());
 }
 
 //[/MiscUserCode]
@@ -486,9 +507,8 @@ BEGIN_JUCER_METADATA
                     virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="88 64 150 24"
                     class="ComboBox" params=""/>
   <TEXTBUTTON name="Map Modes Button" id="7a76936bfde482aa" memberName="mapModesBtn"
-              virtualName="" explicitFocusOrder="0" pos="0 101 17.861% 24"
-              posRelativeX="eb2e366c9ad8965c" buttonText="Map!" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="88 101 152 24" buttonText="Map!"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TOGGLEBUTTON name="Map Full Button" id="13073042620ecb96" memberName="mapFullBtn"
                 virtualName="" explicitFocusOrder="0" pos="432 29 120 24" tooltip="Maps each new modal note to original modal notes, and approximates the notes in between."
                 buttonText="Mode to Mode" connectedEdges="0" needsCallback="1"

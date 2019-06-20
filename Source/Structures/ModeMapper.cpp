@@ -15,6 +15,16 @@ void ModeMapper::setMapType(int mapTypeIn)
     mapType = mapTypeIn;
 }
 
+void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
+{
+    mapByOrderNum1 = order1;
+    mapByOrderNum2 = order2;
+
+    mapByOrderOffset1 = offset1;
+    mapByOrderOffset2 = offset2;
+}
+
+
 NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2)
 {
     NoteMap mapOut;
@@ -26,6 +36,7 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int or
             break;
             
         case ModeByOrder:
+            
             mapOut = mapByOrder(mode1, mode2, order1, order2, offset1, offset2);
             break;
             
@@ -72,15 +83,21 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
 
 NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order, int mode2Order, int mode1Offset, int mode2Offset)
 {
+    mode1Order = jlimit(0, mode1.getMaxStep() - 1, mode1Order);
+    mode2Order = jlimit(0, mode2.getMaxStep() - 1, mode2Order);
+
     Array<int> midiNotesFrom = mode1.getNotesOfOrder(mode1Order);
     Array<int> midiNotesTo = mode2.getNotesOfOrder(mode2Order);
+    
+    mode1Offset = jlimit(0, midiNotesFrom.size() - 1, mode1Offset);
+    mode2Offset = jlimit(0, midiNotesTo.size() - 1, mode2Offset);
     
     int rootNoteFrom = mode1.getRootNote();
     int rootNoteTo = mode2.getRootNote();
 
     int rootIndexFrom = mode1.getNotesOfOrder().indexOf(rootNoteFrom);
     int rootIndexTo = mode2.getNotesOfOrder().indexOf(rootNoteTo);
-    int rootIndexOffset = rootIndexTo - rootIndexFrom;
+    int rootIndexOffset = rootIndexTo - rootIndexFrom + mode2Offset - mode1Offset;
 
     NoteMap mappingOut;
     

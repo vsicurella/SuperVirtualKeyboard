@@ -476,7 +476,6 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		break;
 	case IDs::CommandIDs::remapMidiNotes:
 		midiSettingsWindow->setVisible(true);
-        midiSettingsComponent->refreshTables();
 		break;
     case IDs::CommandIDs::autoRemap:
             pluginState->getMidiProcessor()->setAutoRemapOn(
