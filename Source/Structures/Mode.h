@@ -18,13 +18,42 @@
 	based on a given mode. The mode can be applied to different scales.
 */
 
-struct Mode
+class Mode
 {
+    String name;
+    int scaleSize;
+    int modeSize;
+    String family;
+    String info;
+    StringArray tags;
+    
+    int rootNote = 60;
+    int offset;
+    
+    String stepsString;
+    Array<int> steps;
+    Array<int> ordersDefault;
+    Array<int> mosClass;
+    
+    Array<int> orders;
+    Array<int> scaleDegrees;
+    Array<float> modeDegrees;
+    
+    // Keyboard Convenience
+    Array<int> stepsOfOrders; // each index is the step which the note is associated with
+    Array<int> keyboardOrdersSizes; // amount of keys in each key order groupings
+    
+    // Hopefully I come up with a better way to either resize keyboard keys, give keys a step value, or
+    // place keys in a grid such that I won't need this
+    void updateStepsOfOrders();
+    
+public:
+    
 	ValueTree modeNode;
 
 	Mode();
-	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60,  String infoIn="");
-	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60,  String infoIn="");
+	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
+	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
 	Mode(ValueTree modeNodeIn, int rootNoteIn=60);
 
 	~Mode();
@@ -34,13 +63,18 @@ struct Mode
 
     static bool isValidMode(ValueTree nodeIn, bool& hasModeChild);
 
-	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String infoIn="", bool factoryPreset = false);
-	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String infoIn="", bool factoryPreset = false);
+	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);
+	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);
 
 	/*
-		Sets custom name of the mode. 
+		Sets temperament family name.
 	*/
-	String setFamily(String nameIn);
+	void setFamily(String familyIn);
+    
+    /*
+        Sets custom name of the mode.
+    */
+    void setName(String nameIn);
 
     /*
         Sets info regarding the mode.
@@ -52,6 +86,10 @@ struct Mode
 		offset replaces the current visualization of the mode
 	*/
 	void setRootNote(int rootNoteIn);
+    
+    void addTag(String tagIn);
+    
+    int removeTag(String tagIn);
 
 	int getRootNote() const;
 
@@ -62,8 +100,12 @@ struct Mode
 	int getModeSize() const;
 
 	String getFamily() const;
+    
+    String getName() const;
 
     String getInfo() const;
+    
+    StringArray getTags() const;
 
 	Array<int>* getKeyboardOrdersSizes();
 
@@ -102,6 +144,8 @@ struct Mode
 	String getModeDescription() const;
     
 	Array<int> getNotesOfOrder(int order = 0) const;
+    
+    int indexOfTag(String tagNameIn);
 
 	/*
 	Simply parses a string reprsenting step sizes and returns a vector
@@ -161,34 +205,6 @@ struct Mode
 	*/
 	static Array<int> sum_of_steps(Array<int> stepsIn, int offsetIn = 0, bool includePeriod = false);
 
-
-private:
-    
-    // Hopefully I come up with a better way to either resize keyboard keys, give keys a step value, or
-    // place keys in a grid such that I won't need this
-    void updateStepsOfOrders();
-
-	String name;
-	int scaleSize;
-	int modeSize;
-	String family;
-    String info;
-	
-	int rootNote = 60;
-	int offset;
-
-	String stepsString;
-	Array<int> steps;
-	Array<int> ordersDefault;
-	Array<int> mosClass;
-
-	Array<int> orders;
-	Array<int> scaleDegrees;
-	Array<float> modeDegrees;
-
-    // Keyboard Convenience
-    Array<int> stepsOfOrders; // each index is the step which the note is associated with
-	Array<int> keyboardOrdersSizes; // amount of keys in each key order groupings
 };
 
 

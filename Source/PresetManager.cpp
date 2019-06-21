@@ -267,7 +267,7 @@ void SvkPresetManager::createFactoryPresets()
                 
                 info = line.fromFirstOccurrenceOf("; ", false, true);
 
-                factoryMode = Mode::createNode(steps, family, info, true);
+                factoryMode = Mode::createNode(steps, family, "", info, true);
 				
 				addAndSortPreset(factoryMode);
                 loadedFactoryPresets.add(factoryMode);

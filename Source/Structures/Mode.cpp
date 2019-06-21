@@ -34,7 +34,7 @@ Mode::Mode()
 	updateNode(true);
 }
 
-Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String infoIn)
+Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
 	stepsString = stepsIn;
 	family = familyIn;
@@ -46,8 +46,12 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String infoIn)
 	mosClass = interval_sizes(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
-    name = getDescription();
 	offset = getOffset() * -1;
+    
+    if (nameIn == "")
+        name = getDescription();
+    else
+        name = nameIn;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
@@ -58,7 +62,7 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String infoIn)
 	updateNode(true);
 }
 
-Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String infoIn)
+Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
 	stepsString = steps_to_string(stepsIn);
 	family = familyIn;
@@ -70,8 +74,12 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String infoIn)
 	mosClass = interval_sizes(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
-	name = getDescription();
 	offset = getOffset() * -1;
+    
+    if (nameIn == "")
+        name = getDescription();
+    else
+        name = nameIn;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(orders);
@@ -182,7 +190,6 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         if (name == "")
             name = getDescription();
         
-        
         if (useNodeRoot)
             rootNote = totalModulus(modeNode[IDs::rootMidiNote], 128);
         
@@ -217,7 +224,7 @@ bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 }
 
 
-ValueTree Mode::createNode(String stepsIn, String familyIn, String infoIn, bool factoryPreset)
+ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, String infoIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> steps = parse_steps(stepsIn);
@@ -231,12 +238,18 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, String infoIn, bool 
     modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
-	String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
-	modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+    if (nameIn == "")
+    {
+        String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
+        modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+    }
+    else
+        modeNodeOut.setProperty(IDs::modeName, nameIn, nullptr);
+    
 	return modeNodeOut;
 }
 
-ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String infoIn, bool factoryPreset)
+ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, String infoIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> orders = steps_to_orders(stepsIn);
@@ -250,22 +263,30 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String infoIn, b
     modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
-	String modeName = familyIn + "[" + String(stepsIn.size()) + "] " + String(orders.size());
-	modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+    if (nameIn == "")
+    {
+        String modeName = familyIn + "[" + String(stepsStr.length()) + "] " + String(orders.size());
+        modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+    }
+    else
+        modeNodeOut.setProperty(IDs::modeName, nameIn, nullptr);
 
 	return modeNodeOut;
 }
 
-String Mode::setFamily(String nameIn)
+
+void Mode::setFamily(String familyIn)
 {
-	family = nameIn;
+	family = familyIn;
 	modeNode.setProperty(IDs::family, family, nullptr);
-
-	name = getDescription();
-	modeNode.setProperty(IDs::modeName, name, nullptr);
-
-	return name;
 }
+
+void Mode::setName(String nameIn)
+{
+    name = nameIn;
+    modeNode.setProperty(IDs::modeName, name, nullptr);
+}
+
 
 void Mode::setInfo(String infoIn)
 {
@@ -285,6 +306,19 @@ void Mode::setRootNote(int rootNoteIn)
 		keyboardOrdersSizes = interval_sizes(orders);
 		updateStepsOfOrders();
 	}
+}
+
+void Mode::addTag(String tagIn)
+{
+    tags.add(tagIn);
+}
+
+int Mode::removeTag(String tagIn)
+{
+    int index = tags.indexOf(tagIn);
+    tags.remove(index);
+    
+    return index;
 }
 
 int Mode::getRootNote() const
@@ -315,6 +349,11 @@ Array<int> Mode::getStepsOfOrders()  const
 String Mode::getFamily() const
 {
 	return family;
+}
+
+String Mode::getName() const
+{
+    return name;
 }
 
 String Mode::getInfo() const
@@ -437,6 +476,11 @@ String Mode::getModeDescription()  const
 void Mode::updateStepsOfOrders()
 {
 	stepsOfOrders = expand_steps(orders_to_steps(orders));
+}
+
+int Mode::indexOfTag(String tagNameIn)
+{
+    return tags.indexOf(tagNameIn);
 }
 
 Array<int> Mode::parse_steps(String stepsIn)
