@@ -366,14 +366,37 @@ String Mode::getInfo() const
     return info;
 }
 
-Array<int> Mode::getSteps()  const
+StringArray Mode::getTags() const
 {
-	return steps;
+	return tags;
 }
 
-String Mode::getStepsString()  const
+Array<int> Mode::getSteps(int rotationIn)  const
 {
-	return stepsString;
+	if (rotationIn == 0)
+		return steps;
+	else
+	{
+		Array<int> rotatedSteps;
+		rotationIn = totalModulus(rotationIn, modeSize);
+
+		for (int i = 0; i < modeSize; i++)
+			rotatedSteps.add(steps[(i + rotationIn) % modeSize]);
+
+		return rotatedSteps;
+	}
+}
+
+String Mode::getStepsString(int rotationIn)  const
+{
+	if (rotationIn == 0)
+		return stepsString;
+	else
+	{
+		// lol feelin lazy about this boring function
+		Array<int> stepsRotated = getSteps(rotationIn);
+		return steps_to_string(stepsRotated);
+	}
 }
 
 Array<int>* Mode::getKeyboardOrdersSizes()

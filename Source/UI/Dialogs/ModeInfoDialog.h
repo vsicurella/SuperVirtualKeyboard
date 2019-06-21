@@ -36,6 +36,7 @@
                                                                     //[/Comments]
 */
 class ModeInfoDialog  : public Component,
+                        public ChangeBroadcaster,
                         public Button::Listener,
                         public Slider::Listener
 {
@@ -46,6 +47,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void commitMode();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -74,12 +76,13 @@ private:
     std::unique_ptr<ToggleButton> defaultNameBtn;
     std::unique_ptr<Label> infoLbl;
     std::unique_ptr<TextEditor> nameBox;
-    std::unique_ptr<TextButton> applyButton;
+    std::unique_ptr<TextButton> saveButton;
     std::unique_ptr<Slider> rotateSld;
     std::unique_ptr<Label> modeRotateLbl;
     std::unique_ptr<Label> scaleSizeReadout;
     std::unique_ptr<Label> modeSizeReadout;
     std::unique_ptr<Label> intervalSizeReadout;
+    std::unique_ptr<TextButton> closeButton;
 
 
     //==============================================================================

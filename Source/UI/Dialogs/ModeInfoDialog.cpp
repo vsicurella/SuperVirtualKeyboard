@@ -48,9 +48,9 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     addAndMakeVisible (stepsBox.get());
     stepsBox->setMultiLine (false);
     stepsBox->setReturnKeyStartsNewLine (false);
-    stepsBox->setReadOnly (false);
+    stepsBox->setReadOnly (true);
     stepsBox->setScrollbarsShown (true);
-    stepsBox->setCaretVisible (true);
+    stepsBox->setCaretVisible (false);
     stepsBox->setPopupMenuEnabled (true);
     stepsBox->setText (TRANS("2 2 1 2 2 2 1"));
 
@@ -166,12 +166,12 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
     nameBox->setBounds (8, 168, 192, 24);
 
-    applyButton.reset (new TextButton ("Apply Button"));
-    addAndMakeVisible (applyButton.get());
-    applyButton->setButtonText (TRANS("Apply"));
-    applyButton->addListener (this);
+    saveButton.reset (new TextButton ("Save Button"));
+    addAndMakeVisible (saveButton.get());
+    saveButton->setButtonText (TRANS("Save"));
+    saveButton->addListener (this);
 
-    applyButton->setBounds (112, 488, 104, 24);
+    saveButton->setBounds (32, 488, 104, 24);
 
     rotateSld.reset (new Slider ("Rotate Slider"));
     addAndMakeVisible (rotateSld.get());
@@ -226,25 +226,34 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
     intervalSizeReadout->setBounds (104, 272, 143, 24);
 
+    closeButton.reset (new TextButton ("closeButton"));
+    addAndMakeVisible (closeButton.get());
+    closeButton->setButtonText (TRANS("Close"));
+    closeButton->addListener (this);
+
+    closeButton->setBounds (192, 488, 104, 24);
+
 
     //[UserPreSize]
-    
+
     mode = modeIn;
-    modeNode = mode->modeNode;
-    
+    modeNode = ValueTree(mode->modeNode);
+
     stepsBox->setText(mode->getStepsString());
     familyBox->setText(mode->getFamily());
-    
+
     nameBox->setText(mode->getName());
     if (mode->getName() != mode->getDescription())
         defaultNameBtn->setToggleState(false, dontSendNotification);
-    
+
     scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
     modeSizeReadout->setText(String(mode->getModeSize()), dontSendNotification);
-    
+
     intervalSizeReadout->setText(arrayToString(mode->getIntervalSizeCount()), dontSendNotification);
-    
+
     infoBox->setText(mode->getInfo());
+
+	rotateSld->setRange(-(mode->getModeSize() - 1), mode->getModeSize() - 1, 1);
 
     //[/UserPreSize]
 
@@ -258,6 +267,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 ModeInfoDialog::~ModeInfoDialog()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	removeAllChangeListeners();
     //[/Destructor_pre]
 
     familyBox = nullptr;
@@ -272,12 +282,13 @@ ModeInfoDialog::~ModeInfoDialog()
     defaultNameBtn = nullptr;
     infoLbl = nullptr;
     nameBox = nullptr;
-    applyButton = nullptr;
+    saveButton = nullptr;
     rotateSld = nullptr;
     modeRotateLbl = nullptr;
     scaleSizeReadout = nullptr;
     modeSizeReadout = nullptr;
     intervalSizeReadout = nullptr;
+    closeButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -313,12 +324,29 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == defaultNameBtn.get())
     {
         //[UserButtonCode_defaultNameBtn] -- add your button handler code here..
+		if (buttonThatWasClicked->getToggleState())
+		{
+			nameBox->setText(mode->getDescription());
+			nameBox->setEnabled(false);
+		}
+		else
+		{
+			nameBox->setEnabled(true);
+		}
         //[/UserButtonCode_defaultNameBtn]
     }
-    else if (buttonThatWasClicked == applyButton.get())
+    else if (buttonThatWasClicked == saveButton.get())
     {
-        //[UserButtonCode_applyButton] -- add your button handler code here..
-        //[/UserButtonCode_applyButton]
+        //[UserButtonCode_saveButton] -- add your button handler code here..
+		commitMode();
+		sendChangeMessage();
+        //[/UserButtonCode_saveButton]
+    }
+    else if (buttonThatWasClicked == closeButton.get())
+    {
+        //[UserButtonCode_closeButton] -- add your button handler code here..
+		getParentComponent()->exitModalState(0);
+        //[/UserButtonCode_closeButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -333,6 +361,9 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         //[UserSliderCode_rotateSld] -- add your slider handling code here..
+		String modeRotatedSteps = mode->getStepsString(sliderThatWasMoved->getValue());
+		modeNode.setProperty(IDs::stepString, modeRotatedSteps, nullptr);
+		stepsBox->setText(modeRotatedSteps);
         //[/UserSliderCode_rotateSld]
     }
 
@@ -343,6 +374,15 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void ModeInfoDialog::commitMode()
+{
+	modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
+	modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
+	modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
+
+	mode->restoreNode(modeNode);
+}
+
 //[/MiscUserCode]
 
 
@@ -356,7 +396,7 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component" constructorParams="Mode* modeIn"
+                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="Mode* modeIn"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -366,8 +406,8 @@ BEGIN_JUCER_METADATA
               caret="1" popupmenu="1"/>
   <TEXTEDITOR name="Steps Box" id="5f84971388b9cded" memberName="stepsBox"
               virtualName="" explicitFocusOrder="0" pos="8 40 192 24" initialText="2 2 1 2 2 2 1"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
+              multiline="0" retKeyStartsLine="0" readonly="1" scrollbars="1"
+              caret="0" popupmenu="1"/>
   <TEXTEDITOR name="Info Box" id="9460b63ee92bad3f" memberName="infoBox" virtualName=""
               explicitFocusOrder="0" pos="8 336 320 128" initialText="Ever hear of it?"
               multiline="1" retKeyStartsLine="0" readonly="0" scrollbars="1"
@@ -414,8 +454,8 @@ BEGIN_JUCER_METADATA
               explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone[7] 12"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
-  <TEXTBUTTON name="Apply Button" id="819ae7d5095491a2" memberName="applyButton"
-              virtualName="" explicitFocusOrder="0" pos="112 488 104 24" buttonText="Apply"
+  <TEXTBUTTON name="Save Button" id="819ae7d5095491a2" memberName="saveButton"
+              virtualName="" explicitFocusOrder="0" pos="32 488 104 24" buttonText="Save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Rotate Slider" id="58e50eefb260dd55" memberName="rotateSld"
           virtualName="" explicitFocusOrder="0" pos="216 40 96 24" min="-3.0"
@@ -442,6 +482,9 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="7, 5" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="closeButton" id="7fdae5390323aa2b" memberName="closeButton"
+              virtualName="" explicitFocusOrder="0" pos="192 488 104 24" buttonText="Close"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

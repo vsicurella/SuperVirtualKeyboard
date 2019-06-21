@@ -115,9 +115,9 @@ public:
     
     Array<int> getStepsOfOrders() const;
 
-	Array<int> getSteps() const;
+	Array<int> getSteps(int rotationIn=0) const;
 
-	String getStepsString() const;
+	String getStepsString(int rotationIn=0) const;
 
 	Array<int> getOrdersDefault() const;
 
