@@ -40,12 +40,13 @@ namespace IDs
     static Identifier midiOutputName("OutputDevice");
     static Identifier autoRemapOn("AutoRemapOn");
 
-	// ModeLayout
+	// Mode
 	static Identifier scaleSize("ScaleSize");
 	static Identifier modeSize("ModeSize");
 	static Identifier stepString("StepsString");
 	static Identifier MOSClass("MosClass");
 	static Identifier family("Family");
+    static Identifier modeInfo("Description");
     static Identifier modeName("ModeName");
 	static Identifier factoryPreset("FactoryPreset");
 	static Identifier libraryIndexOfMode("IndexOfMode");

@@ -23,8 +23,8 @@ struct Mode
 	ValueTree modeNode;
 
 	Mode();
-	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60);
-	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60);
+	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60,  String infoIn="");
+	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60,  String infoIn="");
 	Mode(ValueTree modeNodeIn, int rootNoteIn=60);
 
 	~Mode();
@@ -42,6 +42,11 @@ struct Mode
 	*/
 	String setFamily(String nameIn);
 
+    /*
+        Sets info regarding the mode.
+    */
+    void setInfo(String infoIn);
+    
 	/*
 		Sets the offset of the mode and updates parameters so that the 
 		offset replaces the current visualization of the mode
@@ -93,6 +98,8 @@ struct Mode
 	String getScaleDescription() const;
 
 	String getModeDescription() const;
+    
+    String getInfo() const;
 
 	Array<int> getNotesOfOrder(int order = 0) const;
 
@@ -165,6 +172,7 @@ private:
 	int scaleSize;
 	int modeSize;
 	String family;
+    String info;
 	
 	int rootNote = 60;
 	int offset;
