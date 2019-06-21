@@ -25,7 +25,7 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
 }
 
 
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2)
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2, NoteMap prevMap)
 {
     NoteMap mapOut;
     
@@ -37,7 +37,7 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int or
             
         case ModeByOrder:
             
-            mapOut = mapByOrder(mode1, mode2, order1, order2, offset1, offset2);
+            mapOut = mapByOrder(mode1, mode2, order1, order2, offset1, offset2, prevMap);
             break;
             
         default:
@@ -81,7 +81,7 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
 }
 
 
-NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order, int mode2Order, int mode1Offset, int mode2Offset)
+NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order, int mode2Order, int mode1Offset, int mode2Offset, NoteMap prevMap)
 {
     mode1Order = jlimit(0, mode1.getMaxStep() - 1, mode1Order);
     mode2Order = jlimit(0, mode2.getMaxStep() - 1, mode2Order);
@@ -98,8 +98,6 @@ NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Or
     int rootIndexFrom = mode1.getNotesOfOrder().indexOf(rootNoteFrom);
     int rootIndexTo = mode2.getNotesOfOrder().indexOf(rootNoteTo);
     int rootIndexOffset = rootIndexTo - rootIndexFrom + mode2Offset - mode1Offset;
-
-    NoteMap mappingOut;
     
     int mode1Index, mode2Index;
     int noteFrom, noteTo;
@@ -114,15 +112,10 @@ NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Or
         noteTo = midiNotesTo[mode2Index];
         
         if (noteFrom > 0)
-            mappingOut.setValue(noteFrom, noteTo);
-        
-        if (m == rootNoteFrom)
-        {
-            DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) +")");
-        }
+			prevMap.setValue(noteFrom, noteTo);
     }
     
-    return mappingOut;
+    return prevMap;
 }
 
 NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn)

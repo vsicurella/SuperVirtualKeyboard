@@ -296,9 +296,12 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapModesBtn] -- add your button handler code here..
 		if (modeSelected1.get() && modeSelected2.get())
 		{
-            NoteMap mapToUse = modeMapper->map(*modeSelected1.get(), *modeSelected2.get(),
-                    mode1OrderBox->getSelectedId() - 1, mode2OrderBox->getSelectedId() - 1,
-                    orderOffsetSld1->getValue(), orderOffsetSld2->getValue());
+			NoteMap* prevMap = pluginState->getMidiProcessor()->getInputNoteMap();
+			NoteMap mapToUse = modeMapper->map(*modeSelected1.get(), *modeSelected2.get(),
+				mode1OrderBox->getSelectedId() - 1, mode2OrderBox->getSelectedId() - 1,
+				orderOffsetSld1->getValue(), orderOffsetSld2->getValue(),
+				*prevMap);
+
             pluginState->getMidiProcessor()->setMidiInputMap(mapToUse);
 		}
         //[/UserButtonCode_mapModesBtn]
