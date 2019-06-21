@@ -59,7 +59,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 
     midiSettingsComponent->setMode1RootNote(60);
     midiSettingsComponent->setMode2RootNote(60);
-
+    
 	appCmdMgr->registerAllCommandsForTarget(this);
 	appCmdMgr->registerAllCommandsForTarget(piano);
 
@@ -416,6 +416,7 @@ void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
 		IDs::CommandIDs::loadCustomLayout,
 		IDs::CommandIDs::saveReaperMap,
 		IDs::CommandIDs::setKeyColor,
+        IDs::CommandIDs::showModeInfo,
 		IDs::CommandIDs::remapMidiNotes
 	};
 
@@ -443,9 +444,12 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 		break;
 	case IDs::CommandIDs::setKeyColor:
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-            result.setActive(false);
+        result.setActive(false);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
+    case IDs::CommandIDs::showModeInfo:
+        result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Modes", 0);
+        result.setActive(true);
 	case IDs::CommandIDs::remapMidiNotes:
 		result.setInfo("Set midi note mapping", "Allows you to remap your keyboard to trigger modal notes.", "Midi", 0);
 		break;
@@ -460,30 +464,50 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 
 bool SvkPluginEditor::perform(const InvocationInfo &info)
 {
-	switch (info.commandID)
-	{
-	case IDs::CommandIDs::saveCustomLayout:
-		save_preset();
-		break;
-	case IDs::CommandIDs::loadCustomLayout:
-		load_preset();
-		break;
-	case IDs::CommandIDs::saveReaperMap:
-		write_reaper_file();
-		break;
-	case IDs::CommandIDs::setKeyColor:
-		beginColorEditing();
-		break;
-	case IDs::CommandIDs::remapMidiNotes:
-		midiSettingsWindow->setVisible(true);
-		break;
-    case IDs::CommandIDs::autoRemap:
-            pluginState->getMidiProcessor()->setAutoRemapOn(
-            !pluginState->getMidiProcessor()->isAutoRemapping());
-        break;
-	default:
-		return false;
-	}
-	return true;
+    switch (info.commandID)
+    {
+        case IDs::CommandIDs::saveCustomLayout:
+        {
+            save_preset();
+            break;
+        }
+        case IDs::CommandIDs::loadCustomLayout:
+        {
+            load_preset();
+            break;
+        }
+        case IDs::CommandIDs::saveReaperMap:
+        {
+            write_reaper_file();
+            break;
+        }
+        case IDs::CommandIDs::setKeyColor:
+        {
+            beginColorEditing();
+            break;
+        }
+        case IDs::CommandIDs::showModeInfo:
+        {
+            ModeInfoDialog* modeInfo = new ModeInfoDialog(pluginState->getModeLoaded());
+            CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), nullptr);
+            break;
+        }
+        case IDs::CommandIDs::remapMidiNotes:
+        {
+            midiSettingsWindow->setVisible(true);
+            break;
+        }
+        case IDs::CommandIDs::autoRemap:
+        {
+            pluginState->getMidiProcessor()->setAutoRemapOn(!pluginState->getMidiProcessor()->isAutoRemapping());
+            break;
+        }
+        default:
+        {
+            return false;
+        }
+            
+    }
+    return true;
 }
 

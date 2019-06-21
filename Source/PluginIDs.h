@@ -91,6 +91,7 @@ namespace IDs
 		saveCustomLayout = 1,
 		loadCustomLayout,
 		saveReaperMap,
+        showModeInfo,
 		setKeyColor,
 		setMidiNoteOffset,
 		pianoPlayMode,

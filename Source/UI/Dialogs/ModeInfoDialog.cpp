@@ -27,46 +27,46 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-ModeInfoDialog::ModeInfoDialog ()
+ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    textEditor.reset (new TextEditor ("new text editor"));
-    addAndMakeVisible (textEditor.get());
-    textEditor->setMultiLine (false);
-    textEditor->setReturnKeyStartsNewLine (false);
-    textEditor->setReadOnly (false);
-    textEditor->setScrollbarsShown (true);
-    textEditor->setCaretVisible (true);
-    textEditor->setPopupMenuEnabled (true);
-    textEditor->setText (TRANS("Meantone"));
+    familyBox.reset (new TextEditor ("Family Box"));
+    addAndMakeVisible (familyBox.get());
+    familyBox->setMultiLine (false);
+    familyBox->setReturnKeyStartsNewLine (false);
+    familyBox->setReadOnly (false);
+    familyBox->setScrollbarsShown (true);
+    familyBox->setCaretVisible (true);
+    familyBox->setPopupMenuEnabled (true);
+    familyBox->setText (TRANS("Meantone"));
 
-    textEditor->setBounds (8, 104, 192, 24);
+    familyBox->setBounds (8, 104, 192, 24);
 
-    textEditor2.reset (new TextEditor ("new text editor"));
-    addAndMakeVisible (textEditor2.get());
-    textEditor2->setMultiLine (false);
-    textEditor2->setReturnKeyStartsNewLine (false);
-    textEditor2->setReadOnly (false);
-    textEditor2->setScrollbarsShown (true);
-    textEditor2->setCaretVisible (true);
-    textEditor2->setPopupMenuEnabled (true);
-    textEditor2->setText (TRANS("2 2 1 2 2 2 1"));
+    stepsBox.reset (new TextEditor ("Steps Box"));
+    addAndMakeVisible (stepsBox.get());
+    stepsBox->setMultiLine (false);
+    stepsBox->setReturnKeyStartsNewLine (false);
+    stepsBox->setReadOnly (false);
+    stepsBox->setScrollbarsShown (true);
+    stepsBox->setCaretVisible (true);
+    stepsBox->setPopupMenuEnabled (true);
+    stepsBox->setText (TRANS("2 2 1 2 2 2 1"));
 
-    textEditor2->setBounds (8, 40, 192, 24);
+    stepsBox->setBounds (8, 40, 192, 24);
 
-    textEditor3.reset (new TextEditor ("new text editor"));
-    addAndMakeVisible (textEditor3.get());
-    textEditor3->setMultiLine (true);
-    textEditor3->setReturnKeyStartsNewLine (false);
-    textEditor3->setReadOnly (false);
-    textEditor3->setScrollbarsShown (true);
-    textEditor3->setCaretVisible (true);
-    textEditor3->setPopupMenuEnabled (true);
-    textEditor3->setText (TRANS("Ever hear of it?"));
+    infoBox.reset (new TextEditor ("Info Box"));
+    addAndMakeVisible (infoBox.get());
+    infoBox->setMultiLine (true);
+    infoBox->setReturnKeyStartsNewLine (false);
+    infoBox->setReadOnly (false);
+    infoBox->setScrollbarsShown (true);
+    infoBox->setCaretVisible (true);
+    infoBox->setPopupMenuEnabled (true);
+    infoBox->setText (TRANS("Ever hear of it?"));
 
-    textEditor3->setBounds (8, 336, 320, 128);
+    infoBox->setBounds (8, 336, 320, 128);
 
     familyNameLbl.reset (new Label ("Family Name Label",
                                     TRANS("Temperament Family:\n")));
@@ -154,17 +154,17 @@ ModeInfoDialog::ModeInfoDialog ()
 
     infoLbl->setBounds (8, 304, 40, 24);
 
-    textEditor4.reset (new TextEditor ("new text editor"));
-    addAndMakeVisible (textEditor4.get());
-    textEditor4->setMultiLine (false);
-    textEditor4->setReturnKeyStartsNewLine (false);
-    textEditor4->setReadOnly (false);
-    textEditor4->setScrollbarsShown (true);
-    textEditor4->setCaretVisible (true);
-    textEditor4->setPopupMenuEnabled (true);
-    textEditor4->setText (TRANS("Meantone[7] 12"));
+    nameBox.reset (new TextEditor ("Name Box"));
+    addAndMakeVisible (nameBox.get());
+    nameBox->setMultiLine (false);
+    nameBox->setReturnKeyStartsNewLine (false);
+    nameBox->setReadOnly (false);
+    nameBox->setScrollbarsShown (true);
+    nameBox->setCaretVisible (true);
+    nameBox->setPopupMenuEnabled (true);
+    nameBox->setText (TRANS("Meantone[7] 12"));
 
-    textEditor4->setBounds (8, 168, 192, 24);
+    nameBox->setBounds (8, 168, 192, 24);
 
     applyButton.reset (new TextButton ("Apply Button"));
     addAndMakeVisible (applyButton.get());
@@ -173,14 +173,14 @@ ModeInfoDialog::ModeInfoDialog ()
 
     applyButton->setBounds (112, 488, 104, 24);
 
-    slider.reset (new Slider ("new slider"));
-    addAndMakeVisible (slider.get());
-    slider->setRange (-3, 4, 1);
-    slider->setSliderStyle (Slider::IncDecButtons);
-    slider->setTextBoxStyle (Slider::TextBoxLeft, false, 48, 20);
-    slider->addListener (this);
+    rotateSld.reset (new Slider ("Rotate Slider"));
+    addAndMakeVisible (rotateSld.get());
+    rotateSld->setRange (-3, 4, 1);
+    rotateSld->setSliderStyle (Slider::IncDecButtons);
+    rotateSld->setTextBoxStyle (Slider::TextBoxLeft, false, 48, 20);
+    rotateSld->addListener (this);
 
-    slider->setBounds (216, 40, 96, 24);
+    rotateSld->setBounds (216, 40, 96, 24);
 
     modeRotateLbl.reset (new Label ("Mode Rotate Label",
                                     TRANS("Rotate Mode:")));
@@ -228,6 +228,24 @@ ModeInfoDialog::ModeInfoDialog ()
 
 
     //[UserPreSize]
+    
+    mode = modeIn;
+    modeNode = mode->modeNode;
+    
+    stepsBox->setText(mode->getStepsString());
+    familyBox->setText(mode->getFamily());
+    
+    nameBox->setText(mode->getName());
+    if (mode->getName() != mode->getDescription())
+        defaultNameBtn->setToggleState(false, dontSendNotification);
+    
+    scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
+    modeSizeReadout->setText(String(mode->getModeSize()), dontSendNotification);
+    
+    intervalSizeReadout->setText(arrayToString(mode->getIntervalSizeCount()), dontSendNotification);
+    
+    infoBox->setText(mode->getInfo());
+
     //[/UserPreSize]
 
     setSize (340, 525);
@@ -242,9 +260,9 @@ ModeInfoDialog::~ModeInfoDialog()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    textEditor = nullptr;
-    textEditor2 = nullptr;
-    textEditor3 = nullptr;
+    familyBox = nullptr;
+    stepsBox = nullptr;
+    infoBox = nullptr;
     familyNameLbl = nullptr;
     stepsLbl = nullptr;
     intervalSizesLbl = nullptr;
@@ -253,9 +271,9 @@ ModeInfoDialog::~ModeInfoDialog()
     scaleSizeLbl = nullptr;
     defaultNameBtn = nullptr;
     infoLbl = nullptr;
-    textEditor4 = nullptr;
+    nameBox = nullptr;
     applyButton = nullptr;
-    slider = nullptr;
+    rotateSld = nullptr;
     modeRotateLbl = nullptr;
     scaleSizeReadout = nullptr;
     modeSizeReadout = nullptr;
@@ -312,10 +330,10 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == slider.get())
+    if (sliderThatWasMoved == rotateSld.get())
     {
-        //[UserSliderCode_slider] -- add your slider handling code here..
-        //[/UserSliderCode_slider]
+        //[UserSliderCode_rotateSld] -- add your slider handling code here..
+        //[/UserSliderCode_rotateSld]
     }
 
     //[UsersliderValueChanged_Post]
@@ -338,20 +356,20 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="340" initialHeight="525">
+                 parentClasses="public Component" constructorParams="Mode* modeIn"
+                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <TEXTEDITOR name="new text editor" id="23f020c7a9a4bed2" memberName="textEditor"
+  <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
               virtualName="" explicitFocusOrder="0" pos="8 104 192 24" initialText="Meantone"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
-  <TEXTEDITOR name="new text editor" id="5f84971388b9cded" memberName="textEditor2"
+  <TEXTEDITOR name="Steps Box" id="5f84971388b9cded" memberName="stepsBox"
               virtualName="" explicitFocusOrder="0" pos="8 40 192 24" initialText="2 2 1 2 2 2 1"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
-  <TEXTEDITOR name="new text editor" id="9460b63ee92bad3f" memberName="textEditor3"
-              virtualName="" explicitFocusOrder="0" pos="8 336 320 128" initialText="Ever hear of it?"
+  <TEXTEDITOR name="Info Box" id="9460b63ee92bad3f" memberName="infoBox" virtualName=""
+              explicitFocusOrder="0" pos="8 336 320 128" initialText="Ever hear of it?"
               multiline="1" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <LABEL name="Family Name Label" id="dc9e44984d2c580c" memberName="familyNameLbl"
@@ -392,17 +410,18 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Info:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTEDITOR name="new text editor" id="fd47b34a29e0b3c1" memberName="textEditor4"
-              virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone[7] 12"
+  <TEXTEDITOR name="Name Box" id="fd47b34a29e0b3c1" memberName="nameBox" virtualName=""
+              explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone[7] 12"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Apply Button" id="819ae7d5095491a2" memberName="applyButton"
               virtualName="" explicitFocusOrder="0" pos="112 488 104 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="new slider" id="58e50eefb260dd55" memberName="slider" virtualName=""
-          explicitFocusOrder="0" pos="216 40 96 24" min="-3.0" max="4.0"
-          int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="48" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <SLIDER name="Rotate Slider" id="58e50eefb260dd55" memberName="rotateSld"
+          virtualName="" explicitFocusOrder="0" pos="216 40 96 24" min="-3.0"
+          max="4.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="48" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
   <LABEL name="Mode Rotate Label" id="8b18e2a5c9cac13c" memberName="modeRotateLbl"
          virtualName="" explicitFocusOrder="0" pos="216 8 103 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Rotate Mode:" editableSingleClick="0"

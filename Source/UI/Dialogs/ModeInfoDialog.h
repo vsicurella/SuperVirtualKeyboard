@@ -21,6 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../../../JuceLibraryCode/JuceHeader.h"
+#include "../../CommonFunctions.h"
+#include "../../Structures/Mode.h"
 //[/Headers]
 
 
@@ -39,7 +41,7 @@ class ModeInfoDialog  : public Component,
 {
 public:
     //==============================================================================
-    ModeInfoDialog ();
+    ModeInfoDialog (Mode* modeIn);
     ~ModeInfoDialog();
 
     //==============================================================================
@@ -55,12 +57,14 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    Mode* mode;
+    ValueTree modeNode;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TextEditor> textEditor;
-    std::unique_ptr<TextEditor> textEditor2;
-    std::unique_ptr<TextEditor> textEditor3;
+    std::unique_ptr<TextEditor> familyBox;
+    std::unique_ptr<TextEditor> stepsBox;
+    std::unique_ptr<TextEditor> infoBox;
     std::unique_ptr<Label> familyNameLbl;
     std::unique_ptr<Label> stepsLbl;
     std::unique_ptr<Label> intervalSizesLbl;
@@ -69,9 +73,9 @@ private:
     std::unique_ptr<Label> scaleSizeLbl;
     std::unique_ptr<ToggleButton> defaultNameBtn;
     std::unique_ptr<Label> infoLbl;
-    std::unique_ptr<TextEditor> textEditor4;
+    std::unique_ptr<TextEditor> nameBox;
     std::unique_ptr<TextButton> applyButton;
-    std::unique_ptr<Slider> slider;
+    std::unique_ptr<Slider> rotateSld;
     std::unique_ptr<Label> modeRotateLbl;
     std::unique_ptr<Label> scaleSizeReadout;
     std::unique_ptr<Label> modeSizeReadout;
@@ -83,5 +87,6 @@ private:
 };
 
 //[EndFile] You can add extra defines here...
+
 //[/EndFile]
 

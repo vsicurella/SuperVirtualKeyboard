@@ -20,6 +20,7 @@
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
 #include "Dialogs/MidiSettingsComponent.h"
+#include "Dialogs/ModeInfoDialog.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -109,6 +110,6 @@ private:
 
 	std::unique_ptr<MidiSettingsWindow> midiSettingsWindow;
     std::unique_ptr<MidiSettingsComponent> midiSettingsComponent;
-
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };
