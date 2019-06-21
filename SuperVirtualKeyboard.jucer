@@ -68,6 +68,10 @@
               file="Source/UI/Dialogs/MidiSettingsComponent.h"/>
         <FILE id="aea56S" name="MidiSettingsWindow.h" compile="0" resource="0"
               file="Source/UI/Dialogs/MidiSettingsWindow.h"/>
+        <FILE id="eRcvHJ" name="ModeInfoDialog.cpp" compile="1" resource="0"
+              file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
+        <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
+              file="Source/UI/Dialogs/ModeInfoDialog.h"/>
       </GROUP>
       <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
