@@ -254,7 +254,7 @@ void SvkPresetManager::createFactoryPresets()
 		{
 			MemoryInputStream instream(factoryPresets, size, false);
 
-			String line, steps, family, name;
+			String line, steps, family, info, name;
 			ValueTree factoryMode;
 
 			while (instream.getNumBytesRemaining() > 0)
@@ -262,8 +262,9 @@ void SvkPresetManager::createFactoryPresets()
 				line = instream.readNextLine();
 				steps = line.upToFirstOccurrenceOf(", ", false, true);
 				family = line.fromFirstOccurrenceOf(", ", false, true);
+                info = line.fromFirstOccurrenceOf("; ", false, true);
 
-                factoryMode = Mode::createNode(steps, family, true);
+                factoryMode = Mode::createNode(steps, family, info, true);
 				
 				addAndSortPreset(factoryMode);
                 loadedFactoryPresets.add(factoryMode);
