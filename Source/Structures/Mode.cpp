@@ -341,6 +341,11 @@ int Mode::getModeSize() const
 	return modeSize;
 }
 
+Array<int> Mode::getIntervalSizeCount() const
+{
+    return interval_sizes(steps);
+}
+
 Array<int> Mode::getStepsOfOrders()  const
 {
 	return stepsOfOrders;

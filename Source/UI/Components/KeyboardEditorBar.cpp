@@ -366,6 +366,7 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoPlayMode, "Play Mode");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoEditMode, "Edit Mode");
         menu.addCommandItem(appCmdMgr, IDs::CommandIDs::remapMidiNotes, "Edit Note Mapping");
+        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::showModeInfo, "Mode Info");
         menu.addCommandItem(appCmdMgr, IDs::CommandIDs::autoRemap, "Auto-Remap From Standard Layout");
 	}
 	else if (topLevelMenuIndex == 2)

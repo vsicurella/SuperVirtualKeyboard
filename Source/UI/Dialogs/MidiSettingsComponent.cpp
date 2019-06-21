@@ -351,7 +351,7 @@ void MidiSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == orderOffsetSld1.get())
     {
         //[UserSliderCode_orderOffsetSld1] -- add your slider handling code here..
-        
+
         //[/UserSliderCode_orderOffsetSld1]
     }
     else if (sliderThatWasMoved == orderOffsetSld2.get())
@@ -374,9 +374,9 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
             modeSelected1 = std::make_unique<Mode>(modeToLoad);
             modeSelected1->setRootNote(rootFromSld->getValue());
-            
+
             mode1OrderBox->getRootMenu()->clear();
-            
+
             for (int i = 0; i < modeSelected1->getMaxStep(); i++)
                 mode1OrderBox->addItem(String(i), i+1);
         }
@@ -396,9 +396,9 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             modeSelected2 = std::make_unique<Mode>(modeToLoad);
             presetBox2->setText(modeSelected2->getDescription());
         }
-        
+
         mode2OrderBox->getRootMenu()->clear();
-        
+
         for (int i = 0; i < modeSelected2->getMaxStep(); i++)
             mode2OrderBox->addItem(String(i), i+1);
     }

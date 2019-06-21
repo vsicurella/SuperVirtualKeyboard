@@ -340,6 +340,22 @@ static T sumUpToRingIndex(Array<T> arrayIn, int indexIn)
 }
 
 template <class T>
+String arrayToString(const Array<T>& arrayIn)
+{
+    String arrayString = "";
+    
+    for (int i = 0; i < arrayIn.size(); i++)
+    {
+        arrayString+= String(arrayIn[i]);
+        
+        if (i + 1 < arrayIn.size())
+            arrayString += ", ";
+    }
+    
+    return arrayString;
+}
+
+template <class T>
 static void DBGArray(Array<T>& arrayIn, String arrayName="Array")
 {
 	DBG(arrayName + ":");

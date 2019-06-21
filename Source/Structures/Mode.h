@@ -98,6 +98,8 @@ public:
 	int getScaleSize() const;
 
 	int getModeSize() const;
+    
+    Array<int> getIntervalSizeCount() const;
 
 	String getFamily() const;
     
