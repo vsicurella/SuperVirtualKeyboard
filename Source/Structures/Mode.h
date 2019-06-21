@@ -34,8 +34,8 @@ struct Mode
 
     static bool isValidMode(ValueTree nodeIn, bool& hasModeChild);
 
-	static ValueTree createNode(String stepsIn, String familyIn = "undefined", bool factoryPreset = false);
-	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", bool factoryPreset = false);
+	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String infoIn="", bool factoryPreset = false);
+	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String infoIn="", bool factoryPreset = false);
 
 	/*
 		Sets custom name of the mode. 
@@ -62,6 +62,8 @@ struct Mode
 	int getModeSize() const;
 
 	String getFamily() const;
+
+    String getInfo() const;
 
 	Array<int>* getKeyboardOrdersSizes();
 
@@ -99,8 +101,6 @@ struct Mode
 
 	String getModeDescription() const;
     
-    String getInfo() const;
-
 	Array<int> getNotesOfOrder(int order = 0) const;
 
 	/*

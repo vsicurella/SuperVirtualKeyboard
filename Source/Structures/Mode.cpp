@@ -217,7 +217,7 @@ bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
 }
 
 
-ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
+ValueTree Mode::createNode(String stepsIn, String familyIn, String infoIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> steps = parse_steps(stepsIn);
@@ -228,6 +228,7 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
 	modeNodeOut.setProperty(IDs::modeSize, steps.size(), nullptr);
 	modeNodeOut.setProperty(IDs::stepString, stepsIn, nullptr);
 	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
+    modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
 	String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
@@ -235,7 +236,7 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, bool factoryPreset)
 	return modeNodeOut;
 }
 
-ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, bool factoryPreset)
+ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String infoIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> orders = steps_to_orders(stepsIn);
@@ -246,6 +247,7 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, bool factoryPres
 	modeNodeOut.setProperty(IDs::modeSize, stepsIn.size(), nullptr);
 	modeNodeOut.setProperty(IDs::stepString, stepsStr, nullptr);
 	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
+    modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
 	String modeName = familyIn + "[" + String(stepsIn.size()) + "] " + String(orders.size());
@@ -313,6 +315,11 @@ Array<int> Mode::getStepsOfOrders()  const
 String Mode::getFamily() const
 {
 	return family;
+}
+
+String Mode::getInfo() const
+{
+    return info;
 }
 
 Array<int> Mode::getSteps()  const
@@ -431,12 +438,6 @@ void Mode::updateStepsOfOrders()
 {
 	stepsOfOrders = expand_steps(orders_to_steps(orders));
 }
-
-String Mode::getInfo()
-{
-    return info;
-}
-
 
 Array<int> Mode::parse_steps(String stepsIn)
 {
