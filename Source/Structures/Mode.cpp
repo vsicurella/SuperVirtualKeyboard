@@ -34,11 +34,12 @@ Mode::Mode()
 	updateNode(true);
 }
 
-Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
+Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String infoIn)
 {
 	stepsString = stepsIn;
 	family = familyIn;
 	rootNote = rootNoteIn;
+    info = infoIn;
 
 	steps = parse_steps(stepsIn);
 	ordersDefault = steps_to_orders(steps);
@@ -57,11 +58,12 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn)
 	updateNode(true);
 }
 
-Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn)
+Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String infoIn)
 {
 	stepsString = steps_to_string(stepsIn);
 	family = familyIn;
 	rootNote = rootNoteIn;
+    info = infoIn;
 
 	steps = stepsIn;
 	ordersDefault = steps_to_orders(steps);
@@ -110,6 +112,8 @@ Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
         if (family == "")
             family = "undefined";
         
+        info = modeNode[IDs::modeInfo];
+        
         name = modeNode[IDs::modeName];
         if (name == "")
             name = getDescription();
@@ -139,6 +143,7 @@ void Mode::updateNode(bool initializeNode)
 	modeNode.setProperty(IDs::modeSize, modeSize, nullptr);
 	modeNode.setProperty(IDs::stepString, stepsString, nullptr);
 	modeNode.setProperty(IDs::family, family, nullptr);
+    modeNode.setProperty(IDs::modeInfo, info, nullptr);
 	modeNode.setProperty(IDs::factoryPreset, false, nullptr);
     modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
 }
@@ -170,6 +175,8 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         family = modeNode[IDs::family];
         if (family == "")
             family = "undefined";
+        
+        info = modeNode[IDs::modeInfo];
         
         name = modeNode[IDs::modeName];
         if (name == "")
@@ -256,6 +263,12 @@ String Mode::setFamily(String nameIn)
 	modeNode.setProperty(IDs::modeName, name, nullptr);
 
 	return name;
+}
+
+void Mode::setInfo(String infoIn)
+{
+    info = infoIn;
+    modeNode.setProperty(IDs::modeInfo, infoIn, nullptr);
 }
 
 void Mode::setRootNote(int rootNoteIn)
@@ -418,6 +431,12 @@ void Mode::updateStepsOfOrders()
 {
 	stepsOfOrders = expand_steps(orders_to_steps(orders));
 }
+
+String Mode::getInfo()
+{
+    return info;
+}
+
 
 Array<int> Mode::parse_steps(String stepsIn)
 {
