@@ -21,7 +21,7 @@ class NoteMap
 	Array<int> values; // Key Number In, Midi Note Out
 
 	int nullVal;
-        
+
 public:
     
     NoteMap();

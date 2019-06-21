@@ -110,6 +110,8 @@ private:
 
 	std::unique_ptr<MidiSettingsWindow> midiSettingsWindow;
     std::unique_ptr<MidiSettingsComponent> midiSettingsComponent;
+
+	ModeInfoDialog* modeInfo;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };

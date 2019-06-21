@@ -42,7 +42,7 @@
 3 1 3 1 3 1 3 1 3 1, Blackwood
 2 3 2 2 3 2 2 3 2, Miracle
 4 4 1 4 4 4 1, Superpyth; A MOS generated from 9\22 and is a somewhat skewed version of the Meantone major scale. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
-1 3 1 3 1 1 3 1 3 1 3 1; Superpyth, A MOS generated from 9\22 and is a somewhat skewed version of the Meantone major scale. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
+1 3 1 3 1 1 3 1 3 1 3 1, Superpyth; A MOS generated from 9\22 and is a somewhat skewed version of the Meantone major scale. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
 3 3 3 3 3 3 3 1, Porcupine
 5 1 1 5 1 1 5 1 1 1, Magic
 3 1 3 1 3 3 1 3 1 3, Astrology

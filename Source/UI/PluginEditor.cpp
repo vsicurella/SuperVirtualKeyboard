@@ -117,7 +117,7 @@ void SvkPluginEditor::update_children_to_preset()
 	Mode* modeLoaded = pluginState->getModeLoaded();
 	
 	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
-	keyboardEditorBar->setModeLibraryText(modeLoaded->getDescription());
+	keyboardEditorBar->setModeLibraryText(modeLoaded->getName());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 
 	midiSettingsComponent->setMode2SelectedId(keyboardEditorBar->getPresetSelectedId());
@@ -385,6 +385,12 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
         midiSettingsComponent->setMode2RootNote(keyboardEditorBar->getOffsetReadout());
 		update_children_to_preset();
     }
+
+	// Mode Info Changed
+	if (source == modeInfo)
+	{
+		pluginState->updatePluginToPresetLoaded();
+	}
 }
 
 //==============================================================================
@@ -488,7 +494,8 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
         }
         case IDs::CommandIDs::showModeInfo:
         {
-            ModeInfoDialog* modeInfo = new ModeInfoDialog(pluginState->getModeLoaded());
+            modeInfo = new ModeInfoDialog(pluginState->getModeLoaded());
+			modeInfo->addChangeListener(this);
             CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), nullptr);
             break;
         }
