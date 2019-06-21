@@ -261,7 +261,10 @@ void SvkPresetManager::createFactoryPresets()
 			{
 				line = instream.readNextLine();
 				steps = line.upToFirstOccurrenceOf(", ", false, true);
-				family = line.fromFirstOccurrenceOf(", ", false, true);
+                
+                family = line.upToFirstOccurrenceOf("; ", false, true);
+                family = family.substring(steps.length() + 2, family.length());
+                
                 info = line.fromFirstOccurrenceOf("; ", false, true);
 
                 factoryMode = Mode::createNode(steps, family, info, true);
