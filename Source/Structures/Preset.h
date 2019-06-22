@@ -35,4 +35,5 @@ struct SvkPreset
 	bool writeToFile(String absoluteFilePath="");
        
 	String toString();	
+
 };

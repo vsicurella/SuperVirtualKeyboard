@@ -42,7 +42,7 @@ SvkPluginState::SvkPluginState()
 	textFilterInt.reset(new TextFilterInt());
     
     loadMode(7);
-    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
 }
 
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()
@@ -57,7 +57,7 @@ UndoManager* SvkPluginState::getUndoManager()
 
 SvkPreset* SvkPluginState::getPresetLoaded()
 {
-	return presetWorking.get();
+	return &presetWorking;
 }
 
 Mode* SvkPluginState::getModeLoaded()
@@ -112,7 +112,7 @@ void SvkPluginState::updatePluginToPresetLoaded()
     virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
-    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
     
     sendChangeMessage();
@@ -127,7 +127,7 @@ void SvkPluginState::updatePluginFromParentNode()
     virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
-    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
     
     sendChangeMessage();
@@ -135,12 +135,12 @@ void SvkPluginState::updatePluginFromParentNode()
 
 void SvkPluginState::commitPresetChanges()
 {
-    presetWorking->updateModeNode(modeLoaded->modeNode);
-    presetWorking->updateKeyboardNode(pianoNode);
-    presetWorking->updateMapNode(midiProcessor->midiMapNode);
-    presetManager->commitPresetNode(presetWorking->parentNode);
+    presetWorking.updateModeNode(modeLoaded->modeNode);
+    presetWorking.updateKeyboardNode(pianoNode);
+    presetWorking.updateMapNode(midiProcessor->midiMapNode);
+    presetManager->commitPresetNode(presetWorking.parentNode);
     
-    presetWorking = std::make_unique<SvkPreset>(*presetManager->getPresetLoaded());
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
 }
 
