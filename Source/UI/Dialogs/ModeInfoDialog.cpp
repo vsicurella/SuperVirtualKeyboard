@@ -234,27 +234,28 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
 
     //[UserPreSize]
-    mode = modeIn;
-    modeNode = ValueTree(mode->modeNode);
+    modeOriginal = modeIn;
+    modeWorking = Mode(modeIn->modeNode);
+    modeNode = modeWorking.modeNode;
 
-    stepsBox->setText(mode->getStepsString());
-    familyBox->setText(mode->getFamily());
+    stepsBox->setText(modeWorking.getStepsString());
+    familyBox->setText(modeWorking.getFamily());
 
-    nameBox->setText(mode->getName());
+    nameBox->setText(modeWorking.getName());
 	nameBox->setEnabled(false);
 
 	defaultNameBtn->setClickingTogglesState(true);
-    if (mode->getName() != mode->getDescription())
+    if (modeWorking.getName() != modeWorking.getDescription())
         defaultNameBtn->setToggleState(false, sendNotification);
 
-	scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
-    modeSizeReadout->setText(String(mode->getModeSize()), dontSendNotification);
+	scaleSizeReadout->setText(String(modeWorking.getScaleSize()), dontSendNotification);
+    modeSizeReadout->setText(String(modeWorking.getModeSize()), dontSendNotification);
 
-    intervalSizeReadout->setText(arrayToString(mode->getIntervalSizeCount()), dontSendNotification);
+    intervalSizeReadout->setText(arrayToString(modeWorking.getIntervalSizeCount()), dontSendNotification);
 
-    infoBox->setText(mode->getInfo());
+    infoBox->setText(modeWorking.getInfo());
 
-	rotateSld->setRange(-(mode->getModeSize() - 1), mode->getModeSize() - 1, 1);
+	rotateSld->setRange(-(modeWorking.getModeSize() - 1), modeWorking.getModeSize() - 1, 1);
 
     //[/UserPreSize]
 
@@ -328,8 +329,10 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
 
 		if (defaultNameBtn->getToggleState())
 		{
-			nameBox->setText(mode->getDescription());
 			nameBox->setEnabled(false);
+            modeWorking.setFamily(familyBox->getText());
+            modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
+            nameBox->setText(modeWorking.getDescription());
 		}
 		else
 		{
@@ -364,7 +367,7 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         //[UserSliderCode_rotateSld] -- add your slider handling code here..
-		String modeRotatedSteps = mode->getStepsString(sliderThatWasMoved->getValue());
+		String modeRotatedSteps = modeWorking.getStepsString(sliderThatWasMoved->getValue());
 		modeNode.setProperty(IDs::stepString, modeRotatedSteps, nullptr);
 		stepsBox->setText(modeRotatedSteps);
         //[/UserSliderCode_rotateSld]
@@ -383,7 +386,7 @@ void ModeInfoDialog::commitMode()
 	modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
 	modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
 
-	mode->restoreNode(modeNode);
+	modeOriginal->restoreNode(modeNode);
 }
 
 //[/MiscUserCode]

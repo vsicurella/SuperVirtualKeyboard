@@ -2,8 +2,9 @@
 
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
               jucerVersion="5.4.3" companyName="Finer Notes" companyEmail="sicurella12@gmail.com"
-              pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Analyzer" pluginFormats="buildAU,buildStandalone,buildVST3">
+              pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginVST3Category="Analyzer" pluginFormats="buildAU,buildStandalone,buildVST3"
+              pluginAUMainType="'aumi'">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
     <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
       <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"

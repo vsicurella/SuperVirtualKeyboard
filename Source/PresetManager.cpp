@@ -74,7 +74,7 @@ PopupMenu* SvkPresetManager::getPresetMenu()
 
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 {
-	presetLoaded = presetNodeIn.createCopy();
+	presetLoaded = SvkPreset(presetNodeIn.createCopy());
 
     presetNode = presetLoaded.parentNode;
 			
@@ -140,7 +140,7 @@ ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 
 bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
 {
-    if (nodeIn.hasType(IDs::presetNode))
+    if (nodeIn.isValid())
     {
         ValueTree nodeChild;
         
