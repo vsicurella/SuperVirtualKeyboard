@@ -41,8 +41,8 @@ SvkPluginState::SvkPluginState()
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
-    loadMode(8);
-    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
+    updatePluginToPresetLoaded();
+    //presetWorking = SvkPreset(*presetManager->getPresetLoaded());
 }
 
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()
@@ -106,17 +106,17 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 
 void SvkPluginState::updatePluginToPresetLoaded()
 {
-    
+    DBG("Loading this preset:");
     presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
     
-    midiProcessor->setMidiMaps(presetWorking.theModeNode);
+    DBG(presetWorking.parentNode.toXmlString());
     
-    modeLoaded->restoreNode(presetManager->presetNode, false);
+    midiProcessor->setMidiMaps(presetWorking.theMapNode);
+    
+    modeLoaded->restoreNode(presetWorking.theModeNode, false);
     virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
-    
-
     
     sendChangeMessage();
 }
@@ -124,14 +124,16 @@ void SvkPluginState::updatePluginToPresetLoaded()
 void SvkPluginState::updatePluginFromParentNode()
 {
     presetManager->loadPreset(modePresetNode, false);
-    midiProcessor->restoreFromNode(midiSettingsNode);
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
+    presetEdited = false;
+    
+    midiProcessor->restoreFromNode(presetWorking.theMapNode);
 
     modeLoaded->restoreNode(modePresetNode, false);
     virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
-    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
-    presetEdited = false;
+
     
     sendChangeMessage();
 }

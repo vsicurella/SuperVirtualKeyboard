@@ -208,6 +208,8 @@ void SvkPresetManager::intializePresets()
 	createFactoryPresets();
 	loadPresetDirectory();
     buildPresetMenu();
+    
+    loadPreset(8);
 }
 
 
