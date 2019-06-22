@@ -137,7 +137,6 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     defaultNameBtn.reset (new ToggleButton ("Default Name Button"));
     addAndMakeVisible (defaultNameBtn.get());
     defaultNameBtn->setButtonText (TRANS("Use Default"));
-    defaultNameBtn->setRadioGroupId (1);
     defaultNameBtn->addListener (this);
     defaultNameBtn->setToggleState (true, dontSendNotification);
 
@@ -235,7 +234,6 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
 
     //[UserPreSize]
-
     mode = modeIn;
     modeNode = ValueTree(mode->modeNode);
 
@@ -243,10 +241,13 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     familyBox->setText(mode->getFamily());
 
     nameBox->setText(mode->getName());
-    if (mode->getName() != mode->getDescription())
-        defaultNameBtn->setToggleState(false, dontSendNotification);
+	nameBox->setEnabled(false);
 
-    scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
+	defaultNameBtn->setClickingTogglesState(true);
+    if (mode->getName() != mode->getDescription())
+        defaultNameBtn->setToggleState(false, sendNotification);
+
+	scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
     modeSizeReadout->setText(String(mode->getModeSize()), dontSendNotification);
 
     intervalSizeReadout->setText(arrayToString(mode->getIntervalSizeCount()), dontSendNotification);
@@ -324,7 +325,8 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == defaultNameBtn.get())
     {
         //[UserButtonCode_defaultNameBtn] -- add your button handler code here..
-		if (buttonThatWasClicked->getToggleState())
+
+		if (defaultNameBtn->getToggleState())
 		{
 			nameBox->setText(mode->getDescription());
 			nameBox->setEnabled(false);
@@ -340,6 +342,7 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_saveButton] -- add your button handler code here..
 		commitMode();
 		sendChangeMessage();
+		getParentComponent()->exitModalState(0);
         //[/UserButtonCode_saveButton]
     }
     else if (buttonThatWasClicked == closeButton.get())
@@ -444,7 +447,7 @@ BEGIN_JUCER_METADATA
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="Default Name Button" id="9d115fe17c7425f5" memberName="defaultNameBtn"
                 virtualName="" explicitFocusOrder="0" pos="216 168 111 24" buttonText="Use Default"
-                connectedEdges="0" needsCallback="1" radioGroupId="1" state="1"/>
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
   <LABEL name="Info Label" id="4618a6a917e67a95" memberName="infoLbl"
          virtualName="" explicitFocusOrder="0" pos="8 304 40 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Info:" editableSingleClick="0" editableDoubleClick="0"
