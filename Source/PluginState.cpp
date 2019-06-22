@@ -41,7 +41,7 @@ SvkPluginState::SvkPluginState()
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
-    loadMode(7);
+    loadMode(8);
     presetWorking = SvkPreset(*presetManager->getPresetLoaded());
 }
 

@@ -277,8 +277,8 @@ void MidiSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    modeFromLbl->setBounds (0, 76 - (21 / 2), 88, 21);
-    modeToLbl->setBounds (16, 43 - (24 / 2), 72, 24);
+    modeFromLbl->setBounds (0, 42 - (21 / 2), 88, 21);
+    modeToLbl->setBounds (16, 76 - (24 / 2), 72, 24);
     rootNoteLabel->setBounds (88 + 160, 5, 80, 24);
     mapModeToScaleBtn->setBounds (432 + 0, 29 + 24, 128, 24);
     mapModeOrdersBtn->setBounds (432 + 0, 29 + 48, 128, 24);
@@ -371,7 +371,7 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         if (presetBox1->getSelectedId() > 0)
         {
-            ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox2->getSelectedId()-1);
+            ValueTree modeToLoad = pluginState->presetManager->getMode(presetBox1->getSelectedId()-1);
             modeSelected1 = std::make_unique<Mode>(modeToLoad);
             modeSelected1->setRootNote(rootFromSld->getValue());
 
@@ -422,6 +422,18 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void MidiSettingsComponent::setMode1(Mode* modeIn)
+{
+	modeSelected1.reset(new Mode(modeIn->modeNode));
+	presetBox1->setText(modeSelected1->getName());
+}
+
+void MidiSettingsComponent::setMode2(Mode* modeIn)
+{
+	modeSelected2.reset(new Mode(modeIn->modeNode));
+	presetBox2->setText(modeSelected2->getName());
+}
 
 void MidiSettingsComponent::updateModeMapper()
 {
@@ -489,12 +501,12 @@ BEGIN_JUCER_METADATA
                  initialWidth="800" initialHeight="600">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="Mode From Label" id="5b2fda69d594937a" memberName="modeFromLbl"
-         virtualName="" explicitFocusOrder="0" pos="0 76.5c 88 21" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="0 42.5c 88 21" edTextCol="ff000000"
          edBkgCol="0" labelText="From Mode:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <LABEL name="Mode To Label" id="44d358cbb3982e4" memberName="modeToLbl"
-         virtualName="" explicitFocusOrder="0" pos="16 43c 72 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 76c 72 24" edTextCol="ff000000"
          edBkgCol="0" labelText="To Mode:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
