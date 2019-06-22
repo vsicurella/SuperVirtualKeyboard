@@ -92,20 +92,6 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 			keyColorsSingle.clear();
 			get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle);
 		}
-
-		keyPlacesOrder.clear();
-		get_array_from_node(pianoNode, keyPlacesOrder, IDs::pianoKeyPlaceOrder);
-		keyPlacesDegree.clear();
-		get_array_from_node(pianoNode, keyPlacesDegree, IDs::pianoKeyPlaceDegree);
-		keyPlacesSingle.clear();
-		get_array_from_node(pianoNode, keyPlacesSingle, IDs::pianoKeyPlaceSingle);
-
-		keyRatiosOrder.clear();
-		get_array_from_node(pianoNode, keyRatiosOrder, IDs::pianoKeyRatioOrder);
-		keyRatiosDegree.clear();
-		get_array_from_node(pianoNode, keyRatiosDegree, IDs::pianoKeyRatioDegree);
-		keyRatiosSingle.clear();
-		get_array_from_node(pianoNode, keyRatiosSingle, IDs::pianoKeyRatioSingle);
 	}
 }
 
@@ -116,29 +102,17 @@ void Keyboard::updatePianoNode()
 
 void Keyboard::updateKeyProperties()
 {
-	// Colors
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
-	add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsDegree), nullptr);
-	add_array_to_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, "Color");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorSingle), nullptr);
-	add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, "Color");
+	// COLOR BY ORDERS
+	pianoNode.removeProperty(IDs::pianoKeyColorsOrder, nullptr);
+	add_array_as_property(pianoNode, keyColorsOrder, "Color");
 
-	// Placements
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceOrder), nullptr);
-	add_array_to_node(pianoNode, keyPlacesOrder, IDs::pianoKeyPlaceOrder, "Place");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceDegree), nullptr);
-	add_array_to_node(pianoNode, keyPlacesDegree, IDs::pianoKeyPlaceDegree, "Place");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceSingle), nullptr);
-	add_array_to_node(pianoNode, keyPlacesSingle, IDs::pianoKeyPlaceSingle, "Place");
+	// COLOR BY ORDERS
+	pianoNode.removeProperty(IDs::pianoKeyColorsDegree, nullptr);
+	add_array_as_property(pianoNode, keyColorsDegree, "Color");
 
-	// Ratios
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioOrder), nullptr);
-	add_array_to_node(pianoNode, keyRatiosOrder, IDs::pianoKeyRatioOrder, "Ratio");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioDegree), nullptr);
-	add_array_to_node(pianoNode, keyRatiosDegree, IDs::pianoKeyRatioDegree, "Ratio");
-	pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioSingle), nullptr);
-	add_array_to_node(pianoNode, keyRatiosSingle, IDs::pianoKeyRatioSingle, "Ratio");
+	// COLOR BY ORDERS
+	pianoNode.removeProperty(IDs::pianoKeyColorSingle, nullptr);
+	add_array_as_property(pianoNode, keyColorsSingle, "Color");
 }
 
 ValueTree Keyboard::getNode()

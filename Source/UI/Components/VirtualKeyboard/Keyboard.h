@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
+#include "../../../CommonFunctions.h"
 #include "../../../PluginIDs.h"
 #include "../../../MidiProcessor.h"
 #include "../../../Structures/Mode.h"
@@ -58,7 +59,7 @@ namespace VirtualKeyboard
         //===============================================================================================
         
         Keyboard(SvkMidiProcessor* midiProcessorIn);
-        ~Keyboard() {};
+		~Keyboard() {};
         
         //===============================================================================================
         
@@ -225,10 +226,6 @@ namespace VirtualKeyboard
                 
         // Data
         ValueTree pianoNode;
-		ValueTree keyPlacePresetNode;
-		ValueTree keyRatioPresetNode;
-		ValueTree keyColorPresetNode;
-
         OwnedArray<Key> keys;
         
         Array<Array<Key*>> keysOrder;
@@ -242,16 +239,7 @@ namespace VirtualKeyboard
 		
 		Array<Colour> keyColorsDegree;
 		Array<Colour> keyColorsSingle; // organized by (keyNumber - Mode offset)
-
-		Array<Point<float>> keyPlacesOrder;
-		Array<Point<float>> keyPlacesDegree;
-		Array<Point<float>> keyPlacesSingle;
-
-		Array<Point<float>> keyRatiosOrder;
-		Array<Point<float>> keyRatiosDegree;
-		Array<Point<float>> keyRatiosSingle;
-
-        
+		        
         // Properties
         int keyWidth = 50;
         int keyHeight = 200;

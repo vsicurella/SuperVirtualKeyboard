@@ -120,6 +120,19 @@ struct FamilyNameSorter
 	}
 };
 
+template <class T, class U>
+struct Pair
+{
+	T key;
+	U value;
+
+	Pair<T, U>(T keyIn, U valueIn)
+	{
+		key = keyIn;
+		value = valueIn;
+	}
+};
+
 class TextFilterIntOrSpace : public TextEditor::InputFilter
 {
 	String filterNewText(TextEditor&, const String& newInput) override
@@ -241,15 +254,41 @@ static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Id
 	nodeIn.addChild(arrayTree, -1, nullptr);
 }
 
-static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID)
-{
-	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+static void add_array_as_property(ValueTree& nodeIn, const Array<Colour>& arrayIn, Identifier itemId)
+{	
+	String array = "";
 
-	if (childArray.isValid())
+	for (int i = 0; i < arrayIn.size(); i++)
 	{
-		for (int i = 0; i < childArray.getNumChildren(); i++)
+		array += arrayIn[i].toString();
+		array += '\n';
+	}
+
+	nodeIn.setProperty(itemId, array, nullptr);
+}
+
+static void get_array_from_node(const ValueTree& nodeIn, Array<Colour>& arrayIn, Identifier arrayID)
+{
+	String array = nodeIn[arrayID];
+	String value = "";
+	int charsRead = 0;
+
+	Colour c = Colours::transparentWhite;
+
+	while (charsRead < array.length())
+	{
+		value += array[charsRead];
+
+		if (charsRead + 1 < array.length())
 		{
-			arrayIn.add(Colour::fromString(childArray.getChild(i).getProperty("Value").toString()));
+			if (array[charsRead + 1] == '\n')
+				c = Colour::fromString(value);
+		}
+
+		if (c != Colours::transparentWhite)
+		{
+			arrayIn.add(c);
+			c = Colours::transparentWhite;
 		}
 	}
 }
