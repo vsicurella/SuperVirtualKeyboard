@@ -42,7 +42,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     familyBox->setPopupMenuEnabled (true);
     familyBox->setText (TRANS("Meantone"));
 
-    familyBox->setBounds (8, 104, 192, 24);
+    familyBox->setBounds (8, 168, 192, 24);
 
     stepsBox.reset (new TextEditor ("Steps Box"));
     addAndMakeVisible (stepsBox.get());
@@ -77,7 +77,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     familyNameLbl->setColour (TextEditor::textColourId, Colours::black);
     familyNameLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    familyNameLbl->setBounds (8, 72, 150, 24);
+    familyNameLbl->setBounds (8, 136, 150, 24);
 
     stepsLbl.reset (new Label ("Steps Label",
                                TRANS("Steps:\n")));
@@ -110,7 +110,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     nameLabel->setColour (TextEditor::textColourId, Colours::black);
     nameLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    nameLabel->setBounds (8, 136, 96, 24);
+    nameLabel->setBounds (9, 73, 96, 24);
 
     modeSizeLbl.reset (new Label ("Mode Size Label",
                                   TRANS("Mode Size:")));
@@ -140,7 +140,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     defaultNameBtn->addListener (this);
     defaultNameBtn->setToggleState (true, dontSendNotification);
 
-    defaultNameBtn->setBounds (216, 168, 111, 24);
+    defaultNameBtn->setBounds (217, 105, 111, 24);
 
     infoLbl.reset (new Label ("Info Label",
                               TRANS("Info:")));
@@ -163,7 +163,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     nameBox->setPopupMenuEnabled (true);
     nameBox->setText (TRANS("Meantone[7] 12"));
 
-    nameBox->setBounds (8, 168, 192, 24);
+    nameBox->setBounds (9, 105, 192, 24);
 
     saveButton.reset (new TextButton ("Save Button"));
     addAndMakeVisible (saveButton.get());
@@ -404,7 +404,7 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
-              virtualName="" explicitFocusOrder="0" pos="8 104 192 24" initialText="Meantone"
+              virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <TEXTEDITOR name="Steps Box" id="5f84971388b9cded" memberName="stepsBox"
@@ -416,7 +416,7 @@ BEGIN_JUCER_METADATA
               multiline="1" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <LABEL name="Family Name Label" id="dc9e44984d2c580c" memberName="familyNameLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 72 150 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="8 136 150 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Temperament Family:&#10;" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -431,7 +431,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="Name Label" id="5c6262b1b505756a" memberName="nameLabel"
-         virtualName="" explicitFocusOrder="0" pos="8 136 96 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="9 73 96 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Mode Name:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -446,7 +446,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="Default Name Button" id="9d115fe17c7425f5" memberName="defaultNameBtn"
-                virtualName="" explicitFocusOrder="0" pos="216 168 111 24" buttonText="Use Default"
+                virtualName="" explicitFocusOrder="0" pos="217 105 111 24" buttonText="Use Default"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
   <LABEL name="Info Label" id="4618a6a917e67a95" memberName="infoLbl"
          virtualName="" explicitFocusOrder="0" pos="8 304 40 24" edTextCol="ff000000"
@@ -454,7 +454,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="Name Box" id="fd47b34a29e0b3c1" memberName="nameBox" virtualName=""
-              explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone[7] 12"
+              explicitFocusOrder="0" pos="9 105 192 24" initialText="Meantone[7] 12"
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Save Button" id="819ae7d5095491a2" memberName="saveButton"

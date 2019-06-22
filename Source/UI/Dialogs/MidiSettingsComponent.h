@@ -53,6 +53,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setMode1SelectedId(int selectedIdIn);
 	void setMode2SelectedId(int selectedIdIn);
+	void setMode1(Mode* modeIn);
+	void setMode2(Mode* modeIn);
     void setMode1RootNote(int rootNoteIn);
     void setMode2RootNote(int rootNoteIn);
 
@@ -71,12 +73,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	/*
-    std::unique_ptr<MidiRemapTableModel> remapTableModel;
-	std::unique_ptr<TableListBox> remapTable;
-	std::unique_ptr<ModeMapper> modeMapper;
-     */
-
     std::unique_ptr<ModeMapper> modeMapper;
 
 	std::unique_ptr<Mode> modeSelected1;
