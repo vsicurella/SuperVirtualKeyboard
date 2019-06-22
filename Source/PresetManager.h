@@ -20,7 +20,7 @@
 class SvkPresetManager : public ComboBox::Listener,
 							public ChangeBroadcaster
 {
-	std::unique_ptr<SvkPreset> presetLoaded;
+	SvkPreset presetLoaded;
 
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;

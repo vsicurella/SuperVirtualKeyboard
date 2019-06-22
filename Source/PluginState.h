@@ -76,7 +76,7 @@ private:
 	std::unique_ptr<UndoManager> undoManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
-    std::unique_ptr<SvkPreset> presetWorking;
+    SvkPreset presetWorking;
     std::unique_ptr<Mode> modeLoaded;
 	
 	Array<ValueTree> loadedFactoryPresets;
