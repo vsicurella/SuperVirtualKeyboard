@@ -106,14 +106,17 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 
 void SvkPluginState::updatePluginToPresetLoaded()
 {
-    midiProcessor->setMidiMaps(presetManager->presetNode.getChildWithName(IDs::midiMapNode));
+    
+    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
+    presetEdited = false;
+    
+    midiProcessor->setMidiMaps(presetWorking.theModeNode);
     
     modeLoaded->restoreNode(presetManager->presetNode, false);
     virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
     
-    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
-    presetEdited = false;
+
     
     sendChangeMessage();
 }

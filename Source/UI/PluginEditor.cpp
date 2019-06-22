@@ -389,7 +389,9 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-		pluginState->updatePluginToPresetLoaded();
+        // should make this better
+        pluginState->modePresetNode = pluginState->getModeLoaded()->modeNode;
+		pluginState->updatePluginFromParentNode();
 	}
 }
 
