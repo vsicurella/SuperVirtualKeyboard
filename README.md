@@ -59,7 +59,6 @@ TO DO:
 
 BUGS:
 
- - PRESET RECALL BROKE - Whoops gonna fix this ASAP
  - Midi device doesn't get reconfigured when device settings change
  - Window resizing is bad funky
  - Colors aren't working
