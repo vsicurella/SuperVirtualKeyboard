@@ -123,9 +123,12 @@ void SvkPluginEditor::update_children_to_preset()
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 
 	midiSettingsComponent->setMode2(pluginState->getModeLoaded());
-	
-	//piano->updatePianoNode();
-	piano->applyMode(modeLoaded);
+    
+    if (pluginState->getPresetLoaded()->theKeyboardNode[IDs::pianoHasCustomColor])
+        piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
+    
+    piano->setMode(modeLoaded);
+	piano->updateKeys();
 
     keyboardEditorBar->repaint();
 	DBG("Children Updated");
@@ -358,7 +361,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		{
 			piano->updatePianoNode();
 
-			piano->applyMode(pluginState->getModeLoaded());
+			piano->updateKeys();
 			piano->setUIMode(UIMode::playMode);
 			keyboardEditorBar->allowUserInput();
 		}

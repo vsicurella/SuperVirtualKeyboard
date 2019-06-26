@@ -84,7 +84,7 @@ bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
 	}
 
     theKeyboardNode.copyPropertiesAndChildrenFrom(keyboardNodeIn, nullptr);
-
+    DBG("Keyboard Node Commited:\n" + theKeyboardNode.toXmlString());
 	return theKeyboardNode.isValid();
 }
 
@@ -99,29 +99,6 @@ bool SvkPreset::updateMapNode(ValueTree mapNodeIn)
     theMapNode.copyPropertiesAndChildrenFrom(mapNodeIn, nullptr);
 
     return theMapNode.isValid();
-}
-
-bool SvkPreset::writeToFile(String absoluteFilePath)
-{
-	File fileOut = File(absoluteFilePath);
-
-	if (!fileOut.getParentDirectory().exists())
-	{		
-		FileChooser chooser("Save your preset", 
-			File::getSpecialLocation(File::userDocumentsDirectory),
-			"*.svk");
-
-		chooser.browseForFileToSave(true);
-		fileOut = chooser.getResult();
-	}
-
-	if (fileOut.getParentDirectory().exists())
-	{
-		std::unique_ptr<XmlElement> xml(parentNode.createXml());
-		return xml->writeToFile(fileOut, "");
-	}
-
-	return false;
 }
 
 String SvkPreset::toString()

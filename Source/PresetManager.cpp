@@ -74,14 +74,17 @@ PopupMenu* SvkPresetManager::getPresetMenu()
 
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 {
-	presetLoaded = SvkPreset(presetNodeIn.createCopy());
-
-    presetNode = presetLoaded.parentNode;
-			
-	if (sendChangeSignal)
-		sendChangeMessage();
-
-	return presetLoaded.theModeNode.isValid();
+    if (presetNodeIn.isValid())
+    {
+        presetLoaded = SvkPreset(presetNodeIn.createCopy());
+        
+        presetNode = presetLoaded.parentNode;
+        
+        if (sendChangeSignal)
+            sendChangeMessage();
+    }
+    
+	return presetNodeIn.isValid();
 }
 
 bool SvkPresetManager::loadPreset(int indexIn, bool sendChangeSignal)
@@ -101,9 +104,26 @@ bool SvkPresetManager::loadPreset(bool sendChangeSignal)
 
 bool SvkPresetManager::savePreset(String absolutePath)
 {
-	return presetLoaded.writeToFile(absolutePath);
+    File fileOut = File(absolutePath);
+        
+    if (!fileOut.getParentDirectory().exists())
+    {
+        FileChooser chooser("Save your preset",
+                            pluginSettingsNode[IDs::presetDirectory].toString(),
+                            "*.svk");
+        
+        chooser.browseForFileToSave(true);
+        fileOut = chooser.getResult();
+    }
+    
+    if (fileOut.getParentDirectory().exists())
+    {
+        std::unique_ptr<XmlElement> xml(presetLoaded.parentNode.createXml());
+        return xml->writeToFile(fileOut, "");
+    }
+    
+    return false;
 }
-
 
 ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 {

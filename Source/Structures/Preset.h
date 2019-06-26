@@ -31,8 +31,6 @@ struct SvkPreset
     bool updateKeyboardNode(ValueTree modeNodeIn);
     
     bool updateMapNode(ValueTree mapNodeIn);
-
-	bool writeToFile(String absoluteFilePath="");
        
 	String toString();	
 

@@ -25,13 +25,14 @@ class SvkPluginSettings
 	File currentSettingsLocation;
 	File currentPresetLocation;
 
-	bool createPresetFolder = false;
+	bool createPresetFolder = true;
 	bool saveFactoryPresets = false;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 
 public:
 
 	SvkPluginSettings();
-	SvkPluginSettings(SvkPluginSettings& settingsToCopy);
 	~SvkPluginSettings() {}
 
 	ValueTree pluginSettingsNode;
