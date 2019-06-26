@@ -115,8 +115,9 @@ void SvkPluginState::updatePluginToPresetLoaded()
     midiProcessor->setMidiMaps(presetWorking.theMapNode);
     
     modeLoaded->restoreNode(presetWorking.theModeNode, false);
-    virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
+	
+	virtualKeyboard->restoreDataNode(presetWorking.theKeyboardNode);
     
     sendChangeMessage();
 }
@@ -130,10 +131,7 @@ void SvkPluginState::updatePluginFromParentNode()
     midiProcessor->restoreFromNode(presetWorking.theMapNode);
 
     modeLoaded->restoreNode(modePresetNode, false);
-    virtualKeyboard->applyMode(modeLoaded.get());
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
-    
-
     
     sendChangeMessage();
 }

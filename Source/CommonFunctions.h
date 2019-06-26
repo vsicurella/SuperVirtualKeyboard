@@ -239,6 +239,8 @@ static void get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Ident
 	}
 }
 
+/* Adds a Colour array reduced to nontrivial items to a node represented in a ValueTree structure */
+
 static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId)
 {
 	ValueTree arrayTree = ValueTree(arrayID);
@@ -246,9 +248,13 @@ static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Id
 
 	for (int i = 0; i < arrayIn.size(); i++)
 	{
-		item = ValueTree(itemId);
-		item.setProperty("Value", arrayIn[i].toString(), nullptr);
-		arrayTree.addChild(item, i, nullptr);
+		if (arrayIn[i].isOpaque())
+		{
+			item = ValueTree(itemId);
+			item.setProperty("Key", i, nullptr);
+			item.setProperty("Value", arrayIn[i].toString(), nullptr);
+			arrayTree.addChild(item, i, nullptr);
+		}
 	}
 
 	nodeIn.addChild(arrayTree, -1, nullptr);
@@ -290,6 +296,24 @@ static void get_array_from_node(const ValueTree& nodeIn, Array<Colour>& arrayIn,
 			arrayIn.add(c);
 			c = Colours::transparentWhite;
 		}
+	}
+}
+
+/* Creates a Colour array from a node, and populates trivial and nontrivial keys */
+
+static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID, int arraySizeOut)
+{
+	ValueTree arrayNode;
+	ValueTree item;
+
+	arrayIn.resize(arraySizeOut);
+
+	arrayNode = nodeIn.getChildWithName(arrayID);
+
+	for (int i = 0; i < arrayNode.getNumChildren(); i++)
+	{
+		item = arrayNode.getChild(i);
+		arrayIn.set(item["Key"], Colour::fromString(item["Value"].toString()));
 	}
 }
 

@@ -14,12 +14,6 @@
 ColorChooserWindow::ColorChooserWindow (String windowName, Colour backgroundColor, int windowFlags)
     : DocumentWindow(windowName, backgroundColor, windowFlags)
 {
-
-	colorChooser.reset(new ColourSelector());
-    colorChooser->setName("Color Chooser");
-    colorChooser->setBounds(0, 0, 450, 450);
-    //setContentOwned(colorChooser.get(), true);
-
     setAlwaysOnTop(true);
     setOpaque(true);
 
@@ -42,7 +36,6 @@ void ColorChooserWindow::paint (Graphics& g)
 void ColorChooserWindow::resized()
 {
     DocumentWindow::resized();
-	colorChooser->setBounds(0, getHeight() - proportionOfHeight(0.9493f), proportionOfWidth(1.0000f), proportionOfHeight(0.9493f));
 }
 
 void ColorChooserWindow::closeButtonPressed()
