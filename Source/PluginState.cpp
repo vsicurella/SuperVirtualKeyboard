@@ -99,14 +99,14 @@ void SvkPluginState::setMidiRootNote(int rootNoteIn)
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	midiProcessor->setRootNote(rootNoteIn);
 	modeLoaded->setRootNote(rootNoteIn);
-    virtualKeyboard->applyMode(modeLoaded.get());
+    virtualKeyboard->updateKeys();
     
     presetEdited = true;
 }
 
 void SvkPluginState::updatePluginToPresetLoaded()
 {
-    DBG("Loading this preset:");
+    DBG("Updating plugin from this loaded preset:");
     presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
     
@@ -117,16 +117,20 @@ void SvkPluginState::updatePluginToPresetLoaded()
     modeLoaded->restoreNode(presetWorking.theModeNode, false);
     midiProcessor->setScaleSize(modeLoaded->getScaleSize());
 	
-	virtualKeyboard->restoreDataNode(presetWorking.theKeyboardNode);
+	//virtualKeyboard->restoreDataNode(presetWorking.theKeyboardNode);
     
     sendChangeMessage();
 }
 
 void SvkPluginState::updatePluginFromParentNode()
 {
+    DBG("Updating plugin from memory block with this preset:");
+    
     presetManager->loadPreset(modePresetNode, false);
     presetWorking = SvkPreset(*presetManager->getPresetLoaded());
     presetEdited = false;
+    
+    DBG(presetWorking.parentNode.toXmlString());
     
     midiProcessor->restoreFromNode(presetWorking.theMapNode);
 
@@ -150,7 +154,7 @@ void SvkPluginState::commitPresetChanges()
 bool SvkPluginState::savePreset()
 {
     commitPresetChanges();
-	return presetManager->savePreset();
+    return presetManager->savePreset();
 }
 
 

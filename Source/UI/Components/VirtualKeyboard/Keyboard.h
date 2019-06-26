@@ -68,10 +68,14 @@ namespace VirtualKeyboard
         void restoreDataNode(ValueTree pianoNodeIn);
 
 		void updatePianoNode();
-
-		void updateKeyProperties();
         
         ValueTree getNode();
+        
+        //===============================================================================================
+
+        void setMode(Mode* modeIn);
+        
+        void updateKeys();
         
         //===============================================================================================
         
@@ -124,7 +128,6 @@ namespace VirtualKeyboard
 
 		Colour getKeySingleColor(int keyIn);
 
-
 		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor = true);
 		
 		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor = true);
@@ -143,8 +146,6 @@ namespace VirtualKeyboard
 
 		//===============================================================================================
         
-        void applyMode(Mode* layoutIn);
-                
         void allNoteOff();
         
         void isolateLastNote();
@@ -218,7 +219,6 @@ namespace VirtualKeyboard
 		int orientationSelected = 0;
 		int keyPlacementSelected = 0;
 
-		int midiChannelSelected = 1;
 		int midiNoteOffset = 0;
 		bool mpeOn = false;
         
@@ -256,7 +256,7 @@ namespace VirtualKeyboard
 		int lastKeyOver = 0;
 		int lastKeyClicked = 0;
 
-		int currentOffset = 0;
+		int modeOffset = 0;
         
         float pianoWidth;
         float minWindowHeight;
