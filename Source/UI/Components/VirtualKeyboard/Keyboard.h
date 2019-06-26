@@ -239,6 +239,14 @@ namespace VirtualKeyboard
 		
 		Array<Colour> keyColorsDegree;
 		Array<Colour> keyColorsSingle; // organized by (keyNumber - Mode offset)
+
+		Array<Point<int>> keyPlacesOrder;
+		Array<Point<int>> keyPlacesDegree;
+		Array<Point<int>> keyPlacesSingle;
+
+		Array<Point<int>> keyRatioOrder;
+		Array<Point<int>> keyRatioDegree;
+		Array<Point<int>> keyRatioSingle;
 		        
         // Properties
         int keyWidth = 50;

@@ -33,12 +33,14 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	view.get()->setViewedComponent(piano, false);
 	view.get()->setTopLeftPosition(1, 49);
     
-    /*
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
 	colorChooserWindow->addChangeListener(this);
 	colorChooserWindow->addToDesktop();
-     */
+
+	colorSelector.reset(new ColourSelector());
+	colorSelector->setSize(450, 450);
+	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
     midiSettingsWindow = std::make_unique<MidiSettingsWindow>();
     midiSettingsWindow->setSize(560, 150);
@@ -121,7 +123,10 @@ void SvkPluginEditor::update_children_to_preset()
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 
 	midiSettingsComponent->setMode2(pluginState->getModeLoaded());
-    
+	
+	//piano->updatePianoNode();
+	piano->applyMode(modeLoaded);
+
     keyboardEditorBar->repaint();
 	DBG("Children Updated");
 }
@@ -259,14 +264,12 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				else if (piano->getKeySingleColor(key->keyNumber).isOpaque())
 					piano->resetKeySingleColor(key->keyNumber);
 
-				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
+				piano->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
 			}
 			else if (e.mods.isCtrlDown())
-				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
+				piano->setKeyColor(key->keyNumber, 3, colorSelector->getCurrentColour());
 			else
-				piano->setKeyColorDegree(key->scaleDegree, 3, colorChooserWindow->getColorSelected());
-            
-            piano->repaint();
+				piano->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());       
 		}
 	}
     else if (piano->getUIMode() == UIMode::mapMode)
@@ -345,7 +348,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     if (source == pluginState)
     {
         piano->resetKeyColors(true);
-        piano->updatePianoNode();
         update_children_to_preset();
     }
     
@@ -452,7 +454,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 		break;
 	case IDs::CommandIDs::setKeyColor:
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-        result.setActive(false);
+        result.setActive(true);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
     case IDs::CommandIDs::showModeInfo:
