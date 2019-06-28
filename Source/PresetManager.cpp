@@ -208,7 +208,7 @@ bool SvkPresetManager::commitMapNode(ValueTree mapNodeIn)
 {
     if (mapNodeIn.hasType(IDs::midiMapNode))
     {
-        presetLoaded.updateMapNode(mapNodeIn);
+        presetLoaded.updateMidiNode(mapNodeIn);
         return true;
     }
     

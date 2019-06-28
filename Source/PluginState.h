@@ -23,13 +23,14 @@ struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
 {
 	ValueTree pluginStateNode;
-	ValueTree presetLibraryNode;
-	ValueTree pluginEditorNode;
-
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;
-	ValueTree modePresetNode;
+	ValueTree presetLibraryNode;
+	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
+
+	ValueTree presetWorkingNode;
+	ValueTree modePresetNode;
     
     SvkPluginState();
 	~SvkPluginState() {}
@@ -59,6 +60,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     void commitPresetChanges();
 	bool savePreset();
 	bool loadPreset();
+
+	void recallState(ValueTree nodeIn);
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     

@@ -19,7 +19,7 @@ struct SvkPreset
 	ValueTree parentNode;
 	ValueTree theModeNode;
 	ValueTree theKeyboardNode;
-    ValueTree theMapNode;
+    ValueTree theMidiSettingsNode;
 
 	SvkPreset();
 	SvkPreset(ValueTree presetNodeIn);
@@ -30,7 +30,7 @@ struct SvkPreset
     
     bool updateKeyboardNode(ValueTree modeNodeIn);
     
-    bool updateMapNode(ValueTree mapNodeIn);
+    bool updateMidiNode(ValueTree midiNodeIn);
        
 	String toString();	
 
