@@ -15,11 +15,11 @@ SvkPreset::SvkPreset()
 	parentNode = ValueTree(IDs::presetNode);
 	theModeNode = ValueTree(IDs::modePresetNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
-    theMapNode = ValueTree(IDs::midiMapNode);
+    theMidiSettingsNode = ValueTree(IDs::midiMapNode);
     
 	parentNode.addChild(theModeNode, -1, nullptr);
     parentNode.addChild(theKeyboardNode, -1, nullptr);
-    parentNode.addChild(theMapNode, -1, nullptr);
+    parentNode.addChild(theMidiSettingsNode, -1, nullptr);
 }
 
 SvkPreset::SvkPreset(ValueTree presetNodeIn)
@@ -43,15 +43,15 @@ SvkPreset::SvkPreset(ValueTree presetNodeIn)
 
 	ValueTree mapNodeTry = presetNodeIn.getChildWithName(IDs::midiMapNode);
 	if (mapNodeTry.isValid())
-		theMapNode = mapNodeTry.createCopy();
+		theMidiSettingsNode = mapNodeTry.createCopy();
     else
-        theMapNode = ValueTree(IDs::midiMapNode);
+        theMidiSettingsNode = ValueTree(IDs::midiMapNode);
 
     parentNode = ValueTree(IDs::presetNode);
     
     parentNode.addChild(theModeNode, -1, nullptr);
     parentNode.addChild(theKeyboardNode, -1, nullptr);
-    parentNode.addChild(theMapNode, -1, nullptr);
+    parentNode.addChild(theMidiSettingsNode, -1, nullptr);
 }
 
 SvkPreset::SvkPreset(SvkPreset& presetToCopy)
@@ -88,17 +88,17 @@ bool SvkPreset::updateKeyboardNode(ValueTree keyboardNodeIn)
 	return theKeyboardNode.isValid();
 }
 
-bool SvkPreset::updateMapNode(ValueTree mapNodeIn)
+bool SvkPreset::updateMidiNode(ValueTree midiNodeIn)
 {
-    if (!mapNodeIn.isValid())
+    if (!midiNodeIn.isValid())
     {
-        theMapNode = ValueTree(IDs::midiMapNode);
-        parentNode.addChild(theMapNode, -1, nullptr);
+        theMidiSettingsNode = ValueTree(IDs::midiMapNode);
+        parentNode.addChild(theMidiSettingsNode, -1, nullptr);
     }
     
-    theMapNode.copyPropertiesAndChildrenFrom(mapNodeIn, nullptr);
+    theMidiSettingsNode.copyPropertiesAndChildrenFrom(midiNodeIn, nullptr);
 
-    return theMapNode.isValid();
+    return theMidiSettingsNode.isValid();
 }
 
 String SvkPreset::toString()
