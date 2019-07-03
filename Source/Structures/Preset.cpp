@@ -15,7 +15,7 @@ SvkPreset::SvkPreset()
 	parentNode = ValueTree(IDs::presetNode);
 	theModeNode = ValueTree(IDs::modePresetNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
-    theMidiSettingsNode = ValueTree(IDs::midiMapNode);
+    theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
     
 	parentNode.addChild(theModeNode, -1, nullptr);
     parentNode.addChild(theKeyboardNode, -1, nullptr);
@@ -45,7 +45,7 @@ SvkPreset::SvkPreset(ValueTree presetNodeIn)
 	if (mapNodeTry.isValid())
 		theMidiSettingsNode = mapNodeTry.createCopy();
     else
-        theMidiSettingsNode = ValueTree(IDs::midiMapNode);
+        theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 
     parentNode = ValueTree(IDs::presetNode);
     
@@ -92,7 +92,7 @@ bool SvkPreset::updateMidiNode(ValueTree midiNodeIn)
 {
     if (!midiNodeIn.isValid())
     {
-        theMidiSettingsNode = ValueTree(IDs::midiMapNode);
+        theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
         parentNode.addChild(theMidiSettingsNode, -1, nullptr);
     }
     
