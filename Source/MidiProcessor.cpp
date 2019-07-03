@@ -14,9 +14,9 @@ SvkMidiProcessor::SvkMidiProcessor()
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
-    
-    midiSettingsNode.addChild(midiMapNode, -1, nullptr);
-       
+
+	midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+           
     midiInputFilter = std::make_unique<MidiFilter>();
     midiOutputFilter = std::make_unique<MidiFilter>();
 
@@ -94,8 +94,8 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         // Root note
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
-        // Note maps
-        setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
+		// Set Note Maps
+		setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
 
         return true;
     }
