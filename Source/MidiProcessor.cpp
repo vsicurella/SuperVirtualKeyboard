@@ -95,6 +95,12 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
 		// Set Note Maps
+		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
+		{
+			midiMapNode = ValueTree(IDs::midiMapNode);
+			midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+		}
+
 		setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
 
         return true;
@@ -264,6 +270,8 @@ void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn, bool updateNode)
 		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
 		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
 	}
+	DBG("FYI HERES THE MIDI SETTINGS NODE\n" + midiSettingsNode.toXmlString());
+
 }
 
 void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn, bool updateNode)
@@ -275,6 +283,8 @@ void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn, bool updateNode)
 		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
 		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
 	}
+	DBG("FYI HERES THE MIDI SETTINGS NODE\n" + midiSettingsNode.toXmlString());
+
 }
 
 void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn, bool updateNode)

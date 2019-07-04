@@ -41,7 +41,7 @@ SvkPreset::SvkPreset(ValueTree presetNodeIn)
     else
         theKeyboardNode = ValueTree(IDs::pianoNode);
 
-	ValueTree mapNodeTry = presetNodeIn.getChildWithName(IDs::midiMapNode);
+	ValueTree mapNodeTry = presetNodeIn.getChildWithName(IDs::midiSettingsNode);
 	if (mapNodeTry.isValid())
 		theMidiSettingsNode = mapNodeTry.createCopy();
     else

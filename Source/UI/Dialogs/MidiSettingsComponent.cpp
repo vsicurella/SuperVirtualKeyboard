@@ -302,7 +302,7 @@ void MidiSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 				orderOffsetSld1->getValue(), orderOffsetSld2->getValue(),
 				*prevMap);
 
-            pluginState->getMidiProcessor()->setMidiInputMap(mapToUse);
+            pluginState->setMidiInputMap(mapToUse);
 		}
         //[/UserButtonCode_mapModesBtn]
     }
