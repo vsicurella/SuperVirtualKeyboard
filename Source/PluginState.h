@@ -53,9 +53,10 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void loadMode(ValueTree modeNodeIn);
 
 	void setMidiRootNote(int rootNoteIn);
+	void setMidiInputMap(NoteMap noteMapIn);
+	void setMidiOutputMap(NoteMap noteMapIn);
     
     void updatePluginToPresetLoaded();
-    void updatePluginFromParentNode();
 
     void commitPresetChanges();
 	bool savePreset();

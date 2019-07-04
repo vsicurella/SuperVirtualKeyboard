@@ -98,8 +98,6 @@ void SvkPluginEditor::initNodeData()
 		pluginState->pluginEditorNode = pluginEditorNode;
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 
-		pluginEditorNode.addChild(pluginState->pianoNode, 0, nullptr);
-
 		view.get()->setViewPositionProportionately(0.52, 0);
         pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
@@ -394,9 +392,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-        // should make this better
-        pluginState->modePresetNode = pluginState->getModeLoaded()->modeNode;
-		pluginState->updatePluginFromParentNode();
+		pluginState->loadMode(pluginState->getModeLoaded()->modeNode);
 	}
 }
 
