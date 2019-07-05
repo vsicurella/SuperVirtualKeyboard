@@ -120,7 +120,7 @@ void SvkPluginEditor::update_children_to_preset()
 	keyboardEditorBar->setModeLibraryText(modeLoaded->getName());
     keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
 
-	midiSettingsComponent->setMode2(pluginState->getModeLoaded());
+	midiSettingsComponent->setMode2(modeLoaded);
     
     if (pluginState->getPresetLoaded()->theKeyboardNode[IDs::pianoHasCustomColor])
         piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);

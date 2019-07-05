@@ -181,16 +181,12 @@ void SvkPluginState::commitPresetChanges()
     presetWorking.updateKeyboardNode(pianoNode);
     presetWorking.updateMidiNode(midiProcessor->midiSettingsNode);
     presetManager->commitPresetNode(presetWorking.parentNode);
-
-	DBG("LIGHT COMMIT:\n" + presetWorking.parentNode.toXmlString());
     
     presetWorking = SvkPreset(*presetManager->getPresetLoaded());
 	presetWorkingNode = presetWorking.parentNode;
     presetEdited = false;
 
 	modePresetNode = modeLoaded->modeNode;
-
-	DBG("HARD COMMIT:" + pluginStateNode.toXmlString());
 }
 
 bool SvkPluginState::savePreset()
