@@ -989,7 +989,7 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     if (uiModeSelected == playMode)
     {
         key = keys.getUnchecked(keyTriggered);
-        key->externalMidiState = 1;
+        key->externalMidiState = midiChannel;
     }
     else if (uiModeSelected == mapMode)
     {
