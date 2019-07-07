@@ -56,8 +56,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
 	initNodeData();
     
-    midiSettingsComponent->setMode1SelectedId(9);
-    midiSettingsComponent->setMode2SelectedId(9);
+    midiSettingsComponent->setMode1(9);
+    midiSettingsComponent->setMode2(9);
 
     midiSettingsComponent->setMode1RootNote(60);
     midiSettingsComponent->setMode2RootNote(60);
