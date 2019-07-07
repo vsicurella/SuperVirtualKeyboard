@@ -207,6 +207,8 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
 
 
     //[UserPreSize]
+    midiSettingsNode = pluginState->midiSettingsNode;
+    
     presetBox1->setMenu(*pluginState->presetManager->getPresetMenu());
 	presetBox1->addListener(this);
     presetBox2->setMenu(*pluginState->presetManager->getPresetMenu());
@@ -380,6 +382,8 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             for (int i = 0; i < modeSelected1->getMaxStep(); i++)
                 mode1OrderBox->addItem(String(i), i+1);
         }
+        
+        
     }
 
     else if (comboBoxThatHasChanged == presetBox2.get())
@@ -416,6 +420,7 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
 
     //[UsercomboBoxChanged_Post]
+    
     //[/UsercomboBoxChanged_Post]
 }
 
@@ -423,40 +428,63 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+void MidiSettingsComponent::visibilityChanged(bool isVisible)
+{
+    midiSettingsNode = pluginState->midiSettingsNode;
+}
+
+void MidiSettingsComponent::setMode1(int selectedIdIn)
+{
+    modeSelected1.reset(new Mode(pluginState->presetManager->getPreset(selectedIdIn)));
+    presetBox1->setSelectedId(selectedIdIn);
+}
+
+void MidiSettingsComponent::setMode1(ValueTree modeNodeIn)
+{
+    modeSelected1.reset(new Mode(modeNodeIn));
+    presetBox1->setText(modeSelected1->getName());
+}
+
 void MidiSettingsComponent::setMode1(Mode* modeIn)
 {
-	modeSelected1.reset(new Mode(modeIn->modeNode));
-	presetBox1->setText(modeSelected1->getName());
+    setMode1(modeIn->modeNode);
+}
+
+void MidiSettingsComponent::setMode2(int selectedIdIn)
+{
+    modeSelected1.reset(new Mode(pluginState->presetManager->getPreset(selectedIdIn)));
+    presetBox2->setSelectedId(selectedIdIn);
+}
+
+void MidiSettingsComponent::setMode2(ValueTree modeNodeIn)
+{
+    modeSelected2.reset(new Mode(modeNodeIn));
+    presetBox1->setText(modeSelected2->getName());
 }
 
 void MidiSettingsComponent::setMode2(Mode* modeIn)
 {
-	modeSelected2.reset(new Mode(modeIn->modeNode));
-	presetBox2->setText(modeSelected2->getName());
+    setMode2(modeIn->modeNode);
 }
 
 void MidiSettingsComponent::updateModeMapper()
 {
     if (mapFullBtn->getToggleState())
+    {
         modeMapper->setMapType(ModeMapper::ModeToMode);
+    }
 
     else if (mapModeToScaleBtn->getToggleState())
+    {
         modeMapper->setMapType(ModeMapper::ModeToScale);
+    }
 
     else if (mapModeOrdersBtn->getToggleState())
+    {
         modeMapper->setMapType(ModeMapper::ModeByOrder);
+    }
 
     setOrderMappingVisibility(mapModeOrdersBtn->getToggleState());
-}
-
-void MidiSettingsComponent::setMode1SelectedId(int selectedIdIn)
-{
-    presetBox1->setSelectedId(selectedIdIn);
-}
-
-void MidiSettingsComponent::setMode2SelectedId(int selectedIdIn)
-{
-	presetBox2->setSelectedId(selectedIdIn);
 }
 
 void MidiSettingsComponent::setMode1RootNote(int rootNoteIn)

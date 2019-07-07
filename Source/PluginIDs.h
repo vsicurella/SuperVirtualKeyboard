@@ -28,7 +28,6 @@ namespace IDs
 	static Identifier createPresetFolder("CreatePresetFolder");
 	static Identifier saveFactoryPresets("SaveFactoryPresets");
 
-
 	// Midi Settings
     static Identifier midiSettingsNode("MidiSettings");
     static Identifier midiMapNode("MidiMappings");
@@ -39,6 +38,9 @@ namespace IDs
     static Identifier midiInputName("InputDevice");
     static Identifier midiOutputName("OutputDevice");
     static Identifier autoRemapOn("AutoRemapOn");
+    static Identifier modeMapFromRootNote("ModeMapFromRootNote");
+    static Identifier modeMapFromPreset("ModeMapFromPreset");
+    static Identifier modeMappingType("ModeMappingType");
 
 	// Mode
 	static Identifier scaleSize("ScaleSize");

@@ -51,15 +51,21 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setMode1SelectedId(int selectedIdIn);
-	void setMode2SelectedId(int selectedIdIn);
-	void setMode1(Mode* modeIn);
-	void setMode2(Mode* modeIn);
+    void setMode1(int selectedIdIn);
+    void setMode1(ValueTree modeNodeIn);
+    void setMode1(Mode* modeIn);
+
+    void setMode2(int selectedIdIn);
+    void setMode2(ValueTree modeNodeIn);
+    void setMode2(Mode* modeIn);
+
     void setMode1RootNote(int rootNoteIn);
     void setMode2RootNote(int rootNoteIn);
 
     void updateModeMapper();
     void setOrderMappingVisibility(bool isVisible);
+    
+    void visibilityChanged(bool isVisible) override;
 
     //[/UserMethods]
 
@@ -77,6 +83,8 @@ private:
 
 	std::unique_ptr<Mode> modeSelected1;
 	std::unique_ptr<Mode> modeSelected2;
+    
+    ValueTree midiSettingsNode;
 
 	int boxW = 10;
 	int boxH = 8;
