@@ -357,19 +357,19 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 	PopupMenu menu;
 	if (topLevelMenuIndex == 0)
 	{
-        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::saveCustomLayout, "Save layout");
-		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::loadCustomLayout, "Load layout");
+        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::savePreset, "Save layout");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset, "Load layout");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::saveReaperMap, "Export to Reaper MIDI note names file");
 	}
 	else if (topLevelMenuIndex == 1)
 	{
-		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeyColor, "Set default Key Colors");
-		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setMidiNoteOffset, "Set layout offset");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::beginColorEditing, "Set default Key Colors");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setMode2RootNote, "Set layout offset");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoPlayMode, "Play Mode");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::pianoEditMode, "Edit Mode");
         menu.addCommandItem(appCmdMgr, IDs::CommandIDs::remapMidiNotes, "Edit Note Mapping");
         menu.addCommandItem(appCmdMgr, IDs::CommandIDs::showModeInfo, "Mode Info");
-        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::autoRemap, "Auto-Remap From Standard Layout");
+        menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setAutoRemapState, "Auto-Remap From Standard Layout");
 	}
 	else if (topLevelMenuIndex == 2)
 	{
@@ -377,7 +377,7 @@ PopupMenu KeyboardEditorBar::KeyboardMenu::getMenuForIndex(int topLevelMenuIndex
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setPianoVerticalL, "Vertical Keyboard Left");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setPianoVerticalR, "Vertical Keyboard Right");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysNestedRight, "Cascade Keys");
-		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysNestedCenter, "Flat Keys");
+		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysFlat, "Flat Keys");
 		menu.addCommandItem(appCmdMgr, IDs::CommandIDs::setKeysAdjacent, "Adjacent Keys");
 	}
 

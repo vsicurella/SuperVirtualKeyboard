@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginProcessor.h"
 
+#include "Components/PluginControlComponent.h"
 #include "Components/KeyboardEditorBar.h"
 #include "../Structures/Mode.h"
 #include "Components/VirtualKeyboard/Keyboard.h"
@@ -31,6 +32,10 @@ using namespace VirtualKeyboard;
 */
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
+						public ComboBox::Listener,
+						public Slider::Listener,
+						public Button::Listener,
+						public TextEditor::Listener,
 						private ChangeListener,
 						private Timer
 {
@@ -54,13 +59,37 @@ public:
 	void updateNodeData();
 
 	void update_children_to_preset();
-	void beginColorEditing();
 
 	//===============================================================================================
 
 	bool save_preset();
 	bool load_preset();
 	bool write_reaper_file();
+
+	void beginColorEditing();
+	void beginMapEditing();
+
+	void commitCustomScale();
+	void showModeInfo();
+	void setMappingStyle(int mapStyleId);
+
+	void setMode1Root(int rootIn);
+	void setMode2Root(int rootIn);
+
+	void loadMode1(ValueTree modeNodeIn);
+	void loadMode1(int presetId);
+	
+	void loadMode2(ValueTree modeNodeIn);
+	void loadMode2(int presetId);
+
+	void setModeView(int modeNumberIn);
+
+	void setPeriodShift(int periodsIn);
+	void setMidiChannel(int midiChannelIn);
+	void setNoteNumsVisible(bool noteNumsVisible);
+	void setKeyStyle(int keyStyleId);
+	void setHighlightStyle(int highlightStyleId);
+
 
 	//===============================================================================================
 
@@ -101,6 +130,8 @@ private:
 
 	ApplicationCommandManager* appCmdMgr;
 	
+	std::unique_ptr<PluginControlComponent> controlComponent;
+
 	std::unique_ptr<Viewport> view;
 	Keyboard* piano;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;

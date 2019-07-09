@@ -426,7 +426,7 @@ Colour Keyboard::getKeySingleColor(int keyIn)
 	return keyColorsSingle[keyNum];
 }
 
-void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor)
+void Keyboard::beginColorEditing(Key* keyIn, int colorIndex, Colour colorIn, bool useColor)
 {
 	keyIn->setColour(colorIndex, colorIn);
 	keyIn->customColor = useColor;
@@ -437,9 +437,9 @@ void Keyboard::setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useC
 	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
 }
 
-void Keyboard::setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
+void Keyboard::beginColorEditing(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
 {
-	setKeyColor(keys.getUnchecked(keyNumIn), colorIndex, colorIn, useColor);
+	beginColorEditing(keys.getUnchecked(keyNumIn), colorIndex, colorIn, useColor);
 }
 
 void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
@@ -1026,7 +1026,7 @@ void Keyboard::getAllCommands(Array< CommandID > &c)
 		//IDs::CommandIDs::setPianoVerticalL,
 		//IDs::CommandIDs::setPianoVerticalR,
 		IDs::CommandIDs::setKeysNestedRight,
-		IDs::CommandIDs::setKeysNestedCenter,
+		IDs::CommandIDs::setKeysFlat,
 		IDs::CommandIDs::setKeysAdjacent };
 
 	c.addArray(commands);
@@ -1065,7 +1065,7 @@ void Keyboard::getCommandInfo(CommandID commandID, ApplicationCommandInfo &resul
 		result.setInfo("Keys Aligned Right", "The keys outside of the mode will be justified to the right.", "Piano", 0);
 		result.setTicked(keyPlacementSelected == KeyPlacementType::nestedRight);
 		break;
-	case IDs::CommandIDs::setKeysNestedCenter:
+	case IDs::CommandIDs::setKeysFlat:
 		result.setInfo("Keys Aligned Center", "The keys outside of the mode will be centered.", "Piano", 0);
 		result.setTicked(keyPlacementSelected == KeyPlacementType::nestedCenter);
 		break;
@@ -1099,7 +1099,7 @@ bool Keyboard::perform(const InvocationInfo &info)
 	case IDs::CommandIDs::setKeysNestedRight:
 		setKeyPlacement(KeyPlacementType::nestedRight);
 		break;
-	case IDs::CommandIDs::setKeysNestedCenter:
+	case IDs::CommandIDs::setKeysFlat:
 		setKeyPlacement(KeyPlacementType::nestedCenter);
 		break;
 	case IDs::CommandIDs::setKeysAdjacent:

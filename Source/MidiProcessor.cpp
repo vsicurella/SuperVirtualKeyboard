@@ -183,7 +183,7 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 bool SvkMidiProcessor::isAutoRemapping()
 {
-    return autoRemap;
+    return setAutoMap;
 }
 
 
@@ -307,8 +307,8 @@ void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn, bool updateNode)
 
 void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
 {
-    autoRemap = remapIn;
-    midiSettingsNode.setProperty(IDs::autoRemapOn, autoRemap, nullptr);
+    setAutoMap = remapIn;
+    midiSettingsNode.setProperty(IDs::autoRemapOn, setAutoMap, nullptr);
 }
 
 void SvkMidiProcessor::resetInputMap(bool updateNode)

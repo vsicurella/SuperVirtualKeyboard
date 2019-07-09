@@ -52,8 +52,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
 
     pluginState->addChangeListener(this);
-    keyboardEditorBar->addChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
+
 	initNodeData();
     
     midiSettingsComponent->setMode1(9);
@@ -172,6 +172,84 @@ bool SvkPluginEditor::write_reaper_file()
 	return rpp.write_file();
 }
 
+void SvkPluginEditor::beginMapEditing()
+{
+
+}
+
+void SvkPluginEditor::commitCustomScale()
+{
+	
+}
+
+void SvkPluginEditor::showModeInfo()
+{
+
+}
+void SvkPluginEditor::setMappingStyle(int mapStyleId)
+{
+
+}
+
+void SvkPluginEditor::setMode1Root(int rootIn)
+{
+
+}
+void SvkPluginEditor::setMode2Root(int rootIn)
+{
+
+}
+
+void SvkPluginEditor::loadMode1(ValueTree modeNodeIn)
+{
+
+}
+void SvkPluginEditor::loadMode1(int presetId)
+{
+
+}
+
+void SvkPluginEditor::loadMode2(ValueTree modeNodeIn)
+{
+
+}
+
+void SvkPluginEditor::loadMode2(int presetId)
+{
+
+}
+
+void SvkPluginEditor::setModeView(int modeNumberIn)
+{
+
+}
+
+void SvkPluginEditor::setPeriodShift(int periodsIn)
+{
+
+}
+
+void SvkPluginEditor::setMidiChannel(int midiChannelIn)
+{
+
+}
+
+void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
+{
+
+}
+
+void SvkPluginEditor::setKeyStyle(int keyStyleId)
+{
+
+}
+
+void SvkPluginEditor::setHighlightStyle(int highlightStyleId)
+{
+
+}
+
+
 //==============================================================================
 
 void SvkPluginEditor::paint(Graphics& g)
@@ -268,7 +346,7 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				piano->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
 			}
 			else if (e.mods.isCtrlDown())
-				piano->setKeyColor(key->keyNumber, 3, colorSelector->getCurrentColour());
+				piano->beginColorEditing(key->keyNumber, 3, colorSelector->getCurrentColour());
 			else
 				piano->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());       
 		}
@@ -421,12 +499,11 @@ ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
-		IDs::CommandIDs::saveCustomLayout,
-		IDs::CommandIDs::loadCustomLayout,
+		IDs::CommandIDs::savePreset,
+		IDs::CommandIDs::loadPreset,
 		IDs::CommandIDs::saveReaperMap,
-		IDs::CommandIDs::setKeyColor,
+		IDs::CommandIDs::beginColorEditing,
         IDs::CommandIDs::showModeInfo,
-		IDs::CommandIDs::remapMidiNotes
 	};
 
 	c.addArray(commands);
@@ -436,22 +513,17 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 {
 	switch (commandID)
 	{
-	case IDs::CommandIDs::saveCustomLayout:
+	case IDs::CommandIDs::savePreset:
 		result.setInfo("Save Layout", "Save your custom layout to a file.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
 		break;
-	case IDs::CommandIDs::loadCustomLayout:
+	case IDs::CommandIDs::loadPreset:
 		result.setInfo("Load Layout", "Load a custom layout from a file.", "Piano", 0);
 		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
 		//result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
 		break;
-	case IDs::CommandIDs::saveReaperMap:
-		result.setInfo("Save Reaper Note Names", "Save the current layout as a Reaper MIDI Note Name text file.", "Piano", 0);
-		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
-		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
-		break;
-	case IDs::CommandIDs::setKeyColor:
+	case IDs::CommandIDs::beginColorEditing:
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
         result.setActive(true);
 		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
@@ -459,10 +531,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
     case IDs::CommandIDs::showModeInfo:
         result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Modes", 0);
         result.setActive(true);
-	case IDs::CommandIDs::remapMidiNotes:
-		result.setInfo("Set midi note mapping", "Allows you to remap your keyboard to trigger modal notes.", "Midi", 0);
-		break;
-    case IDs::CommandIDs::autoRemap:
+    case IDs::CommandIDs::setAutoMap:
         result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
         result.setTicked(pluginState->getMidiProcessor()->isAutoRemapping());
         break;
@@ -475,12 +544,12 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 {
     switch (info.commandID)
     {
-        case IDs::CommandIDs::saveCustomLayout:
+        case IDs::CommandIDs::savePreset:
         {
             save_preset();
             break;
         }
-        case IDs::CommandIDs::loadCustomLayout:
+        case IDs::CommandIDs::loadPreset:
         {
             load_preset();
             break;
@@ -490,7 +559,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
             write_reaper_file();
             break;
         }
-        case IDs::CommandIDs::setKeyColor:
+        case IDs::CommandIDs::beginColorEditing:
         {
             beginColorEditing();
             break;
@@ -502,12 +571,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
             CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), nullptr);
             break;
         }
-        case IDs::CommandIDs::remapMidiNotes:
-        {
-            midiSettingsWindow->setVisible(true);
-            break;
-        }
-        case IDs::CommandIDs::autoRemap:
+        case IDs::CommandIDs::setAutoRemapState:
         {
             pluginState->getMidiProcessor()->setAutoRemapOn(!pluginState->getMidiProcessor()->isAutoRemapping());
             break;
