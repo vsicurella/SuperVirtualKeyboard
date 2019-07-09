@@ -428,11 +428,12 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
+/*
 void MidiSettingsComponent::visibilityChanged(bool isVisible)
 {
     midiSettingsNode = pluginState->midiSettingsNode;
 }
-
+*/
 void MidiSettingsComponent::setMode1(int selectedIdIn)
 {
     modeSelected1.reset(new Mode(pluginState->presetManager->getPreset(selectedIdIn)));
