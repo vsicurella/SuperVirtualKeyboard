@@ -17,7 +17,7 @@ namespace IDs
 {
 	// Plugin State & Presets
 	static Identifier pluginStateNode("PluginState");
-	static Identifier presetLibraryNode("ModeLibrary");
+	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
 

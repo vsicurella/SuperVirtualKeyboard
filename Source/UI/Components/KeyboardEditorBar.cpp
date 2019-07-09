@@ -98,7 +98,7 @@ KeyboardEditorBar::KeyboardEditorBar (SvkPluginState* pluginStateIn, Application
     //[UserPreSize]
 	mapButton->setVisible(false);
 
-    presetLibraryBox->setMenu(*pluginState->presetManager->getPresetMenu());
+    presetLibraryBox->setMenu(*pluginState->presetManager->getModeMenu());
     presetLibraryBox->setEditableText(false);
 	presetLibraryBox->addListener(this);
 

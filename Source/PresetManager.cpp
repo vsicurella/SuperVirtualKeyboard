@@ -13,9 +13,9 @@
 SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
-	presetLoaded = SvkPreset();
+	presetsLoaded = OwnedArray<SvkPreset>();
 
-    intializePresets();
+    initializeModePresets();
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -23,63 +23,62 @@ SvkPresetManager::~SvkPresetManager()
 	removeAllChangeListeners();
 }
 
-SvkPreset* SvkPresetManager::getPresetLoaded()
+SvkPreset* SvkPresetManager::getPresetLoaded(int slotNumIn)
 {
-	return &presetLoaded;
+	SvkPreset* preset = presetsLoaded[slotNumIn];
+
+	if (!preset)
+	{
+		preset = new SvkPreset();
+		presetsLoaded.set(slotNumIn, preset);
+	}
+
+	return preset;
 }
 
-int SvkPresetManager::getPresetLoadedId()
+int SvkPresetManager::getPresetLoadedId(int slotNumIn)
 {
-    return presetLoaded.parentNode[IDs::libraryIndexOfMode];
+	SvkPreset* preset = getPresetLoaded(slotNumIn);
+    return preset->parentNode[IDs::libraryIndexOfMode];
 }
 
+ValueTree SvkPresetManager::getPresetLoadedNode(int slotNumIn)
+{
+	SvkPreset* preset = getPresetLoaded(slotNumIn);
+	return preset->parentNode;
+}
 
 Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 {
-	return &presetsSorted;
-}
-
-ValueTree SvkPresetManager::getPreset(int indexIn)
-{
-    if (indexIn < 0)
-        indexIn = 0;
-    
-	int subMenu = indexIn / numberOfPresets;
-	int index = indexIn % numberOfPresets;
-    
-    if (subMenu < presetsSorted.size())
-        if (index < presetsSorted.getUnchecked(subMenu).size())
-            return presetsSorted.getUnchecked(subMenu).getUnchecked(index);
-    
-    return ValueTree();
+	return &modesSorted;
 }
 
 ValueTree SvkPresetManager::getMode(int indexIn)
 {
-	bool hasModeChild;
-	ValueTree preset = getPreset(indexIn);
-
-	if (Mode::isValidMode(preset, hasModeChild))
-		if (hasModeChild)
-			return preset.getChildWithName(IDs::modePresetNode);
-	
-	return preset;
+    if (indexIn < 0)
+        indexIn = 0;
+    
+	int subMenu = indexIn / numberOfModes;
+	int index = indexIn % numberOfModes;
+    
+    if (subMenu < modesSorted.size())
+        if (index < modesSorted.getUnchecked(subMenu).size())
+            return modesSorted.getUnchecked(subMenu).getUnchecked(index);
+    
+    return ValueTree();
 }
 
-// Put inside a shared pointer
-PopupMenu* SvkPresetManager::getPresetMenu()
+PopupMenu* SvkPresetManager::getModeMenu()
 {
-    return presetMenu.get();
+    return modeMenu.get();
 }
 
-bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
+bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, ValueTree presetNodeIn,  bool sendChangeSignal)
 {
     if (presetNodeIn.isValid())
     {
-        presetLoaded = SvkPreset(presetNodeIn.createCopy());
-        
-        presetNode = presetLoaded.parentNode;
-        
+		presetsLoaded[presetSlotNum]; // TODO
+                
         if (sendChangeSignal)
             sendChangeMessage();
     }
@@ -87,22 +86,46 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 	return presetNodeIn.isValid();
 }
 
-bool SvkPresetManager::loadPreset(int indexIn, bool sendChangeSignal)
+bool SvkPresetManager::loadMode(int presetSlotNum,  int modeSlotNum, SvkPreset* presetIn, bool sendChangeSignal)
 {
-	return loadPreset(getPreset(indexIn), sendChangeSignal);
+	return loadPreset(slotNumber, presetIn->parentNode, sendChangeSignal);
 }
 
-bool SvkPresetManager::loadPreset(SvkPreset* presetIn, bool sendChangeSignal)
+bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, bool sendChangeSignal)
 {
-	return loadPreset(presetIn->parentNode, sendChangeSignal);
+	return loadPreset(slotNumber, presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
 }
 
-bool SvkPresetManager::loadPreset(bool sendChangeSignal)
+bool SvkPresetManager::loadPreset(int slotNumber, ValueTree presetNodeIn, bool sendChangeSignal)
 {
-	return loadPreset(presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
+	if (presetNodeIn.isValid())
+	{
+		presetsLoaded.set(slotNumber, new SvkPreset(presetNodeIn.createCopy()));
+
+		if (sendChangeSignal)
+			sendChangeMessage();
+	}
+
+	return presetNodeIn.isValid();
 }
 
-bool SvkPresetManager::savePreset(String absolutePath)
+bool SvkPresetManager::loadPreset(int slotNumber, int indexIn, bool sendChangeSignal)
+{
+	return loadPreset(slotNumber, getMode(indexIn), sendChangeSignal);
+}
+
+bool SvkPresetManager::loadPreset(int slotNumber, SvkPreset* presetIn, bool sendChangeSignal)
+{
+	return loadPreset(slotNumber, presetIn->parentNode, sendChangeSignal);
+}
+
+bool SvkPresetManager::loadPreset(int slotNumber, bool sendChangeSignal)
+{
+	return loadPreset(slotNumber, presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
+}
+
+
+bool SvkPresetManager::savePreset(int slotNumber, String absolutePath)
 {
     File fileOut = File(absolutePath);
         
@@ -118,7 +141,8 @@ bool SvkPresetManager::savePreset(String absolutePath)
     
     if (fileOut.getParentDirectory().exists())
     {
-        std::unique_ptr<XmlElement> xml(presetLoaded.parentNode.createXml());
+		SvkPreset* preset = getPresetLoaded(slotNumber);
+        std::unique_ptr<XmlElement> xml(preset->parentNode.createXml());
         return xml->writeToFile(fileOut, "");
     }
     
@@ -158,7 +182,7 @@ ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 	return ValueTree();
 }
 
-bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
+bool SvkPresetManager::commitPresetNode(int slotNumber, ValueTree nodeIn)
 {
     if (nodeIn.isValid())
     {
@@ -166,15 +190,15 @@ bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
         
         // MODE SETTINGS
         nodeChild = nodeIn.getChildWithName(IDs::modePresetNode);
-        commitModeNode(nodeChild);
+        commitModeNode(slotNumber, nodeChild);
         
         // KEYBOARD SETTINGS
         nodeChild = nodeIn.getChildWithName(IDs::pianoNode);
-        commitKeyboardNode(nodeChild);
+        commitKeyboardNode(slotNumber, nodeChild);
         
         // MIDI MAPS
         nodeChild = nodeIn.getChildWithName(IDs::midiMapNode);
-        commitMapNode(nodeChild);
+        commitMapNode(slotNumber, nodeChild);
         
         return true;
     }
@@ -182,61 +206,61 @@ bool SvkPresetManager::commitPresetNode(ValueTree nodeIn)
     return false;
 }
 
-bool SvkPresetManager::commitModeNode(ValueTree modeNodeIn)
+bool SvkPresetManager::commitModeNode(int slotNumber, ValueTree modeNodeIn)
 {
     if (modeNodeIn.hasType(IDs::modePresetNode))
     {
-        presetLoaded.updateModeNode(modeNodeIn);
+		SvkPreset* preset = getPresetLoaded(slotNumber);
+		preset->updateModeNode(modeNodeIn);
         return true;
     }
     
     return false;
 }
 
-bool SvkPresetManager::commitKeyboardNode(ValueTree keyboardNodeIn)
+bool SvkPresetManager::commitKeyboardNode(int slotNumber, ValueTree keyboardNodeIn)
 {
     if (keyboardNodeIn.hasType(IDs::pianoNode))
     {
-        presetLoaded.updateKeyboardNode(keyboardNodeIn);
+		SvkPreset* preset = getPresetLoaded(slotNumber);
+        preset->updateKeyboardNode(keyboardNodeIn);
         return true;
     }
     
     return false;
 }
 
-bool SvkPresetManager::commitMapNode(ValueTree mapNodeIn)
+bool SvkPresetManager::commitMapNode(int slotNumber, ValueTree mapNodeIn)
 {
     if (mapNodeIn.hasType(IDs::midiMapNode))
     {
-        presetLoaded.updateMidiNode(mapNodeIn);
+		SvkPreset* preset = getPresetLoaded(slotNumber);
+        preset->updateMidiNode(mapNodeIn);
         return true;
     }
     
     return false;
 }
 
-void SvkPresetManager::intializePresets()
+void SvkPresetManager::initializeModePresets()
 {
-	presetLibraryNode = ValueTree(IDs::presetLibraryNode);
-	presetNode = ValueTree(IDs::presetNode);
+	modeLibraryNode = ValueTree(IDs::modeLibraryNode);
 	loadedFactoryPresets.clear();
 	loadedUserPresets.clear();
-	presetsSorted.clear();
+	modesSorted.clear();
 	for (int m = 0; m < numSortTypes; m++)
-		presetsSorted.add(Array<ValueTree>());
+		modesSorted.add(Array<ValueTree>());
 
-	createFactoryPresets();
+	createFactoryModes();
 	loadPresetDirectory();
     buildPresetMenu();
     
-    loadPreset(8);
+    loadPreset(0, 8);
 }
 
 
-void SvkPresetManager::createFactoryPresets()
+void SvkPresetManager::createFactoryModes()
 {
-	// I would like to add some more error checking to this and making it so that
-	//  it creates missing factory presets if it notices them gone from the directory
 	if (!(bool) pluginSettingsNode[IDs::saveFactoryPresets] || !(bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
 		const char* factoryPresets = BinaryData::FactoryModes_txt;
@@ -263,7 +287,7 @@ void SvkPresetManager::createFactoryPresets()
 
                 factoryMode = Mode::createNode(steps, family, "", info, true);
 				
-				addAndSortPreset(factoryMode);
+				addAndSortMode(factoryMode);
                 loadedFactoryPresets.add(factoryMode);
 			}
 		}
@@ -289,7 +313,7 @@ void SvkPresetManager::loadPresetDirectory()
 
 			if (presetInNode.hasType(IDs::modePresetNode))
 			{
-				addAndSortPreset(presetInNode);
+				addAndSortMode(presetInNode);
 
 				if ((bool)presetInNode[IDs::factoryPreset])
 				{
@@ -305,29 +329,30 @@ void SvkPresetManager::loadPresetDirectory()
 }
 
 
-void SvkPresetManager::resortPresetLibrary()
+void SvkPresetManager::resortModeLibrary()
 {
-	presetsSorted.clear();
+	modesSorted.clear();
 	for (int m = 0; m < numSortTypes; m++)
-		presetsSorted.add(Array<ValueTree>());
+		modesSorted.add(Array<ValueTree>());
 
-	ValueTree presetToSort;
+	ValueTree modeToSort;
 
-	for (int i = 0; i < presetLibraryNode.getNumChildren(); i++)
+	for (int i = 0; i < modeLibraryNode.getNumChildren(); i++)
 	{
-		presetToSort = presetLibraryNode.getChild(i);
-		addPresetToSort(presetToSort);
+		modeToSort = modeLibraryNode.getChild(i);
+		addModeToSort(modeToSort);
 	}
 }
 
-int SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
+int SvkPresetManager::addModeToLibrary(ValueTree modeNodeIn)
 {
-	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
+	if (modeNodeIn.hasType(IDs::modePresetNode))
 	{
-		int libraryIndex = presetLibraryNode.getNumChildren();
-		presetNodeIn.setProperty(IDs::libraryIndexOfMode, libraryIndex, nullptr);
-		presetLibraryNode.appendChild(ValueTree(presetNodeIn), nullptr);
-		numberOfPresets = presetLibraryNode.getNumChildren();
+		int libraryIndex = modeLibraryNode.getNumChildren();
+		modeNodeIn.setProperty(IDs::libraryIndexOfMode, libraryIndex, nullptr);
+		
+		modeLibraryNode.appendChild(modeNodeIn, nullptr);
+		numberOfModes = modeLibraryNode.getNumChildren();
 
 		return libraryIndex;
 	}
@@ -335,38 +360,38 @@ int SvkPresetManager::addPresetToLibrary(ValueTree presetNodeIn)
 	return -1;
 }
 
-void SvkPresetManager::addPresetToSort(ValueTree presetNodeIn)
+void SvkPresetManager::addModeToSort(ValueTree modeNodeIn)
 {
-	if (presetNodeIn.hasType(IDs::presetNode) || presetNodeIn.hasType(IDs::modePresetNode))
+	if (modeNodeIn.hasType(IDs::modePresetNode))
 	{
-		presetsSorted.getReference(SortType::scaleSize).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
-		presetsSorted.getReference(SortType::modeSize).addSorted(modeSizeSort, ValueTree(presetNodeIn));
-		presetsSorted.getReference(SortType::familyName).addSorted(familyNameSort, ValueTree(presetNodeIn));
+		modesSorted.getReference(SortType::scaleSize).addSorted(scaleSizeSort, modeNodeIn);
+		modesSorted.getReference(SortType::modeSize).addSorted(modeSizeSort, modeNodeIn);
+		modesSorted.getReference(SortType::familyName).addSorted(familyNameSort, modeNodeIn);
 
-		if (!(bool)presetNodeIn[IDs::factoryPreset])
+		if (!(bool)modeNodeIn[IDs::factoryPreset])
 		{
-			presetsSorted.getReference(SortType::user).addSorted(scaleSizeSort, ValueTree(presetNodeIn));
+			modesSorted.getReference(SortType::user).addSorted(scaleSizeSort, modeNodeIn);
 		}
 	}
 }
 
-int SvkPresetManager::addAndSortPreset(ValueTree presetNodeIn)
+int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 {
-	int ind = addPresetToLibrary(presetNodeIn);
-	addPresetToSort(presetNodeIn);
+	int ind = addModeToLibrary(modeNodeIn);
+	addModeToSort(modeNodeIn);
 
 	return ind;
 }
 
 void SvkPresetManager::buildPresetMenu()
 {
-    presetMenu.reset(new PopupMenu());
-    presetSubMenus.clear();
+    modeMenu.reset(new PopupMenu());
+    modeSubMenu.clear();
     
-    PopupMenu* scaleSubMenu = presetSubMenus.add(new PopupMenu());
-    PopupMenu* modeSubMenu = presetSubMenus.add(new PopupMenu());
-    PopupMenu* familySubMenu = presetSubMenus.add(new PopupMenu());
-    PopupMenu* userSubMenu = presetSubMenus.add(new PopupMenu());
+    PopupMenu* scaleSizeSubMenu = modeSubMenu.add(new PopupMenu());
+	PopupMenu* modeSizeSubMenu = modeSubMenu.add(new PopupMenu());
+    PopupMenu* familySubMenu = modeSubMenu.add(new PopupMenu());
+    PopupMenu* userSubMenu = modeSubMenu.add(new PopupMenu());
     
     ValueTree presetIn;
     String displayName;
@@ -376,26 +401,26 @@ void SvkPresetManager::buildPresetMenu()
     
     for (int subMenu = 0; subMenu < SortType::user; subMenu++)
     {
-        for (int presetNum = 0; presetNum < presetLibraryNode.getNumChildren(); presetNum++)
+        for (int presetNum = 0; presetNum < modeLibraryNode.getNumChildren(); presetNum++)
         {
-            presetIn = presetsSorted.getUnchecked(subMenu).getUnchecked(presetNum);
+            presetIn = modesSorted.getUnchecked(subMenu).getUnchecked(presetNum);
             
             switch (subMenu)
             {
                 case (SortType::scaleSize):
                     if (separatorProperty != presetIn[IDs::scaleSize])
-                        scaleSubMenu->addSeparator();
+                        scaleSizeSubMenu->addSeparator();
                     separatorProperty = presetIn[IDs::scaleSize];
                     displayName = presetIn[IDs::modeName];
-                    scaleSubMenu->addItem(++subMenuIndex, displayName);
+                    scaleSizeSubMenu->addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::modeSize):
                     if (separatorProperty != presetIn[IDs::modeSize])
-                        modeSubMenu->addSeparator();
+						modeSizeSubMenu->addSeparator();
                     separatorProperty = presetIn[IDs::modeSize];
                     displayName = presetIn[IDs::modeName];
-                    modeSubMenu->addItem(++subMenuIndex, displayName);
+					modeSizeSubMenu->addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::familyName):
@@ -419,18 +444,8 @@ void SvkPresetManager::buildPresetMenu()
         }
     }
 
-    presetMenu->addSubMenu("by Scale Size", *scaleSubMenu, true);
-    presetMenu->addSubMenu("by Mode Size", *modeSubMenu, true);
-    presetMenu->addSubMenu("by Family", *familySubMenu, true);
-    presetMenu->addSubMenu("User", *userSubMenu, true);
-}
-
-
-void SvkPresetManager::comboBoxChanged(ComboBox *comboBoxThatHasChanged)
-{
-	int subMenuIndex = comboBoxThatHasChanged->getSelectedId();
-
-	ValueTree presetToLoad = presetLibraryNode.getChild(subMenuIndex % presetLibraryNode.getNumChildren());
-
-	loadPreset(presetToLoad);
+    modeMenu->addSubMenu("by Scale Size", *scaleSizeSubMenu, true);
+    modeMenu->addSubMenu("by Mode Size", *modeSizeSubMenu, true);
+    modeMenu->addSubMenu("by Family", *familySubMenu, true);
+    modeMenu->addSubMenu("User", *userSubMenu, true);
 }

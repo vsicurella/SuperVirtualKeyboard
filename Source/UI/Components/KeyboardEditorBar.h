@@ -107,7 +107,7 @@ private:
 	// Preset Menus
 
     OwnedArray<Mode>* presets;
-    Array<Array<Mode*>>* presetsSorted;
+    Array<Array<Mode*>>* modesSorted;
 
     HashMap<String, int> menuToPresetIndex;
     std::unique_ptr<PopupMenu> menuSortByScale;
