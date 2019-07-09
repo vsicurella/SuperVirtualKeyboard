@@ -53,6 +53,10 @@
               file="Source/UI/Components/MidiRemapTableModel.cpp"/>
         <FILE id="wf4Gan" name="MidiRemapTableModel.h" compile="0" resource="0"
               file="Source/UI/Components/MidiRemapTableModel.h"/>
+        <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
+              file="Source/UI/Components/PluginControlComponent.cpp"/>
+        <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"
+              file="Source/UI/Components/PluginControlComponent.h"/>
         <FILE id="gtGOgZ" name="ReferencedComboBox.cpp" compile="1" resource="0"
               file="Source/UI/Components/ReferencedComboBox.cpp"/>
         <FILE id="el2G9f" name="ReferencedComboBox.h" compile="0" resource="0"

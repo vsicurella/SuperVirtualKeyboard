@@ -128,9 +128,9 @@ namespace VirtualKeyboard
 
 		Colour getKeySingleColor(int keyIn);
 
-		void setKeyColor(Key* keyIn, int colorIndex, Colour colorIn, bool useColor = true);
+		void beginColorEditing(Key* keyIn, int colorIndex, Colour colorIn, bool useColor = true);
 		
-		void setKeyColor(int keyNumIn, int colorIndex, Colour colorIn, bool useColor = true);
+		void beginColorEditing(int keyNumIn, int colorIndex, Colour colorIn, bool useColor = true);
 
 		void setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn);
 
