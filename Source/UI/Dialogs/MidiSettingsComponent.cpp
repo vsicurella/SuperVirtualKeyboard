@@ -209,9 +209,9 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     //[UserPreSize]
     midiSettingsNode = pluginState->midiSettingsNode;
     
-    presetBox1->setMenu(*pluginState->presetManager->getPresetMenu());
+    presetBox1->setMenu(*pluginState->presetManager->getModeMenu());
 	presetBox1->addListener(this);
-    presetBox2->setMenu(*pluginState->presetManager->getPresetMenu());
+    presetBox2->setMenu(*pluginState->presetManager->getModeMenu());
 	presetBox2->addListener(this);
 
 	midiInputFilter = pluginState->getMidiProcessor()->getMidiInputFilter();
@@ -436,7 +436,7 @@ void MidiSettingsComponent::visibilityChanged(bool isVisible)
 */
 void MidiSettingsComponent::setMode1(int selectedIdIn)
 {
-    modeSelected1.reset(new Mode(pluginState->presetManager->getPreset(selectedIdIn)));
+    modeSelected1.reset(new Mode(pluginState->presetManager->getMode(selectedIdIn)));
     presetBox1->setSelectedId(selectedIdIn);
 }
 
@@ -453,7 +453,7 @@ void MidiSettingsComponent::setMode1(Mode* modeIn)
 
 void MidiSettingsComponent::setMode2(int selectedIdIn)
 {
-    modeSelected1.reset(new Mode(pluginState->presetManager->getPreset(selectedIdIn)));
+    modeSelected1.reset(new Mode(pluginState->presetManager->getMode(selectedIdIn)));
     presetBox2->setSelectedId(selectedIdIn);
 }
 

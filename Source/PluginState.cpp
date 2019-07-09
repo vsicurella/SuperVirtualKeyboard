@@ -26,7 +26,7 @@ SvkPluginState::SvkPluginState()
     pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
 
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
-	presetLibraryNode = presetManager->presetLibraryNode;
+	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
 	modeLoaded.reset(new Mode());
@@ -45,6 +45,26 @@ SvkPluginState::SvkPluginState()
     updatePluginToPresetLoaded();
 }
 
+SvkPresetManager* SvkPluginState::getPresetManager()
+{
+	return presetManager.get();
+}
+
+SvkMidiProcessor* SvkPluginState::getMidiProcessor()
+{
+	return midiProcessor.get();
+}
+
+SvkPluginSettings* SvkPluginState::getPluginSettings()
+{
+	return pluginSettings.get();
+}
+
+ApplicationCommandManager* SvkPluginState::getAppCmdMgr()
+{
+	return appCmdMgr.get();
+}
+
 SvkMidiProcessor* SvkPluginState::getMidiProcessor()
 {
     return midiProcessor.get();
@@ -55,14 +75,9 @@ UndoManager* SvkPluginState::getUndoManager()
 	return undoManager.get();
 }
 
-SvkPreset* SvkPluginState::getPresetLoaded()
+SvkPreset* SvkPluginState::getPresetLoaded(int slotNumIn)
 {
-	return &presetWorking;
-}
-
-Mode* SvkPluginState::getModeLoaded(int modeNumber)
-{
-	return modesLoaded[modeNumber];
+	return presetsWorking[slotNumIn];
 }
 
 VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()

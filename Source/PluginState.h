@@ -25,23 +25,23 @@ struct SvkPluginState : public ChangeBroadcaster,
 	ValueTree pluginStateNode;
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;
-	ValueTree presetLibraryNode;
+	ValueTree modeLibraryNode;
 	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
-
-	ValueTree presetWorkingNode;
-	ValueTree modePresetNode;
     
     SvkPluginState();
 	~SvkPluginState() {}
 
 	//==============================================================================
 
+	SvkPresetManager* getPresetManager();
+	SvkMidiProcessor* getMidiProcessor();
+	SvkPluginSettings* getPluginSettings();
+
+	ApplicationCommandManager* getAppCmdMgr();
 	UndoManager* getUndoManager();
 
-    SvkMidiProcessor* getMidiProcessor();
-	SvkPreset* getPresetLoaded();
-	Mode* getModeLoaded(int modeNumber=1);
+	SvkPreset* getPresetLoaded(int slotNumIn=0);
 	VirtualKeyboard::Keyboard* getKeyboard();
     
     NoteMap* getMidiInputMap();
@@ -68,26 +68,27 @@ struct SvkPluginState : public ChangeBroadcaster,
     
 	//==============================================================================
 	
-	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
-	std::unique_ptr<SvkPluginSettings> pluginSettings;
-	std::unique_ptr<SvkPresetManager> presetManager;
+
 
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
 
-	std::unique_ptr<UndoManager> undoManager;
-    std::unique_ptr<SvkMidiProcessor> midiProcessor;
-	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
-    SvkPreset presetWorking;
-    std::unique_ptr<Mode> modeLoaded;
+	std::unique_ptr<SvkPresetManager> presetManager;
+	std::unique_ptr<SvkMidiProcessor> midiProcessor;
+	std::unique_ptr<SvkPluginSettings> pluginSettings;
 
-	OwnedArray<Mode> modesLoaded;
+	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
+	std::unique_ptr<UndoManager> undoManager;
+
+	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
+	
+	OwnedArray<SvkPreset> presetsWorking;
 	
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
-	Array<Array<int>> presetsSorted;
+	Array<Array<int>> modesSorted;
     bool presetEdited = false;
 };
