@@ -60,9 +60,9 @@ SvkPreset* SvkPluginState::getPresetLoaded()
 	return &presetWorking;
 }
 
-Mode* SvkPluginState::getModeLoaded()
+Mode* SvkPluginState::getModeLoaded(int modeNumber)
 {
-	return modeLoaded.get();
+	return modesLoaded[modeNumber];
 }
 
 VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
@@ -84,12 +84,12 @@ bool SvkPluginState::isPresetEdited()
     return presetEdited;
 }
 
-void SvkPluginState::loadMode(int presetIndexIn)
+void SvkPluginState::loadMode(int presetIndexIn, int modeNumberIn)
 {
 	presetManager->loadPreset(presetIndexIn);
 }
 
-void SvkPluginState::loadMode(ValueTree modeNodeIn)
+void SvkPluginState::loadMode(ValueTree modeNodeIn, int modeNumberIn)
 {
 	presetManager->loadPreset(modeNodeIn);
 }

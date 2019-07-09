@@ -57,6 +57,8 @@ public:
 	ReferencedComboBox* getMode1Box();
 	ReferencedComboBox* getMode2Box();
 
+	TextButton* getModeInfoButton();
+
 	int getMode1BoxSelection();
 	int getMode2BoxSelection();
 
@@ -72,6 +74,9 @@ public:
 	void setMode2View(bool isViewed, NotificationType notify = NotificationType::dontSendNotification);
 	bool getMode2View();
 
+	int getModeViewed();
+
+	bool getAutoMapState();
 	void setAutoMapState(bool isAutoMapping, NotificationType notify = NotificationType::dontSendNotification);
 
 	int getMappingStyle();
