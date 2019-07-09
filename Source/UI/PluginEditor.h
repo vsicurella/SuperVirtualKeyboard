@@ -32,10 +32,6 @@ using namespace VirtualKeyboard;
 */
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
-						public ComboBox::Listener,
-						public Slider::Listener,
-						public Button::Listener,
-						public TextEditor::Listener,
 						private ChangeListener,
 						private Timer
 {
@@ -62,34 +58,61 @@ public:
 
 	//===============================================================================================
 
-	bool save_preset();
-	bool load_preset();
-	bool write_reaper_file();
+	bool savePreset();
+	bool saveMode();
 
-	void beginColorEditing();
-	void beginMapEditing();
+	bool loadPreset();
+	bool loadMode();
+
+	bool exportReaperMap();
+	bool exportAbletonMap();
 
 	void commitCustomScale();
-	void showModeInfo();
-	void setMappingStyle(int mapStyleId);
 
+	void setMode1();
+	void setMode1(ValueTree modeNodeIn);
+	void setMode1(int presetId);
+
+	void setMode2();
+	void setMode2(ValueTree modeNodeIn);
+	void setMode2(int presetId);
+
+	void setMode1Root();
 	void setMode1Root(int rootIn);
+	
+	void setMode2Root();
 	void setMode2Root(int rootIn);
 
-	void loadMode1(ValueTree modeNodeIn);
-	void loadMode1(int presetId);
-	
-	void loadMode2(ValueTree modeNodeIn);
-	void loadMode2(int presetId);
-
+	void setModeView();
 	void setModeView(int modeNumberIn);
 
-	void setPeriodShift(int periodsIn);
-	void setMidiChannel(int midiChannelIn);
-	void setNoteNumsVisible(bool noteNumsVisible);
-	void setKeyStyle(int keyStyleId);
-	void setHighlightStyle(int highlightStyleId);
+	void showModeInfo();
 
+	void setMappingStyle();
+	void setMappingStyle(int mapStyleId);
+
+	void applyMap();
+
+	void setAutoMap();
+	void setAutoMap(bool isAutoMapping);
+	void beginMapEditing();
+
+	void setPeriodShift();
+	void setPeriodShift(int periodsIn);
+	
+	void setMidiChannel();
+	void setMidiChannel(int midiChannelIn);
+
+	void beginColorEditing();
+
+	void setNoteNumsVisible();
+	void setNoteNumsVisible(bool noteNumsVisible);
+	
+	void setKeyStyle();
+	void setKeyStyle(int keyStyleId);
+
+	void setHighlightStyle();
+	void setHighlightStyle(int highlightStyleId);
 
 	//===============================================================================================
 
@@ -133,7 +156,7 @@ private:
 	std::unique_ptr<PluginControlComponent> controlComponent;
 
 	std::unique_ptr<Viewport> view;
-	Keyboard* piano;
+	Keyboard* virtualKeyboard;
 	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;

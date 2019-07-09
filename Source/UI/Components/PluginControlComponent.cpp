@@ -28,7 +28,7 @@
 
 //==============================================================================
 PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn), appCmdMgr(pluginState->appCmdMgr)
+    : pluginState(pluginStateIn), appCmdMgr(pluginState->appCmdMgr.get())
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -279,10 +279,13 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     //[UserPreSize]
 	scaleTextBox->addListener(this);
 
+	autoMapBtn->setClickingTogglesState(true);
+	noteNumsBtn->setClickingTogglesState(true);
+
 	mode1Box->setMenu(*pluginState->presetManager->getPresetMenu());
 	mode2Box->setMenu(*pluginState->presetManager->getPresetMenu());
 
-	//[/UserPreSize]
+    //[/UserPreSize]
 
     setSize (600, 400);
 
@@ -435,7 +438,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == scaleEntryBtn.get())
     {
         //[UserButtonCode_scaleEntryBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::applyCustomScale, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::commitCustomScale, true);
         //[/UserButtonCode_scaleEntryBtn]
     }
     else if (buttonThatWasClicked == modeInfoButton.get())
@@ -525,7 +528,7 @@ void PluginControlComponent::textEditorEscapeKeyPressed(TextEditor& textEditor)
 
 void PluginControlComponent::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-	appCmdMgr->invokeDirectly(IDs::CommandIDs::applyCustomScale, true);
+	appCmdMgr->invokeDirectly(IDs::CommandIDs::commitCustomScale, true);
 }
 
 void PluginControlComponent::textEditorFocusLost(TextEditor& textEditor)
@@ -551,6 +554,11 @@ ReferencedComboBox* PluginControlComponent::getMode1Box()
 ReferencedComboBox* PluginControlComponent::getMode2Box()
 {
 	return mode2Box.get();
+}
+
+TextButton* PluginControlComponent::getModeInfoButton()
+{
+	return modeInfoButton.get();
 }
 
 int PluginControlComponent::getMode1BoxSelection()
@@ -596,13 +604,21 @@ bool PluginControlComponent::getMode1View()
 void PluginControlComponent::setMode2View(bool isViewed, NotificationType notify)
 {
 	mode2ViewBtn->setToggleState(isViewed, notify);
-
 }
 
 bool PluginControlComponent::getMode2View()
 {
 	return mode1ViewBtn->getToggleState();
+}
 
+int PluginControlComponent::getModeViewed()
+{
+	return mode2ViewBtn->getToggleState() ? 0 : 1;
+}
+
+bool PluginControlComponent::getAutoMapState()
+{
+	return autoMapBtn->getToggleState();
 }
 
 void PluginControlComponent::setAutoMapState(bool isAutoMapping, NotificationType notify)
@@ -703,7 +719,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginControlComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener"
-                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), appCmdMgr(pluginState-&gt;appCmdMgr)"
+                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), appCmdMgr(pluginState-&gt;appCmdMgr.get())"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -808,7 +824,7 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="536 216 96 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 80.469% 128"
+            virtualName="" explicitFocusOrder="0" pos="24 80 80.488% 128"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>

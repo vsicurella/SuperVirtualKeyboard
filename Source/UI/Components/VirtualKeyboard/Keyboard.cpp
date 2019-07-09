@@ -19,7 +19,7 @@ Keyboard::Keyboard(SvkMidiProcessor* midiProcessorIn)
     
 	midiProcessor = midiProcessorIn;
        
-    // Create children (piano keys)
+    // Create children (virtualKeyboard keys)
     for (int i = 0; i < 128; i++)
     {
         String keyName = "Key " + String(i);

@@ -14,7 +14,7 @@
 #include "../CommonFunctions.h"
 
 /*
-	A class for representing the layout of a piano
+	A class for representing the layout of a virtualKeyboard
 	based on a given mode. The mode can be applied to different scales.
 */
 

@@ -41,7 +41,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 
     SvkMidiProcessor* getMidiProcessor();
 	SvkPreset* getPresetLoaded();
-	Mode* getModeLoaded();
+	Mode* getModeLoaded(int modeNumber=1);
 	VirtualKeyboard::Keyboard* getKeyboard();
     
     NoteMap* getMidiInputMap();
@@ -49,8 +49,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     bool isPresetEdited();
 
-	void loadMode(int presetIndexIn);
-	void loadMode(ValueTree modeNodeIn);
+	void loadMode(int presetIndexIn, int modeNumberIn=1);
+	void loadMode(ValueTree modeNodeIn, int modeNumberIn=1);
 
 	void setMidiRootNote(int rootNoteIn);
 	void setMidiInputMap(NoteMap noteMapIn);
@@ -82,11 +82,12 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
     SvkPreset presetWorking;
     std::unique_ptr<Mode> modeLoaded;
+
+	OwnedArray<Mode> modesLoaded;
 	
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
 	Array<Array<int>> presetsSorted;
     bool presetEdited = false;
-    
 };
