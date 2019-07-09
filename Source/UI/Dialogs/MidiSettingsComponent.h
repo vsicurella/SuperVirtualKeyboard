@@ -65,7 +65,7 @@ public:
     void updateModeMapper();
     void setOrderMappingVisibility(bool isVisible);
     
-    void visibilityChanged(bool isVisible) override;
+    //void visibilityChanged(bool isVisible) override;
 
     //[/UserMethods]
 
