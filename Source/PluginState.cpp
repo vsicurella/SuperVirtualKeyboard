@@ -204,10 +204,10 @@ void SvkPluginState::commitPresetChanges()
 	modePresetNode = modeLoaded->modeNode;
 }
 
-bool SvkPluginState::savePreset()
+bool SvkPluginState::savePresetToFile()
 {
     commitPresetChanges();
-    return presetManager->savePreset();
+    return presetManager->savePresetToFile();
 }
 
 

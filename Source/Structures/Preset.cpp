@@ -77,7 +77,7 @@ void SvkPreset::commitPreset()
 	}
 }
 
-ValueTree SvkPreset::getMode(int slotNum)
+ValueTree SvkPreset::getModeInLibrary(int slotNum)
 {
 	return modeSlots[slotNum];
 }

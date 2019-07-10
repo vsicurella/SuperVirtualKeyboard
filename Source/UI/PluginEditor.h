@@ -58,7 +58,7 @@ public:
 
 	//===============================================================================================
 
-	bool savePreset();
+	bool savePresetToFile();
 	bool saveMode();
 
 	bool loadPreset();
