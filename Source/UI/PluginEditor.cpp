@@ -134,9 +134,9 @@ void SvkPluginEditor::update_children_to_preset()
 
 //==============================================================================
 
-bool SvkPluginEditor::savePreset()
+bool SvkPluginEditor::savePresetToFile()
 {
-    bool written = pluginState->savePreset();
+    bool written = pluginState->savePresetToFile();
 	if (written)
 		DBG("file was saved");
 	else
@@ -597,7 +597,7 @@ ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
 {
 	Array<CommandID> commands{
-		IDs::CommandIDs::savePreset,
+		IDs::CommandIDs::savePresetToFile,
 		IDs::CommandIDs::saveMode,
 		IDs::CommandIDs::loadPreset,
 		IDs::CommandIDs::loadMode,
@@ -631,7 +631,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 {
 	switch (commandID)
 	{
-	case IDs::CommandIDs::savePreset:
+	case IDs::CommandIDs::savePresetToFile:
 		result.setInfo("Save Layout", "Save your custom layout to a file.", "Preset", 0);
 		break;
 	case IDs::CommandIDs::saveMode:
@@ -712,9 +712,9 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 {
     switch (info.commandID)
     {
-        case IDs::CommandIDs::savePreset:
+        case IDs::CommandIDs::savePresetToFile:
         {
-            savePreset();
+            savePresetToFile();
             break;
         }
 		case IDs::CommandIDs::saveMode:

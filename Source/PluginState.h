@@ -59,7 +59,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     void updatePluginToPresetLoaded();
 
     void commitPresetChanges();
-	bool savePreset();
+	bool savePresetToFile();
 	bool loadPreset();
 
 	void recallState(ValueTree nodeIn);

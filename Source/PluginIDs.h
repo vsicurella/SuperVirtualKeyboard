@@ -20,6 +20,7 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
+	static Identifier modeCustomNode("CurrentCustomMode");
 	static Identifier modeSlotsNode("ModeSlots");
 	static Identifier mode1SlotNumber("Mode1SlotNum");
 	static Identifier mode2SlotNumber("Mode2SlotNum");
@@ -94,7 +95,7 @@ namespace IDs
 
 	enum CommandIDs
 	{
-		savePreset = 1,
+		savePresetToFile = 1,
 		saveMode,
 		loadPreset,
 		loadMode,
@@ -108,6 +109,8 @@ namespace IDs
 		setMode2RootNote,
 		viewMode1,
 		viewMode2,
+		setMode1SlotNumber,
+		setMode2SlotNumber,
 		showModeInfo,
 		setMappingStyle,
 		setMappingModeToMode,

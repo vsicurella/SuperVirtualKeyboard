@@ -19,8 +19,6 @@
 
 class SvkPresetManager : public ChangeBroadcaster
 {
-	OwnedArray<SvkPreset> presetsLoaded;
-
 	Array<ValueTree> loadedFactoryPresets;
 	Array<ValueTree> loadedUserPresets;
 
@@ -36,6 +34,12 @@ class SvkPresetManager : public ChangeBroadcaster
 	std::unique_ptr<PopupMenu> mode1Menu;
     std::unique_ptr<PopupMenu> mode2Menu;
     OwnedArray<PopupMenu> modeSubMenu;
+
+	OwnedArray<SvkPreset> presetsLoaded;
+	OwnedArray<OwnedArray<Mode>> modeSlots;
+	std::unique_ptr<Mode> modeCustom;
+
+	int presetViewed = 0;
 
 	// Methods
 	void createFactoryModes();
@@ -67,25 +71,27 @@ public:
     
 	Array<Array<ValueTree>>* getPresetsSorted();
 
-	ValueTree getMode(int indexIn);
+	ValueTree getModeInLibrary(int indexIn);
+	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
+	Mode* getModeCustom();
     
 	PopupMenu* getMode1Menu();
     PopupMenu* getMode2Menu();
 
-	bool loadMode(int presetSlotNum, int modeSlotNum, ValueTree modeNodeIn, bool sendChangeSignal = true);
-	bool loadMode(int presetSlotNum, int modeSlotNum, Mode* modeIn, bool sendChangeSignal = true);
-	bool loadMode(int presetSlotNum, int modeSlotNum, int modeLibraryId, bool sendChangeSignal = true);
-	bool loadMode(int presetSlotNum, int modeSlotNum, bool sendChangeSignal = true);
+	Mode* setModeCustom(ValueTree modeNodeIn);
+	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
 	
 	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
 	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
 	bool loadPreset(int presetSlotNum, int presetLibraryId, bool sendChangeSignal=true);
 	bool loadPreset(int presetSlotNum, bool sendChangeSignal=true);
 
-	bool savePreset(int presetSlotNum =0, String absolutePath="");
+	bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
+	bool savePresetToFile(int presetSlotNum = 0, String absolutePath="");
+	bool saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "");
+	bool saveModeToFile(String absolutePath="");
     
     bool commitPreset(int slotNumber, ValueTree presetNodeIn);
-
 
 	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
 	static ValueTree modeFromFile(String absoluteFilePath = "");

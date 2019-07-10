@@ -53,7 +53,7 @@ Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 	return &modesSorted;
 }
 
-ValueTree SvkPresetManager::getMode(int indexIn)
+ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
 {
     if (indexIn < 0)
         indexIn = 0;
@@ -68,6 +68,11 @@ ValueTree SvkPresetManager::getMode(int indexIn)
     return ValueTree();
 }
 
+Mode* SvkPresetManager::getModeCustom()
+{
+	return modeCustom.get();
+}
+
 PopupMenu* SvkPresetManager::getMode1Menu()
 {
 	return mode1Menu.get();
@@ -78,27 +83,16 @@ PopupMenu* SvkPresetManager::getMode2Menu()
     return mode2Menu.get();
 }
 
-bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, ValueTree modeNodeIn, bool sendChangeSignal)
+Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
 {
-	presetsLoaded[presetSlotNum]->setModeSlot(modeNodeIn, modeSlotNum);
-
-	if (sendChangeSignal)
-		sendChangeMessage();
+	modeCustom.reset(new Mode(modeNodeIn));
+	
+	return modeCustom.get();
 }
 
-bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, Mode* modeIn, bool sendChangeSignal)
+Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
-	loadMode(presetSlotNum, modeSlotNum, modeIn->modeNode, sendChangeSignal);
-}
-
-bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, int modeLibraryId, bool sendChangeSignal)
-{
-	loadMode(presetSlotNum, modeSlotNum, getMode(modeLibraryId), sendChangeSignal);
-}
-
-bool SvkPresetManager::loadMode(int presetSlotNum, int modeSlotNum, bool sendChangeSignal)
-{
-	loadMode(presetSlotNum, modeSlotNum, modeFromFile(pluginSettingsNode[IDs::modeDirectory]), sendChangeSignal);
+	modeCustom.reset(new Mode(stepsIn, familyIn, rootNoteIn, nameIn, infoIn));
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal)
@@ -116,7 +110,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, int indexIn, bool sendChangeSignal)
 {
-	return loadPreset(presetSlotNum, getMode(indexIn), sendChangeSignal);
+	return loadPreset(presetSlotNum, getModeInLibrary(indexIn), sendChangeSignal);
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal)
@@ -129,29 +123,48 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, bool sendChangeSignal)
 	return loadPreset(presetSlotNum, presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
 }
 
-bool SvkPresetManager::savePreset(int presetSlotNum, String absolutePath)
+bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "")
 {
-    File fileOut = File(absolutePath);
-        
-    if (!fileOut.getParentDirectory().exists())
-    {
-        FileChooser chooser("Save your preset",
-                            pluginSettingsNode[IDs::presetDirectory].toString(),
-                            "*.svk");
-        
-        chooser.browseForFileToSave(true);
-        fileOut = chooser.getResult();
-    }
-    
-    if (fileOut.getParentDirectory().exists())
-    {
-		SvkPreset* preset = getPresetLoaded(presetSlotNum);
-		preset->commitPreset();
-        std::unique_ptr<XmlElement> xml(preset->parentNode.createXml());
-        return xml->writeToFile(fileOut, "");
-    }
-    
-    return false;
+	File fileOut = File(absolutePath);
+
+	if (!fileOut.getParentDirectory().exists())
+	{
+		FileChooser chooser(saveMsg,
+			pluginSettingsNode[IDs::presetDirectory].toString(),
+			fileEnding);
+
+		chooser.browseForFileToSave(true);
+		fileOut = chooser.getResult();
+	}
+
+	if (fileOut.getParentDirectory().exists())
+	{
+		std::unique_ptr<XmlElement> xml(nodeToSave.createXml());
+		return xml->writeToFile(fileOut, "");
+	}
+
+	return false;
+}
+
+
+bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
+{
+	SvkPreset* preset = getPresetLoaded(presetSlotNum);
+	preset->commitPreset();
+
+	return saveNodeToFile(preset->parentNode, "Save preset", ".svk", pluginSettingsNode[IDs::presetDirectory]);
+}
+
+bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "")
+{
+	Mode* mode = getModeInSlots(presetSlotNum, modeSlotNumber);
+
+	return saveNodeToFile(mode->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
+}
+
+bool SvkPresetManager::saveModeToFile(String absolutePath = "")
+{
+	return saveNodeToFile(modeCustom->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
 }
 
 ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath)
@@ -231,7 +244,7 @@ void SvkPresetManager::initializeModePresets()
     buildPresetMenu();
     
 	presetsLoaded.set(0, new SvkPreset());
-	presetsLoaded[0]->addMode(getMode(8));
+	presetsLoaded[0]->addMode(getModeInLibrary(8));
 }
 
 

@@ -480,7 +480,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == saveBtn.get())
     {
         //[UserButtonCode_saveBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::savePreset, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::savePresetToFile, true);
         //[/UserButtonCode_saveBtn]
     }
     else if (buttonThatWasClicked == loadBtn.get())
