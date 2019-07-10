@@ -61,7 +61,7 @@ public:
 	void updateNode(bool initializeNode=false);
 	void restoreNode(ValueTree nodeIn, bool useNodeRoot=false);
 
-    static bool isValidMode(ValueTree nodeIn, bool& hasModeChild);
+	static bool isValidMode(ValueTree nodeIn);
 
 	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);
 	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);

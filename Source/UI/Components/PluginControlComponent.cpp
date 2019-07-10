@@ -282,8 +282,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	autoMapBtn->setClickingTogglesState(true);
 	noteNumsBtn->setClickingTogglesState(true);
 
-	mode1Box->setMenu(*pluginState->presetManager->getModeMenu());
-	mode2Box->setMenu(*pluginState->presetManager->getModeMenu());
+	mode1Box->setMenu(*pluginState->presetManager->getMode2Menu());
+	mode2Box->setMenu(*pluginState->presetManager->getMode2Menu());
 
     //[/UserPreSize]
 
