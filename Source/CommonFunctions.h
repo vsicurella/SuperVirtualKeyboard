@@ -209,6 +209,30 @@ static ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
     return nodeOut;
 }
 
+static Array<ValueTree> extractNodes(ValueTree nodeOrigin, Identifier nodeType)
+{
+	Array<ValueTree> nodesOut;
+	ValueTree childNode;
+	
+	int numChildren = nodeOrigin.getNumChildren();
+	int level = 0;
+
+	while (level < numChildren)
+	{
+		childNode = nodeOrigin.getChild(level);
+
+		if (childNode.hasType(nodeType))
+			nodesOut.add(childNode);
+
+		else if (childNode.getNumChildren() > 0)
+			nodesOut.addArray(extractNodes(childNode, nodeType));
+
+		level++;
+	}
+
+	return nodesOut;
+}
+
 template <class T>
 static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
 {

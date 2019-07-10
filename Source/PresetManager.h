@@ -33,12 +33,22 @@ class SvkPresetManager : public ChangeBroadcaster
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
     
-    std::unique_ptr<PopupMenu> modeMenu;
+	std::unique_ptr<PopupMenu> mode1Menu;
+    std::unique_ptr<PopupMenu> mode2Menu;
     OwnedArray<PopupMenu> modeSubMenu;
 
 	// Methods
 	void createFactoryModes();
 	void resortModeLibrary();
+
+	void initializeModePresets();
+	void loadPresetDirectory();
+
+	int addModeToLibrary(ValueTree presetNodeIn);
+	void addModeToSort(ValueTree presetNodeIn);
+	int addAndSortMode(ValueTree presetNodeIn);
+
+	void buildPresetMenu();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 
@@ -59,32 +69,25 @@ public:
 
 	ValueTree getMode(int indexIn);
     
-    PopupMenu* getModeMenu();
+	PopupMenu* getMode1Menu();
+    PopupMenu* getMode2Menu();
 
-	bool loadMode(int presetSlotNum, int modeSlotNum, ValueTree presetNodeIn, bool sendChangeSignal = true);
-	bool loadMode(int presetSlotNum, int modeSlotNum, Mode* presetIn, bool sendChangeSignal = true);
+	bool loadMode(int presetSlotNum, int modeSlotNum, ValueTree modeNodeIn, bool sendChangeSignal = true);
+	bool loadMode(int presetSlotNum, int modeSlotNum, Mode* modeIn, bool sendChangeSignal = true);
+	bool loadMode(int presetSlotNum, int modeSlotNum, int modeLibraryId, bool sendChangeSignal = true);
 	bool loadMode(int presetSlotNum, int modeSlotNum, bool sendChangeSignal = true);
 	
-	bool loadPreset(int slotNumber, ValueTree presetNodeIn, bool sendChangeSignal=true);
-	bool loadPreset(int slotNumber, int indexIn, bool sendChangeSignal=true);
-	bool loadPreset(int slotNumber, SvkPreset* presetIn, bool sendChangeSignal=true);
-	bool loadPreset(int slotNumber, bool sendChangeSignal=true);
+	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
+	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
+	bool loadPreset(int presetSlotNum, int presetLibraryId, bool sendChangeSignal=true);
+	bool loadPreset(int presetSlotNum, bool sendChangeSignal=true);
 
-	bool savePreset(int slotNumber=0, String absolutePath="");
+	bool savePreset(int presetSlotNum =0, String absolutePath="");
     
-    bool commitPresetNode(int slotNumber, ValueTree nodeIn);
-    bool commitModeNode(int slotNumber, ValueTree modeNodeIn);
-    bool commitKeyboardNode(int slotNumber, ValueTree keyboardNodeIn);
-    bool commitMapNode(int slotNumber, ValueTree mapNodeIn);
+    bool commitPreset(int slotNumber, ValueTree presetNodeIn);
 
-	void initializeModePresets();
-	void loadPresetDirectory();
 
-	int addModeToLibrary(ValueTree presetNodeIn);
-	void addModeToSort(ValueTree presetNodeIn);
-	int addAndSortMode(ValueTree presetNodeIn);
-    
-    void buildPresetMenu();
-
+	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
+	static ValueTree modeFromFile(String absoluteFilePath = "");
 	static ValueTree presetFromFile(String absoluteFilePath = "");
 };

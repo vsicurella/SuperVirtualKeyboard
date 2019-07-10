@@ -204,23 +204,15 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 	}
 }
 
-bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
+bool Mode::isValidMode(ValueTree nodeIn)
 {
-    bool isValid = true;
-	bool isMode = nodeIn.hasType(IDs::modePresetNode);
-	hasModeChild = nodeIn.getChildWithName(IDs::modePresetNode).isValid();
+	String steps = nodeIn.getProperty(IDs::stepString).toString();
+	Array<int> stepsArray = Mode::parse_steps(steps);
 
-	String steps;
+	int length = stepsArray.size();
+	int numDegrees = sumUpToIndex(stepsArray, length);
 
-	if (isMode)
-		steps = nodeIn.getProperty(IDs::stepString).toString();
-	else
-		steps = nodeIn.getChildWithName(IDs::modePresetNode).getProperty(IDs::stepString).toString();
-
-	int stepsLength = steps.length();
-	bool hasSteps = stepsLength > 0;
-    
-    return isValid && (isMode || hasModeChild) && hasSteps;
+    return length > 0 && numDegrees <= 128;
 }
 
 

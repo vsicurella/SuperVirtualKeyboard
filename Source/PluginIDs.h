@@ -20,11 +20,15 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
+	static Identifier modeSlotsNode("ModeSlots");
+	static Identifier mode1SlotNumber("Mode1SlotNum");
+	static Identifier mode2SlotNumber("Mode2SlotNum");
 
 	// Plugin Settings
 	static Identifier pluginSettingsNode("Preferences");
 	static Identifier settingsDirectory("SettingsDirectory");
 	static Identifier presetDirectory("PresetDirectory");
+	static Identifier modeDirectory("ModeDirectory");
 	static Identifier createPresetFolder("CreatePresetFolder");
 	static Identifier saveFactoryPresets("SaveFactoryPresets");
 

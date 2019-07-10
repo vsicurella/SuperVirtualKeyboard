@@ -209,9 +209,9 @@ MidiSettingsComponent::MidiSettingsComponent (SvkPluginState* pluginStateIn)
     //[UserPreSize]
     midiSettingsNode = pluginState->midiSettingsNode;
     
-    presetBox1->setMenu(*pluginState->presetManager->getModeMenu());
+    presetBox1->setMenu(*pluginState->presetManager->getMode2Menu());
 	presetBox1->addListener(this);
-    presetBox2->setMenu(*pluginState->presetManager->getModeMenu());
+    presetBox2->setMenu(*pluginState->presetManager->getMode2Menu());
 	presetBox2->addListener(this);
 
 	midiInputFilter = pluginState->getMidiProcessor()->getMidiInputFilter();
