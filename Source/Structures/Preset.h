@@ -45,6 +45,7 @@ struct SvkPreset
 	String toString();	
 
 	static bool isValidPresetNode(ValueTree presetNodeIn);
+	static bool isValidPresetNode(ValueTree presetNodeIn, Array<ValueTree>& modesContained);
 
 private:
 

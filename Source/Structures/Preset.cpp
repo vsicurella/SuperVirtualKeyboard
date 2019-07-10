@@ -45,22 +45,31 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
 		return;
 	
 	theModeNode = ValueTree(IDs::modeSlotsNode);
-	Array<ValueTree> modeSlots = extractNodes(presetNodeIn, IDs::modePresetNode);
-	addModes(modeSlots);
+	Array<ValueTree> modeSlots;
+	
+	if (isValidPresetNode(presetNodeIn, modeSlots))
+	{
+		addModes(modeSlots);
 
-	ValueTree keyboardNodeTry = presetNodeIn.getChildWithName(IDs::pianoNode);
-	if (keyboardNodeTry.isValid())
-		theKeyboardNode = keyboardNodeTry.createCopy();
+		ValueTree keyboardNodeTry = presetNodeIn.getChildWithName(IDs::pianoNode);
+		if (keyboardNodeTry.isValid())
+			theKeyboardNode = keyboardNodeTry.createCopy();
+		else
+			theKeyboardNode = ValueTree(IDs::pianoNode);
+
+		ValueTree mapNodeTry = presetNodeIn.getChildWithName(IDs::midiSettingsNode);
+		if (mapNodeTry.isValid())
+			theMidiSettingsNode = mapNodeTry.createCopy();
+		else
+			theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
+
+		parentNode = ValueTree(IDs::presetNode);
+	}
 	else
+	{
 		theKeyboardNode = ValueTree(IDs::pianoNode);
-
-	ValueTree mapNodeTry = presetNodeIn.getChildWithName(IDs::midiSettingsNode);
-	if (mapNodeTry.isValid())
-		theMidiSettingsNode = mapNodeTry.createCopy();
-	else
 		theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
-
-	parentNode = ValueTree(IDs::presetNode);
+	}
 
 	parentNode.addChild(theModeNode, -1, nullptr);
 	parentNode.addChild(theKeyboardNode, -1, nullptr);
@@ -148,6 +157,34 @@ bool SvkPreset::addModes(Array<ValueTree> modeSlotsIn)
 	}
 
 	return numAdded > 0;
+}
+
+bool SvkPreset::isValidPresetNode(ValueTree presetNodeIn)
+{
+	bool isValid = presetNodeIn.hasType(IDs::presetNode);
+	
+	if (isValid)
+	{
+		if (extractNodes(presetNodeIn, IDs::modePresetNode).size() > 0)
+			return true;
+	}
+
+	return false;
+}
+
+bool SvkPreset::isValidPresetNode(ValueTree presetNodeIn, Array<ValueTree>& modesContained)
+{
+	bool isValid = presetNodeIn.hasType(IDs::presetNode);
+
+	if (isValid)
+	{
+		modesContained = extractNodes(presetNodeIn, IDs::modePresetNode);
+
+		if (modesContained.size() > 0)
+			return true;
+	}
+
+	return false;
 }
 
 String SvkPreset::toString()
