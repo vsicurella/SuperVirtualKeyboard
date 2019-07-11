@@ -351,7 +351,7 @@ void PluginControlComponent::resized()
     //[/UserPreResize]
 
     mode2Box->setBounds (790 - 150, 48, 150, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.8049f), 128);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9329f), 128);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -824,7 +824,7 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="536 216 96 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 80.488% 128"
+            virtualName="" explicitFocusOrder="0" pos="24 80 93.286% 128"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>

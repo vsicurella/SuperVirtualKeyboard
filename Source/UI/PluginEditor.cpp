@@ -122,8 +122,8 @@ void SvkPluginEditor::update_children_to_preset()
 
 	midiSettingsComponent->setMode2(modeLoaded);
     
-    if (pluginState->getPresetLoaded()->theKeyboardNode[IDs::pianoHasCustomColor])
-        virtualKeyboard->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
+    if (pluginState->getPresetinSlot()->theKeyboardNode[IDs::pianoHasCustomColor])
+        virtualKeyboard->restoreDataNode(pluginState->getPresetinSlot()->theKeyboardNode);
     
     virtualKeyboard->setMode(modeLoaded);
 	virtualKeyboard->updateKeys();

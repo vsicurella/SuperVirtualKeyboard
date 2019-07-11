@@ -43,6 +43,44 @@ SvkPluginState::SvkPluginState()
     updatePluginToPresetLoaded();
 }
 
+void SvkPluginState::recallState(ValueTree nodeIn)
+{
+    if (nodeIn.hasType(IDs::presetNode))
+    {
+        presetManager->loadPreset(nodeIn);
+        return;
+    }
+    
+    ValueTree childNode = nodeIn.getChildWithName(IDs::presetNode);
+    
+    if (childNode.hasType(IDs::presetNode))
+    {
+        presetManager->loadPreset(childNode);
+    }
+    else
+    {
+        updatePluginToPresetLoaded();
+        return;
+    }
+    
+    childNode = nodeIn.getChildWithName(IDs::pluginSettingsNode);
+    
+    if (childNode.isValid())
+        pluginSettings->restoreNode(childNode);
+    
+    childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
+    
+    if (childNode.isValid())
+        pluginEditorNode = childNode.createCopy();
+    
+    childNode = nodeIn.getChildWithName(IDs::pianoNode);
+    
+    if (childNode.isValid())
+        virtualKeyboard->restoreDataNode(childNode);
+}
+
+//==============================================================================
+
 SvkPresetManager* SvkPluginState::getPresetManager()
 {
 	return presetManager.get();
@@ -63,19 +101,9 @@ ApplicationCommandManager* SvkPluginState::getAppCmdMgr()
 	return appCmdMgr.get();
 }
 
-SvkMidiProcessor* SvkPluginState::getMidiProcessor()
-{
-    return midiProcessor.get();
-}
-
 UndoManager* SvkPluginState::getUndoManager()
 {
 	return undoManager.get();
-}
-
-SvkPreset* SvkPluginState::getPresetLoaded(int slotNumIn)
-{
-	return presetManager->getPresetLoaded(slotNumIn);
 }
 
 VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
@@ -97,56 +125,85 @@ NoteMap* SvkPluginState::getMidiOutputMap()
     return midiProcessor->getMidiOutputFilter()->getNoteMap();
 }
 
+SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
+{
+    return presetManager->getPresetLoaded(slotNumIn);
+}
+
+SvkPreset* SvkPluginState::getPresetViewed()
+{
+    return presetViewed;
+}
+
+Mode* SvkPluginState::getModeInSlot(int slotNumIn)
+{
+    return presetManager->getModeInSlots(presetSlotNumViewed, slotNumIn);
+}
+
+Mode* SvkPluginState::getModeViewed()
+{
+    return modeViewed;
+}
+
+//==============================================================================
+
 bool SvkPluginState::isPresetEdited()
 {
     return presetEdited;
 }
 
-
-
-void SvkPluginState::recallState(ValueTree nodeIn)
+void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
-	if (nodeIn.hasType(IDs::presetNode))
-	{
-		presetManager->loadPreset(nodeIn);
-		return;
-	}
-
-	ValueTree childNode = nodeIn.getChildWithName(IDs::presetNode);
-
-	if (childNode.hasType(IDs::presetNode))
-	{
-		presetManager->loadPreset(childNode);
-	}
-	else
-	{
-		updatePluginToPresetLoaded();
-		return;
-	}
-
-	childNode = nodeIn.getChildWithName(IDs::pluginSettingsNode);
-
-	if (childNode.isValid())
-		pluginSettings->restoreNode(childNode);
-
-	childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
-
-	if (childNode.isValid())
-		pluginEditorNode = childNode.createCopy();
-
-	childNode = nodeIn.getChildWithName(IDs::pianoNode);
-
-	if (childNode.isValid())
-		virtualKeyboard->restoreDataNode(childNode);
+    presetSlotNumViewed = presetViewedIn;
+    presetViewed = &presetManager->getPresetLoaded()[presetSlotNumViewed];
 }
 
+void SvkPluginState::setModeViewed(int modeViewedIn)
+{
+    modeViewedNum = modeViewedIn;
+    modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modeViewedIn);
+}
+
+void SvkPluginState::changeModeInCurrentSlot(int modeLibraryIndexIn)
+{
+    ValueTree modeNode = presetManager->getModeInLibrary(modeLibraryIndexIn);
+    presetViewed->setModeSlot(modeNode, modePresetSlotNum);
+    
+    presetEdited = true;
+}
+
+void SvkPluginState::addModeToNewSlot(int modeLibraryIndexIn)
+{
+    ValueTree modeNode = presetManager->getModeInLibrary(modeLibraryIndexIn);
+    addModeToNewSlot(modeNode);
+}
+
+void SvkPluginState::addModeToNewSlot(ValueTree modePresetNodeIn)
+{
+    presetViewed->addMode(modePresetNodeIn);
+    
+    presetEdited = true;
+}
+
+void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
+{
+    if (modeViewed) // Mode index 1, AKA Mode2
+    {
+        presetViewed->setMode2SlotNumber(slotNumberIn);
+    }
+    else // Mode1
+    {
+        presetViewed->setMode1SlotNumber(slotNumberIn);
+    }
+    
+    presetEdited = true;
+}
 
 void SvkPluginState::setModeViewedRoot(int rootNoteIn)
 {
-	rootNoteIn = totalModulus(rootNoteIn, 128);
-	midiProcessor->setRootNote(rootNoteIn);
-	modeLoaded->setRootNote(rootNoteIn);
-    virtualKeyboard->updateKeys();
+    rootNoteIn = totalModulus(rootNoteIn, 128);
+    midiProcessor->setRootNote(rootNoteIn);
+    modeViewed->setRootNote(rootNoteIn);
     
     presetEdited = true;
 }
@@ -204,7 +261,6 @@ bool SvkPluginState::savePresetViewedToFile()
     commitPresetChanges();
     return presetManager->savePresetToFile(presetSlotNumViewed);
 }
-
 
 bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 {
