@@ -71,7 +71,7 @@ public:
     
 	Array<Array<ValueTree>>* getPresetsSorted();
 
-	ValueTree getModeInLibrary(int indexIn);
+	ValueTree getModeInSlot(int indexIn);
 	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
 	Mode* getModeCustom();
     

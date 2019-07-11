@@ -86,9 +86,19 @@ void SvkPreset::commitPreset()
 	}
 }
 
-ValueTree SvkPreset::getModeInLibrary(int slotNum)
+ValueTree SvkPreset::getModeInSlot(int slotNum)
 {
 	return modeSlots[slotNum];
+}
+
+ValueTree SvkPreset::getMode1()
+{
+	return modeSlots[mode1SlotNumber];
+}
+
+ValueTree SvkPreset::getMode2()
+{
+	return modeSlots[mode2SlotNumber];
 }
 
 int SvkPreset::getMode1SlotNumber()
@@ -98,6 +108,11 @@ int SvkPreset::getMode1SlotNumber()
 int SvkPreset::getMode2SlotNumber()
 {
 	return mode2SlotNumber;
+}
+
+int SvkPreset::getNumModes()
+{
+	return modeSlots.size();
 }
 
 void SvkPreset::setMode1SlotNumber(int slotNumIn)
@@ -122,8 +137,7 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumber = 0)
 {
 	if (Mode::isValidMode(modeNodeIn))
 	{
-		if (modeSlots.size() < slotNumber + 1)
-			modeSlots.resize(slotNumber + 1);
+		modeSlots.ensureStorageAllocated(slotNumber + 1);
 
 		modeSlots.set(slotNumber, modeNodeIn);
 		return slotNumber;

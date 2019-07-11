@@ -373,7 +373,7 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         if (presetBox1->getSelectedId() > 0)
         {
-            ValueTree modeToLoad = pluginState->presetManager->getModeInLibrary(presetBox1->getSelectedId()-1);
+            ValueTree modeToLoad = pluginState->presetManager->getModeInSlot(presetBox1->getSelectedId()-1);
             modeSelected1 = std::make_unique<Mode>(modeToLoad);
             modeSelected1->setRootNote(rootFromSld->getValue());
 
@@ -390,7 +390,7 @@ void MidiSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         if (presetBox2->getSelectedId() > 0)
         {
-            ValueTree modeToLoad = pluginState->presetManager->getModeInLibrary(presetBox2->getSelectedId()-1);
+            ValueTree modeToLoad = pluginState->presetManager->getModeInSlot(presetBox2->getSelectedId()-1);
             modeSelected2 = std::make_unique<Mode>(modeToLoad);
             modeSelected2->setRootNote(rootToSld->getValue());
         }
@@ -436,7 +436,7 @@ void MidiSettingsComponent::visibilityChanged(bool isVisible)
 */
 void MidiSettingsComponent::setMode1(int selectedIdIn)
 {
-    modeSelected1.reset(new Mode(pluginState->presetManager->getModeInLibrary(selectedIdIn)));
+    modeSelected1.reset(new Mode(pluginState->presetManager->getModeInSlot(selectedIdIn)));
     presetBox1->setSelectedId(selectedIdIn);
 }
 
@@ -453,7 +453,7 @@ void MidiSettingsComponent::setMode1(Mode* modeIn)
 
 void MidiSettingsComponent::setMode2(int selectedIdIn)
 {
-    modeSelected1.reset(new Mode(pluginState->presetManager->getModeInLibrary(selectedIdIn)));
+    modeSelected1.reset(new Mode(pluginState->presetManager->getModeInSlot(selectedIdIn)));
     presetBox2->setSelectedId(selectedIdIn);
 }
 
