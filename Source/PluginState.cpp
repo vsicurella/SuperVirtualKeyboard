@@ -29,19 +29,17 @@ SvkPluginState::SvkPluginState()
 	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
-	modeLoaded.reset(new Mode());
-
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor.get()));
 	virtualKeyboard->addListener(midiProcessor.get()); // generates MIDI from UI
 	pianoNode = virtualKeyboard->getNode();
+
+	modeMapper.reset(new ModeMapper());
 
 	pluginStateNode.addChild(pianoNode, -1, nullptr);
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
-	presetWorkingNode = ValueTree(IDs::presetNode);
-
     updatePluginToPresetLoaded();
 }
 
@@ -77,12 +75,17 @@ UndoManager* SvkPluginState::getUndoManager()
 
 SvkPreset* SvkPluginState::getPresetLoaded(int slotNumIn)
 {
-	return presetsWorking[slotNumIn];
+	return presetManager->getPresetLoaded(slotNumIn);
 }
 
 VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
 {
 	return virtualKeyboard.get();
+}
+
+ModeMapper* SvkPluginState::getModeMapper()
+{
+	return modeMapper.get();
 }
 
 NoteMap* SvkPluginState::getMidiInputMap()
@@ -99,15 +102,7 @@ bool SvkPluginState::isPresetEdited()
     return presetEdited;
 }
 
-void SvkPluginState::loadMode(int presetIndexIn, int modeNumberIn)
-{
-	presetManager->loadPreset(presetIndexIn);
-}
 
-void SvkPluginState::loadMode(ValueTree modeNodeIn, int modeNumberIn)
-{
-	presetManager->loadPreset(modeNodeIn);
-}
 
 void SvkPluginState::recallState(ValueTree nodeIn)
 {
@@ -146,7 +141,7 @@ void SvkPluginState::recallState(ValueTree nodeIn)
 }
 
 
-void SvkPluginState::setMidiRootNote(int rootNoteIn)
+void SvkPluginState::setModeViewedRoot(int rootNoteIn)
 {
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	midiProcessor->setRootNote(rootNoteIn);
@@ -204,16 +199,21 @@ void SvkPluginState::commitPresetChanges()
 	modePresetNode = modeLoaded->modeNode;
 }
 
-bool SvkPluginState::savePresetToFile()
+bool SvkPluginState::savePresetViewedToFile()
 {
     commitPresetChanges();
-    return presetManager->savePresetToFile();
+    return presetManager->savePresetToFile(presetSlotNumViewed);
 }
 
 
-bool SvkPluginState::loadPreset()
+bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 {
-    return presetManager->loadPreset();
+	int slotNumber = presetSlotNumViewed;
+
+	if (!replaceViewed)
+		slotNumber = presetManager->getNumPresetsLoaded();
+
+    return presetManager->loadPreset(slotNumber);
 }
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)

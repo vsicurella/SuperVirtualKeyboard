@@ -53,6 +53,11 @@ Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 	return &modesSorted;
 }
 
+int SvkPresetManager::getNumPresetsLoaded()
+{
+	return presetsLoaded.size();
+}
+
 ValueTree SvkPresetManager::getModeInSlot(int indexIn)
 {
     if (indexIn < 0)

@@ -136,7 +136,7 @@ void SvkPluginEditor::update_children_to_preset()
 
 bool SvkPluginEditor::savePresetToFile()
 {
-    bool written = pluginState->savePresetToFile();
+    bool written = pluginState->savePresetViewedToFile();
 	if (written)
 		DBG("file was saved");
 	else
@@ -152,7 +152,7 @@ bool SvkPluginEditor::saveMode()
 
 bool SvkPluginEditor::loadPreset()
 {
-	bool loaded = pluginState->loadPreset();
+	bool loaded = pluginState->loadPresetFromFile();
 
 	if (loaded)
 	{

@@ -203,7 +203,7 @@ void KeyboardEditorBar::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == offsetSld.get())
     {
         //[UserSliderCode_offsetSld] -- add your slider handling code here..
-		pluginState->setMidiRootNote((int)offsetSld->getValue());
+		pluginState->setModeViewedRoot((int)offsetSld->getValue());
 		sendChangeMessage();
         //[/UserSliderCode_offsetSld]
     }
