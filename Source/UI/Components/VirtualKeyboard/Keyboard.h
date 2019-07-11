@@ -95,7 +95,7 @@ namespace VirtualKeyboard
 
         float getKeyVelocity(Key* keyIn, const MouseEvent& e);
 
-		Mode* getModeInLibrary();
+		Mode* getModeInSlot();
         
 		int getWidthFromHeight(int heightIn);
 

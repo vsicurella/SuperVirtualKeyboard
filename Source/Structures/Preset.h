@@ -30,10 +30,15 @@ struct SvkPreset
 	bool restoreFromNode(ValueTree presetNodeIn);
 	void commitPreset();
 
-	ValueTree getModeInLibrary(int slotNum);
+	ValueTree getModeInSlot(int slotNum);
+
+	ValueTree getMode1();
+	ValueTree getMode2();
 
 	int getMode1SlotNumber();
 	int getMode2SlotNumber();
+
+	int getNumModes();
 
 	void setMode1SlotNumber(int slotNumIn);
 	void setMode2SlotNumber(int slotNumIn);

@@ -260,7 +260,7 @@ float Keyboard::getKeyVelocity(Key* keyIn, const MouseEvent& e)
     return velocity;
 }
 
-Mode* Keyboard::getModeInLibrary()
+Mode* Keyboard::getModeInSlot()
 {
 	return mode;
 }
