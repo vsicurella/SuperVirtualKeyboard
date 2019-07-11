@@ -39,8 +39,6 @@ class SvkPresetManager : public ChangeBroadcaster
 	OwnedArray<OwnedArray<Mode>> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
 
-	int presetViewed = 0;
-
 	// Methods
 	void createFactoryModes();
 	void resortModeLibrary();
@@ -68,6 +66,7 @@ public:
 	SvkPreset* getPresetLoaded(int slotNumIn=0);
     int getPresetLoadedId(int slotNumIn=0);
 	ValueTree getPresetLoadedNode(int slotNumIn=0);
+	int getNumPresetsLoaded();
     
 	Array<Array<ValueTree>>* getPresetsSorted();
 

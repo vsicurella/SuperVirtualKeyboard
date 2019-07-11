@@ -18,6 +18,7 @@
 #include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "UI/Components/VirtualKeyboard/Keyboard.h"
+#include "Structures/ModeMapper.h"
 
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
@@ -43,32 +44,35 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	SvkPreset* getPresetLoaded(int slotNumIn=0);
 	VirtualKeyboard::Keyboard* getKeyboard();
+	ModeMapper* getModeMapper();
     
     NoteMap* getMidiInputMap();
     NoteMap* getMidiOutputMap();
     
     bool isPresetEdited();
 
-	void loadMode(int presetIndexIn, int modeNumberIn=1);
-	void loadMode(ValueTree modeNodeIn, int modeNumberIn=1);
+	void setModeViewed(int modeViewedIn);
+	
+	void changeModeInCurrentSlot(int modeLibraryIndexIn);
+	void addModeToNewSlot(int modeLibraryIndexIn);
+	void addModeToNewSlot(ValueTree modePresetNodeIn);
 
-	void setMidiRootNote(int rootNoteIn);
+	void setModeViewedRoot(int rootNoteIn);
+
 	void setMidiInputMap(NoteMap noteMapIn);
 	void setMidiOutputMap(NoteMap noteMapIn);
     
     void updatePluginToPresetLoaded();
 
     void commitPresetChanges();
-	bool savePresetToFile();
-	bool loadPreset();
+	bool savePresetViewedToFile();
+	bool loadPresetFromFile(bool replaceViewed=true);
 
 	void recallState(ValueTree nodeIn);
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
 	//==============================================================================
-	
-
 
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
@@ -83,12 +87,10 @@ private:
 	std::unique_ptr<UndoManager> undoManager;
 
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
-	
-	OwnedArray<SvkPreset> presetsWorking;
-	
-	Array<ValueTree> loadedFactoryModes;
-	Array<ValueTree> loadedUserModes;
+	std::unique_ptr<ModeMapper> modeMapper;
 
-	Array<Array<int>> modesSorted;
     bool presetEdited = false;
+
+	int presetSlotNumViewed = 0;
+	int modeViewed = 1;
 };
