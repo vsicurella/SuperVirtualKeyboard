@@ -51,7 +51,7 @@ bool SvkPluginSettings::updateNode(bool writeSettings)
 	pluginSettingsNode.setProperty(IDs::settingsDirectory, currentSettingsLocation.getFullPathName(), nullptr);
 	pluginSettingsNode.setProperty(IDs::presetDirectory, currentPresetLocation.getFullPathName(), nullptr);
 	pluginSettingsNode.setProperty(IDs::createPresetFolder, createPresetFolder, nullptr);
-	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+	pluginSettingsNode.setProperty(IDs::saveFactoryModes, saveFactoryModes, nullptr);
     
     if (writeSettings)
     {
@@ -73,7 +73,7 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 		currentPresetLocation = File(pluginSettingsNode.getProperty(IDs::presetDirectory).toString());
 
 		createPresetFolder = (bool)pluginSettingsNode.getProperty(IDs::createPresetFolder);
-		saveFactoryPresets = (bool)pluginSettingsNode.getProperty(IDs::saveFactoryPresets);
+		saveFactoryModes = (bool)pluginSettingsNode.getProperty(IDs::saveFactoryModes);
 
 		return true;
 	}
@@ -98,7 +98,7 @@ bool SvkPluginSettings::getCreatePresetFolder()
 
 bool SvkPluginSettings::getSaveFactoryPresets()
 {
-	return saveFactoryPresets;
+	return saveFactoryModes;
 }
 
 void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
@@ -109,6 +109,6 @@ void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
 
 void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
 {
-	saveFactoryPresets = shouldSavePresets;
-	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+	saveFactoryModes = shouldSavePresets;
+	pluginSettingsNode.setProperty(IDs::saveFactoryModes, saveFactoryModes, nullptr);
 }

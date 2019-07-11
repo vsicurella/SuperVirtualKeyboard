@@ -26,7 +26,7 @@ class SvkPluginSettings
 	File currentPresetLocation;
 
 	bool createPresetFolder = true;
-	bool saveFactoryPresets = false;
+	bool saveFactoryModes = false;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 
