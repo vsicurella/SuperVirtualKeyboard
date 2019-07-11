@@ -19,8 +19,8 @@
 
 class SvkPresetManager : public ChangeBroadcaster
 {
-	Array<ValueTree> loadedFactoryPresets;
-	Array<ValueTree> loadedUserPresets;
+	Array<ValueTree> loadedFactoryModes;
+	Array<ValueTree> loadedUserModes;
 
 	int numberOfModes = 0;
 
@@ -46,13 +46,13 @@ class SvkPresetManager : public ChangeBroadcaster
 	void resortModeLibrary();
 
 	void initializeModePresets();
-	void loadPresetDirectory();
+	void loadModeDirectory();
 
 	int addModeToLibrary(ValueTree presetNodeIn);
 	void addModeToSort(ValueTree presetNodeIn);
 	int addAndSortMode(ValueTree presetNodeIn);
 
-	void buildPresetMenu();
+	void buildModeMenu();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 

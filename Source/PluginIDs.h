@@ -31,7 +31,7 @@ namespace IDs
 	static Identifier presetDirectory("PresetDirectory");
 	static Identifier modeDirectory("ModeDirectory");
 	static Identifier createPresetFolder("CreatePresetFolder");
-	static Identifier saveFactoryPresets("SaveFactoryPresets");
+	static Identifier saveFactoryModes("SaveFactoryPresets");
 
 	// Midi Settings
     static Identifier midiSettingsNode("MidiSettings");

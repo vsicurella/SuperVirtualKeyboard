@@ -68,6 +68,11 @@ ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
     return ValueTree();
 }
 
+Mode* SvkPresetManager::getModeInSlots(int presetNumIn, int slotNumIn)
+{
+
+}
+
 Mode* SvkPresetManager::getModeCustom()
 {
 	return modeCustom.get();
@@ -110,7 +115,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, int indexIn, bool sendChangeSignal)
 {
-	return loadPreset(presetSlotNum, getModeInLibrary(indexIn), sendChangeSignal);
+	return loadPreset(presetSlotNum, presetsLoaded[indexIn]->parentNode, sendChangeSignal);
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal)
@@ -233,15 +238,15 @@ bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 void SvkPresetManager::initializeModePresets()
 {
 	modeLibraryNode = ValueTree(IDs::modeLibraryNode);
-	loadedFactoryPresets.clear();
-	loadedUserPresets.clear();
+	loadedFactoryModes.clear();
+	loadedUserModes.clear();
 	modesSorted.clear();
 	for (int m = 0; m < numSortTypes; m++)
 		modesSorted.add(Array<ValueTree>());
 
 	createFactoryModes();
-	loadPresetDirectory();
-    buildPresetMenu();
+	loadModeDirectory();
+    buildModeMenu();
     
 	presetsLoaded.set(0, new SvkPreset());
 	presetsLoaded[0]->addMode(getModeInLibrary(8));
@@ -250,16 +255,16 @@ void SvkPresetManager::initializeModePresets()
 
 void SvkPresetManager::createFactoryModes()
 {
-	if (!(bool) pluginSettingsNode[IDs::saveFactoryPresets] || !(bool)pluginSettingsNode[IDs::createPresetFolder])
+	if (!(bool) pluginSettingsNode[IDs::saveFactoryModes] || !(bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
-		const char* factoryPresets = BinaryData::FactoryModes_txt;
+		const char* factoryModes = BinaryData::FactoryModes_txt;
 		int size = BinaryData::FactoryModes_txtSize;
 
-		loadedFactoryPresets.clear();
+		loadedFactoryModes.clear();
 
-		if (factoryPresets && size > 0)
+		if (factoryModes && size > 0)
 		{
-			MemoryInputStream instream(factoryPresets, size, false);
+			MemoryInputStream instream(factoryModes, size, false);
 
 			String line, steps, family, info, name;
 			ValueTree factoryMode;
@@ -277,40 +282,40 @@ void SvkPresetManager::createFactoryModes()
                 factoryMode = Mode::createNode(steps, family, "", info, true);
 				
 				addAndSortMode(factoryMode);
-                loadedFactoryPresets.add(factoryMode);
+                loadedFactoryModes.add(factoryMode);
 			}
 		}
 	}
 }
 
-void SvkPresetManager::loadPresetDirectory()
+void SvkPresetManager::loadModeDirectory()
 {
 	// TODO: Add checking for duplicate modes
 
 	if ((bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
-		File presetDirectory = File(pluginSettingsNode[IDs::presetDirectory]);
-		Array<File> filesToLoad = presetDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.svk");
+		File modeDirectory = File(pluginSettingsNode[IDs::presetDirectory]);
+		Array<File> filesToLoad = modeDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.svk");
 
 		std::unique_ptr<XmlElement> xml;
-		ValueTree presetInNode;
+		ValueTree modeNodeIn;
 
 		while (filesToLoad.size() > 0)
 		{
 			xml = parseXML(filesToLoad.removeAndReturn(0));
-			presetInNode = ValueTree::fromXml(*(xml.get()));
+			modeNodeIn = ValueTree::fromXml(*(xml.get()));
 
-			if (presetInNode.hasType(IDs::modePresetNode))
+			if (modeNodeIn.hasType(IDs::modePresetNode))
 			{
-				addAndSortMode(presetInNode);
+				addAndSortMode(modeNodeIn);
 
-				if ((bool)presetInNode[IDs::factoryPreset])
+				if ((bool)modeNodeIn[IDs::factoryPreset])
 				{
-					loadedFactoryPresets.add(presetInNode);
+					loadedFactoryModes.add(modeNodeIn);
 				}
 				else
 				{
-					loadedUserPresets.add(presetInNode);
+					loadedUserModes.add(modeNodeIn);
 				}
 			}
 		}
@@ -372,7 +377,7 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 	return ind;
 }
 
-void SvkPresetManager::buildPresetMenu()
+void SvkPresetManager::buildModeMenu()
 {
     mode1Menu.reset(new PopupMenu());
     modeSubMenu.clear();
@@ -440,6 +445,7 @@ void SvkPresetManager::buildPresetMenu()
 
 	mode1Menu->addSeparator();
 	mode1Menu->addSubMenu("Slots", PopupMenu());
+	mode1Menu->addItem(mode1Menu->getNumItems(), "Custom Mode");
 
 	mode2Menu.reset(new PopupMenu(*mode1Menu.get()));
 }

@@ -86,8 +86,8 @@ private:
 	
 	OwnedArray<SvkPreset> presetsWorking;
 	
-	Array<ValueTree> loadedFactoryPresets;
-	Array<ValueTree> loadedUserPresets;
+	Array<ValueTree> loadedFactoryModes;
+	Array<ValueTree> loadedUserModes;
 
 	Array<Array<int>> modesSorted;
     bool presetEdited = false;
