@@ -32,31 +32,42 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     SvkPluginState();
 	~SvkPluginState() {}
+    
+    void recallState(ValueTree nodeIn);
 
 	//==============================================================================
-
+    
+    ApplicationCommandManager* getAppCmdMgr();
+    UndoManager* getUndoManager();
+    
 	SvkPresetManager* getPresetManager();
 	SvkMidiProcessor* getMidiProcessor();
 	SvkPluginSettings* getPluginSettings();
-
-	ApplicationCommandManager* getAppCmdMgr();
-	UndoManager* getUndoManager();
-
-	SvkPreset* getPresetLoaded(int slotNumIn=0);
-	VirtualKeyboard::Keyboard* getKeyboard();
-	ModeMapper* getModeMapper();
+    
+    VirtualKeyboard::Keyboard* getKeyboard();
+    ModeMapper* getModeMapper();
     
     NoteMap* getMidiInputMap();
     NoteMap* getMidiOutputMap();
     
+    SvkPreset* getPresetinSlot(int slotNumIn=0);
+    SvkPreset* getPresetViewed();
+    
+    Mode* getModeInSlot(int slotNumIn);
+    Mode* getModeViewed();
+
+    //==============================================================================
+    
     bool isPresetEdited();
 
+    void setPresetViewed(int presetViewedIn);
 	void setModeViewed(int modeViewedIn);
 	
 	void changeModeInCurrentSlot(int modeLibraryIndexIn);
 	void addModeToNewSlot(int modeLibraryIndexIn);
 	void addModeToNewSlot(ValueTree modePresetNodeIn);
 
+    void setModeViewedSlotNumber(int slotNumberIn);
 	void setModeViewedRoot(int rootNoteIn);
 
 	void setMidiInputMap(NoteMap noteMapIn);
@@ -67,8 +78,6 @@ struct SvkPluginState : public ChangeBroadcaster,
     void commitPresetChanges();
 	bool savePresetViewedToFile();
 	bool loadPresetFromFile(bool replaceViewed=true);
-
-	void recallState(ValueTree nodeIn);
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
@@ -91,6 +100,10 @@ private:
 
     bool presetEdited = false;
 
+    SvkPreset* presetViewed;
 	int presetSlotNumViewed = 0;
-	int modeViewed = 1;
+    
+    Mode* modeViewed; // What is currently on screen
+    int modeViewedNum = 1; // The mode box view selection
+	int modePresetSlotNum = 0; // The Slot number of the preset
 };

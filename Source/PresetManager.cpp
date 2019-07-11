@@ -58,7 +58,7 @@ int SvkPresetManager::getNumPresetsLoaded()
 	return presetsLoaded.size();
 }
 
-ValueTree SvkPresetManager::getModeInSlot(int indexIn)
+ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
 {
     if (indexIn < 0)
         indexIn = 0;
@@ -270,7 +270,7 @@ void SvkPresetManager::initializeModePresets()
     buildModeMenu();
     
 	presetsLoaded.set(0, new SvkPreset());
-	presetsLoaded[0]->addMode(getModeInSlot(8));
+	presetsLoaded[0]->addMode(getModeInLibrary(8));
 }
 
 
