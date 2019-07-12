@@ -109,7 +109,7 @@ namespace VirtualKeyboard
 
         void setUIMode(UIMode uiModeIn);
         
-        void setKeyPlacement(KeyPlacementType placementIn);
+        void setKeyPlacement(int placementIn);
         
         void setKeyProportions(Key* keyIn);
 

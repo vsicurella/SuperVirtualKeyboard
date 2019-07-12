@@ -57,6 +57,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     Mode* getModeViewed();
     Mode* getMode1();
     Mode* getMode2();
+    Mode* getModeCustom();
 
     //==============================================================================
     
@@ -67,11 +68,16 @@ struct SvkPluginState : public ChangeBroadcaster,
 	
 	void changeModeInCurrentSlot(int modeLibraryIndexIn);
 	void addModeToNewSlot(int modeLibraryIndexIn);
-	void addModeToNewSlot(ValueTree modePresetNodeIn);
-
+    void addModeToNewSlot(ValueTree modePresetNodeIn);
     void setModeViewedSlotNumber(int slotNumberIn);
+    
+    void setModeCustom(String stepsIn);
+
 	void setMode1Root(int rootNoteIn);
     void setMode2Root(int rootNoteIn);
+    
+    void setPeriodShift(int shiftIn);
+    void setMidiChannel(int midiChannelIn);
     
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);
@@ -81,6 +87,9 @@ struct SvkPluginState : public ChangeBroadcaster,
     void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
     void doMapping();
+    
+    void setKeyStyle(int keyStyleIn);
+    void setHighlightStyle(int highlightStyleIn);
     
     void updateToPreset();
 

@@ -31,6 +31,8 @@ class SvkMidiProcessor : public MidiMessageCollector
     int scaleSize = 12;
     int rootMidiNote = 60;
     int periodShift = 0;
+    
+    int midiChannelOut = 1;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;
@@ -64,6 +66,7 @@ public:
     
     int getRootNote();
     int getPeriodShift();
+    int getMidiChannelOut();
 
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
@@ -82,6 +85,7 @@ public:
     void setScaleSize(int scaleSizeIn);
     void setRootNote(int rootNoteIn);
     void setPeriodShift(int shiftIn);
+    void setMidiChannelOut(int channelOut);
     
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);
