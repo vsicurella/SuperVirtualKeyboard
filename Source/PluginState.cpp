@@ -14,6 +14,7 @@ SvkPluginState::SvkPluginState()
 {
     appCmdMgr.reset(new ApplicationCommandManager());
     undoManager.reset(new UndoManager());
+    modeMapper.reset(new ModeMapper());
 
 	pluginStateNode = ValueTree(IDs::pluginStateNode);
 
@@ -30,37 +31,27 @@ SvkPluginState::SvkPluginState()
 	presetManager->addChangeListener(this);
 
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor.get()));
-	virtualKeyboard->addListener(midiProcessor.get()); // generates MIDI from UI
+	virtualKeyboard->addListener(midiProcessor.get());
 	pianoNode = virtualKeyboard->getNode();
-
-	modeMapper.reset(new ModeMapper());
-
 	pluginStateNode.addChild(pianoNode, -1, nullptr);
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
-    updatePluginToPresetLoaded();
+    updateToPreset();
 }
 
 void SvkPluginState::recallState(ValueTree nodeIn)
 {
-    if (nodeIn.hasType(IDs::presetNode))
-    {
-        presetManager->loadPreset(nodeIn);
-        return;
-    }
-    
     ValueTree childNode = nodeIn.getChildWithName(IDs::presetNode);
     
-    if (childNode.hasType(IDs::presetNode))
+    if (nodeIn.hasType(IDs::presetNode))
     {
-        presetManager->loadPreset(childNode);
+        presetManager->loadPreset(0, nodeIn, dontSendNotification);
     }
     else
     {
-        updatePluginToPresetLoaded();
-        return;
+        presetManager->loadPreset(0, childNode, dontSendNotification);
     }
     
     childNode = nodeIn.getChildWithName(IDs::pluginSettingsNode);
@@ -73,10 +64,7 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     if (childNode.isValid())
         pluginEditorNode = childNode.createCopy();
     
-    childNode = nodeIn.getChildWithName(IDs::pianoNode);
-    
-    if (childNode.isValid())
-        virtualKeyboard->restoreDataNode(childNode);
+    updateToPreset();
 }
 
 //==============================================================================
@@ -162,6 +150,7 @@ void SvkPluginState::setModeViewed(int modeViewedIn)
 {
     modeViewedNum = modeViewedIn;
     modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modeViewedIn);
+    presetViewed->parentNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 }
 
 void SvkPluginState::changeModeInCurrentSlot(int modeLibraryIndexIn)
@@ -202,7 +191,6 @@ void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
 void SvkPluginState::setModeViewedRoot(int rootNoteIn)
 {
     rootNoteIn = totalModulus(rootNoteIn, 128);
-    midiProcessor->setRootNote(rootNoteIn);
     modeViewed->setRootNote(rootNoteIn);
     
     presetEdited = true;
@@ -218,42 +206,28 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 	midiProcessor->setMidiOutputMap(noteMapIn);
 }
 
-void SvkPluginState::updatePluginToPresetLoaded()
+void SvkPluginState::updateToPreset()
 {
-    DBG("Updating plugin from this loaded preset:");
-
-    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
-	presetWorkingNode = presetWorking.parentNode;
     presetEdited = false;
-
-	DBG(presetManager->getPresetLoaded()->parentNode.toXmlString());
-
+    
+    setPresetViewed(0);
+    setModeViewed(presetViewed->parentNode[IDs::modeSlotNumViewed]);
+    
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
-	pluginStateNode.addChild(presetWorkingNode, -1, nullptr);
-
-    modeLoaded->restoreNode(presetWorking.theModeNode, false);
-	modePresetNode = modeLoaded->modeNode;
+	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 	
-	midiProcessor->restoreFromNode(presetWorking.theMidiSettingsNode);
-    midiProcessor->setScaleSize(modeLoaded->getScaleSize());
+	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
+    midiProcessor->setScaleSize(modeViewed->getScaleSize());
 	
-	//virtualKeyboard->restoreDataNode(presetWorking.theKeyboardNode);
+	virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
     
     sendChangeMessage();
 }
 
 void SvkPluginState::commitPresetChanges()
 {
-    presetWorking.updateModeNode(modeLoaded->modeNode);
-    presetWorking.updateKeyboardNode(pianoNode);
-    presetWorking.updateMidiNode(midiProcessor->midiSettingsNode);
-    presetManager->commitPresetNode(presetWorking.parentNode);
-    
-    presetWorking = SvkPreset(*presetManager->getPresetLoaded());
-	presetWorkingNode = presetWorking.parentNode;
+    presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
     presetEdited = false;
-
-	modePresetNode = modeLoaded->modeNode;
 }
 
 bool SvkPluginState::savePresetViewedToFile()
@@ -277,6 +251,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	// Preset loaded
 	if (source == presetManager.get())
 	{
-        updatePluginToPresetLoaded();
+        updateToPreset();
 	}
 }
