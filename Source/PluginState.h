@@ -69,9 +69,14 @@ struct SvkPluginState : public ChangeBroadcaster,
 
     void setModeViewedSlotNumber(int slotNumberIn);
 	void setModeViewedRoot(int rootNoteIn);
-
+    
 	void setMidiInputMap(NoteMap noteMapIn);
-	void setMidiOutputMap(NoteMap noteMapIn);
+    void setMidiOutputMap(NoteMap noteMapIn);
+    void setAutoMapping(bool isAutoMappingIn);
+    
+    void setMapStyle(int mapStyleIn);
+    void doMapping(Mode* mode1, Mode* mode2, int mappingType);
+    void doMapping();
     
     void updateToPreset();
 
@@ -106,4 +111,7 @@ private:
     Mode* modeViewed; // What is currently on screen
     int modeViewedNum = 1; // The mode box view selection
 	int modePresetSlotNum = 0; // The Slot number of the preset
+    
+    bool isAutoMapping = true;
+    int mapStyleSelected = 0;
 };

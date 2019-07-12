@@ -13,13 +13,15 @@
 SvkPreset::SvkPreset()
 {
 	parentNode = ValueTree(IDs::presetNode);
+    thePropertiesNode = ValueTree(IDs::presetProperties);
 	theModeNode = ValueTree(IDs::modeSlotsNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 	
-	theModeNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
-	theModeNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
+	thePropertiesNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
+	thePropertiesNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
 
+    parentNode.addChild(thePropertiesNode, -1, nullptr);
 	parentNode.addChild(theModeNode, -1, nullptr);
     parentNode.addChild(theKeyboardNode, -1, nullptr);
     parentNode.addChild(theMidiSettingsNode, -1, nullptr);
@@ -53,13 +55,13 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
 	{
 		addModes(modeSlots);
         
-        ValueTree modeSlotsTry = presetNodeIn.getChildWithName(IDs::modeSlotsNode);
-        if (modeSlotsTry.isValid())
+        ValueTree propertiesTry = presetNodeIn.getChildWithName(IDs::presetProperties);
+        if (propertiesTry.isValid())
         {
-            mode1SlotNumber = modeSlotsTry[IDs::mode1SlotNumber];
-            mode2SlotNumber = modeSlotsTry[IDs::mode2SlotNumber];
+            mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
+            mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
         }
-
+        
 		ValueTree keyboardNodeTry = presetNodeIn.getChildWithName(IDs::pianoNode);
 		if (keyboardNodeTry.isValid())
 			theKeyboardNode = keyboardNodeTry.createCopy();

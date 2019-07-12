@@ -206,6 +206,34 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 	midiProcessor->setMidiOutputMap(noteMapIn);
 }
 
+void SvkPluginState::setAutoMapping(bool isAutoMappingIn)
+{
+    isAutoMapping = isAutoMappingIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::autoRemapOn, isAutoMapping, nullptr);
+}
+
+
+void SvkPluginState::setMapStyle(int mapStyleIn)
+{
+    modeMapper->setMapType(mapStyleIn);
+    presetViewed->parentNode.setProperty(IDs::modeMappingType, mapStyleIn, nullptr);
+    
+    if (isAutoMapping)
+    {
+        
+    }
+}
+
+void SvkPluginState::doMapping(Mode* mode1, Mode* mode2, int mappingType)
+{
+    
+}
+
+void SvkPluginState::doMapping()
+{
+    
+}
+
 void SvkPluginState::updateToPreset()
 {
     presetEdited = false;
