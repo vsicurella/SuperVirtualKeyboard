@@ -103,13 +103,13 @@ PopupMenu* SvkPresetManager::getMode2Menu()
 Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
 {
 	modeCustom.reset(new Mode(modeNodeIn));
-	
 	return modeCustom.get();
 }
 
 Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
 	modeCustom.reset(new Mode(stepsIn, familyIn, rootNoteIn, nameIn, infoIn));
+    return modeCustom.get();
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal)
@@ -149,7 +149,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, bool sendChangeSignal)
 	return loadPreset(presetSlotNum, presetFromFile(pluginSettingsNode[IDs::presetDirectory]), sendChangeSignal);
 }
 
-bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "")
+bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath)
 {
 	File fileOut = File(absolutePath);
 
@@ -172,7 +172,6 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
 	return false;
 }
 
-
 bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
 {
 	SvkPreset* preset = getPresetLoaded(presetSlotNum);
@@ -181,14 +180,14 @@ bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
 	return saveNodeToFile(preset->parentNode, "Save preset", ".svk", pluginSettingsNode[IDs::presetDirectory]);
 }
 
-bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "")
+bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath)
 {
 	Mode* mode = getModeInSlots(presetSlotNum, modeSlotNumber);
 
 	return saveNodeToFile(mode->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
 }
 
-bool SvkPresetManager::saveModeToFile(String absolutePath = "")
+bool SvkPresetManager::saveModeToFile(String absolutePath)
 {
 	return saveNodeToFile(modeCustom->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
 }

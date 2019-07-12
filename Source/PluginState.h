@@ -73,11 +73,11 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setMidiInputMap(NoteMap noteMapIn);
 	void setMidiOutputMap(NoteMap noteMapIn);
     
-    void updatePluginToPresetLoaded();
+    void updateToPreset();
 
     void commitPresetChanges();
 	bool savePresetViewedToFile();
-	bool loadPresetFromFile(bool replaceViewed=true);
+	bool loadPresetFromFile(bool replaceViewed);
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     

@@ -824,7 +824,7 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="536 216 96 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 93.286% 128"
+            virtualName="" explicitFocusOrder="0" pos="24 80 93.302% 128"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>
