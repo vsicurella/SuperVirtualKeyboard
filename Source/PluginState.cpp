@@ -133,6 +133,16 @@ Mode* SvkPluginState::getModeViewed()
     return modeViewed;
 }
 
+Mode* SvkPluginState::getMode1()
+{
+    return presetManager->getModeInSlots(presetSlotNumViewed, presetViewed->getMode1SlotNumber());
+}
+
+Mode* SvkPluginState::getMode2()
+{
+    return presetManager->getModeInSlots(presetSlotNumViewed, presetViewed->getMode2SlotNumber());
+}
+
 //==============================================================================
 
 bool SvkPluginState::isPresetEdited()
@@ -220,18 +230,22 @@ void SvkPluginState::setMapStyle(int mapStyleIn)
     
     if (isAutoMapping)
     {
-        
+        doMapping();
     }
 }
 
-void SvkPluginState::doMapping(Mode* mode1, Mode* mode2, int mappingType)
+void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mappingType,
+                               int mode1OrderIn, int mode2OrderIn, int mode1OrderOffsetIn, int mode2OrderOffsetIn)
 {
-    
+    NoteMap noteMap = modeMapper->map(*mode1, *mode2, mappingType,
+                                      mode1OrderIn, mode2OrderIn, mode1OrderOffsetIn, mode2OrderOffsetIn,
+                                      *midiProcessor->getInputNoteMap());
+    setMidiInputMap(noteMap);
 }
 
 void SvkPluginState::doMapping()
 {
-    
+    doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
 }
 
 void SvkPluginState::updateToPreset()
