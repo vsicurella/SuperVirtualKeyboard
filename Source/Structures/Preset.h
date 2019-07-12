@@ -18,6 +18,7 @@
 struct SvkPreset
 {
 	ValueTree parentNode;
+    ValueTree thePropertiesNode;
 	ValueTree theModeNode;
 	ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;

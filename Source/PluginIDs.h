@@ -20,20 +20,24 @@ namespace IDs
 	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
-    static Identifier presetSlotViewed("PresetSlotViewed");
 	static Identifier modeCustomNode("CurrentCustomMode");
-	static Identifier modeSlotsNode("ModeSlots");
-	static Identifier mode1SlotNumber("Mode1SlotNum");
-	static Identifier mode2SlotNumber("Mode2SlotNum");
-    static Identifier modeSlotNumViewed("ModeSlotViewed");
 
-	// Plugin Settings
-	static Identifier pluginSettingsNode("Preferences");
+
+	// Global Settings
+	static Identifier globalSettingsNode("Preferences");
 	static Identifier settingsDirectory("SettingsDirectory");
 	static Identifier presetDirectory("PresetDirectory");
 	static Identifier modeDirectory("ModeDirectory");
 	static Identifier createPresetFolder("CreatePresetFolder");
 	static Identifier saveFactoryModes("SaveFactoryPresets");
+    
+    // Preset Properties
+    static Identifier presetProperties("PresetProperties");
+    static Identifier presetSlotViewed("PresetSlotViewed");
+    static Identifier modeSlotsNode("ModeSlots");
+    static Identifier mode1SlotNumber("Mode1SlotNum");
+    static Identifier mode2SlotNumber("Mode2SlotNum");
+    static Identifier modeSlotNumViewed("ModeSlotViewed");
 
 	// Midi Settings
     static Identifier midiSettingsNode("MidiSettings");

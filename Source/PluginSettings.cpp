@@ -32,7 +32,7 @@ SvkPluginSettings::SvkPluginSettings()
 		currentSettingsLocation = factoryDefaultSettingsLocation;
         currentSettingsLocation.createDirectory();
 
-		pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
+		pluginSettingsNode = ValueTree(IDs::globalSettingsNode);
 	}
 
 	if (currentPresetLocation == File() || !currentPresetLocation.exists())
@@ -65,7 +65,7 @@ bool SvkPluginSettings::updateNode(bool writeSettings)
 
 bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 {
-	if (pluginSettingsNodeIn.hasType(IDs::pluginSettingsNode))
+	if (pluginSettingsNodeIn.hasType(IDs::globalSettingsNode))
 	{
 		pluginSettingsNode = pluginSettingsNodeIn;
 
