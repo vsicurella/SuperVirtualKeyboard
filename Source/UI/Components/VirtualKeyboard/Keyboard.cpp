@@ -129,21 +129,17 @@ ValueTree Keyboard::getNode()
 
 //===============================================================================================
 
-void Keyboard::setMode(Mode* modeIn)
+void Keyboard::updateMode(Mode* modeIn)
 {
     mode = modeIn;
     modeOffset = mode->getOffset();
-}
-
-// NEED TO MAKE THIS MORE EFFICIENT
-void Keyboard::updateKeys()
-{
+    
     grid.reset(new KeyboardGrid(mode));
     
     keysOrder.clear();
     keysOrder.resize(mode->getMaxStep());
     
-    keyColorsDegree.resize(mode->getScaleSize());
+    keyColorsDegree.ensureStorageAllocated(mode->getScaleSize());
     
     Key* key;
     for (int i = 0; i < keys.size(); i++)
@@ -159,13 +155,6 @@ void Keyboard::updateKeys()
         key->step = mode->getStepsOfOrders()[i];
         setKeyProportions(key);
         
-        key->mappedNoteIn = midiProcessor->getInputNote(i);
-        key->mappedNoteOut = midiProcessor->getOutputNote(i);
-        
-        key->setColour(0, getKeyColor(key));
-        key->setColour(1, key->findColour(0).contrasting(0.25));
-        key->setColour(2, key->findColour(0).contrasting(0.75));
-        
         key->setVisible(true);
     }
     
@@ -177,6 +166,25 @@ void Keyboard::updateKeys()
     // Calculate properties
     displayIsReady = true;
     resized();
+}
+
+void Keyboard::updateKeyColors()
+{
+    Key* key;
+    for (int i = 0; i < keys.size(); i++)
+    {
+        key = keys.getUnchecked(i);
+        
+        key->setColour(0, getKeyColor(key));
+        key->setColour(1, key->findColour(0).contrasting(0.25));
+        key->setColour(2, key->findColour(0).contrasting(0.75));
+    }
+}
+
+void Keyboard::updateKeyboard(Mode* modeIn)
+{
+    updateMode(modeIn);
+    updateKeyColors();
 }
 
 //===============================================================================================
@@ -331,7 +339,7 @@ void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
 {
 	keyPlacementSelected = placementIn;
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, placementIn, nullptr);
-	updateKeys();
+	updateKeyboard();
 }
 
 void Keyboard::setKeyProportions(Key* keyIn)

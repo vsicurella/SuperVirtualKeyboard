@@ -70,7 +70,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void addModeToNewSlot(ValueTree modePresetNodeIn);
 
     void setModeViewedSlotNumber(int slotNumberIn);
-	void setModeViewedRoot(int rootNoteIn);
+	void setMode1Root(int rootNoteIn);
+    void setMode2Root(int rootNoteIn);
     
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);

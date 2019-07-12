@@ -125,8 +125,8 @@ void SvkPluginEditor::update_children_to_preset()
     if (pluginState->getPresetinSlot()->theKeyboardNode[IDs::pianoHasCustomColor])
         virtualKeyboard->restoreDataNode(pluginState->getPresetinSlot()->theKeyboardNode);
     
-    virtualKeyboard->setMode(modeLoaded);
-	virtualKeyboard->updateKeys();
+    virtualKeyboard->updateMode(modeLoaded);
+	virtualKeyboard->updateKeyboard();
 
     keyboardEditorBar->repaint();
 	DBG("Children Updated");
@@ -535,7 +535,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		{
 			virtualKeyboard->updatePianoNode();
 
-			virtualKeyboard->updateKeys();
+			virtualKeyboard->updateKeyboard();
 			virtualKeyboard->setUIMode(UIMode::playMode);
 			keyboardEditorBar->allowUserInput();
 		}
