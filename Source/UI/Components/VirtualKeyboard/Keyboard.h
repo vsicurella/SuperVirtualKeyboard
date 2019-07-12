@@ -73,9 +73,11 @@ namespace VirtualKeyboard
         
         //===============================================================================================
 
-        void setMode(Mode* modeIn);
+        void updateMode(Mode* modeIn);
         
-        void updateKeys();
+        void updateKeyColors();
+        
+        void updateKeyboard(Mode* modeIn);
         
         //===============================================================================================
         

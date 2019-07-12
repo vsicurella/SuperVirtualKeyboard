@@ -198,12 +198,36 @@ void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
     presetEdited = true;
 }
 
-void SvkPluginState::setModeViewedRoot(int rootNoteIn)
+void SvkPluginState::setMode1Root(int rootNoteIn)
 {
+    Mode* mode = getMode1();
+    
     rootNoteIn = totalModulus(rootNoteIn, 128);
-    modeViewed->setRootNote(rootNoteIn);
+    mode->setRootNote(rootNoteIn);
     
     presetEdited = true;
+    
+    if (modeViewed == mode)
+        virtualKeyboard->updateMode(mode);
+    
+    if (isAutoMapping)
+        doMapping();
+}
+
+void SvkPluginState::setMode2Root(int rootNoteIn)
+{
+    Mode* mode = getMode2();
+
+    rootNoteIn = totalModulus(rootNoteIn, 128);
+    mode->setRootNote(rootNoteIn);
+    
+    presetEdited = true;
+    
+    if (modeViewed == mode)
+        virtualKeyboard->updateMode(mode);
+    
+    if (isAutoMapping)
+        doMapping();
 }
 
 void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
@@ -221,7 +245,6 @@ void SvkPluginState::setAutoMapping(bool isAutoMappingIn)
     isAutoMapping = isAutoMappingIn;
     presetViewed->thePropertiesNode.setProperty(IDs::autoRemapOn, isAutoMapping, nullptr);
 }
-
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
