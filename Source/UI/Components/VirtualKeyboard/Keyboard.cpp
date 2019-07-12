@@ -335,11 +335,11 @@ void Keyboard::setUIMode(UIMode uiModeIn)
     repaint();
 }
 
-void Keyboard::setKeyPlacement(KeyPlacementType placementIn)
+void Keyboard::setKeyPlacement(int placementIn)
 {
 	keyPlacementSelected = placementIn;
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, placementIn, nullptr);
-	updateKeyboard();
+	updateMode(mode);
 }
 
 void Keyboard::setKeyProportions(Key* keyIn)

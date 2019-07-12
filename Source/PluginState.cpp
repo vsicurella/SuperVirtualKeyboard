@@ -143,6 +143,11 @@ Mode* SvkPluginState::getMode2()
     return presetManager->getModeInSlots(presetSlotNumViewed, presetViewed->getMode2SlotNumber());
 }
 
+Mode* SvkPluginState::getModeCustom()
+{
+    return presetManager->getModeCustom();
+}
+
 //==============================================================================
 
 bool SvkPluginState::isPresetEdited()
@@ -184,6 +189,7 @@ void SvkPluginState::addModeToNewSlot(ValueTree modePresetNodeIn)
     presetEdited = true;
 }
 
+
 void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
 {
     if (modeViewed) // Mode index 1, AKA Mode2
@@ -196,6 +202,11 @@ void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
     }
     
     presetEdited = true;
+}
+
+void SvkPluginState::setModeCustom(String stepsIn)
+{
+    presetManager->setModeCustom(stepsIn);
 }
 
 void SvkPluginState::setMode1Root(int rootNoteIn)
@@ -228,6 +239,16 @@ void SvkPluginState::setMode2Root(int rootNoteIn)
     
     if (isAutoMapping)
         doMapping();
+}
+
+void SvkPluginState::setPeriodShift(int shiftIn)
+{
+    midiProcessor->setPeriodShift(shiftIn);
+}
+
+void SvkPluginState::setMidiChannel(int midiChannelIn)
+{
+    midiProcessor->setMidiChannelOut(midiChannelIn);
 }
 
 void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
@@ -269,6 +290,16 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
 void SvkPluginState::doMapping()
 {
     doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+}
+
+void SvkPluginState::setKeyStyle(int keyStyleIn)
+{
+    virtualKeyboard->setKeyPlacement(keyStyleIn);
+}
+
+void SvkPluginState::setHighlightStyle(int highlightStyleIn)
+{
+    // TODO
 }
 
 void SvkPluginState::updateToPreset()

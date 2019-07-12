@@ -151,6 +151,11 @@ int SvkMidiProcessor::getPeriodShift()
     return periodShift;
 }
 
+int SvkMidiProcessor::getMidiChannelOut()
+{
+    return midiChannelOut;
+}
+
 NoteMap* SvkMidiProcessor::getInputNoteMap()
 {
 	return midiInputFilter->getNoteMap();
@@ -224,6 +229,17 @@ void SvkMidiProcessor::setPeriodShift(int shiftIn)
 {
     midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
     periodShift = shiftIn;
+}
+
+void SvkMidiProcessor::setMidiChannelOut(int channelOut)
+{
+    if (channelOut < 1)
+        channelOut = 1;
+    
+    channelOut = channelOut % 16;
+    
+    midiSettingsNode.setProperty(IDs::pianoMidiChannel, channelOut, nullptr);
+    midiChannelOut = channelOut;
 }
 
 void SvkMidiProcessor::setInputToRemap(bool doRemap)
