@@ -24,12 +24,17 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
     mapByOrderOffset2 = offset2;
 }
 
-
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2, NoteMap prevMap)
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapTypeIn, int order1, int order2, int offset1, int offset2,
+                        NoteMap prevMap)
 {
     NoteMap mapOut;
     
-    switch (mapType)
+    int mappingTypeUsed = mapType;
+    
+    if (mapTypeIn >= 0)
+        mappingTypeUsed = mapTypeIn;
+    
+    switch (mappingTypeUsed)
     {
         case ModeToScale:
             mapOut = mapToMode1Scale(mode1, mode2);
