@@ -130,6 +130,7 @@ void Keyboard::updateMode(Mode* modeIn)
 {
     mode = modeIn;
     modeOffset = mode->getOffset();
+	numOrder0Keys = mode->getKeyboardOrdersSize(0);
         
     keysOrder.clear();
     keysOrder.resize(mode->getMaxStep());
@@ -149,6 +150,14 @@ void Keyboard::updateMode(Mode* modeIn)
         
         key->step = mode->getStepsOfOrders()[i];
     }
+
+	// bring all keys to front with highest orders frontmost
+	for (int o = 0; o < keysOrder.size(); o++)
+		for (int k = 0; k < keysOrder.getUnchecked(o).size(); k++)
+			keysOrder.getReference(o).getReference(k)->toFront(false);
+
+	
+	updateKeyPlacement();
 }
 
 void Keyboard::updateKeyPlacement()
@@ -163,11 +172,6 @@ void Keyboard::updateKeyPlacement()
 		setKeyProportions(key);
 		key->setVisible(true);
 	}
-
-	// bring all keys to front with highest orders frontmost
-	for (int o = 0; o < keysOrder.size(); o++)
-		for (int k = 0; k < keysOrder.getUnchecked(o).size(); k++)
-			keysOrder.getReference(o).getReference(k)->toFront(false);
 
 	// Calculate properties
 	displayIsReady = true;
@@ -185,12 +189,13 @@ void Keyboard::updateKeyColors()
         key->setColour(1, key->findColour(0).contrasting(0.25));
         key->setColour(2, key->findColour(0).contrasting(0.75));
     }
+
+	repaint();
 }
 
 void Keyboard::updateKeyboard(Mode* modeIn)
 {
     updateMode(modeIn);
-	updateKeyPlacement();
     updateKeyColors();
 }
 
@@ -789,7 +794,7 @@ void Keyboard::resized()
 		keyWidth = keyHeight * defaultKeyWHRatio;
 
 		// Adjust Parent bounds and grid
-		pianoWidth = mode->getKeyboardOrdersSize(0) * keyWidth;
+		pianoWidth = numOrder0Keys * keyWidth;
 		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 		// Resize keys

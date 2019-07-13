@@ -265,7 +265,8 @@ namespace VirtualKeyboard
 		int lastKeyClicked = 0;
 
 		int modeOffset = 0;
-        
+		int numOrder0Keys = 128;
+
         float pianoWidth;
         float minWindowHeight;
         

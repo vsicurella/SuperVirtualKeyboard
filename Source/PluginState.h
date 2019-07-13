@@ -109,6 +109,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     
 	//==============================================================================
 
+	void updateModeViewed();
     void updateToPreset();
 
     void commitPresetChanges();
