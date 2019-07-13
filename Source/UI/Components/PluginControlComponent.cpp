@@ -687,7 +687,7 @@ void PluginControlComponent::setMidiChannel(int channelIn, NotificationType noti
 
 bool PluginControlComponent::getNoteNumsView()
 {
-	noteNumsBtn->getToggleState();
+	return noteNumsBtn->getToggleState();
 }
 
 void PluginControlComponent::setNoteNumsView(bool isViewed, NotificationType notify)

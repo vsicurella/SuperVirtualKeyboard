@@ -124,7 +124,7 @@ bool SvkPluginEditor::savePresetToFile()
 
 bool SvkPluginEditor::saveMode()
 {
-
+	return pluginState->saveModeViewedToFile();
 }
 
 bool SvkPluginEditor::loadPreset()
@@ -142,7 +142,8 @@ bool SvkPluginEditor::loadPreset()
 
 bool SvkPluginEditor::loadMode()
 {
-
+	// TODO
+	return false;
 }
 
 bool SvkPluginEditor::exportReaperMap()
@@ -153,7 +154,7 @@ bool SvkPluginEditor::exportReaperMap()
 
 bool SvkPluginEditor::exportAbletonMap()
 {
-
+	return false;
 }
 
 void SvkPluginEditor::commitCustomScale()
