@@ -22,6 +22,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setBroughtToFrontOnMouseClick(true);
 
 	controlComponent.reset(new PluginControlComponent(pluginState));
+	controlComponent->setBounds(getBounds());
+	addAndMakeVisible(controlComponent.get());
     
 	view = controlComponent->getViewport();
 	virtualKeyboard = pluginState->getKeyboard();
@@ -322,9 +324,10 @@ void SvkPluginEditor::resized()
 {
 	int viewPositionKeyboardX = view->getViewPositionX();
 	AudioProcessorEditor::resized();
+	controlComponent->setSize(getWidth(), getHeight());
 
 	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
-	virtualKeyboard->setBounds(0, 0, virtualKeyboard->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
+	//virtualKeyboard->setBounds(0, 0, virtualKeyboard->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
 	
 	//view->setViewPosition(viewPositionKeyboardX, 0);
 }
