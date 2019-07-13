@@ -127,6 +127,7 @@ Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 		orders = expand_orders(ordersDefault, offset);
 		modeDegrees = orders_to_modeDegrees(orders);
 		scaleDegrees = scale_degrees(scaleSize, offset);
+		keyboardOrdersSizes = interval_sizes(orders);
 		updateStepsOfOrders();
         
         updateNode();
@@ -186,8 +187,9 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         offset = -getOffset();
         
         orders = expand_orders(ordersDefault, offset);
-        modeDegrees = orders_to_modeDegrees(orders);
+        modeDegrees = orders_to_modeDegrees(orders); 
         scaleDegrees = scale_degrees(scaleSize, offset);
+		keyboardOrdersSizes = interval_sizes(orders);
         updateStepsOfOrders();
         
         updateNode();

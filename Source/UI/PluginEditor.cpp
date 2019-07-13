@@ -50,9 +50,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	addMouseListener(this, true);
     
     setSize(1000, 250);
-	setResizeLimits(986, 100, 10e4, 10e4);
+	setResizeLimits(750, 100, 10e4, 10e4);
     
-	startTimerHz(20);
+	startTimerHz(60);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -95,8 +95,8 @@ void SvkPluginEditor::updateNodeData()
 void SvkPluginEditor::updateUI()
 {
 	controlComponent->setAutoMapState(pluginState->isAutoMapOn());
-	controlComponent->setScaleEntryText(pluginState->getModeCustom()->getStepsString());
-	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
+	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
+	controlComponent->setMappingStyleId(pluginState->getMappingStyle() + 1);
 	controlComponent->setMode1Root(pluginState->getMode1Root());
 	controlComponent->setMode2Root(pluginState->getMode2Root());
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
@@ -105,8 +105,8 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setPeriodShift(pluginState->getPeriodShift());
 	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
-	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
-	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
+	controlComponent->setKeyStyleId(pluginState->getKeyStyle() + 1);
+	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle() + 1);
 
 	DBG("Children Updated");
 }
@@ -327,7 +327,7 @@ void SvkPluginEditor::resized()
 	controlComponent->setSize(getWidth(), getHeight());
 
 	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
-	//virtualKeyboard->setBounds(0, 0, virtualKeyboard->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
+	//virtualKeyboard->setSize(getWidth(), getHeight());
 	
 	//view->setViewPosition(viewPositionKeyboardX, 0);
 }
