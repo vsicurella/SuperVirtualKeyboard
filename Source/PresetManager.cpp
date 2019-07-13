@@ -53,9 +53,14 @@ Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
 	return &modesSorted;
 }
 
-int SvkPresetManager::getNumPresetsLoaded()
+int SvkPresetManager::getNumModesLoaded()
 {
-	return presetsLoaded.size();
+	return numberOfModes;
+}
+
+int SvkPresetManager::getNumModesInFavorites()
+{
+	return favoriteModes.size();
 }
 
 ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
@@ -81,8 +86,10 @@ Mode* SvkPresetManager::getModeInSlots(int presetNumIn, int slotNumIn)
 	{
 		return modeSlots.getUnchecked(presetNumIn)->getUnchecked(slotNumIn);
 	}
-
-	return nullptr;
+	else
+	{
+		return modeCustom.get();
+	}
 }
 
 Mode* SvkPresetManager::getModeCustom()
@@ -110,6 +117,39 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootN
 {
 	modeCustom.reset(new Mode(stepsIn, familyIn, rootNoteIn, nameIn, infoIn));
     return modeCustom.get();
+}
+
+void SvkPresetManager::replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
+{
+	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
+	presetsLoaded[presetSlotNum]->setModeSlot(modeNode, modeSlotNum);
+	
+	loadModeIntoSlot(presetSlotNum, modeSlotNum, modeNode);
+}
+
+int SvkPresetManager::addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn)
+{
+	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
+	int slotNumberOut = presetsLoaded[presetSlotNum]->addMode(modeNode);
+
+	loadModeIntoSlot(presetSlotNum, slotNumberOut, modeNode);
+
+	return slotNumberOut;
+}
+
+int SvkPresetManager::addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn)
+{
+	int slotNumberOut = presetsLoaded[presetSlotNum]->addMode(modePresetNodeIn);
+
+	loadModeIntoSlot(presetSlotNum, slotNumberOut, modePresetNodeIn);
+
+	return slotNumberOut;
+}
+
+Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode)
+{
+	modeSlots[presetSlotNum]->ensureStorageAllocated(modeSlotNum + 1);
+	return modeSlots[presetSlotNum]->set(modeSlotNum, new Mode(modeNode));
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal)
