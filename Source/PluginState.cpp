@@ -38,6 +38,8 @@ SvkPluginState::SvkPluginState()
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
+	setPresetViewed(0);
+	setModeViewed(1);
     updateToPreset();
 }
 
@@ -71,11 +73,8 @@ void SvkPluginState::updateToPreset()
 {
 	presetEdited = false;
 
-	setPresetViewed(0);
-	setModeViewed(presetViewed->parentNode[IDs::modeSlotNumViewed]);
-
-	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
-	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
+	//pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
+	//pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
 	midiProcessor->setScaleSize(modeViewed->getScaleSize());
@@ -230,14 +229,18 @@ bool SvkPluginState::isPresetEdited()
 void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
     presetSlotNumViewed = presetViewedIn;
-    presetViewed = &presetManager->getPresetLoaded()[presetSlotNumViewed];
+    presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
 }
 
 void SvkPluginState::setModeViewed(int modeViewedIn)
 {
     modeViewedNum = modeViewedIn;
+
+	modePresetSlotNum = modeViewedNum ?
+		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
+
     modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modeViewedIn);
-    presetViewed->parentNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
+    //presetViewed->parentNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 
 	virtualKeyboard->updateKeyboard(modeViewed);
 }

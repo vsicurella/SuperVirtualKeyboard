@@ -38,9 +38,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
-
     pluginState->addChangeListener(this);
-    pluginState->getMidiProcessor()->getKeyboardState()->addListener(virtualKeyboard); // displays MIDI on Keyboard
 
 	initNodeData();
     

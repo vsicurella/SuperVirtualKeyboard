@@ -144,7 +144,7 @@ private:
     
     Mode* modeViewed; // What is currently on screen
     int modeViewedNum = 1; // The mode box view selection
-	int modePresetSlotNum = 0; // The Slot number of the preset
+	int modePresetSlotNum = 0; // The slot number of the mode in the current preset
     
 	// Mapping parameters
 
