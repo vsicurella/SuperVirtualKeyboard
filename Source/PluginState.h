@@ -54,6 +54,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     SvkPreset* getPresetinSlot(int slotNumIn=0);
     SvkPreset* getPresetViewed();
+	int getNumModesInPresetViewed();
     
     Mode* getModeInSlot(int slotNumIn);
     Mode* getModeViewed();
@@ -79,10 +80,6 @@ struct SvkPluginState : public ChangeBroadcaster,
 
     void setPresetViewed(int presetViewedIn);
 	void setModeViewed(int modeViewedIn);
-	
-	void changeModeInCurrentSlot(int modeLibraryIndexIn);
-	void addModeToNewSlot(int modeLibraryIndexIn);
-    void addModeToNewSlot(ValueTree modePresetNodeIn);
 
 	void setMode1Selection(int idIn);
 	void setMode2Selection(int idIn);

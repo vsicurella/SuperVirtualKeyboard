@@ -21,6 +21,7 @@ class SvkPresetManager : public ChangeBroadcaster
 {
 	Array<ValueTree> loadedFactoryModes;
 	Array<ValueTree> loadedUserModes;
+	Array<ValueTree> favoriteModes;
 
 	int numberOfModes = 0;
 
@@ -66,9 +67,11 @@ public:
 	SvkPreset* getPresetLoaded(int slotNumIn=0);
     int getPresetLoadedId(int slotNumIn=0);
 	ValueTree getPresetLoadedNode(int slotNumIn=0);
-	int getNumPresetsLoaded();
     
 	Array<Array<ValueTree>>* getPresetsSorted();
+
+	int getNumModesLoaded();
+	int getNumModesInFavorites();
 
 	ValueTree getModeInLibrary(int indexIn);
 	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
@@ -79,6 +82,12 @@ public:
 
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
+
+	void replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
+	int addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn);
+	int addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn);
+
+	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
 	
 	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
 	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
