@@ -20,18 +20,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
-	
-	keyboardEditorBar = std::make_unique<KeyboardEditorBar>(pluginState, appCmdMgr);
-	keyboardEditorBar.get()->setName("Keyboard Editor Bar");
-	keyboardEditorBar.get()->setSize(640, 48);
-	addAndMakeVisible(keyboardEditorBar.get());
     
+	view = controlComponent->getViewport();
 	virtualKeyboard = pluginState->getKeyboard();
 
-	view = std::make_unique<Viewport>("Piano Viewport");
-	addAndMakeVisible(view.get());
-	view.get()->setViewedComponent(virtualKeyboard, false);
-	view.get()->setTopLeftPosition(1, 49);
+	view->setViewedComponent(virtualKeyboard, false);
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
@@ -42,25 +35,12 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorSelector->setSize(450, 450);
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
-    midiSettingsWindow = std::make_unique<MidiSettingsWindow>();
-    midiSettingsWindow->setSize(560, 150);
-    midiSettingsComponent = std::make_unique<MidiSettingsComponent>(pluginState);
-    midiSettingsComponent->setSize(560, 150);
-    midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
-    midiSettingsWindow->setAlwaysOnTop(true);
-    
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
 
     pluginState->addChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->addListener(virtualKeyboard); // displays MIDI on Keyboard
 
 	initNodeData();
-    
-    midiSettingsComponent->setMode1(9);
-    midiSettingsComponent->setMode2(9);
-
-    midiSettingsComponent->setMode1RootNote(60);
-    midiSettingsComponent->setMode2RootNote(60);
     
 	appCmdMgr->registerAllCommandsForTarget(this);
 
@@ -76,7 +56,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 SvkPluginEditor::~SvkPluginEditor()
 {
     pluginState->removeChangeListener(this);
-    keyboardEditorBar->removeChangeListener(this);
     pluginState->getMidiProcessor()->getKeyboardState()->removeListener(virtualKeyboard);
 }
 
@@ -89,7 +68,7 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
+        view->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
 	}
 	else
 	{
@@ -97,7 +76,7 @@ void SvkPluginEditor::initNodeData()
 		pluginState->pluginEditorNode = pluginEditorNode;
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 
-		view.get()->setViewPositionProportionately(0.52, 0);
+		view->setViewPositionProportionately(0.52, 0);
         pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
     
@@ -108,7 +87,7 @@ void SvkPluginEditor::updateNodeData()
 {
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	pluginEditorNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
+	pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
 }
 
 void SvkPluginEditor::updateUI()
@@ -298,7 +277,6 @@ void SvkPluginEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
 	virtualKeyboard->setUIMode(UIMode::colorMode);
-	keyboardEditorBar->allowUserInput(false);
 }
 
 
@@ -344,11 +322,10 @@ void SvkPluginEditor::resized()
 	int viewPositionKeyboardX = view->getViewPositionX();
 	AudioProcessorEditor::resized();
 
-	keyboardEditorBar->setBounds(0, 0, getWidth(), 36);
-	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
+	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
 	virtualKeyboard->setBounds(0, 0, virtualKeyboard->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
 	
-	view->setViewPosition(viewPositionKeyboardX, 0);
+	//view->setViewPosition(viewPositionKeyboardX, 0);
 }
 
 //==============================================================================
@@ -520,7 +497,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 			virtualKeyboard->updatePianoNode();
 			virtualKeyboard->updateKeyColors();
 			virtualKeyboard->setUIMode(UIMode::playMode);
-			keyboardEditorBar->allowUserInput();
 		}
 	}
     
@@ -528,24 +504,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     if (source == &processor)
     {
         //pluginState->midiStateIn->addListener(virtualKeyboard);
-    }
-    
-    // Root note or Mapping button toggled 
-    if (source == keyboardEditorBar.get())
-    {
-        if (keyboardEditorBar->isMapButtonOn())
-        {
-            pluginState->getMidiProcessor()->pauseMidiInput();
-            virtualKeyboard->setUIMode(UIMode::mapMode);
-        }
-        else
-        {
-            pluginState->getMidiProcessor()->pauseMidiInput(false);
-            virtualKeyboard->setUIMode(UIMode::playMode);
-        }
-
-        midiSettingsComponent->setMode2RootNote(keyboardEditorBar->getOffsetReadout());
-		updateUI();
     }
 
 	// Mode Info Changed

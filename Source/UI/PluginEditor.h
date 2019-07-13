@@ -153,15 +153,11 @@ private:
 	
 	std::unique_ptr<PluginControlComponent> controlComponent;
 
-	std::unique_ptr<Viewport> view;
+	Viewport* view;
 	Keyboard* virtualKeyboard;
-	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
-
-	std::unique_ptr<MidiSettingsWindow> midiSettingsWindow;
-    std::unique_ptr<MidiSettingsComponent> midiSettingsComponent;
 
 	ModeInfoDialog* modeInfo;
     
