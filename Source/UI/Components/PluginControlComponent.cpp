@@ -538,6 +538,11 @@ void PluginControlComponent::textEditorFocusLost(TextEditor& textEditor)
 
 }
 
+Viewport* PluginControlComponent::getViewport()
+{
+	return keyboardViewport.get();
+}
+
 String PluginControlComponent::getScaleEntryText()
 {
 	return scaleTextBox->getText();
