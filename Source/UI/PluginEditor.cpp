@@ -20,6 +20,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
+
+	controlComponent.reset(new PluginControlComponent(pluginState));
     
 	view = controlComponent->getViewport();
 	virtualKeyboard = pluginState->getKeyboard();
