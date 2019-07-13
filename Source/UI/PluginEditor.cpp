@@ -92,7 +92,7 @@ void SvkPluginEditor::updateNodeData()
 
 void SvkPluginEditor::updateUI()
 {
-	controlComponent->setAutoMapState(pluginState->isAutoMapOn);
+	controlComponent->setAutoMapState(pluginState->isAutoMapOn());
 	controlComponent->setScaleEntryText(pluginState->getModeCustom()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
 	controlComponent->setMode1Root(pluginState->getMode1Root());

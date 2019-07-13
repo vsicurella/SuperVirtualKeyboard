@@ -93,13 +93,8 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, S
 Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 : Mode()
 {
-	bool hasModeChild;
-
-	if (isValidMode(modeNodeIn, hasModeChild))
+	if (isValidMode(modeNodeIn))
 	{
-		if (hasModeChild)
-			modeNodeIn = modeNodeIn.getChildWithName(IDs::modePresetNode);
-
         modeNode = ValueTree(IDs::modePresetNode);
 		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
 
@@ -158,13 +153,8 @@ void Mode::updateNode(bool initializeNode)
 
 void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 {
-	bool hasModeChild;
-
-	if (isValidMode(nodeIn, hasModeChild))
+	if (isValidMode(nodeIn))
 	{
-		if (hasModeChild)
-			nodeIn = nodeIn.getChildWithName(IDs::modePresetNode);
-
 		modeNode = nodeIn;
         
         stepsString = modeNode[IDs::stepString];
