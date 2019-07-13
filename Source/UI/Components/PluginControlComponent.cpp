@@ -28,7 +28,7 @@
 
 //==============================================================================
 PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn), appCmdMgr(pluginState->appCmdMgr.get())
+    : pluginState(pluginStateIn), appCmdMgr(pluginState->getAppCmdMgr())
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -282,8 +282,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	autoMapBtn->setClickingTogglesState(true);
 	noteNumsBtn->setClickingTogglesState(true);
 
-	mode1Box->setMenu(*pluginState->presetManager->getMode2Menu());
-	mode2Box->setMenu(*pluginState->presetManager->getMode2Menu());
+	mode1Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
+	mode2Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
 
     //[/UserPreSize]
 
@@ -728,7 +728,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginControlComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener"
-                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), appCmdMgr(pluginState-&gt;appCmdMgr.get())"
+                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), appCmdMgr(pluginState-&gt;getAppCmdMgr())"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
