@@ -217,7 +217,12 @@ bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
 
 bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath)
 {
-	Mode* mode = getModeInSlots(presetSlotNum, modeSlotNumber);
+	Mode* mode;
+
+	if (modeSlotNumber < modeSlots.size())
+		mode = getModeInSlots(presetSlotNum, modeSlotNumber);
+	else
+		mode = modeCustom.get();
 
 	return saveNodeToFile(mode->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
 }

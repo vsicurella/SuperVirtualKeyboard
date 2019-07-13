@@ -107,11 +107,16 @@ struct SvkPluginState : public ChangeBroadcaster,
     void setKeyStyle(int keyStyleIn);
     void setHighlightStyle(int highlightStyleIn);
     
+	//==============================================================================
+
     void updateToPreset();
 
     void commitPresetChanges();
 	bool savePresetViewedToFile();
 	bool loadPresetFromFile(bool replaceViewed);
+
+	bool saveModeViewedToFile();
+	bool loadModeIntoSlot();
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     

@@ -429,6 +429,20 @@ bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
     return presetManager->loadPreset(slotNumber);
 }
 
+bool SvkPluginState::saveModeViewedToFile()
+{
+	int modeSlotNumber = modeViewed ? 
+		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
+
+	return presetManager->saveModeToFile(presetSlotNumViewed, modeSlotNumber);
+}
+
+bool SvkPluginState::loadModeIntoSlot()
+{
+	// TODO
+	return false;
+}
+
 //==============================================================================
 
 
