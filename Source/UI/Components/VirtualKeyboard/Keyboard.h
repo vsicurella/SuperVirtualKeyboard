@@ -45,12 +45,21 @@ namespace VirtualKeyboard
     {
         nestedRight = 0,
         nestedCenter,
+		flat,
         adjacent
     };
+
+	enum HighlightStyle
+	{
+		full = 0,
+		inside,
+		outline,
+		circles,
+		squares
+	};
     
     class Keyboard :
         public Component,
-        public ApplicationCommandTarget,
 		public MidiKeyboardState,
         public MidiKeyboardStateListener // displaying external MIDI input
     {
@@ -58,7 +67,7 @@ namespace VirtualKeyboard
     public:
         //===============================================================================================
         
-        Keyboard(SvkMidiProcessor* midiProcessorIn);
+        Keyboard();
 		~Keyboard() {};
         
         //===============================================================================================
@@ -74,10 +83,14 @@ namespace VirtualKeyboard
         //===============================================================================================
 
         void updateMode(Mode* modeIn);
+
+		void updateKeyPlacement();
         
         void updateKeyColors();
         
         void updateKeyboard(Mode* modeIn);
+
+		void updateKeyMapping(const MidiFilter* inputMap, const MidiFilter* outputMap);
         
         //===============================================================================================
         
@@ -96,25 +109,34 @@ namespace VirtualKeyboard
         Key* getKeyFromPosition(const MouseEvent& e);
 
         float getKeyVelocity(Key* keyIn, const MouseEvent& e);
-
-		Mode* getModeInSlot();
         
 		int getWidthFromHeight(int heightIn);
 
 		//===============================================================================================
 
 		int getUIMode();
-        
-        void updateKeyMidiNotes();
+
+		int getKeyPlacementStyle();
+
+		int isShowingNoteNumbers();
+
+		int getHighlightStyle();
+
+		//===============================================================================================
+
 
         void setUIMode(UIMode uiModeIn);
         
-        void setKeyPlacement(int placementIn);
+        void setKeyPlacementStyle(int placementIn);
         
         void setKeyProportions(Key* keyIn);
 
 		// might want to restructure so this is not necessary
 		void setLastKeyClicked(int keyNumIn);
+
+		void setNoteNumbersVisible(bool showNoteNumsIn);
+
+		void setHighlightStyle(int styleIn);
         
         //===============================================================================================
 
@@ -193,24 +215,11 @@ namespace VirtualKeyboard
         void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
         
         //===============================================================================================
-
-		ApplicationCommandTarget* getNextCommandTarget() override;
-
-		void getAllCommands(Array< CommandID > &commands) override;
-
-		void getCommandInfo(CommandID commandID, ApplicationCommandInfo &result) override;
-
-		bool perform(const InvocationInfo &info) override;
-
-		//===============================================================================================       
         
     private:
-        
-		// Application pointers
-		SvkMidiProcessor* midiProcessor;
-		UndoManager* undo;
-        
+
 		// Functionality
+		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
         MidiKeyboardState* keyboardState;
         MidiBuffer buffer;
@@ -220,11 +229,8 @@ namespace VirtualKeyboard
 		int uiModeSelected = 0;
 		int orientationSelected = 0;
 		int keyPlacementSelected = 0;
-
-		int midiNoteOffset = 0;
-		bool mpeOn = false;
-        
-        bool showNoteNumbers = false;
+		int highlightSelected = 0;
+		bool showNoteNumbers = false;
                 
         // Data
         ValueTree pianoNode;
