@@ -30,7 +30,7 @@ SvkPluginState::SvkPluginState()
 	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
-	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor.get()));
+	virtualKeyboard.reset(new VirtualKeyboard::Keyboard());
 	virtualKeyboard->addListener(midiProcessor.get());
 	pianoNode = virtualKeyboard->getNode();
 	pluginStateNode.addChild(pianoNode, -1, nullptr);
@@ -54,7 +54,7 @@ void SvkPluginState::recallState(ValueTree nodeIn)
         presetManager->loadPreset(0, childNode, dontSendNotification);
     }
     
-    childNode = nodeIn.getChildWithName(IDs::pluginSettingsNode);
+    childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
     
     if (childNode.isValid())
         pluginSettings->restoreNode(childNode);
@@ -65,6 +65,25 @@ void SvkPluginState::recallState(ValueTree nodeIn)
         pluginEditorNode = childNode.createCopy();
     
     updateToPreset();
+}
+
+void SvkPluginState::updateToPreset()
+{
+	presetEdited = false;
+
+	setPresetViewed(0);
+	setModeViewed(presetViewed->parentNode[IDs::modeSlotNumViewed]);
+
+	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
+	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
+
+	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
+	midiProcessor->setScaleSize(modeViewed->getScaleSize());
+
+	virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
+	sendMappingToKeyboard();
+
+	sendChangeMessage();
 }
 
 //==============================================================================
@@ -146,6 +165,39 @@ Mode* SvkPluginState::getMode2()
 Mode* SvkPluginState::getModeCustom()
 {
     return presetManager->getModeCustom();
+}
+
+int SvkPluginState::getMode1Root()
+{
+	return getMode1()->getRootNote();
+}
+
+int SvkPluginState::getMode2Root()
+{
+	return getMode2()->getRootNote();
+}
+
+int SvkPluginState::getPeriodShift()
+{
+	return midiProcessor->getPeriodShift();
+}
+
+int SvkPluginState::getMidiChannelOut()
+{
+	return midiProcessor->getMidiChannelOut();
+}
+
+bool SvkPluginState::isShowingNoteNums()
+{
+	return virtualKeyboard->isShowingNoteNumbers();
+}
+int SvkPluginState::getKeyStyle()
+{
+	return virtualKeyboard->getKeyPlacementStyle();
+}
+int SvkPluginState::getHighlightStyle()
+{
+	return virtualKeyboard->getHighlightStyle();
 }
 
 //==============================================================================
@@ -284,6 +336,7 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
     NoteMap noteMap = modeMapper->map(*mode1, *mode2, mappingType,
                                       mode1OrderIn, mode2OrderIn, mode1OrderOffsetIn, mode2OrderOffsetIn,
                                       *midiProcessor->getInputNoteMap());
+
     setMidiInputMap(noteMap);
 }
 
@@ -292,33 +345,33 @@ void SvkPluginState::doMapping()
     doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
 }
 
+void SvkPluginState::sendMappingToKeyboard()
+{
+	virtualKeyboard->updateKeyMapping(midiProcessor->getMidiInputFilter(), midiProcessor->getMidiOutputFilter());
+}
+
+void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
+{
+	midiProcessor->setMidiMaps(mapNodeIn);
+	sendMappingToKeyboard();
+}
+
+void SvkPluginState::setNoteNumsShowing(bool showNoteNumsIn)
+{
+	virtualKeyboard->setNoteNumbersVisible(showNoteNumsIn);
+}
+
 void SvkPluginState::setKeyStyle(int keyStyleIn)
 {
-    virtualKeyboard->setKeyPlacement(keyStyleIn);
+    virtualKeyboard->setKeyPlacementStyle(keyStyleIn);
 }
 
 void SvkPluginState::setHighlightStyle(int highlightStyleIn)
 {
-    // TODO
+	virtualKeyboard->setHighlightStyle(highlightStyleIn);
 }
 
-void SvkPluginState::updateToPreset()
-{
-    presetEdited = false;
-    
-    setPresetViewed(0);
-    setModeViewed(presetViewed->parentNode[IDs::modeSlotNumViewed]);
-    
-	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
-	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
-	
-	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
-    midiProcessor->setScaleSize(modeViewed->getScaleSize());
-	
-	virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
-    
-    sendChangeMessage();
-}
+//==============================================================================
 
 void SvkPluginState::commitPresetChanges()
 {
@@ -341,6 +394,9 @@ bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 
     return presetManager->loadPreset(slotNumber);
 }
+
+//==============================================================================
+
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {

@@ -59,6 +59,17 @@ struct SvkPluginState : public ChangeBroadcaster,
     Mode* getMode2();
     Mode* getModeCustom();
 
+	int getMode1Root();
+	int getMode2Root();
+
+	int getPeriodShift();
+	int getMidiChannelOut();
+
+	bool isShowingNoteNums();
+	int getKeyStyle();
+	int getHighlightStyle();
+
+
     //==============================================================================
     
     bool isPresetEdited();
@@ -87,7 +98,11 @@ struct SvkPluginState : public ChangeBroadcaster,
     void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
     void doMapping();
+
+	void sendMappingToKeyboard();
+	void sendMappingToKeyboard(ValueTree mapNodeIn);
     
+	void setNoteNumsShowing(bool showNoteNumsIn);
     void setKeyStyle(int keyStyleIn);
     void setHighlightStyle(int highlightStyleIn);
     
@@ -125,6 +140,8 @@ private:
     int modeViewedNum = 1; // The mode box view selection
 	int modePresetSlotNum = 0; // The Slot number of the preset
     
+	// Mapping parameters
+
     bool isAutoMapping = true;
     int mapStyleSelected = 0;
     

@@ -81,6 +81,8 @@ namespace IDs
 	static Identifier pianoWHRatio("WidthToHeightRatio");
 	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
+	static Identifier pianoKeysShowNoteNumbers("KeysShowNoteNumbers");
+	static Identifier pianoKeysHighlightStyle("KeysHighlightStyle");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
 	static Identifier pianoKeyColorSingle("KeySingleColors");
@@ -90,7 +92,6 @@ namespace IDs
 	static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 	static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 	static Identifier pianoKeyRatioSingle("KeySingleRatios");
-	static Identifier pianoKeyMidiNoteMappings("KeyMappedMidiNotes");
 
 
 	// Piano Key Component
