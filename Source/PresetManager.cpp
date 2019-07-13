@@ -97,14 +97,9 @@ Mode* SvkPresetManager::getModeCustom()
 	return modeCustom.get();
 }
 
-PopupMenu* SvkPresetManager::getMode1Menu()
+PopupMenu* SvkPresetManager::getModeMenu()
 {
-	return mode1Menu.get();
-}
-
-PopupMenu* SvkPresetManager::getMode2Menu()
-{
-    return mode2Menu.get();
+	return modeMenu.get();
 }
 
 Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
@@ -439,7 +434,7 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 
 void SvkPresetManager::buildModeMenu()
 {
-    mode1Menu.reset(new PopupMenu());
+    modeMenu.reset(new PopupMenu());
     modeSubMenu.clear();
     
     PopupMenu* scaleSizeSubMenu = modeSubMenu.add(new PopupMenu());
@@ -498,14 +493,15 @@ void SvkPresetManager::buildModeMenu()
         }
     }
 
-    mode1Menu->addSubMenu("by Scale Size", *scaleSizeSubMenu, true);
-    mode1Menu->addSubMenu("by Mode Size", *modeSizeSubMenu, true);
-    mode1Menu->addSubMenu("by Family", *familySubMenu, true);
-    mode1Menu->addSubMenu("User", *userSubMenu, true);
+	modeMenu->addSubMenu("by Scale Size", *scaleSizeSubMenu);
+	modeMenu->addSubMenu("by Mode Size", *modeSizeSubMenu);
+	modeMenu->addSubMenu("by Family", *familySubMenu);
+	modeMenu->addSubMenu("User", *userSubMenu);
+	modeMenu->addSubMenu("Favorites", PopupMenu());
 
-	mode1Menu->addSeparator();
-	mode1Menu->addSubMenu("Slots", PopupMenu());
-	mode1Menu->addItem(mode1Menu->getNumItems(), "Custom Mode");
+	modeMenu->addSeparator();
+	modeMenu->addSubMenu("Slots", PopupMenu());
+	modeMenu->addSeparator();
 
-	mode2Menu.reset(new PopupMenu(*mode1Menu.get()));
+	modeMenu->addItem(modeMenu->getNumItems(), "Custom Mode");
 }
