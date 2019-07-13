@@ -134,7 +134,7 @@ void SvkPreset::setMode1SlotNumber(int slotNumIn)
 {
 	if (slotNumIn >= 0)
 	{
-		mode1SlotNumber = slotNumIn % modeSlots.size();
+		mode1SlotNumber = jlimit(0, modeSlots.size(), slotNumIn);
 		theModeNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
 	}
 }
@@ -143,7 +143,7 @@ void SvkPreset::setMode2SlotNumber(int slotNumIn)
 {
 	if (slotNumIn >= 0)
 	{
-		mode2SlotNumber = slotNumIn % modeSlots.size();
+		mode2SlotNumber = jlimit(0, modeSlots.size(), slotNumIn);
 		theModeNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
 	}
 }

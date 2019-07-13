@@ -132,6 +132,16 @@ NoteMap* SvkPluginState::getMidiOutputMap()
     return midiProcessor->getMidiOutputFilter()->getNoteMap();
 }
 
+bool SvkPluginState::isAutoMapOn()
+{
+	return isAutoMapping;
+}
+
+int SvkPluginState::getMappingStyle()
+{
+	return mapStyleSelected;
+}
+
 SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
 {
     return presetManager->getPresetLoaded(slotNumIn);
@@ -150,6 +160,11 @@ Mode* SvkPluginState::getModeInSlot(int slotNumIn)
 Mode* SvkPluginState::getModeViewed()
 {
     return modeViewed;
+}
+
+int SvkPluginState::getModeViewedNum()
+{
+	return modeViewedNum;
 }
 
 Mode* SvkPluginState::getMode1()
@@ -237,23 +252,45 @@ void SvkPluginState::addModeToNewSlot(int modeLibraryIndexIn)
 void SvkPluginState::addModeToNewSlot(ValueTree modePresetNodeIn)
 {
     presetViewed->addMode(modePresetNodeIn);
-    
     presetEdited = true;
 }
 
-
-void SvkPluginState::setModeViewedSlotNumber(int slotNumberIn)
+void SvkPluginState::setMode1Selection(int idIn)
 {
-    if (modeViewed) // Mode index 1, AKA Mode2
-    {
-        presetViewed->setMode2SlotNumber(slotNumberIn);
-    }
-    else // Mode1
-    {
-        presetViewed->setMode1SlotNumber(slotNumberIn);
-    }
-    
-    presetEdited = true;
+	int modeLibrarySize = presetManager->getNumPresetsLoaded();
+	int favNum = idIn - 0;
+	int slotNum = idIn - modeLibrarySize;
+
+	if (idIn <= modeLibrarySize)
+	{
+		presetViewed->setModeSlot(presetManager->getModeInLibrary(idIn),
+			presetViewed->getMode1SlotNumber());
+	}
+	else // will use the custom mode if the slot number is too large
+	{
+		presetViewed->setMode1SlotNumber(slotNum);
+	}
+	
+	presetEdited = true;
+}
+
+void SvkPluginState::setMode2Selection(int idIn)
+{
+	int modeLibrarySize = presetManager->getNumPresetsLoaded();
+	int favNum = idIn - 0;
+	int slotNum = idIn - modeLibrarySize;
+
+	if (idIn <= modeLibrarySize)
+	{
+		presetViewed->setModeSlot(presetManager->getModeInLibrary(idIn),
+			presetViewed->getMode2SlotNumber());
+	}
+	else // will use the custom mode if the slot number is too large
+	{
+		presetViewed->setMode2SlotNumber(slotNum);
+	}
+
+	presetEdited = true;
 }
 
 void SvkPluginState::setModeCustom(String stepsIn)
