@@ -351,7 +351,7 @@ void PluginControlComponent::resized()
     //[/UserPreResize]
 
     mode2Box->setBounds (790 - 150, 48, 150, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9329f), 128);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.8049f), 128);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -405,12 +405,14 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_mode1RootSld] -- add your slider handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1RootNote, true);
+		mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
         //[/UserSliderCode_mode1RootSld]
     }
     else if (sliderThatWasMoved == mode2RootSld.get())
     {
         //[UserSliderCode_mode2RootSld] -- add your slider handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2RootNote, true);
+		mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
         //[/UserSliderCode_mode2RootSld]
     }
     else if (sliderThatWasMoved == periodShiftSld.get())
@@ -644,6 +646,7 @@ int PluginControlComponent::getMode1Root()
 void PluginControlComponent::setMode1Root(int rootIn, NotificationType notify)
 {
 	mode1RootSld->setValue(rootIn, notify);
+	mode1RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
 }
 
 int PluginControlComponent::getMode2Root()
@@ -653,7 +656,8 @@ int PluginControlComponent::getMode2Root()
 
 void PluginControlComponent::setMode2Root(int rootIn, NotificationType notify)
 {
-	mode1RootSld->setValue(rootIn, notify);
+	mode2RootSld->setValue(rootIn, notify);
+	mode2RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
 }
 
 int PluginControlComponent::getPeriodShift()
@@ -824,7 +828,7 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="536 216 96 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 93.302% 128"
+            virtualName="" explicitFocusOrder="0" pos="24 80 80.488% 128"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>

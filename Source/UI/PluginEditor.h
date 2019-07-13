@@ -54,7 +54,7 @@ public:
     void initNodeData();
 	void updateNodeData();
 
-	void update_children_to_preset();
+	void updateUI();
 
 	//===============================================================================================
 
@@ -70,12 +70,10 @@ public:
 	void commitCustomScale();
 
 	void setMode1();
-	void setMode1(ValueTree modeNodeIn);
-	void setMode1(int presetId);
+	void setMode1(int idIn);
 
 	void setMode2();
-	void setMode2(ValueTree modeNodeIn);
-	void setMode2(int presetId);
+	void setMode2(int idIn);
 
 	void setMode1Root();
 	void setMode1Root(int rootIn);

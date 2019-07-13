@@ -63,7 +63,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     midiSettingsComponent->setMode2RootNote(60);
     
 	appCmdMgr->registerAllCommandsForTarget(this);
-	appCmdMgr->registerAllCommandsForTarget(virtualKeyboard);
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
@@ -102,7 +101,7 @@ void SvkPluginEditor::initNodeData()
         pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
     
-    update_children_to_preset();
+    updateUI();
 }
 
 void SvkPluginEditor::updateNodeData()
@@ -112,23 +111,22 @@ void SvkPluginEditor::updateNodeData()
 	pluginEditorNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
 }
 
-void SvkPluginEditor::update_children_to_preset()
+void SvkPluginEditor::updateUI()
 {
-	Mode* modeLoaded = pluginState->getModeLoaded();
-	
-	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
-	keyboardEditorBar->setModeLibraryText(modeLoaded->getName());
-    keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
+	controlComponent->setAutoMapState(pluginState->isAutoMapOn);
+	controlComponent->setScaleEntryText(pluginState->getModeCustom()->getStepsString());
+	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
+	controlComponent->setMode1Root(pluginState->getMode1Root());
+	controlComponent->setMode2Root(pluginState->getMode2Root());
+	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
+	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
+	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
+	controlComponent->setPeriodShift(pluginState->getPeriodShift());
+	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
+	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
+	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
+	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
 
-	midiSettingsComponent->setMode2(modeLoaded);
-    
-    if (pluginState->getPresetinSlot()->theKeyboardNode[IDs::pianoHasCustomColor])
-        virtualKeyboard->restoreDataNode(pluginState->getPresetinSlot()->theKeyboardNode);
-    
-    virtualKeyboard->updateMode(modeLoaded);
-	virtualKeyboard->updateKeyboard();
-
-    keyboardEditorBar->repaint();
 	DBG("Children Updated");
 }
 
@@ -152,12 +150,12 @@ bool SvkPluginEditor::saveMode()
 
 bool SvkPluginEditor::loadPreset()
 {
-	bool loaded = pluginState->loadPresetFromFile();
+	bool loaded = pluginState->loadPresetFromFile(true);
 
 	if (loaded)
 	{
 		//virtualKeyboard->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
-		update_children_to_preset();
+		updateUI();
 	}
 
 	return loaded;
@@ -170,7 +168,7 @@ bool SvkPluginEditor::loadMode()
 
 bool SvkPluginEditor::exportReaperMap()
 {
-	ReaperWriter rpp = ReaperWriter(pluginState->getModeLoaded());
+	ReaperWriter rpp = ReaperWriter(pluginState->getModeViewed());
 	return rpp.write_file();
 }
 
@@ -182,8 +180,7 @@ bool SvkPluginEditor::exportAbletonMap()
 void SvkPluginEditor::commitCustomScale()
 {
 	String scaleSteps = controlComponent->getScaleEntryText();
-	ValueTree customMode = Mode::createNode(scaleSteps);
-	pluginState->loadMode(customMode);
+	pluginState->setModeCustom(scaleSteps);
 }
 
 void SvkPluginEditor::setMode1()
@@ -191,14 +188,9 @@ void SvkPluginEditor::setMode1()
 	setMode1(controlComponent->getMode1BoxSelection());
 }
 
-void SvkPluginEditor::setMode1(ValueTree modeNodeIn)
+void SvkPluginEditor::setMode1(int idIn)
 {
-	pluginState->loadMode(modeNodeIn, 0);
-}
-
-void SvkPluginEditor::setMode1(int presetId)
-{
-	pluginState->loadMode(presetId, 0);
+	pluginState->setMode1Selection(idIn);
 }
 
 void SvkPluginEditor::setMode2()
@@ -206,14 +198,9 @@ void SvkPluginEditor::setMode2()
 	setMode2(controlComponent->getMode2BoxSelection());
 }
 
-void SvkPluginEditor::setMode2(ValueTree modeNodeIn)
+void SvkPluginEditor::setMode2(int idIn)
 {
-	pluginState->loadMode(modeNodeIn, 1);
-}
-
-void SvkPluginEditor::setMode2(int presetId)
-{
-	pluginState->loadMode(presetId, 1);
+	pluginState->setMode2Selection(idIn);
 }
 
 void SvkPluginEditor::setMode1Root()
@@ -223,8 +210,7 @@ void SvkPluginEditor::setMode1Root()
 
 void SvkPluginEditor::setMode1Root(int rootIn)
 {
-	Mode* mode1 = pluginState->getModeLoaded(0);
-	mode1->setRootNote(rootIn);
+	pluginState->setMode1Root(rootIn);
 }
 
 void SvkPluginEditor::setMode2Root()
@@ -234,8 +220,7 @@ void SvkPluginEditor::setMode2Root()
 
 void SvkPluginEditor::setMode2Root(int rootIn)
 {
-	Mode* mode2 = pluginState->getModeLoaded(1);
-	mode2->setRootNote(rootIn);
+	pluginState->setMode2Root(rootIn);
 }
 
 void SvkPluginEditor::setModeView()
@@ -245,12 +230,12 @@ void SvkPluginEditor::setModeView()
 
 void SvkPluginEditor::setModeView(int modeNumberIn)
 {
-
+	pluginState->setModeViewed(modeNumberIn);
 }
 
 void SvkPluginEditor::showModeInfo()
 {
-	modeInfo = new ModeInfoDialog(pluginState->getModeLoaded());
+	modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
 	modeInfo->addChangeListener(this);
 
 	Component* modeViewed = controlComponent->getModeViewed() == 0 ?
@@ -266,12 +251,12 @@ void SvkPluginEditor::setMappingStyle()
 
 void SvkPluginEditor::setMappingStyle(int mapStyleId)
 {
-
+	pluginState->setMapStyle(mapStyleId);
 }
 
 void SvkPluginEditor::applyMap()
 {
-
+	pluginState->doMapping();
 }
 
 void SvkPluginEditor::setAutoMap()
@@ -281,7 +266,7 @@ void SvkPluginEditor::setAutoMap()
 
 void SvkPluginEditor::setAutoMap(bool isAutoMapping)
 {
-
+	pluginState->setAutoMapping(isAutoMapping);
 }
 
 void SvkPluginEditor::beginMapEditing()
@@ -296,7 +281,7 @@ void SvkPluginEditor::setPeriodShift()
 
 void SvkPluginEditor::setPeriodShift(int periodsIn)
 {
-
+	pluginState->setPeriodShift(periodsIn);
 }
 
 void SvkPluginEditor::setMidiChannel()
@@ -306,7 +291,7 @@ void SvkPluginEditor::setMidiChannel()
 
 void SvkPluginEditor::setMidiChannel(int midiChannelIn)
 {
-
+	pluginState->setMidiChannel(midiChannelIn);
 }
 
 void SvkPluginEditor::beginColorEditing()
@@ -324,7 +309,7 @@ void SvkPluginEditor::setNoteNumsVisible()
 
 void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
 {
-
+	pluginState->setNoteNumsShowing(noteNumsVisible);
 }
 
 void SvkPluginEditor::setKeyStyle()
@@ -334,7 +319,7 @@ void SvkPluginEditor::setKeyStyle()
 
 void SvkPluginEditor::setKeyStyle(int keyStyleId)
 {
-
+	pluginState->setKeyStyle(keyStyleId);
 }
 
 void SvkPluginEditor::setHighlightStyle()
@@ -344,9 +329,8 @@ void SvkPluginEditor::setHighlightStyle()
 
 void SvkPluginEditor::setHighlightStyle(int highlightStyleId)
 {
-
+	pluginState->setHighlightStyle(highlightStyleId);
 }
-
 
 //==============================================================================
 
@@ -525,7 +509,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     if (source == pluginState)
     {
         virtualKeyboard->resetKeyColors(true);
-        update_children_to_preset();
+        updateUI();
     }
     
     // Color editing has finished
@@ -534,8 +518,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		if (virtualKeyboard->getUIMode() == UIMode::colorMode)
 		{
 			virtualKeyboard->updatePianoNode();
-
-			virtualKeyboard->updateKeyboard();
+			virtualKeyboard->updateKeyColors();
 			virtualKeyboard->setUIMode(UIMode::playMode);
 			keyboardEditorBar->allowUserInput();
 		}
@@ -562,13 +545,13 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
         }
 
         midiSettingsComponent->setMode2RootNote(keyboardEditorBar->getOffsetReadout());
-		update_children_to_preset();
+		updateUI();
     }
 
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-		pluginState->loadMode(pluginState->getModeLoaded()->modeNode);
+		pluginState->updateToPreset();
 	}
 }
 
@@ -591,7 +574,7 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 
 ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 {
-	return virtualKeyboard;// findFirstTargetParentComponent();
+	return findFirstTargetParentComponent();
 }
 
 void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
@@ -769,12 +752,12 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		}
 		case IDs::CommandIDs::viewMode1:
 		{
-			setModeView(1);
+			setModeView(0);
 			break;
 		}
 		case IDs::CommandIDs::viewMode2:
 		{
-			setModeView(2);
+			setModeView(1);
 			break;
 		}
 		case IDs::CommandIDs::showModeInfo:

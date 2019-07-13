@@ -22,7 +22,6 @@ namespace IDs
 	static Identifier modePresetNode("ModeLayout");
 	static Identifier modeCustomNode("CurrentCustomMode");
 
-
 	// Global Settings
 	static Identifier globalSettingsNode("Preferences");
 	static Identifier settingsDirectory("SettingsDirectory");
