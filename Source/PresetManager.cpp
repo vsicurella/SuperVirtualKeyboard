@@ -13,7 +13,6 @@
 SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
-	presetsLoaded = OwnedArray<SvkPreset>();
 
     initializeModePresets();
 }
@@ -25,12 +24,13 @@ SvkPresetManager::~SvkPresetManager()
 
 SvkPreset* SvkPresetManager::getPresetLoaded(int slotNumIn)
 {
-	SvkPreset* preset = presetsLoaded[slotNumIn];
+	slotNumIn = slotNumIn % presetsLoaded.size();
+
+	SvkPreset* preset = &presetsLoaded.getUnchecked(slotNumIn);
 
 	if (!preset)
 	{
-		preset = new SvkPreset();
-		presetsLoaded.set(slotNumIn, preset);
+		presetsLoaded.set(slotNumIn, SvkPreset());
 	}
 
 	return preset;
@@ -80,7 +80,7 @@ ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
 
 Mode* SvkPresetManager::getModeInSlots(int presetNumIn, int slotNumIn)
 {
-	SvkPreset* preset = presetsLoaded[presetNumIn];
+	SvkPreset* preset = &presetsLoaded.getUnchecked(presetNumIn);
 
 	if (preset && preset->getNumModes() > slotNumIn)
 	{
@@ -117,7 +117,7 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootN
 void SvkPresetManager::replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
 {
 	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
-	presetsLoaded[presetSlotNum]->setModeSlot(modeNode, modeSlotNum);
+	presetsLoaded.getUnchecked(presetSlotNum).setModeSlot(modeNode, modeSlotNum);
 	
 	loadModeIntoSlot(presetSlotNum, modeSlotNum, modeNode);
 }
@@ -125,7 +125,7 @@ void SvkPresetManager::replaceModeInPreset(int presetSlotNum, int modeSlotNum, i
 int SvkPresetManager::addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn)
 {
 	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
-	int slotNumberOut = presetsLoaded[presetSlotNum]->addMode(modeNode);
+	int slotNumberOut = presetsLoaded.getUnchecked(presetSlotNum).addMode(modeNode);
 
 	loadModeIntoSlot(presetSlotNum, slotNumberOut, modeNode);
 
@@ -134,7 +134,7 @@ int SvkPresetManager::addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn
 
 int SvkPresetManager::addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn)
 {
-	int slotNumberOut = presetsLoaded[presetSlotNum]->addMode(modePresetNodeIn);
+	int slotNumberOut = presetsLoaded.getUnchecked(presetSlotNum).addMode(modePresetNodeIn);
 
 	loadModeIntoSlot(presetSlotNum, slotNumberOut, modePresetNodeIn);
 
@@ -154,7 +154,8 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 		presetsLoaded.ensureStorageAllocated(presetSlotNum + 1);
 		modeSlots.ensureStorageAllocated(presetSlotNum + 1);
 
-		SvkPreset* preset = presetsLoaded.set(presetSlotNum, new SvkPreset(presetNodeIn.createCopy()));
+		presetsLoaded.set(presetSlotNum, SvkPreset(presetNodeIn.createCopy()));
+		SvkPreset* preset = &presetsLoaded.getUnchecked(presetSlotNum);
 		
 		OwnedArray<Mode>* modes = modeSlots[presetSlotNum];
 
@@ -175,7 +176,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, int indexIn, bool sendChangeSignal)
 {
-	return loadPreset(presetSlotNum, presetsLoaded[indexIn]->parentNode, sendChangeSignal);
+	return loadPreset(presetSlotNum, presetsLoaded.getUnchecked(indexIn).parentNode, sendChangeSignal);
 }
 
 bool SvkPresetManager::loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal)
@@ -288,7 +289,7 @@ ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 
 bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 {
-	SvkPreset* preset = presetsLoaded[slotNumber];
+	SvkPreset* preset = &presetsLoaded.getUnchecked(slotNumber);
 
 	if (preset && SvkPreset::isValidPresetNode(nodeIn))
 	{
@@ -311,6 +312,8 @@ void SvkPresetManager::initializeModePresets()
 	createFactoryModes();
 	loadModeDirectory();
     buildModeMenu();
+
+	setModeCustom("1");
     
 	loadPreset(0, new SvkPreset(), false);
 	addModeToNewSlot(0, 8);

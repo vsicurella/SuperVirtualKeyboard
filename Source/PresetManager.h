@@ -35,7 +35,7 @@ class SvkPresetManager : public ChangeBroadcaster
 	std::unique_ptr<PopupMenu> modeMenu;
     OwnedArray<PopupMenu> modeSubMenu;
 
-	OwnedArray<SvkPreset> presetsLoaded;
+	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
 
