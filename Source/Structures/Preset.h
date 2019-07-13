@@ -24,8 +24,8 @@ struct SvkPreset
     ValueTree theMidiSettingsNode;
 
 	SvkPreset();
-	SvkPreset(ValueTree presetNodeIn);
-	SvkPreset(SvkPreset& presetToCopy);
+	SvkPreset(const ValueTree presetNodeIn);
+	SvkPreset(const SvkPreset& presetToCopy);
 	~SvkPreset();
 
 	bool restoreFromNode(ValueTree presetNodeIn);

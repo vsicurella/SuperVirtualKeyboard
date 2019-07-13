@@ -17,6 +17,8 @@ SvkPreset::SvkPreset()
 	theModeNode = ValueTree(IDs::modeSlotsNode);
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
+
+	modeSlots.ensureStorageAllocated(2);
 	
 	thePropertiesNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
 	thePropertiesNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
@@ -27,17 +29,48 @@ SvkPreset::SvkPreset()
     parentNode.addChild(theMidiSettingsNode, -1, nullptr);
 }
 
-SvkPreset::SvkPreset(ValueTree presetNodeIn)
+SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 	: SvkPreset()
 {
-	restoreFromNode(presetNodeIn);
+	ValueTree nodeCopy = presetNodeIn.createCopy();
+
+	theModeNode = ValueTree(IDs::modeSlotsNode);
+	Array<ValueTree> modeSlots;
+
+	if (isValidPresetNode(nodeCopy, modeSlots))
+	{
+		addModes(modeSlots);
+
+		ValueTree propertiesTry = nodeCopy.getChildWithName(IDs::presetProperties);
+		if (propertiesTry.isValid())
+		{
+			mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
+			mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
+		}
+
+		ValueTree keyboardNodeTry = nodeCopy.getChildWithName(IDs::pianoNode);
+		if (keyboardNodeTry.isValid())
+			theKeyboardNode = keyboardNodeTry.createCopy();
+		else
+			theKeyboardNode = ValueTree(IDs::pianoNode);
+
+		ValueTree mapNodeTry = nodeCopy.getChildWithName(IDs::midiSettingsNode);
+		if (mapNodeTry.isValid())
+			theMidiSettingsNode = mapNodeTry.createCopy();
+		else
+			theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
+	}
+	else
+	{
+		theKeyboardNode = ValueTree(IDs::pianoNode);
+		theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
+	}
 }
 
-SvkPreset::SvkPreset(SvkPreset& presetToCopy)
+SvkPreset::SvkPreset(const SvkPreset& presetToCopy)
 :     SvkPreset(presetToCopy.parentNode)
 {
 }
-
 
 SvkPreset::~SvkPreset() {}
 
@@ -73,8 +106,6 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
 			theMidiSettingsNode = mapNodeTry.createCopy();
 		else
 			theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
-
-		parentNode = ValueTree(IDs::presetNode);
         
         success = true;
 	}
@@ -83,10 +114,6 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
 		theKeyboardNode = ValueTree(IDs::pianoNode);
 		theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 	}
-
-	parentNode.addChild(theModeNode, -1, nullptr);
-	parentNode.addChild(theKeyboardNode, -1, nullptr);
-	parentNode.addChild(theMidiSettingsNode, -1, nullptr);
     
     return success;
 }
