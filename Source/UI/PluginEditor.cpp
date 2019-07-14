@@ -224,6 +224,7 @@ void SvkPluginEditor::showModeInfo()
 		controlComponent->getMode1Box() : controlComponent->getMode2Box();
 
 	CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), modeViewed);
+	
 }
 
 void SvkPluginEditor::setMappingStyle()
