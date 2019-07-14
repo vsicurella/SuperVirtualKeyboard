@@ -415,6 +415,13 @@ void Keyboard::setNoteNumbersVisible(bool showNoteNumsIn)
 {
 	showNoteNumbers = showNoteNumsIn;
 	pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, showNoteNumbers, nullptr);
+
+	for (int i = 0; i < keys.size(); i++)
+	{
+		keys.getUnchecked(i)->showNoteNumber = showNoteNumbers;
+		//keys.getUnchecked(i)->isKeyboardOut = true;
+	}
+
 	repaint();
 }
 

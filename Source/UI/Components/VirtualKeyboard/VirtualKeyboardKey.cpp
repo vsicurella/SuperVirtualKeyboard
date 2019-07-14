@@ -54,10 +54,11 @@ void Key::paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shou
 	g.setColour(Colours::black);
 	g.drawRect(fillBounds, 1.2);
     
-    if (showNoteNumber && mappedNoteIn >= 0)
+    if (showNoteNumber)
     {
         g.setColour(color.contrasting());
-        String numTxt = String(mappedNoteIn);
+        String numTxt = isKeyboardOut ? 
+			String(mappedNoteOut) : String(mappedNoteIn);
         Rectangle<int> txtArea = getLocalBounds();
         txtArea.removeFromBottom(6);
         g.drawText(numTxt,
