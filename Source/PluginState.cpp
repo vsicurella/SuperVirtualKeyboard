@@ -252,6 +252,8 @@ void SvkPluginState::setMode1Selection(int idIn)
 
 	int favNum = idIn - modeLibrarySize;
 	int slotNum = favNum - favoritesSize;
+    
+    bool newSlot = presetViewed->getMode1SlotNumber() == presetViewed->getMode2SlotNumber();
 
 	if (idIn <= modeLibrarySize)
 	{
@@ -269,6 +271,7 @@ void SvkPluginState::setMode1Selection(int idIn)
 	if (modeViewedNum == 0)
 		updateModeViewed();
 
+    presetManager->buildSlotsMenu();
 	presetEdited = true;
 }
 
@@ -298,6 +301,7 @@ void SvkPluginState::setMode2Selection(int idIn)
 	if (modeViewedNum == 1)
 		updateModeViewed();
 
+    presetManager->buildSlotsMenu();
 	presetEdited = true;
 }
 

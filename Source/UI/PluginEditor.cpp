@@ -107,7 +107,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
 	controlComponent->setKeyStyleId(pluginState->getKeyStyle() + 1);
 	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle() + 1);
-
+    
 	DBG("Children Updated");
 }
 

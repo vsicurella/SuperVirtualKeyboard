@@ -102,6 +102,22 @@ PopupMenu* SvkPresetManager::getModeMenu()
 	return modeMenu.get();
 }
 
+void SvkPresetManager::buildSlotsMenu()
+{
+    slotsMenu->clear();
+    OwnedArray<Mode>* slot = modeSlots.getUnchecked(0);
+    
+    for (int i = 0; i < modeSlots.size(); i++)
+    {
+        slotsMenu->addItem(modeMenu->getNumItems(), slot->getUnchecked(i)->getName());
+    }
+}
+
+void SvkPresetManager::buildFavoritesMenu()
+{
+    
+}
+
 Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
 {
 	modeCustom.reset(new Mode(modeNodeIn));
@@ -159,7 +175,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 		modeSlots.ensureStorageAllocated(presetSlotNum + 1);
 
 		presetsLoaded.set(presetSlotNum, SvkPreset(presetNodeIn.createCopy()));
-		SvkPreset* preset = &presetsLoaded.getUnchecked(presetSlotNum);
+        SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
 		
 		OwnedArray<Mode>* modes = modeSlots[presetSlotNum];
 
@@ -293,7 +309,7 @@ ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
 
 bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 {
-	SvkPreset* preset = &presetsLoaded.getUnchecked(slotNumber);
+	SvkPreset* preset = &presetsLoaded.getReference(slotNumber);
 
 	if (preset && SvkPreset::isValidPresetNode(nodeIn))
 	{
@@ -451,12 +467,15 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 void SvkPresetManager::buildModeMenu()
 {
     modeMenu.reset(new PopupMenu());
-    modeSubMenu.clear();
+    subMenus.clear();
     
-    PopupMenu* scaleSizeSubMenu = modeSubMenu.add(new PopupMenu());
-	PopupMenu* modeSizeSubMenu = modeSubMenu.add(new PopupMenu());
-    PopupMenu* familySubMenu = modeSubMenu.add(new PopupMenu());
-    PopupMenu* userSubMenu = modeSubMenu.add(new PopupMenu());
+    scaleSizeMenu = subMenus.add(new PopupMenu());
+	modeSizeMenu = subMenus.add(new PopupMenu());
+    familyMenu = subMenus.add(new PopupMenu());
+    userMenu = subMenus.add(new PopupMenu());
+    
+    favMenu = subMenus.add(new PopupMenu());
+    slotsMenu = subMenus.add(new PopupMenu());
     
     ValueTree presetIn;
     String displayName;
@@ -474,49 +493,49 @@ void SvkPresetManager::buildModeMenu()
             {
                 case (SortType::scaleSize):
                     if (separatorProperty != presetIn[IDs::scaleSize])
-                        scaleSizeSubMenu->addSeparator();
+                        scaleSizeMenu->addSeparator();
                     separatorProperty = presetIn[IDs::scaleSize];
                     displayName = presetIn[IDs::modeName];
-                    scaleSizeSubMenu->addItem(++subMenuIndex, displayName);
+                    scaleSizeMenu->addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::modeSize):
                     if (separatorProperty != presetIn[IDs::modeSize])
-						modeSizeSubMenu->addSeparator();
+						modeSizeMenu->addSeparator();
                     separatorProperty = presetIn[IDs::modeSize];
                     displayName = presetIn[IDs::modeName];
-					modeSizeSubMenu->addItem(++subMenuIndex, displayName);
+					modeSizeMenu->addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::familyName):
                     if (separatorProperty != presetIn[IDs::family])
-                        familySubMenu->addSeparator();
+                        familyMenu->addSeparator();
                     separatorProperty = presetIn[IDs::family];
                     displayName = presetIn[IDs::modeName];
-                    familySubMenu->addItem(++subMenuIndex, displayName);
+                    familyMenu->addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::user):
                     if (presetIn[IDs::factoryPreset])
                         continue;
                     if (separatorProperty != presetIn[IDs::scaleSize])
-                        userSubMenu->addSeparator();
+                        userMenu->addSeparator();
                     separatorProperty = presetIn[IDs::scaleSize];
                     displayName = presetIn[IDs::modeName];
-                    userSubMenu->addItem(++subMenuIndex, displayName);
+                    userMenu->addItem(++subMenuIndex, displayName);
                     break;
             }
         }
     }
 
-	modeMenu->addSubMenu("by Scale Size", *scaleSizeSubMenu);
-	modeMenu->addSubMenu("by Mode Size", *modeSizeSubMenu);
-	modeMenu->addSubMenu("by Family", *familySubMenu);
-	modeMenu->addSubMenu("User", *userSubMenu);
-	modeMenu->addSubMenu("Favorites", PopupMenu());
+	modeMenu->addSubMenu("by Scale Size", *scaleSizeMenu);
+	modeMenu->addSubMenu("by Mode Size", *modeSizeMenu);
+	modeMenu->addSubMenu("by Family", *familyMenu);
+	modeMenu->addSubMenu("User", *userMenu);
+	modeMenu->addSubMenu("Favorites", *favMenu);
 
 	modeMenu->addSeparator();
-	modeMenu->addSubMenu("Slots", PopupMenu());
+	modeMenu->addSubMenu("Slots", *slotsMenu);
 	modeMenu->addSeparator();
 
 	modeMenu->addItem(modeMenu->getNumItems(), "Custom Mode");

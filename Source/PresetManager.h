@@ -33,8 +33,14 @@ class SvkPresetManager : public ChangeBroadcaster
 	FamilyNameSorter familyNameSort;
     
 	std::unique_ptr<PopupMenu> modeMenu;
-    OwnedArray<PopupMenu> modeSubMenu;
-
+    OwnedArray<PopupMenu> subMenus;
+    PopupMenu* scaleSizeMenu;
+    PopupMenu* modeSizeMenu;
+    PopupMenu* familyMenu;
+    PopupMenu* userMenu;
+    PopupMenu* favMenu;
+    PopupMenu* slotsMenu;
+    
 	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
@@ -77,6 +83,9 @@ public:
 	Mode* getModeCustom();
     
 	PopupMenu* getModeMenu();
+    
+    void buildSlotsMenu();
+    void buildFavoritesMenu();
 
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
