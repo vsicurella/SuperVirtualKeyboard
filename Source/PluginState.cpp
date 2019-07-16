@@ -157,7 +157,7 @@ SvkPreset* SvkPluginState::getPresetViewed()
 
 int SvkPluginState::getNumModesInPresetViewed()
 {
-	return presetViewed->getNumModes();
+	return presetViewed->getModeSlotsSize();
 }
 
 Mode* SvkPluginState::getModeInSlot(int slotNumIn)

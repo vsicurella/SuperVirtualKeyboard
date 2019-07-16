@@ -152,7 +152,7 @@ int SvkPreset::getMode2SlotNumber()
 	return mode2SlotNumber;
 }
 
-int SvkPreset::getNumModes()
+int SvkPreset::getModeSlotsSize()
 {
 	return modeSlots.size();
 }
