@@ -35,14 +35,17 @@ struct SvkPreset
 
 	ValueTree getMode1();
 	ValueTree getMode2();
+	ValueTree getModeByNumber(int modeNumIn);
 
 	int getMode1SlotNumber();
 	int getMode2SlotNumber();
+	int getModeSlotNumber(int modeNumIn);
 
-	int getNumModes();
+	int getModeSlotsSize();
 
 	void setMode1SlotNumber(int slotNumIn);
 	void setMode2SlotNumber(int slotNumIn);
+	void setModeSlotNumber(int modeNumIn, int slotNumIn);
 	
 	int setModeSlot(ValueTree modeNodeIn, int slotNumber = 0);
 	int addMode(ValueTree modeNodeIn);
@@ -56,6 +59,7 @@ struct SvkPreset
 private:
 
 	Array<ValueTree> modeSlots;
+	Array<int> modeSlotNumbers;
 
 	int mode1SlotNumber = 0;
 	int mode2SlotNumber = 0;

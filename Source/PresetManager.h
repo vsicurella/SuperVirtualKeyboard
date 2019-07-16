@@ -43,6 +43,8 @@ class SvkPresetManager : public ChangeBroadcaster
     
 	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
+	OwnedArray<Mode> mode1Preview;
+	OwnedArray<Mode> mode2Preview;
 	std::unique_ptr<Mode> modeCustom;
 
 	// Methods
@@ -93,9 +95,10 @@ public:
 	void replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
 	int addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn);
 	int addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn);
-
 	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
-	
+
+	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
+
 	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
 	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
 	bool loadPreset(int presetSlotNum, int presetLibraryId, bool sendChangeSignal=true);
