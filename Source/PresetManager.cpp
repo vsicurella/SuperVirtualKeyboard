@@ -167,6 +167,44 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, Val
 	return slot->set(modeSlotNum, new Mode(modeNode));
 }
 
+void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
+{
+    SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+    OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
+    
+    int modeLibraryIndex = idIn - 1;
+    
+    int favIdx = idIn - numberOfModes;
+    int slotIdx = favIdx - favoriteModes.size();
+    
+    if ((modeBoxNumber + 1) >= slot->size())
+        slot->ensureStorageAllocated(modeBoxNumber + 1);
+
+    ValueTree modeSelected;
+    
+    if (modeLibraryIndex < modeLibraryNode.getNumChildren())
+    {
+        modeSelected = getModeInLibrary(modeLibraryIndex);
+    }
+    else if (favIdx < favoriteModes.size())
+    {
+        modeSelected = favoriteModes[favIdx];
+    }
+    
+    if (modeSelected.isValid())
+    {
+        loadModeIntoSlot(presetSlotNum, modeBoxNumber, modeSelected);
+    }
+    else // if slot number exceeds the slot size, the custom mode will be used
+    {
+        preset->setModeSelectorSlotNum(modeBoxNumber, slotIdx);
+    }
+    
+    buildSlotsMenu();
+    
+}
+
+
 bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal)
 {
 	if (presetNodeIn.isValid())

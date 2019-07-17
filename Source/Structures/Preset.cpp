@@ -20,8 +20,9 @@ SvkPreset::SvkPreset()
 
 	modeSlots.ensureStorageAllocated(2);
 	
-	thePropertiesNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
-	thePropertiesNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
+    
+//    thePropertiesNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
+//    thePropertiesNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
 
     parentNode.addChild(thePropertiesNode, -1, nullptr);
 	parentNode.addChild(theModeNode, -1, nullptr);
@@ -44,8 +45,8 @@ SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 		ValueTree propertiesTry = nodeCopy.getChildWithName(IDs::presetProperties);
 		if (propertiesTry.isValid())
 		{
-			mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
-			mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
+//            mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
+//            mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
 		}
 
 		ValueTree keyboardNodeTry = nodeCopy.getChildWithName(IDs::pianoNode);
@@ -87,12 +88,12 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
 	if (isValidPresetNode(presetNodeIn, modeSlots))
 	{
 		addModes(modeSlots);
+        modeSelectorSlotNumbers.ensureStorageAllocated(modeSlots.size());
         
         ValueTree propertiesTry = presetNodeIn.getChildWithName(IDs::presetProperties);
         if (propertiesTry.isValid())
         {
-            mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
-            mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
+            // TODO: Associate Mode Selectors with Slot Numbers
         }
         
 		ValueTree keyboardNodeTry = presetNodeIn.getChildWithName(IDs::pianoNode);
@@ -128,51 +129,63 @@ void SvkPreset::commitPreset()
 	}
 }
 
+
+int SvkPreset::getModeSlotsSize()
+{
+    return modeSlots.size();
+}
+
 ValueTree SvkPreset::getModeInSlot(int slotNum)
 {
 	return modeSlots[slotNum];
 }
 
+ValueTree SvkPreset::getModeBySelector(int modeNumIn)
+{
+    return modeSlots[modeSelectorSlotNumbers[modeNumIn]];
+}
+
 ValueTree SvkPreset::getMode1()
 {
-	return modeSlots[mode1SlotNumber];
+	return modeSlots[modeSelectorSlotNumbers[0]];
 }
 
 ValueTree SvkPreset::getMode2()
 {
-	return modeSlots[mode2SlotNumber];
+	return modeSlots[modeSelectorSlotNumbers[1]];
 }
 
 int SvkPreset::getMode1SlotNumber()
 {
-	return mode1SlotNumber;
+	return modeSelectorSlotNumbers[0];;
 }
 int SvkPreset::getMode2SlotNumber()
 {
-	return mode2SlotNumber;
+	return modeSelectorSlotNumbers[1];;
 }
 
-int SvkPreset::getModeSlotsSize()
+int SvkPreset::getSlotNumberBySelector(int modeNumIn)
 {
-	return modeSlots.size();
+    return modeSelectorSlotNumbers[modeNumIn];
+}
+
+void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
+{
+    if (slotNumIn >= 0)
+    {
+        modeSelectorSlotNumbers.set(modeNumIn, jlimit(0, modeSlots.size(), slotNumIn));
+    }
 }
 
 void SvkPreset::setMode1SlotNumber(int slotNumIn)
 {
-	if (slotNumIn >= 0)
-	{
-		mode1SlotNumber = jlimit(0, modeSlots.size(), slotNumIn);
-		theModeNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
-	}
+    setModeSelectorSlotNum(0, slotNumIn);
 }
 
 void SvkPreset::setMode2SlotNumber(int slotNumIn)
 {
-	if (slotNumIn >= 0)
-	{
-		mode2SlotNumber = jlimit(0, modeSlots.size(), slotNumIn);
-		theModeNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
-	}
+    setModeSelectorSlotNum(1, slotNumIn);
+
 }
 
 int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumber)
