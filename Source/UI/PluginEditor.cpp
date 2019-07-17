@@ -172,7 +172,7 @@ void SvkPluginEditor::setMode1()
 
 void SvkPluginEditor::setMode1(int idIn)
 {
-	pluginState->setMode1Selection(idIn);
+    pluginState->handleModeSelection(0, idIn);
 }
 
 void SvkPluginEditor::setMode2()
@@ -182,7 +182,7 @@ void SvkPluginEditor::setMode2()
 
 void SvkPluginEditor::setMode2(int idIn)
 {
-	pluginState->setMode2Selection(idIn);
+    pluginState->handleModeSelection(1, idIn);
 }
 
 void SvkPluginEditor::setMode1Root()

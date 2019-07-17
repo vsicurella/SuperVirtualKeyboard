@@ -243,67 +243,16 @@ void SvkPluginState::setModeViewed(int modeViewedIn)
     //presetViewed->parentNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 }
 
-void SvkPluginState::setMode1Selection(int idIn)
+void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
-	idIn -= 1;
-
-	int modeLibrarySize = presetManager->getNumModesLoaded();
-	int favoritesSize = presetManager->getNumModesInFavorites();
-
-	int favNum = idIn - modeLibrarySize;
-	int slotNum = favNum - favoritesSize;
+    presetManager->handleModeSelection(presetSlotNumViewed, modeBoxNum, idIn);
     
-    bool newSlot = presetViewed->getMode1SlotNumber() == presetViewed->getMode2SlotNumber();
-
-	if (idIn <= modeLibrarySize)
-	{
-		presetManager->replaceModeInPreset(presetSlotNumViewed, presetViewed->getMode1SlotNumber(), idIn);
-	}
-	else if (favNum < favoritesSize)
-	{
-		// TODO
-	}
-	else // will use the custom mode if the slot number is too large
-	{
-		presetViewed->setMode1SlotNumber(slotNum);
-	}
-	
-	if (modeViewedNum == 0)
-		updateModeViewed();
-
-    presetManager->buildSlotsMenu();
-	presetEdited = true;
+    if (modeViewedNum == modeBoxNum)
+        updateModeViewed();
+    
+    presetEdited = true;
 }
 
-void SvkPluginState::setMode2Selection(int idIn)
-{
-	idIn -= 1;
-
-	int modeLibrarySize = presetManager->getNumModesLoaded();
-	int favoritesSize = presetManager->getNumModesInFavorites();
-
-	int favNum = idIn - modeLibrarySize;
-	int slotNum = favNum - favoritesSize;
-
-	if (idIn <= modeLibrarySize)
-	{
-		presetManager->replaceModeInPreset(presetSlotNumViewed, presetViewed->getMode2SlotNumber(), idIn);
-	}
-	else if (favNum < favoritesSize)
-	{
-		// TODO
-	}
-	else // will use the custom mode if the slot number is too large
-	{
-		presetViewed->setMode2SlotNumber(slotNum);
-	}
-
-	if (modeViewedNum == 1)
-		updateModeViewed();
-
-    presetManager->buildSlotsMenu();
-	presetEdited = true;
-}
 
 void SvkPluginState::setModeCustom(String stepsIn)
 {
