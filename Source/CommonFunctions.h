@@ -396,7 +396,12 @@ static void set_value_in_array(ValueTree nodeIn, Identifier arrayID, int indexTo
 
 static int totalModulus(int numIn, int mod)
 {
-	return ((numIn % mod) + mod) % mod;
+	int val = 0;
+
+	if (mod != 0)
+		val = ((numIn % mod) + mod) % mod;
+
+	return val;
 }
 
 template <class T>

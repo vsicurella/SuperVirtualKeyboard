@@ -43,8 +43,6 @@ class SvkPresetManager : public ChangeBroadcaster
     
 	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
-	OwnedArray<Mode> mode1Preview;
-	OwnedArray<Mode> mode2Preview;
 	std::unique_ptr<Mode> modeCustom;
 
 	// Methods

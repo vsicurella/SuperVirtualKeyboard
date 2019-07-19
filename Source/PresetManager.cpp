@@ -159,17 +159,19 @@ int SvkPresetManager::addModeToNewSlot(int presetSlotNum, ValueTree modePresetNo
 
 Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode)
 {
-	modeSlots.ensureStorageAllocated(presetSlotNum + 1);
+	SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+	preset->setModeSlot(modeNode, modeSlotNum);
+	DBG("Preset Mode slot size: " + String(preset->getModeSlotsSize()));
 
 	OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
-	slot->ensureStorageAllocated(modeSlotNum + 1);
-
-	return slot->set(modeSlotNum, new Mode(modeNode));
+	slot->set(modeSlotNum, new Mode(modeNode));
+	
+	return slot->getUnchecked(modeSlotNum);
 }
 
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
-    SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+    SvkPreset& preset = presetsLoaded.getReference(presetSlotNum);
     OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
     
     int modeLibraryIndex = idIn - 1;
@@ -199,15 +201,14 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     if (modeSelected.isValid())
     {
         loadModeIntoSlot(presetSlotNum, modeBoxNumber, modeSelected);
-		modeSlotNumber = slotIdx;
     }
     else // if slot number exceeds the slot size, the custom mode will be used
     {
-        preset->setModeSelectorSlotNum(modeBoxNumber, slotIdx);
-		modeSlotNumber = preset->getModeSlotsSize();
+        preset.setModeSelectorSlotNum(modeBoxNumber, slotIdx);
+		modeSlotNumber = preset.getModeSlotsSize();
     }
     
-	preset->setModeSelectorSlotNum(modeBoxNumber, modeSlotNumber);
+	preset.setModeSelectorSlotNum(modeBoxNumber, modeSlotNumber);
     buildSlotsMenu();
 }
 
@@ -365,7 +366,7 @@ bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 	return false;
 }
 
-void SvkPresetManager::initializeModePresets(	)
+void SvkPresetManager::initializeModePresets()
 {
 	modeLibraryNode = ValueTree(IDs::modeLibraryNode);
 	loadedFactoryModes.clear();
@@ -380,8 +381,9 @@ void SvkPresetManager::initializeModePresets(	)
 
 	setModeCustom("1");
     
-	loadPreset(0, new SvkPreset(), false);
+	loadPreset(0, ValueTree(IDs::presetNode), false);
 	loadModeIntoSlot(0, 0, getModeInLibrary(7));
+	loadModeIntoSlot(0, 1, getModeInLibrary(7));
 }
 
 
@@ -415,7 +417,9 @@ void SvkPresetManager::createFactoryModes()
 				
 				addAndSortMode(factoryMode);
                 loadedFactoryModes.add(factoryMode);
-			}
+		 	}
+
+			factoryMode = ValueTree();
 		}
 	}
 }

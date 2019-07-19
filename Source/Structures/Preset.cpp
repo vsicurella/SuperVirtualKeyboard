@@ -192,8 +192,6 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumber)
 {
 	if (Mode::isValidMode(modeNodeIn))
 	{
-		modeSlots.ensureStorageAllocated(slotNumber + 1);
-
 		modeSlots.set(slotNumber, modeNodeIn);
 		return slotNumber;
 	}
