@@ -95,8 +95,7 @@ Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
 {
 	if (isValidMode(modeNodeIn))
 	{
-        modeNode = ValueTree(IDs::modePresetNode);
-		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+		modeNode = modeNodeIn.createCopy();
 
         stepsString = modeNode[IDs::stepString];
         steps = parse_steps(stepsString);
