@@ -43,7 +43,7 @@ namespace VirtualKeyboard
     
     enum KeyPlacementType
     {
-        nestedRight = 0,
+        nestedRight = 1,
         nestedCenter,
 		flat,
         adjacent
@@ -51,7 +51,7 @@ namespace VirtualKeyboard
 
 	enum HighlightStyle
 	{
-		full = 0,
+		full = 1,
 		inside,
 		outline,
 		circles,

@@ -87,7 +87,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     addAndMakeVisible (periodShiftSld.get());
     periodShiftSld->setRange (-10, 10, 1);
     periodShiftSld->setSliderStyle (Slider::IncDecButtons);
-    periodShiftSld->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
+    periodShiftSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
     periodShiftSld->addListener (this);
 
     mode1ViewBtn.reset (new ToggleButton ("Mode1 View Button"));
@@ -179,7 +179,9 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     keyStyleBox->setTextWhenNothingSelected (String());
     keyStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     keyStyleBox->addItem (TRANS("Nested Right"), 1);
-    keyStyleBox->addItem (TRANS("Flat"), 2);
+    keyStyleBox->addItem (TRANS("Nested Center"), 2);
+    keyStyleBox->addItem (TRANS("Flat"), 3);
+    keyStyleBox->addItem (TRANS("Adjacent"), 4);
     keyStyleBox->addListener (this);
 
     saveBtn.reset (new TextButton ("Save Button"));
@@ -233,6 +235,10 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     highlightStyleBox->setTextWhenNothingSelected (String());
     highlightStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     highlightStyleBox->addItem (TRANS("Full Key"), 1);
+    highlightStyleBox->addItem (TRANS("Inside"), 2);
+    highlightStyleBox->addItem (TRANS("Border"), 3);
+    highlightStyleBox->addItem (TRANS("Circles"), 4);
+    highlightStyleBox->addItem (TRANS("Squares"), 5);
     highlightStyleBox->addListener (this);
 
     keyboardViewport.reset (new Viewport ("Keyboard Viewport"));
@@ -255,6 +261,16 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
+
+	// DISABLED BECAUSE NOT IMPLEMENTED
+	manualMapBtn->setEnabled(false);
+	keyStyleBox->setItemEnabled(2, false);
+	keyStyleBox->setItemEnabled(4, false);
+	highlightStyleBox->setItemEnabled(2, false);
+	highlightStyleBox->setItemEnabled(3, false);
+	highlightStyleBox->setItemEnabled(4, false);
+	highlightStyleBox->setItemEnabled(5, false);
+
     //[/Constructor]
 }
 
@@ -321,14 +337,14 @@ void PluginControlComponent::resized()
     scaleTextBox->setBounds ((getWidth() / 2) + -56 - (207 / 2), 16, 207, 24);
     scaleEntryBtn->setBounds ((getWidth() / 2) + 72 - (31 / 2), 16, 31, 24);
     modeInfoButton->setBounds ((getWidth() / 2) + -181 - (24 / 2), 16, 24, 24);
-    periodShiftSld->setBounds (108, getHeight() - 40, 87, 24);
+    periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 50, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 50, 48, 31, 24);
     mode1RootLbl->setBounds (getWidth() - 326, 16, 32, 24);
     mode2RootLbl->setBounds (getWidth() - 326, 48, 32, 24);
     mapStyleBox->setBounds ((getWidth() / 2) + -29 - (150 / 2), 48, 150, 24);
-    midiChannelSld->setBounds (298, getHeight() - 40, 78, 24);
-    midiChannelLbl->setBounds (203, getHeight() - 40, 96, 24);
+    midiChannelSld->setBounds (292, getHeight() - 40, 86, 24);
+    midiChannelLbl->setBounds (197, getHeight() - 40, 96, 24);
     noteNumsBtn->setBounds (392, getHeight() - 40, 24, 24);
     periodShiftLbl->setBounds (24, getHeight() - 40, 88, 24);
     mapButton->setBounds ((getWidth() / 2) + 72 - (32 / 2), 48, 32, 24);
@@ -751,9 +767,9 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="-181Cc 16 24 24" buttonText="i"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
-          virtualName="" explicitFocusOrder="0" pos="108 40R 87 24" min="-10.0"
+          virtualName="" explicitFocusOrder="0" pos="108 40R 86 24" min="-10.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="60" textBoxHeight="20" skewFactor="1.0"
+          textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TOGGLEBUTTON name="Mode1 View Button" id="bb818484022dae8c" memberName="mode1ViewBtn"
                 virtualName="" explicitFocusOrder="0" pos="50R 16 31 24" buttonText=""
@@ -776,12 +792,12 @@ BEGIN_JUCER_METADATA
             layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="Midi Channel Slider" id="4f2d4d8b9051247f" memberName="midiChannelSld"
-          virtualName="" explicitFocusOrder="0" pos="298 40R 78 24" min="1.0"
+          virtualName="" explicitFocusOrder="0" pos="292 40R 86 24" min="1.0"
           max="16.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Midi Channel Label" id="d2587185be475d9c" memberName="midiChannelLbl"
-         virtualName="" explicitFocusOrder="0" pos="203 40R 96 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="197 40R 96 24" edTextCol="ff000000"
          edBkgCol="0" labelText="MIDI Channel" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -801,8 +817,8 @@ BEGIN_JUCER_METADATA
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Key Style Box" id="292b32e0c6cd0b80" memberName="keyStyleBox"
             virtualName="" explicitFocusOrder="0" pos="432 40R 136 24" editable="0"
-            layout="33" items="Nested Right&#10;Flat" textWhenNonSelected=""
-            textWhenNoItems="(no choices)"/>
+            layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Save Button" id="b3d301956f9f6d50" memberName="saveBtn"
               virtualName="" explicitFocusOrder="0" pos="24 16 48 24" buttonText="Save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -825,9 +841,10 @@ BEGIN_JUCER_METADATA
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Highlight Style Box" id="ddae7c4ef2fca8a5" memberName="highlightStyleBox"
             virtualName="" explicitFocusOrder="0" pos="584 40R 96 24" editable="0"
-            layout="33" items="Full Key" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
+            layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 95.065% 132M"
+            virtualName="" explicitFocusOrder="0" pos="24 80 95.099% 132M"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>

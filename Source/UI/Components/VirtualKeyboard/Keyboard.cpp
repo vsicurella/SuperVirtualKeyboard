@@ -375,7 +375,13 @@ void Keyboard::setKeyProportions(Key* keyIn)
 
 	switch (keyPlacementSelected)
 	{
-	case 1:
+
+	case KeyPlacementType::nestedCenter:
+		break;
+
+
+
+	case KeyPlacementType::flat:
 
 		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
 		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
@@ -383,10 +389,7 @@ void Keyboard::setKeyProportions(Key* keyIn)
 
 		break;
 
-	case 2:
-		break;
-
-	default:
+	default: // Nested Right
 
 		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
 		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
