@@ -179,13 +179,7 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     int favIdx = idIn - numberOfModes;
     int slotIdx = favIdx - favoriteModes.size();
 
-	int modeSlotNumber;
-    
-	if ((modeBoxNumber + 1) >= slot->size())
-	{
-		slot->ensureStorageAllocated(modeBoxNumber + 1);
-		modeSlotNumber = modeBoxNumber;
-	}
+	int modeSlotNumber = modeBoxNumber;
 
     ValueTree modeSelected;
     
@@ -382,8 +376,8 @@ void SvkPresetManager::initializeModePresets()
 	setModeCustom("1");
     
 	loadPreset(0, ValueTree(IDs::presetNode), false);
-	loadModeIntoSlot(0, 0, getModeInLibrary(7));
-	loadModeIntoSlot(0, 1, getModeInLibrary(7));
+	loadModeIntoSlot(0, 0, getModeInLibrary(8));
+	loadModeIntoSlot(0, 1, getModeInLibrary(8));
 }
 
 

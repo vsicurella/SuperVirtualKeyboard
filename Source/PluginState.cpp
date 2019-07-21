@@ -249,7 +249,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
     
     if (modeViewedNum == modeBoxNum)
         updateModeViewed();
-    
+
     presetEdited = true;
 }
 
