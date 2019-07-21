@@ -254,7 +254,7 @@ void SvkPluginEditor::setAutoMap(bool isAutoMapping)
 
 void SvkPluginEditor::beginMapEditing()
 {
-
+	// TODO
 }
 
 void SvkPluginEditor::setPeriodShift()

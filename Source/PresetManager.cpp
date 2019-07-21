@@ -192,7 +192,7 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
 	int factoryModeTotalMenuSize = scaleSizeMenu->getNumItems() + modeSizeMenu->getNumItems() + familyMenu->getNumItems();
 
     int modeLibraryIndex = idIn - 1;
-    int favIdx = idIn - factoryModeTotalMenuSize;
+    int favIdx = modeLibraryIndex - factoryModeTotalMenuSize;
     int slotIdx = favIdx - favoriteModes.size();
 
 	int modeSlotNumber = modeBoxNumber;
@@ -207,7 +207,7 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     {
         modeSelected = favoriteModes[favIdx];
     }
-	else if (slotIdx < slot->size())
+	else if (slotIdx < slot->size() - 2)
 	{
 		modeSelected = slot->getUnchecked(slotIdx)->modeNode;
 		modeSlotNumber = slotIdx;

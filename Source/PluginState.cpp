@@ -262,7 +262,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 void SvkPluginState::setModeCustom(String stepsIn)
 {
     presetManager->setModeCustom(stepsIn);
-	handleModeSelection(modeViewedNum, presetManager->getNumMenuItems());
+	handleModeSelection(modeViewedNum, presetManager->getNumMenuItems() + 1);
 }
 
 void SvkPluginState::setMode1Root(int rootNoteIn)
