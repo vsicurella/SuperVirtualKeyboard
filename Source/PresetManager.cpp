@@ -63,6 +63,19 @@ int SvkPresetManager::getNumModesInFavorites()
 	return favoriteModes.size();
 }
 
+int SvkPresetManager::getNumMenuItems()
+{
+	int totalMenuItems = scaleSizeMenu->getNumItems() + 
+		modeSizeMenu->getNumItems() + 
+		familyMenu->getNumItems() + 
+		userMenu->getNumItems() + 
+		favMenu->getNumItems() + 
+		slotsMenu->getNumItems();
+
+	return totalMenuItems;
+}
+
+
 ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
 {
     if (indexIn < 0)
@@ -171,6 +184,8 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, Val
 
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
+	DBG("ID Selected: " + String(idIn));
+
     SvkPreset& preset = presetsLoaded.getReference(presetSlotNum);
     OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
     
@@ -191,6 +206,17 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     {
         modeSelected = favoriteModes[favIdx];
     }
+	else if (slotIdx < slot->size())
+	{
+		modeSelected = slot->getUnchecked(slotIdx)->modeNode;
+		modeSlotNumber = slotIdx;
+	}
+	else
+	{
+		modeSelected = getModeCustom()->modeNode;
+		modeSlotNumber = slot->size();
+		DBG("Custom mode selected");
+	}
     
     if (modeSelected.isValid())
     {
@@ -581,5 +607,5 @@ void SvkPresetManager::buildModeMenu()
 	modeMenu->addSubMenu("Slots", *slotsMenu);
 	modeMenu->addSeparator();
 
-	modeMenu->addItem(modeMenu->getNumItems(), "Custom Mode");
+	modeMenu->addItem(++subMenuIndex, "Custom Mode");
 }

@@ -77,6 +77,7 @@ public:
 
 	int getNumModesLoaded();
 	int getNumModesInFavorites();
+	int getNumMenuItems();
 
 	ValueTree getModeInLibrary(int indexIn);
 	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
