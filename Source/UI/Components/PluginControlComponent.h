@@ -64,8 +64,8 @@ public:
 	int getMode1BoxSelection();
 	int getMode2BoxSelection();
 
-	void setMode1BoxText(String textIn);
-	void setMode2BoxText(String textIn);
+	void setMode1BoxText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
+	void setMode2BoxText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
 
 	void setMode1BoxId(int idIn, NotificationType notify=NotificationType::dontSendNotification);
 	void setMode2BoxId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
