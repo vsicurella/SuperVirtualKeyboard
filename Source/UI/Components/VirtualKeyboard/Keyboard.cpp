@@ -431,6 +431,18 @@ void Keyboard::setHighlightStyle(int styleIn)
 	pianoNode.setProperty(IDs::pianoKeysHighlightStyle, highlightSelected, nullptr);
 }
 
+void Keyboard::setMidiChannelOut(int midiChannelOutIn)
+{
+	midiChannelOut = jlimit(1, 16, midiChannelOutIn);
+}
+
+//===============================================================================================
+
+int Keyboard::getMidiChannelOut()
+{
+	return midiChannelOut;
+}
+
 //===============================================================================================
 
 void Keyboard::selectKeyToMap(Key* keyIn)
@@ -1014,7 +1026,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 {
     if (velocityIn > 0)
     {
-        noteOn(1, key->keyNumber, velocityIn);
+        noteOn(midiChannelOut, key->keyNumber, velocityIn);
 		key->activeState = 2;
 		key->velocity = velocityIn;
         keysOn.add(key);
@@ -1023,7 +1035,7 @@ void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
 
 void Keyboard::triggerKeyNoteOff(Key* key)
 {
-    noteOff(1, key->keyNumber, 0);
+    noteOff(midiChannelOut, key->keyNumber, 0);
 
 	if (key->isMouseOver())
 		key->activeState = 1;

@@ -371,7 +371,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             midiNote = msg.getNoteNumber();
             
             if (isInputRemapped)
-                midiNote =midiInputFilter->getNoteRemapped(msg.getNoteNumber());
+                midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
             
             midiNote += scaleSize * periodShift;
             
