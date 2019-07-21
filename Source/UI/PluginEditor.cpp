@@ -710,7 +710,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		}
 		case IDs::CommandIDs::setMode2RootNote:
 		{
-			setMode1Root();
+			setMode2Root();
 			break;
 		}
 		case IDs::CommandIDs::viewMode1:

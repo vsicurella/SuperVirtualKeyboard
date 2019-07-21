@@ -274,8 +274,7 @@ void SvkPluginState::setMode1Root(int rootNoteIn)
     
     presetEdited = true;
     
-    if (modeViewedNum == 0)
-        virtualKeyboard->updateMode(mode);
+	updateModeViewed();
     
     if (isAutoMapping)
         doMapping();
@@ -290,9 +289,8 @@ void SvkPluginState::setMode2Root(int rootNoteIn)
     
     presetEdited = true;
     
-    if (modeViewedNum == 1)
-        virtualKeyboard->updateMode(mode);
-    
+	updateModeViewed();
+
     if (isAutoMapping)
         doMapping();
 }
@@ -326,7 +324,7 @@ void SvkPluginState::setAutoMapping(bool isAutoMappingIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-    modeMapper->setMapType(mapStyleIn);
+	mapStyleSelected = mapStyleIn;
     presetViewed->parentNode.setProperty(IDs::modeMappingType, mapStyleIn, nullptr);
     
     if (isAutoMapping)
