@@ -137,6 +137,12 @@ namespace VirtualKeyboard
 		void setNoteNumbersVisible(bool showNoteNumsIn);
 
 		void setHighlightStyle(int styleIn);
+
+		void setMidiChannelOut(int midiChannelOutIn);
+
+		//===============================================================================================
+
+		int getMidiChannelOut();
         
         //===============================================================================================
 
@@ -231,6 +237,8 @@ namespace VirtualKeyboard
 		int keyPlacementSelected = 0;
 		int highlightSelected = 0;
 		bool showNoteNumbers = false;
+
+		int midiChannelOut = 1;
                 
         // Data
         ValueTree pianoNode;

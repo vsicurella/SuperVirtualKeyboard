@@ -84,6 +84,8 @@ void SvkPluginState::updateToPreset()
 
 	//virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
 	virtualKeyboard->updateKeyboard(modeViewed);
+	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
+
 	sendMappingToKeyboard();
 
 	sendChangeMessage();
@@ -250,6 +252,9 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
     if (modeViewedNum == modeBoxNum)
         updateModeViewed();
 
+	if (isAutoMapping)
+		doMapping();
+
     presetEdited = true;
 }
 
@@ -299,6 +304,7 @@ void SvkPluginState::setPeriodShift(int shiftIn)
 void SvkPluginState::setMidiChannel(int midiChannelIn)
 {
     midiProcessor->setMidiChannelOut(midiChannelIn);
+	virtualKeyboard->setMidiChannelOut(midiChannelIn);
 }
 
 void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
