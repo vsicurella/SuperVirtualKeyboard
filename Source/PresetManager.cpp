@@ -189,16 +189,17 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     SvkPreset& preset = presetsLoaded.getReference(presetSlotNum);
     OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
     
+	int factoryModeTotalMenuSize = scaleSizeMenu->getNumItems() + modeSizeMenu->getNumItems() + familyMenu->getNumItems();
+
     int modeLibraryIndex = idIn - 1;
-    
-    int favIdx = idIn - numberOfModes;
+    int favIdx = idIn - factoryModeTotalMenuSize;
     int slotIdx = favIdx - favoriteModes.size();
 
 	int modeSlotNumber = modeBoxNumber;
 
     ValueTree modeSelected;
     
-    if (modeLibraryIndex < modeLibraryNode.getNumChildren())
+    if (modeLibraryIndex < factoryModeTotalMenuSize)
     {
         modeSelected = getModeInLibrary(modeLibraryIndex);
     }

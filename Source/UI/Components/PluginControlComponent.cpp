@@ -586,14 +586,14 @@ int PluginControlComponent::getMode2BoxSelection()
 	return mode2Box->getSelectedId();
 }
 
-void PluginControlComponent::setMode1BoxText(String textIn)
+void PluginControlComponent::setMode1BoxText(String textIn, NotificationType notify)
 {
-	mode1Box->setText(textIn);
+	mode1Box->setText(textIn, notify);
 }
 
-void PluginControlComponent::setMode2BoxText(String textIn)
+void PluginControlComponent::setMode2BoxText(String textIn, NotificationType notify)
 {
-	mode2Box->setText(textIn);
+	mode2Box->setText(textIn, notify);
 }
 
 void PluginControlComponent::setMode1BoxId(int idIn, NotificationType notify)
