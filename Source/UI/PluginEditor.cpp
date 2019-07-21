@@ -220,11 +220,7 @@ void SvkPluginEditor::showModeInfo()
 	modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
 	modeInfo->addChangeListener(this);
 
-	Component* modeViewed = controlComponent->getModeViewed() == 0 ?
-		controlComponent->getMode1Box() : controlComponent->getMode2Box();
-
-	CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), modeViewed);
-	
+	CallOutBox& callout = CallOutBox::launchAsynchronously(modeInfo, controlComponent->getScaleTextEditor()->getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::setMappingStyle()
