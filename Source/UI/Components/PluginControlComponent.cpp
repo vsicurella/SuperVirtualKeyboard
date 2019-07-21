@@ -442,13 +442,15 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode1ViewBtn.get())
     {
         //[UserButtonCode_mode1ViewBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::viewMode1, true);
+		if (mode1ViewBtn->getToggleState())
+			appCmdMgr->invokeDirectly(IDs::CommandIDs::viewMode1, true);
         //[/UserButtonCode_mode1ViewBtn]
     }
     else if (buttonThatWasClicked == mode2ViewBtn.get())
     {
         //[UserButtonCode_mode2ViewBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::viewMode2, true);
+		if (mode2ViewBtn->getToggleState())
+			appCmdMgr->invokeDirectly(IDs::CommandIDs::viewMode2, true);
         //[/UserButtonCode_mode2ViewBtn]
     }
     else if (buttonThatWasClicked == noteNumsBtn.get())
@@ -605,12 +607,12 @@ void PluginControlComponent::setMode2View(bool isViewed, NotificationType notify
 
 bool PluginControlComponent::getMode2View()
 {
-	return mode1ViewBtn->getToggleState();
+	return mode2ViewBtn->getToggleState();
 }
 
 int PluginControlComponent::getModeViewed()
 {
-	return mode2ViewBtn->getToggleState() ? 0 : 1;
+	return mode1ViewBtn->getToggleState() ? 0 : 1;
 }
 
 bool PluginControlComponent::getAutoMapState()

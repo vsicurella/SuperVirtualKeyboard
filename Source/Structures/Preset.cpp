@@ -18,11 +18,11 @@ SvkPreset::SvkPreset()
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 
-	modeSlots.ensureStorageAllocated(2);
-	
+	modeSelectorSlotNumbers.add(0);
+	modeSelectorSlotNumbers.add(1);
     
-//    thePropertiesNode.setProperty(IDs::mode1SlotNumber, mode1SlotNumber, nullptr);
-//    thePropertiesNode.setProperty(IDs::mode2SlotNumber, mode2SlotNumber, nullptr);
+    thePropertiesNode.setProperty(IDs::mode1SlotNumber, 0, nullptr);
+    thePropertiesNode.setProperty(IDs::mode2SlotNumber, 1, nullptr);
 
     parentNode.addChild(thePropertiesNode, -1, nullptr);
 	parentNode.addChild(theModeNode, -1, nullptr);
@@ -45,8 +45,8 @@ SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 		ValueTree propertiesTry = nodeCopy.getChildWithName(IDs::presetProperties);
 		if (propertiesTry.isValid())
 		{
-//            mode1SlotNumber = propertiesTry[IDs::mode1SlotNumber];
-//            mode2SlotNumber = propertiesTry[IDs::mode2SlotNumber];
+            modeSelectorSlotNumbers.set(0, propertiesTry[IDs::mode1SlotNumber]);
+			modeSelectorSlotNumbers.set(1, propertiesTry[IDs::mode2SlotNumber]);
 		}
 
 		ValueTree keyboardNodeTry = nodeCopy.getChildWithName(IDs::pianoNode);
@@ -93,8 +93,9 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn)
         ValueTree propertiesTry = presetNodeIn.getChildWithName(IDs::presetProperties);
         if (propertiesTry.isValid())
         {
-            // TODO: Associate Mode Selectors with Slot Numbers
-        }
+			modeSelectorSlotNumbers.set(0, propertiesTry[IDs::mode1SlotNumber]);
+			modeSelectorSlotNumbers.set(1, propertiesTry[IDs::mode2SlotNumber]);
+		}
         
 		ValueTree keyboardNodeTry = presetNodeIn.getChildWithName(IDs::pianoNode);
 		if (keyboardNodeTry.isValid())
@@ -173,7 +174,14 @@ void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
 {
     if (slotNumIn >= 0)
     {
-        modeSelectorSlotNumbers.set(modeNumIn, jlimit(0, modeSlots.size(), slotNumIn));
+		int slotNumCommit = jlimit(0, modeSlots.size(), slotNumIn);
+        modeSelectorSlotNumbers.set(modeNumIn, slotNumCommit);
+
+		// add support for more mode slots
+		if (modeNumIn == 0)
+			thePropertiesNode.setProperty(IDs::mode1SlotNumber, slotNumCommit, nullptr);
+		else if (modeNumIn == 1)
+			thePropertiesNode.setProperty(IDs::mode2SlotNumber, slotNumCommit, nullptr);
     }
 }
 
@@ -185,7 +193,6 @@ void SvkPreset::setMode1SlotNumber(int slotNumIn)
 void SvkPreset::setMode2SlotNumber(int slotNumIn)
 {
     setModeSelectorSlotNum(1, slotNumIn);
-
 }
 
 int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumber)
