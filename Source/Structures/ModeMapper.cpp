@@ -286,7 +286,7 @@ Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
     
     DBG("Mode1 Root Index: " + String(mode1RootIndex) + "\tMode2Root: " + String(mode2RootIndex));
     
-    DBGArray(mode2MidiNotes, "Mode2 Midi Notes");
+    //DBGArray(mode2MidiNotes, "Mode2 Midi Notes");
 
     
     int mode2ScaleIndex = 0;
