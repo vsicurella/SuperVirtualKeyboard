@@ -551,6 +551,12 @@ Viewport* PluginControlComponent::getViewport()
 	return keyboardViewport.get();
 }
 
+TextEditor* PluginControlComponent::getScaleTextEditor()
+{
+	return scaleTextBox.get();
+}
+
+
 String PluginControlComponent::getScaleEntryText()
 {
 	return scaleTextBox->getText();

@@ -37,6 +37,7 @@
 */
 class ModeInfoDialog  : public Component,
                         public ChangeBroadcaster,
+                        TextEditor::Listener,
                         public Button::Listener,
                         public Slider::Listener
 {
@@ -48,6 +49,13 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void commitMode();
+
+
+	void textEditorTextChanged(TextEditor& textEditor);
+	void textEditorEscapeKeyPressed(TextEditor& textEditor);
+	void textEditorReturnKeyPressed(TextEditor& textEditor);
+	void textEditorFocusLost(TextEditor& textEditor);
+
     //[/UserMethods]
 
     void paint (Graphics& g) override;

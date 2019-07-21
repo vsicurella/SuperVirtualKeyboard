@@ -54,6 +54,8 @@ public:
 	String getScaleEntryText();
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
 
+	TextEditor* getScaleTextEditor();
+
 	Viewport* getViewport();
 
 	ReferencedComboBox* getMode1Box();

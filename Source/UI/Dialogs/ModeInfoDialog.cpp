@@ -238,6 +238,8 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     modeWorking = Mode(modeIn->modeNode);
     modeNode = modeWorking.modeNode;
 
+	familyBox->addListener(this);
+
     stepsBox->setText(modeWorking.getStepsString());
     familyBox->setText(modeWorking.getFamily());
 
@@ -380,6 +382,36 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
+{
+	if (textEditor.getName() == familyBox->getName())
+	{
+		if (defaultNameBtn->getToggleState())
+		{
+			modeWorking.setFamily(familyBox->getText());
+			nameBox->setText(modeWorking.getDescription());
+		}
+	}
+	
+}
+
+void ModeInfoDialog::textEditorEscapeKeyPressed(TextEditor& textEditor)
+{
+
+}
+
+void ModeInfoDialog::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+
+}
+
+void ModeInfoDialog::textEditorFocusLost(TextEditor& textEditor)
+{
+
+}
+
+
 void ModeInfoDialog::commitMode()
 {
 	modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
@@ -402,9 +434,10 @@ void ModeInfoDialog::commitMode()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="Mode* modeIn"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="340" initialHeight="525">
+                 parentClasses="public Component, public ChangeBroadcaster, TextEditor::Listener"
+                 constructorParams="Mode* modeIn" variableInitialisers="" snapPixels="8"
+                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
+                 initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
               virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone"
