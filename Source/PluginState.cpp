@@ -390,7 +390,12 @@ void SvkPluginState::updateModeViewed()
 
 void SvkPluginState::commitPresetChanges()
 {
+	presetViewed->commitPreset();
     presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
+
+	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
+	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
+
     presetEdited = false;
 }
 
