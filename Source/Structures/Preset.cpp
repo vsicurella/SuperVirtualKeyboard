@@ -128,6 +128,9 @@ void SvkPreset::commitPreset()
 	{
 		theModeNode.addChild(modeSlots[i].createCopy(), i, nullptr);
 	}
+
+	theModeNode.setProperty(IDs::mode1SlotNumber, getMode1SlotNumber(), nullptr);
+	theModeNode.setProperty(IDs::mode2SlotNumber, getMode1SlotNumber(), nullptr);
 }
 
 

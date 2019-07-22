@@ -177,7 +177,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	MemoryInputStream memIn(data, sizeInBytes, false);
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
 	DBG("Found this in memory:\n" + presetRecall.toXmlString());
-	//pluginState->recallState(presetRecall);
+	pluginState->recallState(presetRecall);
 }
 
 //==============================================================================
