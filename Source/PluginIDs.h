@@ -50,7 +50,11 @@ namespace IDs
     static Identifier autoRemapOn("AutoRemapOn");
     static Identifier modeMapFromRootNote("ModeMapFromRootNote");
     static Identifier modeMapFromPreset("ModeMapFromPreset");
-    static Identifier modeMappingType("ModeMappingType");
+    static Identifier modeMappingStyle("ModeMappingType");
+	static Identifier mode1OrderMapping("Mode1OrderMapping");
+	static Identifier mode2OrderMapping("Mode2OrderMapping");
+	static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
+	static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
 
 	// Mode
 	static Identifier scaleSize("ScaleSize");

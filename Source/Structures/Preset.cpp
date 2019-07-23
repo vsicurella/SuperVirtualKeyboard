@@ -19,9 +19,6 @@ SvkPreset::SvkPreset()
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 
-	setModeSelectorSlotNum(0, 0);
-	setModeSelectorSlotNum(1, 1);
-
     parentNode.addChild(thePropertiesNode, -1, nullptr);
 	parentNode.addChild(theModeSlots, -1, nullptr);
 	parentNode.addChild(theModeSlotNumbers, -1, nullptr);
@@ -63,6 +60,22 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 		theModeSlotNumbers = parentNode.getChildWithName(IDs::modeSlotsNumberNode);
 		theKeyboardNode = parentNode.getChildWithName(IDs::pianoNode);
 		theMidiSettingsNode = parentNode.getChildWithName(IDs::midiSettingsNode);
+
+		modeSlots.clear();
+
+		for (int i = 0; i < theModeSlots.getNumChildren(); i++)
+		{
+			modeSlots.set(i, theModeSlots.getChild(i));
+		}
+
+		modeSelectorSlotNumbers.clear();
+
+		for (int i = 0; i < theModeSlotNumbers.getNumChildren(); i++)
+		{
+			modeSelectorSlotNumbers.set(i, (int) theModeSlotNumbers.getChild(i).getProperty(IDs::modeSlotNumber));
+		}
+
+		DBGArray(modeSelectorSlotNumbers, "Mode Selector Slot Numbers");
 	}
 	else
 	{
@@ -114,11 +127,11 @@ ValueTree SvkPreset::getMode2()
 
 int SvkPreset::getMode1SlotNumber()
 {
-	return modeSelectorSlotNumbers[0];;
+	return modeSelectorSlotNumbers[0];
 }
 int SvkPreset::getMode2SlotNumber()
 {
-	return modeSelectorSlotNumbers[1];;
+	return modeSelectorSlotNumbers[1];
 }
 
 int SvkPreset::getSlotNumberBySelector(int modeNumIn)
@@ -138,7 +151,7 @@ void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
 		{
 			int filler = numberOfModeSources;
 
-			while (filler <= slotNumIn)
+			while (filler < slotNumIn)
 			{
 				modeSelectorSlotNumbers.set(filler, -1);
 
@@ -150,7 +163,7 @@ void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
 			}
 		}
 
-        modeSelectorSlotNumbers.set(modeNumIn, slotNumCommit);
+        modeSelectorSlotNumbers.add(slotNumCommit);
 
 		slotNumNode = ValueTree(IDs::modeSlotsNumberNode);
 		slotNumNode.setProperty(IDs::modeSlotNumber, slotNumIn, nullptr);

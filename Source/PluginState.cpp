@@ -39,7 +39,8 @@ SvkPluginState::SvkPluginState()
 	textFilterInt.reset(new TextFilterInt());
     
 	setPresetViewed(0);
-    updateToPreset();
+	modeViewedNum = 1;
+	updateModeViewed(false);
 }
 
 void SvkPluginState::recallState(ValueTree nodeIn)
@@ -48,12 +49,18 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (nodeIn.hasType(IDs::presetNode))
     {
-        presetManager->loadPreset(0, nodeIn, dontSendNotification);
+        presetManager->loadPreset(0, nodeIn, false);
+		return;
     }
-    else
+	else if (childNode.hasType(IDs::presetNode))
     {
-        presetManager->loadPreset(0, childNode, dontSendNotification);
+        presetManager->loadPreset(0, childNode, false);
     }
+	else
+	{
+		presetManager->loadPreset(0, ValueTree(IDs::presetNode), false);
+		return;
+	}
     
     childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
     
@@ -68,27 +75,30 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     updateToPreset();
 }
 
-void SvkPluginState::updateToPreset()
+void SvkPluginState::updateToPreset(bool sendChange)
 {
 	presetEdited = false;
 
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
+	modeViewedNum = (int) presetViewed->thePropertiesNode.getProperty(IDs::modeSlotNumViewed);
+	isAutoMapping = (bool) presetViewed->thePropertiesNode.getProperty(IDs::autoRemapOn);
+	mapStyleSelected = (int)presetViewed->thePropertiesNode.getProperty(IDs::modeMappingStyle);
 
 	updateModeViewed();
-
+	
 	//pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
 	//pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
-	midiProcessor->setScaleSize(modeViewed->getScaleSize());
+	//midiProcessor->setScaleSize(modeViewed->getScaleSize());
 
 	//virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
-	virtualKeyboard->updateKeyboard(modeViewed);
 	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
 
 	sendMappingToKeyboard();
 
-	sendChangeMessage();
+	if (sendChange)
+		sendChangeMessage();
 }
 
 //==============================================================================
@@ -241,8 +251,8 @@ void SvkPluginState::setPresetViewed(int presetViewedIn)
 void SvkPluginState::setModeViewed(int modeViewedIn)
 {
     modeViewedNum = modeViewedIn;
+	presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 	updateModeViewed();
-    //presetViewed->parentNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 }
 
 void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
@@ -325,7 +335,7 @@ void SvkPluginState::setAutoMapping(bool isAutoMappingIn)
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
 	mapStyleSelected = mapStyleIn;
-    presetViewed->parentNode.setProperty(IDs::modeMappingType, mapStyleIn, nullptr);
+    presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
     
     if (isAutoMapping)
     {
@@ -376,7 +386,7 @@ void SvkPluginState::setHighlightStyle(int highlightStyleIn)
 
 //==============================================================================
 
-void SvkPluginState::updateModeViewed()
+void SvkPluginState::updateModeViewed(bool sendChange)
 {
 	modePresetSlotNum = modeViewedNum ?
 		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
@@ -384,13 +394,14 @@ void SvkPluginState::updateModeViewed()
 	modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modePresetSlotNum);
 
 	virtualKeyboard->updateKeyboard(modeViewed);
-	sendChangeMessage();
+
+	if (sendChange)
+		sendChangeMessage();
 }
 
 
 void SvkPluginState::commitPresetChanges()
 {
-	presetViewed->commitPreset();
     presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
 
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
