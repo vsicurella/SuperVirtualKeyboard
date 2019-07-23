@@ -34,8 +34,8 @@ namespace IDs
     static Identifier presetProperties("PresetProperties");
     static Identifier presetSlotViewed("PresetSlotViewed");
     static Identifier modeSlotsNode("ModeSlots");
-    static Identifier mode1SlotNumber("Mode1SlotNum");
-    static Identifier mode2SlotNumber("Mode2SlotNum");
+	static Identifier modeSlotsNumberNode("ModeSlotNumbers");
+    static Identifier modeSlotNumber("SlotNumber");
     static Identifier modeSlotNumViewed("ModeSlotViewed");
 
 	// Midi Settings

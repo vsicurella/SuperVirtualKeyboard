@@ -19,7 +19,8 @@ struct SvkPreset
 {
 	ValueTree parentNode;
     ValueTree thePropertiesNode;
-	ValueTree theModeNode;
+	ValueTree theModeSlots;
+	ValueTree theModeSlotNumbers;
 	ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;
 
@@ -28,8 +29,7 @@ struct SvkPreset
 	SvkPreset(const SvkPreset& presetToCopy);
 	~SvkPreset();
 
-	bool restoreFromNode(ValueTree presetNodeIn);
-	void commitPreset();
+	bool restoreFromNode(ValueTree presetNodeIn, bool createCopy=false);
 
     int getModeSlotsSize();
 
@@ -48,7 +48,7 @@ struct SvkPreset
     
 	int setModeSlot(ValueTree modeNodeIn, int slotNumber = 0);
 	int addMode(ValueTree modeNodeIn);
-	bool addModes(Array <ValueTree> modeSlotsIn);
+	bool addModes(Array<ValueTree> modeSlotsIn);
        
 	String toString();	
 
