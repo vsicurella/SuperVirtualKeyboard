@@ -488,6 +488,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     {
         virtualKeyboard->resetKeyColors(true);
         updateUI();
+		pluginState->updateModeViewed(false);
     }
     
     // Color editing has finished
