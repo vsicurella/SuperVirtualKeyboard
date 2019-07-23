@@ -19,6 +19,9 @@ SvkPreset::SvkPreset()
 	theKeyboardNode = ValueTree(IDs::pianoNode);
     theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 
+	modeSelectorSlotNumbers.set(0, 0);
+	modeSelectorSlotNumbers.set(1, 1);
+
     parentNode.addChild(thePropertiesNode, -1, nullptr);
 	parentNode.addChild(theModeSlots, -1, nullptr);
 	parentNode.addChild(theModeSlotNumbers, -1, nullptr);
@@ -163,7 +166,7 @@ void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
 			}
 		}
 
-        modeSelectorSlotNumbers.add(slotNumCommit);
+        modeSelectorSlotNumbers.set(modeNumIn, slotNumCommit);
 
 		slotNumNode = ValueTree(IDs::modeSlotsNumberNode);
 		slotNumNode.setProperty(IDs::modeSlotNumber, slotNumIn, nullptr);

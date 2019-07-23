@@ -95,6 +95,7 @@ public:
 	int addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn);
 	int addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn);
 	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
+	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
 
 	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
 
