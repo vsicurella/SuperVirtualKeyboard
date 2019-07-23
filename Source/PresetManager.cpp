@@ -182,6 +182,11 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, Val
 	return slot->getUnchecked(modeSlotNum);
 }
 
+Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
+{
+	return loadModeIntoSlot(presetSlotNum, modeSlotNum, getModeInLibrary(modeLibraryIndexIn));
+}
+
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
 	DBG("ID Selected: " + String(idIn));
