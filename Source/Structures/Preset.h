@@ -42,7 +42,7 @@ struct SvkPreset
     int getMode1SlotNumber();
     int getMode2SlotNumber();
 
-	void setModeSelectorSlotNum(int modeNumIn, int slotNumIn);
+	int setModeSelectorSlotNum(int modeNumIn, int slotNumIn);
     void setMode1SlotNumber(int slotNumIn);
     void setMode2SlotNumber(int slotNumIn);
     
