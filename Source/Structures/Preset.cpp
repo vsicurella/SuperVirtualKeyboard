@@ -79,6 +79,13 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
             slotNum = jlimit(0, modeSlots.size(), slotNum);
 			modeSelectorSlotNumbers.set(i, slotNum);
 		}
+        
+        // not sure if this is fine, or bad implementation
+        if (modeSelectorSlotNumbers.size() < 2)
+        {
+            modeSelectorSlotNumbers.set(0, 0);
+            modeSelectorSlotNumbers.set(1, 1);
+        }
 
 		DBGArray(modeSelectorSlotNumbers, "Mode Selector Slot Numbers");
 	}
