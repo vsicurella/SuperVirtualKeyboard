@@ -256,8 +256,11 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     intervalSizeReadout->setText(arrayToString(modeWorking.getIntervalSizeCount()), dontSendNotification);
 
     infoBox->setText(modeWorking.getInfo());
-
-	rotateSld->setRange(-(modeWorking.getModeSize() - 1), modeWorking.getModeSize() - 1, 1);
+    
+    if (modeWorking.getModeSize() > 1)
+        rotateSld->setRange(-(modeWorking.getModeSize() - 1), modeWorking.getModeSize() - 1, 1);
+    else
+        rotateSld->setEnabled(false);
 
     //[/UserPreSize]
 

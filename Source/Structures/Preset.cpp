@@ -75,7 +75,9 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 
 		for (int i = 0; i < theModeSlotNumbers.getNumChildren(); i++)
 		{
-			modeSelectorSlotNumbers.set(i, (int) theModeSlotNumbers.getChild(i).getProperty(IDs::modeSlotNumber));
+            int slotNum = (int) theModeSlotNumbers.getChild(i).getProperty(IDs::modeSlotNumber);
+            slotNum = jlimit(0, modeSlots.size(), slotNum);
+			modeSelectorSlotNumbers.set(i, slotNum);
 		}
 
 		DBGArray(modeSelectorSlotNumbers, "Mode Selector Slot Numbers");
@@ -142,36 +144,20 @@ int SvkPreset::getSlotNumberBySelector(int modeNumIn)
     return modeSelectorSlotNumbers[modeNumIn];
 }
 
-void SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
+int SvkPreset::setModeSelectorSlotNum(int modeNumIn, int slotNumIn)
 {
     if (slotNumIn >= 0)
     {
-		int numberOfModeSources = modeSelectorSlotNumbers.size();
-		int slotNumCommit = jlimit(0, modeSlots.size(), slotNumIn);
-		ValueTree slotNumNode;
+		slotNumIn = jlimit(0, modeSlots.size(), slotNumIn);
 
-		if (slotNumIn >= numberOfModeSources)
-		{
-			int filler = numberOfModeSources;
-
-			while (filler < slotNumIn)
-			{
-				modeSelectorSlotNumbers.set(filler, -1);
-
-				slotNumNode = ValueTree(IDs::modeSlotsNumberNode);
-				slotNumNode.setProperty(IDs::modeSlotNumber, -1, nullptr);
-				theModeSlotNumbers.addChild(slotNumNode, filler, nullptr);
-
-				filler++;
-			}
-		}
-
-        modeSelectorSlotNumbers.set(modeNumIn, slotNumCommit);
-
-		slotNumNode = ValueTree(IDs::modeSlotsNumberNode);
+        modeSelectorSlotNumbers.set(modeNumIn, slotNumIn);
+        
+        ValueTree slotNumNode = ValueTree(IDs::modeSlotsNumberNode);
 		slotNumNode.setProperty(IDs::modeSlotNumber, slotNumIn, nullptr);
 		theModeSlotNumbers.addChild(slotNumNode, slotNumIn, nullptr);
     }
+    
+    return slotNumIn;
 }
 
 void SvkPreset::setMode1SlotNumber(int slotNumIn)
