@@ -178,7 +178,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
 	DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
-	//presetRecall = ValueTree();
+    //presetRecall = ValueTree(); // uncomment this line to test new instantiation
 
 	if (presetRecall.isValid())
 		pluginState->recallState(presetRecall);
