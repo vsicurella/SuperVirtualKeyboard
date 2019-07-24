@@ -20,10 +20,10 @@ Mode::Mode()
 	steps = parse_steps(stepsString);
 	ordersDefault = steps_to_orders(steps);
 	mosClass = interval_sizes(steps);
-	scaleSize = ordersDefault.size();
-	modeSize = steps.size();
+    scaleSize = 1;
+    modeSize = 1;
 	name = getDescription();
-	offset = getOffset() * -1;
+    offset = 0;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(ordersDefault);

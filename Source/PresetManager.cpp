@@ -187,6 +187,47 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int
 	return loadModeIntoSlot(presetSlotNum, modeSlotNum, getModeInLibrary(modeLibraryIndexIn));
 }
 
+void SvkPresetManager::removeMode(int presetSlotNum, int modeSlotNum)
+{
+    SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+    OwnedArray<Mode>* slot = modeSlots[presetSlotNum];
+    
+    if (preset && slot)
+    {
+        slot->remove(modeSlotNum);
+        
+        // Decrement mode source slot numbers if a mode in the middle was deleted
+        if (slot->size() > modeSlotNum)
+        {
+            for (int i = 0; i < slot->size(); i ++)
+            {
+                int ind = preset->getSlotNumberBySelector(i);
+                
+                if (ind > modeSlotNum)
+                    preset->setModeSelectorSlotNum(i, ind-1);
+            }
+        }
+    }
+}
+
+void SvkPresetManager::resetModeSlot(int presetSlotNum)
+{
+    SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+    OwnedArray<Mode>* slot = modeSlots[presetSlotNum];
+    
+    if (preset && slot)
+    {
+        slot->clear();
+
+        for (int i = 0; i < slot->size(); i ++)
+        {
+            preset->setModeSelectorSlotNum(i, 0);
+        }
+        
+        addModeToNewSlot(presetSlotNum, Mode::createNode("1"));
+    }
+}
+
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
 	DBG("ID Selected: " + String(idIn));
@@ -249,19 +290,11 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
         SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
 
 		OwnedArray<Mode>* modes = modeSlots[presetSlotNum];
-		
-		if (preset->getModeSlotsSize() == 0)
-		{
-			addModeToNewSlot(0, 8);
-		}
-		else
-		{
-			modes->clear();
-		}
+        modes->clear();
 
 		for (int i = 0; i < preset->getModeSlotsSize(); i++)
 		{
-			modes->add(new Mode(preset->getModeInSlot(i)));
+			modes->set(i, new Mode(preset->getModeInSlot(i)));
 		}
 
 		if (sendChangeSignal)

@@ -352,7 +352,7 @@ void PluginControlComponent::resized()
     keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
     mapStyleLbl->setBounds ((getWidth() / 2) + -152 - (96 / 2), 48, 96, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9510f), getHeight() - 132);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9506f), getHeight() - 132);
     //[UserResized] Add your own custom resize handling here..
 
 	Component* svk = keyboardViewport->getViewedComponent();
@@ -850,7 +850,7 @@ BEGIN_JUCER_METADATA
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 95.099% 132M"
+            virtualName="" explicitFocusOrder="0" pos="24 80 95.177% 132M"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
 </JUCER_COMPONENT>
