@@ -50,7 +50,7 @@ public:
     
     enum MapType
     {
-        ModeToMode = 0,
+        ModeToMode = 1,
         ModeToScale,
         ModeByOrder
     };

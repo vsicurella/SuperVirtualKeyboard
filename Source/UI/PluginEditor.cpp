@@ -71,6 +71,8 @@ void SvkPluginEditor::initNodeData()
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
         view->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
+
+		pluginState->getKeyboard()->addListener(pluginState->getMidiProcessor());
 	}
 	else
 	{
@@ -96,7 +98,7 @@ void SvkPluginEditor::updateUI()
 {
 	controlComponent->setAutoMapState(pluginState->isAutoMapOn());
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
-	controlComponent->setMappingStyleId(pluginState->getMappingStyle() + 1);
+	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
 	controlComponent->setMode1Root(pluginState->getMode1Root());
 	controlComponent->setMode2Root(pluginState->getMode2Root());
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
