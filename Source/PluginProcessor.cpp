@@ -167,6 +167,7 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
 	MemoryOutputStream memOut(destData, true);
     pluginState->commitPresetChanges();
 	pluginState->pluginStateNode.writeToStream(memOut);
+    DBG("Saving Plugin State node to internal memory:" + pluginState->pluginStateNode.toXmlString());
 }
 
 void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)

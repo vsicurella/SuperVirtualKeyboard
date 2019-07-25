@@ -29,33 +29,14 @@ Keyboard::Keyboard()
 
     toBack();
 
-	initiateDataNode();
+    pianoNode = ValueTree(IDs::pianoNode);
+    updatePianoNode();
     
     setSize(1000, 250);
     setOpaque(true);
 }
 
 //===============================================================================================
-
-void Keyboard::initiateDataNode()
-{
-	if (!pianoNode.isValid())
-	{
-		pianoNode = ValueTree(IDs::pianoNode);
-
-		// Initialize default values
-		for (int i = 0; i < 128; i++)
-			keyMidiNoteMappings.add(i);
-
-		pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
-		pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
-		pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
-		pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
-		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
-        
-        updatePianoNode();
-	}
-}
 
 void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 {
@@ -66,7 +47,11 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 		orientationSelected = pianoNode[IDs::pianoOrientation];
 		keyPlacementSelected = pianoNode[IDs::pianoKeyPlacementType];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
-		defaultKeyWHRatio = pianoNode[IDs::pianoWHRatio];
+		defaultKeyWHRatio = (float) pianoNode[IDs::pianoWHRatio];
+        
+        // safeguard
+        if (defaultKeyWHRatio < 0.01)
+            defaultKeyWHRatio = 0.25f;
 
 		if (pianoNode.getChildWithName(IDs::pianoKeyColorsOrder).isValid())
 		{
@@ -90,6 +75,12 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 
 void Keyboard::updatePianoNode()
 {
+    pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
+    pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
+    pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
+    pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
+    pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+    
     // Colors
     pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
     add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
@@ -116,7 +107,6 @@ void Keyboard::updatePianoNode()
     add_array_to_node(pianoNode, keyRatioDegree, IDs::pianoKeyRatioDegree, "Ratio");
     pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioSingle), nullptr);
     add_array_to_node(pianoNode, keyRatioSingle, IDs::pianoKeyRatioSingle, "Ratio");
-    
 }
 
 ValueTree Keyboard::getNode()

@@ -33,6 +33,7 @@ using namespace VirtualKeyboard;
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
+                        private ScrollBar::Listener,
 						private Timer
 {
 public:
@@ -125,6 +126,8 @@ public:
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+    
+    void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart) override;
 
 	 //==============================================================================
 
@@ -155,6 +158,7 @@ private:
 
 	Viewport* view;
 	Keyboard* virtualKeyboard;
+    ScrollBar* keyboardScroll;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;

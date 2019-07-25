@@ -71,9 +71,7 @@ namespace VirtualKeyboard
 		~Keyboard() {};
         
         //===============================================================================================
-        
-        void initiateDataNode();
-        
+                
         void restoreDataNode(ValueTree pianoNodeIn);
 
 		void updatePianoNode();
@@ -234,8 +232,8 @@ namespace VirtualKeyboard
 		// Parameters
 		int uiModeSelected = 0;
 		int orientationSelected = 0;
-		int keyPlacementSelected = 0;
-		int highlightSelected = 0;
+		int keyPlacementSelected = 1;
+		int highlightSelected = 1;
 		bool showNoteNumbers = false;
 
 		int midiChannelOut = 1;
