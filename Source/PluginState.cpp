@@ -32,6 +32,8 @@ SvkPluginState::SvkPluginState()
 
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard());
 	virtualKeyboard->addListener(midiProcessor.get());
+	midiProcessor->getKeyboardState()->addListener(virtualKeyboard.get());
+
 	pianoNode = virtualKeyboard->getNode();
 	pluginStateNode.addChild(pianoNode, -1, nullptr);
 
@@ -50,7 +52,6 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     if (nodeIn.hasType(IDs::presetNode))
     {
         presetManager->loadPreset(0, nodeIn, false);
-		return;
     }
 	else if (childNode.hasType(IDs::presetNode))
     {
@@ -59,7 +60,6 @@ void SvkPluginState::recallState(ValueTree nodeIn)
 	else
 	{
 		presetManager->loadPreset(0, ValueTree(IDs::presetNode), false);
-		return;
 	}
     
     childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
@@ -90,7 +90,8 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	//pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
-	//midiProcessor->setScaleSize(modeViewed->getScaleSize());
+	midiProcessor->setMode1(getMode1());
+	midiProcessor->setMode2(getMode2());
 
 	//virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
 	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
@@ -246,6 +247,9 @@ void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
     presetSlotNumViewed = presetViewedIn;
     presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
+
+	midiProcessor->setMode1(getMode1());
+	midiProcessor->setMode2(getMode2());
 }
 
 void SvkPluginState::setModeViewed(int modeViewedIn)
@@ -259,6 +263,9 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
     presetManager->handleModeSelection(presetSlotNumViewed, modeBoxNum, idIn);
     
+	midiProcessor->setMode1(getMode1());
+	midiProcessor->setMode2(getMode2());
+
     if (modeViewedNum == modeBoxNum)
         updateModeViewed();
 
@@ -346,6 +353,8 @@ void SvkPluginState::setMapStyle(int mapStyleIn)
 void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mappingType,
                                int mode1OrderIn, int mode2OrderIn, int mode1OrderOffsetIn, int mode2OrderOffsetIn)
 {
+	virtualKeyboard->allNoteOff();
+
     NoteMap noteMap = modeMapper->map(*mode1, *mode2, mappingType,
                                       mode1OrderIn, mode2OrderIn, mode1OrderOffsetIn, mode2OrderOffsetIn,
                                       *midiProcessor->getInputNoteMap());
@@ -393,6 +402,7 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 
 	modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modePresetSlotNum);
 
+	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->updateKeyboard(modeViewed);
 
 	if (sendChange)

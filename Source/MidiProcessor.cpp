@@ -214,9 +214,19 @@ String SvkMidiProcessor::setMidiOutput(int deviceIndex)
     return midiOutput->getName();
 }
 
-void SvkMidiProcessor::setScaleSize(int scaleSizeIn)
+void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
 {
-    scaleSize = scaleSizeIn;
+	modeViewed = modeViewedIn;
+}
+
+void SvkMidiProcessor::setMode1(Mode* mode1In)
+{
+	mode1 = mode1In;
+}
+
+void SvkMidiProcessor::setMode2(Mode* mode2In)
+{
+	mode2 = mode2In;
 }
 
 void SvkMidiProcessor::setRootNote(int rootNoteIn)
@@ -229,6 +239,11 @@ void SvkMidiProcessor::setPeriodShift(int shiftIn)
 {
     midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
     periodShift = shiftIn;
+}
+
+void SvkMidiProcessor::periodUsesModeSize(bool useModeSizeIn)
+{
+	useModeSize = useModeSizeIn;
 }
 
 void SvkMidiProcessor::setMidiChannelOut(int channelOut)
@@ -373,7 +388,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             if (isInputRemapped)
                 midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
             
-            midiNote += scaleSize * periodShift;
+			midiNote += periodShift * mode2->getScaleSize();
             
             msg.setNoteNumber(midiNote);
             
