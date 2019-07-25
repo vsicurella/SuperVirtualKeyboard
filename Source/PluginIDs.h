@@ -48,6 +48,8 @@ namespace IDs
     static Identifier midiInputName("InputDevice");
     static Identifier midiOutputName("OutputDevice");
     static Identifier autoRemapOn("AutoRemapOn");
+    static Identifier midiMapInputCustom("Custom Midi Input Map");
+    static Identifier midiMapOutputCustom("Custom Midi Output Map");
     static Identifier modeMapFromRootNote("ModeMapFromRootNote");
     static Identifier modeMapFromPreset("ModeMapFromPreset");
     static Identifier modeMappingStyle("ModeMappingType");

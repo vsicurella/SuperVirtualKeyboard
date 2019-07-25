@@ -276,7 +276,7 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     }
     
 	preset.setModeSelectorSlotNum(modeBoxNumber, modeSlotNumber);
-    buildSlotsMenu();
+    //buildSlotsMenu();
 }
 
 
@@ -447,8 +447,8 @@ void SvkPresetManager::initializeModePresets()
 	setModeCustom("1");
     
 	loadPreset(0, ValueTree(IDs::presetNode), false);
-	loadModeIntoSlot(0, 0, getModeInLibrary(8));
-	loadModeIntoSlot(0, 1, getModeInLibrary(8));
+    handleModeSelection(0, 0, 9);
+    handleModeSelection(0, 1, 9);
 }
 
 

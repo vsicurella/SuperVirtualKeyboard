@@ -46,7 +46,10 @@ class SvkMidiProcessor : public MidiMessageCollector
     bool midiInputPaused = false;
     bool isInputRemapped = true;
     bool isOutputRemapped = true;
+    
     bool setAutoMap = true;
+    bool inputMapIsCustom = false;
+    bool outputMapIsCustom = false;
     
     std::unique_ptr<MidiKeyboardState> keyboardState; // used for displaying on VirtualKeyboard
     

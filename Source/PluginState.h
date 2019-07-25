@@ -149,7 +149,7 @@ private:
 	// Mapping parameters
 
     bool isAutoMapping = true;
-    int mapStyleSelected = 0;
+    int mapStyleSelected = 1;
     
     int mapOrder1 = 0;
     int mapOrder2 = 0;

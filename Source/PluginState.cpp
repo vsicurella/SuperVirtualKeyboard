@@ -32,10 +32,9 @@ SvkPluginState::SvkPluginState()
 
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard());
 	virtualKeyboard->addListener(midiProcessor.get());
-	midiProcessor->getKeyboardState()->addListener(virtualKeyboard.get());
-
 	pianoNode = virtualKeyboard->getNode();
-	pluginStateNode.addChild(pianoNode, -1, nullptr);
+    
+    midiProcessor->getKeyboardState()->addListener(virtualKeyboard.get());
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
@@ -59,7 +58,8 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     }
 	else
 	{
-		presetManager->loadPreset(0, ValueTree(IDs::presetNode), false);
+        //presetManager->loadPreset(0, ValueTree(IDs::presetNode), false);
+        return;
 	}
     
     childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
@@ -69,7 +69,7 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
     
-    if (childNode.isValid())
+    if (childNode.isValid() && childNode.getNumProperties() > 0)
         pluginEditorNode = childNode.createCopy();
     
     updateToPreset();
@@ -85,15 +85,14 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	mapStyleSelected = (int)presetViewed->thePropertiesNode.getProperty(IDs::modeMappingStyle);
 
 	updateModeViewed();
-	
-	//pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
-	//pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
-
-	//virtualKeyboard->restoreDataNode(presetViewed->theKeyboardNode);
+    
+    
+    pianoNode = presetViewed->theKeyboardNode;
+	virtualKeyboard->restoreDataNode(pianoNode);
 	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
 
 	sendMappingToKeyboard();
@@ -409,9 +408,10 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 		sendChangeMessage();
 }
 
-
 void SvkPluginState::commitPresetChanges()
 {
+    virtualKeyboard->updatePianoNode();
+    presetViewed->theKeyboardNode = pianoNode;
     presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
 
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);

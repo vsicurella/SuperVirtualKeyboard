@@ -1,4 +1,4 @@
-1 2 1 2 1, Mavila; gethiAnti-pentatonic scale in 7EDO
+1 2 1 2 1, Mavila; Anti-pentatonic scale in 7EDO
 2 1 2 2 1, Father
 1 1 2 1 1 1 2, Mavila; Anti-diatonic scale in 9EDO
 1 2 1 2 1 2 1, Dicot
@@ -12,7 +12,7 @@
 2 1 2 1 2 1 2 1 1, Orwell
 2 2 2 2 1 2 2 1, Hedgehog
 2 2 1 2 1 2 1 2 1, Titanium
-3 3 3 3 3, Blackwood
+2 1 2 1 2 1 2 1 2 1, Blackwood; Named after Easley Blackwood. This symmetrical scale features major and minor triads on every other tonic.
 3 3 1 3 1 3 1, Hanson
 3 1 3 1 3 1 3, Orgone
 2 2 2 2 2 2 2 1, Porcupine
@@ -48,7 +48,7 @@
 3 1 3 1 3 3 1 3 1 3, Astrology
 3 3 3 3 2 3 3 2, Hedgehog
 3 2 3 2 3 2 3 2 2, Orwell
-2 2 2 2 2 1 2 2 2 2 2 1, Pajara
+2 2 2 2 2 1 2 2 2 2 2 1, Pajara; A symmetrical scale discovered and proposed by Paul Erlich as a natural extension of 7-limit harmony to the familiar 5-limit Meantone system.
 3 3 3 1 3 3 3 3 1, Mavila
 2 2 2 3 2 2 3 2 2 3, Sephiroth
 5 5 4 5 5, Godzilla

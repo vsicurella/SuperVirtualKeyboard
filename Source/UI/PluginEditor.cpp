@@ -27,8 +27,10 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     
 	view = controlComponent->getViewport();
 	virtualKeyboard = pluginState->getKeyboard();
-
 	view->setViewedComponent(virtualKeyboard, false);
+    
+    keyboardScroll = &view->getHorizontalScrollBar();
+    keyboardScroll->addListener(this);
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
@@ -41,8 +43,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
     pluginState->addChangeListener(this);
-
-	initNodeData();
     
 	appCmdMgr->registerAllCommandsForTarget(this);
 
@@ -52,28 +52,28 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     setSize(1000, 250);
 	setResizeLimits(750, 100, 10e4, 10e4);
     
+    initNodeData();
 	startTimerHz(60);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
 {
     pluginState->removeChangeListener(this);
-    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(virtualKeyboard);
 }
 
 //==============================================================================
 
 void SvkPluginEditor::initNodeData()
 {
+    // Gui is recreated
 	if (pluginState->pluginEditorNode.isValid())
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
         view->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
-
-		pluginState->getKeyboard()->addListener(pluginState->getMidiProcessor());
 	}
+    // Intialization
 	else
 	{
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
@@ -108,7 +108,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
 	controlComponent->setKeyStyleId(pluginState->getKeyStyle() + 1);
-	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle() + 1);
+	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
     
 	DBG("Children Updated");
 }
@@ -321,14 +321,17 @@ void SvkPluginEditor::paint(Graphics& g)
 
 void SvkPluginEditor::resized()
 {
-	int viewPositionKeyboardX = view->getViewPositionX();
+	float viewXProportion = (float) view->getViewPositionX() / view->getMaximumVisibleWidth();
 	AudioProcessorEditor::resized();
 	controlComponent->setSize(getWidth(), getHeight());
 
 	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
 	//virtualKeyboard->setSize(getWidth(), getHeight());
 	
-	//view->setViewPosition(viewPositionKeyboardX, 0);
+	view->setViewPosition((int)(viewXProportion * view->getMaximumVisibleWidth()), 0);
+    
+    if (pluginEditorNode.isValid())
+        updateNodeData();
 }
 
 //==============================================================================
@@ -345,6 +348,7 @@ void SvkPluginEditor::userTriedToCloseWindow()
 	if (colorChooserWindow->isVisible())
 		colorChooserWindow->closeButtonPressed();
 
+    updateNodeData();
 	setVisible(false);
 }
 
@@ -488,7 +492,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     // New Mode loaded
     if (source == pluginState)
     {
-        virtualKeyboard->resetKeyColors(true);
         updateUI();
 		pluginState->updateModeViewed(false);
     }
@@ -515,6 +518,14 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	{
 		pluginState->updateToPreset();
 	}
+}
+
+void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
+{
+    if (scrollBarThatHasMoved == keyboardScroll)
+    {
+        pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
+    }
 }
 
 //==============================================================================
