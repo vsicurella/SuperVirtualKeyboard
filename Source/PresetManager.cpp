@@ -346,7 +346,7 @@ bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
 {
 	SvkPreset* preset = getPresetLoaded(presetSlotNum);
 
-	return saveNodeToFile(preset->parentNode, "Save preset", ".svk", pluginSettingsNode[IDs::presetDirectory]);
+	return saveNodeToFile(preset->parentNode, "Save preset", "*.svk", pluginSettingsNode[IDs::presetDirectory]);
 }
 
 bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath)
@@ -358,12 +358,12 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 	else
 		mode = modeCustom.get();
 
-	return saveNodeToFile(mode->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
+	return saveNodeToFile(mode->modeNode, "Save mode", "*.svk", pluginSettingsNode[IDs::modeDirectory]);
 }
 
 bool SvkPresetManager::saveModeToFile(String absolutePath)
 {
-	return saveNodeToFile(modeCustom->modeNode, "Save mode", ".svk", pluginSettingsNode[IDs::modeDirectory]);
+	return saveNodeToFile(modeCustom->modeNode, "Save mode", "*.svk", pluginSettingsNode[IDs::modeDirectory]);
 }
 
 ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath)

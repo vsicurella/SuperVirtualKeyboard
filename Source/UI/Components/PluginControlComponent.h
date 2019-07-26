@@ -107,10 +107,10 @@ public:
 	int getHighlightStyle();
 	void setHighlightStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	void textEditorTextChanged(TextEditor& textEditor);
-	void textEditorEscapeKeyPressed(TextEditor& textEditor);
-	void textEditorReturnKeyPressed(TextEditor& textEditor);
-	void textEditorFocusLost(TextEditor& textEditor);
+	void textEditorTextChanged(TextEditor& textEditor) override;
+	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
+	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+	void textEditorFocusLost(TextEditor& textEditor) override;
 
     //[/UserMethods]
 
@@ -126,6 +126,11 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	SvkPluginState * pluginState;
 	ApplicationCommandManager* appCmdMgr;
+    
+    std::unique_ptr<PopupMenu> saveMenu;
+    std::unique_ptr<PopupMenu> loadMenu;
+    std::unique_ptr<PopupMenu> exportMenu;
+    
     //[/UserVariables]
 
     //==============================================================================

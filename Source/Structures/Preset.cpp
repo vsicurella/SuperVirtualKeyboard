@@ -89,10 +89,6 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 
 		DBGArray(modeSelectorSlotNumbers, "Mode Selector Slot Numbers");
 	}
-	else
-	{
-		return false;
-	}
 
 	if (!thePropertiesNode.isValid())
 	{
@@ -108,6 +104,16 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 	{
 		theMidiSettingsNode = ValueTree(IDs::midiSettingsNode);
 	}
+    
+    if (!theModeSlots.isValid())
+    {
+        theModeSlots = ValueTree(IDs::modeSlotsNode);
+    }
+    
+    if (!theModeSlotNumbers.isValid())
+    {
+        theModeSlotNumbers = ValueTree(IDs::modeSlotsNumberNode);
+    }
     
     return true;
 }

@@ -254,6 +254,18 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 	mode1Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
 	mode2Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
+    
+    saveMenu.reset(new PopupMenu());
+    saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::saveMode);
+    saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::savePresetToFile);
+    
+    loadMenu.reset(new PopupMenu());
+    loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadMode);
+    loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset);
+    
+    exportMenu.reset(new PopupMenu());
+    exportMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::exportReaperMap);
+    exportMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::exportAbletonMap);
 
     //[/UserPreSize]
 
@@ -490,19 +502,22 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == saveBtn.get())
     {
         //[UserButtonCode_saveBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::savePresetToFile, true);
+		//appCmdMgr->invokeDirectly(IDs::CommandIDs::savePresetToFile, true);
+        saveMenu->showAt(saveBtn.get());
         //[/UserButtonCode_saveBtn]
     }
     else if (buttonThatWasClicked == loadBtn.get())
     {
         //[UserButtonCode_loadBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::loadPreset, true);
+		//appCmdMgr->invokeDirectly(IDs::CommandIDs::loadPreset, true);
+        loadMenu->showAt(loadBtn.get());
         //[/UserButtonCode_loadBtn]
     }
     else if (buttonThatWasClicked == exportBtn.get())
     {
         //[UserButtonCode_exportBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::exportPreset, true);
+		//appCmdMgr->invokeDirectly(IDs::CommandIDs::exportPreset, true);
+        exportMenu->showAt(exportBtn.get());
         //[/UserButtonCode_exportBtn]
     }
     else if (buttonThatWasClicked == autoMapBtn.get())

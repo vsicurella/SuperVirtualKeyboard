@@ -61,12 +61,15 @@ public:
 
 	bool savePresetToFile();
 	bool saveMode();
+    void showSaveMenu();
 
 	bool loadPreset();
 	bool loadMode();
+    void showLoadMenu();
 
 	bool exportReaperMap();
 	bool exportAbletonMap();
+    void showExportMenu();
 
 	void commitCustomScale();
 
