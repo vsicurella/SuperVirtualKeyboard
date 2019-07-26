@@ -66,7 +66,7 @@ SvkPluginEditor::~SvkPluginEditor()
 void SvkPluginEditor::initNodeData()
 {
     // Gui is recreated
-	if (pluginState->pluginEditorNode.isValid())
+	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
 
