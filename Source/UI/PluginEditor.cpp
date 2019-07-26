@@ -20,6 +20,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
+    appCmdMgr->registerAllCommandsForTarget(this);
+    appCmdMgr->setFirstCommandTarget(this);
 
 	controlComponent.reset(new PluginControlComponent(pluginState));
 	controlComponent->setBounds(getBounds());
@@ -44,7 +46,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
     pluginState->addChangeListener(this);
     
-	appCmdMgr->registerAllCommandsForTarget(this);
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
@@ -107,7 +108,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setPeriodShift(pluginState->getPeriodShift());
 	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
-	controlComponent->setKeyStyleId(pluginState->getKeyStyle() + 1);
+	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
 	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
     
 	DBG("Children Updated");
@@ -131,6 +132,11 @@ bool SvkPluginEditor::saveMode()
 	return pluginState->saveModeViewedToFile();
 }
 
+void SvkPluginEditor::showSaveMenu()
+{
+    return;
+}
+
 bool SvkPluginEditor::loadPreset()
 {
 	bool loaded = pluginState->loadPresetFromFile(true);
@@ -146,7 +152,7 @@ bool SvkPluginEditor::loadPreset()
 
 bool SvkPluginEditor::loadMode()
 {
-	// TODO
+    // TODO
 	return false;
 }
 
@@ -547,10 +553,10 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 
 ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 {
-	return findFirstTargetParentComponent();
+    return findFirstTargetParentComponent();
 }
 
-void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
+void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 {
 	Array<CommandID> commands{
 		IDs::CommandIDs::savePresetToFile,
@@ -588,23 +594,32 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	switch (commandID)
 	{
 	case IDs::CommandIDs::savePresetToFile:
-		result.setInfo("Save Layout", "Save your custom layout to a file.", "Preset", 0);
+		result.setInfo("Save Preset", "Save your custom layout to a file.", "Preset", 0);
 		break;
 	case IDs::CommandIDs::saveMode:
 		result.setInfo("Save Mode", "Save the currently viewed mode.", "Preset", 0);
 		break;
+    case IDs::CommandIDs::showSaveMenu:
+        result.setInfo("Show Saving Options", "Save current mode or whole preset.", "Preset", 0);
+        break;
 	case IDs::CommandIDs::loadPreset:
 		result.setInfo("Load Layout", "Load a custom layout from a file.", "Preset", 0);
 		break;
 	case IDs::CommandIDs::loadMode:
 		result.setInfo("Load Mode", "Load only the mode of a preset.", "Preset", 0);
 		break;
+    case IDs::CommandIDs::showLoadMenu:
+        result.setInfo("Show Loading Options", "Load a mode or whole preset.", "Preset", 0);
+        break;
 	case IDs::CommandIDs::exportReaperMap:
-		result.setInfo("Export to Reaper", "Exports the current preset to a MIDI Note Name text file for use in Reaper's piano roll.", "Preset", 0);
+		result.setInfo("Export for Reaper", "Exports the current preset to a MIDI Note Name text file for use in Reaper's piano roll.", "Preset", 0);
 		break;
 	case IDs::CommandIDs::exportAbletonMap:
-		result.setInfo("Export to Ableton", "Exports the mode mapping to a MIDI file for to use in Ableton's piano roll for folding.", "Preset", 0);
+		result.setInfo("Export for Ableton", "Exports the mode mapping to a MIDI file for to use in Ableton's piano roll for folding.", "Preset", 0);
 		break;
+    case IDs::CommandIDs::showExportMenu:
+        result.setInfo("Show Export Options", "Shows different ways you can export a mode or preset.", "Preset", 0);
+        break;
 	case IDs::CommandIDs::commitCustomScale:
 		result.setInfo("Commit custom scale", "Registers the entered scale steps as the current custom scale.", "Preset", 0);
 		break;
