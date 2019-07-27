@@ -139,20 +139,24 @@ void SvkPluginEditor::showSaveMenu()
 
 bool SvkPluginEditor::loadPreset()
 {
-	bool loaded = pluginState->loadPresetFromFile(true);
-
-	if (loaded)
+	if (pluginState->loadPresetFromFile(true))
 	{
 		//virtualKeyboard->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
 		updateUI();
+
+		return true;
 	}
 
-	return loaded;
+	return false;
 }
 
 bool SvkPluginEditor::loadMode()
 {
-    // TODO
+	if (pluginState->loadModeFromFile())
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -603,7 +607,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
         result.setInfo("Show Saving Options", "Save current mode or whole preset.", "Preset", 0);
         break;
 	case IDs::CommandIDs::loadPreset:
-		result.setInfo("Load Layout", "Load a custom layout from a file.", "Preset", 0);
+		result.setInfo("Load Preset", "Load a custom layout from a file.", "Preset", 0);
 		break;
 	case IDs::CommandIDs::loadMode:
 		result.setInfo("Load Mode", "Load only the mode of a preset.", "Preset", 0);
