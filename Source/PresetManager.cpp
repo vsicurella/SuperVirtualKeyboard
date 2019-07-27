@@ -187,6 +187,19 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int
 	return loadModeIntoSlot(presetSlotNum, modeSlotNum, getModeInLibrary(modeLibraryIndexIn));
 }
 
+Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, String absolutePath)
+{
+	ValueTree modeFromFile = nodeFromFile("Open Mode", "*.svk", absolutePath);
+
+	if (Mode::isValidMode(modeFromFile))
+	{
+		return loadModeIntoSlot(presetSlotNum, modeSlotNum, modeFromFile);
+	}
+
+	return nullptr;
+}
+
+
 void SvkPresetManager::removeMode(int presetSlotNum, int modeSlotNum)
 {
     SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);

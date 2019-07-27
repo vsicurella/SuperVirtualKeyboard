@@ -116,7 +116,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	bool loadPresetFromFile(bool replaceViewed);
 
 	bool saveModeViewedToFile();
-	bool loadModeIntoSlot();
+	bool loadModeFromFile();
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     

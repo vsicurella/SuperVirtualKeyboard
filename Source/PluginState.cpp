@@ -444,9 +444,11 @@ bool SvkPluginState::saveModeViewedToFile()
 	return presetManager->saveModeToFile(presetSlotNumViewed, modeSlotNumber);
 }
 
-bool SvkPluginState::loadModeIntoSlot()
+bool SvkPluginState::loadModeFromFile()
 {
-	// TODO
+	// change this to mode directory when that's supported
+	presetManager->loadModeIntoSlot(presetSlotNumViewed, modeViewedNum, pluginSettingsNode[IDs::presetDirectory].toString());
+	updateModeViewed();
 	return false;
 }
 
