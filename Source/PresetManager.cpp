@@ -172,7 +172,7 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, Val
 	DBG("Preset Mode slot size: " + String(preset->getModeSlotsSize()));
 
 	OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
-	slot->set(modeSlotNum, new Mode(modeNode));
+	slot->set(modeSlotNum, new Mode(modeNode, false));
 	
 	return slot->getUnchecked(modeSlotNum);
 }
@@ -247,7 +247,7 @@ void SvkPresetManager::refreshModeSlot(int presetSlotNum)
 
 		for (int i = 0; i < preset->getModeSlotsSize(); i++)
 		{
-			slot->add(new Mode(preset->getModeInSlot(i)));
+			slot->add(new Mode(preset->getModeInSlot(i), false));
 		}
 	}
 }
@@ -371,9 +371,9 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
 
 bool SvkPresetManager::savePresetToFile(int presetSlotNum, String absolutePath)
 {
-	SvkPreset* preset = getPresetLoaded(presetSlotNum);
-
-	return saveNodeToFile(preset->parentNode, "Save preset", "*.svk", pluginSettingsNode[IDs::presetDirectory]);
+	SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
+	DBG("Saving this to " + absolutePath + ": " + preset->parentNode.toXmlString());
+	return saveNodeToFile(preset->parentNode, "Save preset", "*.svk", absolutePath);
 }
 
 bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath)
@@ -449,7 +449,7 @@ bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 
 	if (preset && SvkPreset::isValidPresetNode(nodeIn))
 	{
-		preset->restoreFromNode(nodeIn);
+		preset->restoreFromNode(nodeIn);// , true);
 		return true;
 	}
 
@@ -505,7 +505,7 @@ void SvkPresetManager::createFactoryModes()
                 
                 info = line.fromFirstOccurrenceOf("; ", false, true);
 
-                factoryMode = Mode::createNode(steps, family, "", info, true);
+                factoryMode = Mode::createNode(steps, family, "", info, 60, true);
 
 				addAndSortMode(factoryMode);
                 loadedFactoryModes.add(factoryMode);
