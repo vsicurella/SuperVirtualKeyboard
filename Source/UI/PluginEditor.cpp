@@ -46,7 +46,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
     pluginState->addChangeListener(this);
     
-
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
@@ -526,6 +525,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
+		pluginState->getPresetManager()->refreshModeSlot(pluginState->getPresetSlotNumViewed());
 		pluginState->updateToPreset();
 	}
 }

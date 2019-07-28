@@ -46,33 +46,40 @@ SvkPluginState::SvkPluginState()
 
 void SvkPluginState::recallState(ValueTree nodeIn)
 {
-    ValueTree childNode = nodeIn.getChildWithName(IDs::presetNode);
-    
-    if (nodeIn.hasType(IDs::presetNode))
-    {
-        presetManager->loadPreset(0, nodeIn, false);
-    }
-	else if (childNode.hasType(IDs::presetNode))
-    {
-        presetManager->loadPreset(0, childNode, false);
-    }
-	else
+	if (nodeIn.isValid())
 	{
-        //presetManager->loadPreset(0, ValueTree(IDs::presetNode), false);
+		ValueTree childNode = nodeIn.getChildWithName(IDs::presetNode);
+
+		if (nodeIn.hasType(IDs::presetNode))
+		{
+			presetManager->loadPreset(0, nodeIn, false);
+		}
+		else if (childNode.hasType(IDs::presetNode))
+		{
+			presetManager->loadPreset(0, childNode, false);
+		}
+
+		childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
+
+		if (childNode.isValid())
+			pluginSettings->restoreNode(childNode);
+
+		childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
+
+		if (childNode.isValid() && childNode.getNumProperties() > 0)
+			pluginEditorNode = childNode.createCopy();
+
+		updateToPreset();
+	}
+	else // Default settings
+	{
+		setAutoMapping(1);
+		setMapStyle(1);
+		setKeyStyle(1);
+		setHighlightStyle(1);
+		setModeViewed(1);
         return;
 	}
-    
-    childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
-    
-    if (childNode.isValid())
-        pluginSettings->restoreNode(childNode);
-    
-    childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
-    
-    if (childNode.isValid() && childNode.getNumProperties() > 0)
-        pluginEditorNode = childNode.createCopy();
-    
-    updateToPreset();
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
@@ -80,6 +87,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	presetEdited = false;
 
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
+
 	modeViewedNum = (int) presetViewed->thePropertiesNode.getProperty(IDs::modeSlotNumViewed);
 	isAutoMapping = (bool) presetViewed->thePropertiesNode.getProperty(IDs::autoRemapOn);
 	mapStyleSelected = (int)presetViewed->thePropertiesNode.getProperty(IDs::modeMappingStyle);
@@ -89,7 +97,6 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
-    
     
     pianoNode = presetViewed->theKeyboardNode;
 	virtualKeyboard->restoreDataNode(pianoNode);
@@ -165,6 +172,11 @@ SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
 SvkPreset* SvkPluginState::getPresetViewed()
 {
     return presetViewed;
+}
+
+int SvkPluginState::getPresetSlotNumViewed()
+{
+	return presetSlotNumViewed;
 }
 
 int SvkPluginState::getNumModesInPresetViewed()
@@ -278,7 +290,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 void SvkPluginState::setModeCustom(String stepsIn)
 {
     presetManager->setModeCustom(stepsIn);
-	handleModeSelection(modeViewedNum, presetManager->getNumMenuItems() + 1);
+	handleModeSelection(modeViewedNum, 999);
 }
 
 void SvkPluginState::setMode1Root(int rootNoteIn)
@@ -411,7 +423,20 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 void SvkPluginState::commitPresetChanges()
 {
     virtualKeyboard->updatePianoNode();
-    presetViewed->theKeyboardNode = pianoNode;
+	presetViewed->parentNode.removeChild(presetViewed->theKeyboardNode, nullptr);
+	presetViewed->theKeyboardNode = pianoNode;
+	presetViewed->parentNode.addChild(presetViewed->theKeyboardNode, -1, nullptr);
+
+	ValueTree customModeNode = ValueTree(IDs::modeCustomNode);
+	customModeNode.addChild(presetManager->getModeCustom()->modeNode, -1, nullptr);
+	presetViewed->parentNode.removeChild(presetViewed->parentNode.getChildWithName(IDs::modeCustomNode), nullptr);
+	presetViewed->parentNode.addChild(customModeNode, -1, nullptr);
+
+	if (isAutoMapping)
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiMapNode), nullptr);
+	}
+
     presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
 
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);

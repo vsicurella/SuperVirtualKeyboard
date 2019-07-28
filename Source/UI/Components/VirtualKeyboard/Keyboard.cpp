@@ -76,21 +76,26 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 void Keyboard::updatePianoNode()
 {
     pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
-    pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
     pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
     pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
     pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+	
+	pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
+	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
+	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
     
-    // Colors
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
-    add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
-    
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsDegree), nullptr);
-    add_array_to_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, "Color");
-    
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorSingle), nullptr);
-    add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, "Color");
-    
+	if (pianoNode[IDs::pianoHasCustomColor])
+	{
+		// Colors
+		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
+		add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
+
+		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsDegree), nullptr);
+		add_array_to_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, "Color");
+
+		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorSingle), nullptr);
+		add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, "Color");
+	}
     
     // Placements
     pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceOrder), nullptr);

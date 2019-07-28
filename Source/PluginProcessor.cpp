@@ -181,8 +181,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 
     //presetRecall = ValueTree(); // uncomment this line to test new instantiation
 
-	if (presetRecall.isValid())
-		pluginState->recallState(presetRecall);
+	pluginState->recallState(presetRecall);
 }
 
 //==============================================================================

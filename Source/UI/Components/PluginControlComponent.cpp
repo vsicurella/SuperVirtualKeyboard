@@ -252,8 +252,9 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	autoMapBtn->setClickingTogglesState(true);
 	noteNumsBtn->setClickingTogglesState(true);
 
-	mode1Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
-	mode2Box->setMenu(*pluginState->getPresetManager()->getModeMenu());
+	// allows for implementing mouseDown() to update the menus
+	mode1Box->setInterceptsMouseClicks(false, false);
+	mode2Box->setInterceptsMouseClicks(false, false);
     
     saveMenu.reset(new PopupMenu());
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::saveMode);
@@ -382,12 +383,14 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == mode1Box.get())
     {
         //[UserComboBoxCode_mode1Box] -- add your combo box handling code here..
+		DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
         //[/UserComboBoxCode_mode1Box]
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
         //[UserComboBoxCode_mode2Box] -- add your combo box handling code here..
+		DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
         //[/UserComboBoxCode_mode2Box]
     }
@@ -561,6 +564,25 @@ void PluginControlComponent::textEditorFocusLost(TextEditor& textEditor)
 
 }
 
+void PluginControlComponent::mouseDown(const MouseEvent& e)
+{
+	if (mode1Box->getBounds().contains(e.getPosition()))
+	{
+		String display = mode1Box->getText();
+		pluginState->getPresetManager()->requestModeMenu(mode1Box.get());
+		mode1Box->setText(display);
+		mode1Box->showPopup();
+	}
+
+	if (mode2Box->getBounds().contains(e.getPosition()))
+	{
+		String display = mode2Box->getText();
+		pluginState->getPresetManager()->requestModeMenu(mode2Box.get());
+		mode2Box->setText(display);
+		mode2Box->showPopup();
+	}
+}
+
 Viewport* PluginControlComponent::getViewport()
 {
 	return keyboardViewport.get();
@@ -591,6 +613,12 @@ ReferencedComboBox* PluginControlComponent::getMode2Box()
 {
 	return mode2Box.get();
 }
+
+void PluginControlComponent::updateModeBoxMenus()
+{
+	
+}
+
 
 TextButton* PluginControlComponent::getModeInfoButton()
 {

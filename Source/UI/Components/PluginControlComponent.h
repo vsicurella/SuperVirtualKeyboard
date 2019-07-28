@@ -60,6 +60,7 @@ public:
 
 	ReferencedComboBox* getMode1Box();
 	ReferencedComboBox* getMode2Box();
+	void updateModeBoxMenus();
 
 	TextButton* getModeInfoButton();
 
@@ -111,6 +112,8 @@ public:
 	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
 	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
 	void textEditorFocusLost(TextEditor& textEditor) override;
+
+	void mouseDown(const MouseEvent& e) override;
 
     //[/UserMethods]
 

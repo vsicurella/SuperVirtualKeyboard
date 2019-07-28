@@ -54,6 +54,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     SvkPreset* getPresetinSlot(int slotNumIn=0);
     SvkPreset* getPresetViewed();
+	int getPresetSlotNumViewed();
 	int getNumModesInPresetViewed();
     
     Mode* getModeInSlot(int slotNumIn);
