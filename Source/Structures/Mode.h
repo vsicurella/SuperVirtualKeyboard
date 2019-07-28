@@ -54,17 +54,17 @@ public:
 	Mode();
 	Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
 	Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
-	Mode(ValueTree modeNodeIn, int rootNoteIn=60);
+	Mode(ValueTree modeNodeIn, bool copyNode=false);
 
 	~Mode();
 
 	void updateNode(bool initializeNode=false);
-	void restoreNode(ValueTree nodeIn, bool useNodeRoot=false);
+	void restoreNode(ValueTree nodeIn, bool useNodeRoot=true);
 
 	static bool isValidMode(ValueTree nodeIn);
 
-	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);
-	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", bool factoryPreset = false);
+	static ValueTree createNode(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", int rootNoteIn=60, bool factoryPreset = false);
+	static ValueTree createNode(Array<int> stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn="", int rootNoteIn=60, bool factoryPreset = false);
 
 	/*
 		Sets temperament family name.

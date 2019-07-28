@@ -383,15 +383,23 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == mode1Box.get())
     {
         //[UserComboBoxCode_mode1Box] -- add your combo box handling code here..
-		DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
+		if (mode1BoxId != mode1Box->getSelectedId())
+		{
+			DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
+			appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
+			mode1BoxId = mode1Box->getSelectedId();
+		}
         //[/UserComboBoxCode_mode1Box]
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
         //[UserComboBoxCode_mode2Box] -- add your combo box handling code here..
-		DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
+		if (mode2BoxId != mode2Box->getSelectedId())
+		{
+			DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
+			appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
+			mode2BoxId = mode2Box->getSelectedId();
+		}
         //[/UserComboBoxCode_mode2Box]
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
@@ -570,7 +578,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	{
 		String display = mode1Box->getText();
 		pluginState->getPresetManager()->requestModeMenu(mode1Box.get());
-		mode1Box->setText(display);
+		mode1Box->setText(display, dontSendNotification);
 		mode1Box->showPopup();
 	}
 
@@ -578,7 +586,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	{
 		String display = mode2Box->getText();
 		pluginState->getPresetManager()->requestModeMenu(mode2Box.get());
-		mode2Box->setText(display);
+		mode2Box->setText(display, dontSendNotification);
 		mode2Box->showPopup();
 	}
 }
@@ -648,11 +656,13 @@ void PluginControlComponent::setMode2BoxText(String textIn, NotificationType not
 void PluginControlComponent::setMode1BoxId(int idIn, NotificationType notify)
 {
 	mode1Box->setSelectedId(idIn, notify);
+	mode1BoxId = idIn;
 }
 
 void PluginControlComponent::setMode2BoxId(int idIn, NotificationType notify)
 {
 	mode2Box->setSelectedId(idIn, notify);
+	mode2BoxId = idIn;
 }
 
 void PluginControlComponent::setMode1View(bool isViewed, NotificationType notify)

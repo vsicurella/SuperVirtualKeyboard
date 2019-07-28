@@ -133,6 +133,10 @@ private:
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
+
+	// workaround for double selection issue -- not entirely working yet
+	int mode1BoxId = 9;
+	int mode2BoxId = 9;
     
     //[/UserVariables]
 

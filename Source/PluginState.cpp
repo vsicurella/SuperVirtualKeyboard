@@ -277,8 +277,10 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
 
-    if (modeViewedNum == modeBoxNum)
-        updateModeViewed();
+	if (modeViewedNum == modeBoxNum)
+		updateModeViewed();
+	else
+		sendChangeMessage();
 
 	if (isAutoMapping)
 		doMapping();
@@ -427,9 +429,9 @@ void SvkPluginState::commitPresetChanges()
 	presetViewed->theKeyboardNode = pianoNode;
 	presetViewed->parentNode.addChild(presetViewed->theKeyboardNode, -1, nullptr);
 
+	presetViewed->parentNode.removeChild(presetViewed->parentNode.getChildWithName(IDs::modeCustomNode), nullptr);
 	ValueTree customModeNode = ValueTree(IDs::modeCustomNode);
 	customModeNode.addChild(presetManager->getModeCustom()->modeNode, -1, nullptr);
-	presetViewed->parentNode.removeChild(presetViewed->parentNode.getChildWithName(IDs::modeCustomNode), nullptr);
 	presetViewed->parentNode.addChild(customModeNode, -1, nullptr);
 
 	if (isAutoMapping)
@@ -458,7 +460,11 @@ bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 	if (!replaceViewed)
 		slotNumber = presetManager->getNumModesLoaded();
 
-    return presetManager->loadPreset(slotNumber);
+	ValueTree presetLoaded = presetManager->presetFromFile();
+
+	recallState(presetLoaded);
+
+	return true;
 }
 
 bool SvkPluginState::saveModeViewedToFile()
