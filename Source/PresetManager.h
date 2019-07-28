@@ -32,14 +32,14 @@ class SvkPresetManager : public ChangeBroadcaster
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
     
-	std::unique_ptr<PopupMenu> modeMenu;
-    OwnedArray<PopupMenu> subMenus;
-    PopupMenu* scaleSizeMenu;
-    PopupMenu* modeSizeMenu;
-    PopupMenu* familyMenu;
-    PopupMenu* userMenu;
-    PopupMenu* favMenu;
-    PopupMenu* slotsMenu;
+	//std::unique_ptr<PopupMenu> modeMenu;
+ //   OwnedArray<PopupMenu> subMenus;
+ //   PopupMenu* scaleSizeMenu;
+ //   PopupMenu* modeSizeMenu;
+ //   PopupMenu* familyMenu;
+ //   PopupMenu* userMenu;
+ //   PopupMenu* favMenu;
+ //   PopupMenu* slotsMenu;
     
 	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
@@ -55,8 +55,6 @@ class SvkPresetManager : public ChangeBroadcaster
 	int addModeToLibrary(ValueTree presetNodeIn);
 	void addModeToSort(ValueTree presetNodeIn);
 	int addAndSortMode(ValueTree presetNodeIn);
-
-	void buildModeMenu();
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 
@@ -77,16 +75,17 @@ public:
 
 	int getNumModesLoaded();
 	int getNumModesInFavorites();
-	int getNumMenuItems();
+	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
+
+	void requestModeMenu(ComboBox* comboBoxToUse);
 
 	ValueTree getModeInLibrary(int indexIn);
 	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
 	Mode* getModeCustom();
     
-	PopupMenu* getModeMenu();
+	//PopupMenu* getModeMenu();
     
-    void buildSlotsMenu();
-    void buildFavoritesMenu();
+    void updateFavoritesMenu();
 
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
@@ -100,6 +99,7 @@ public:
 
     void removeMode(int presetSlotNum, int modeSlotNum);
     void resetModeSlot(int presetSlotNum);
+	void refreshModeSlot(int presetSlotNum);
 
 	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
 

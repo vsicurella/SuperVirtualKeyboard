@@ -51,10 +51,12 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 	{
 		if (createCopy)
 		{
+			DBG("copying this preset: " + presetNodeIn.toXmlString());
 			parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
 		}
 		else
 		{
+			DBG("copying this preset: " + presetNodeIn.toXmlString());
 			parentNode = presetNodeIn;
 		}
 
