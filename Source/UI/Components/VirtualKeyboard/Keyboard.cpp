@@ -496,7 +496,7 @@ void Keyboard::beginColorEditing(Key* keyIn, int colorIndex, Colour colorIn, boo
 
 	int keyNumOffset = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
 	keyColorsSingle.set(keyNumOffset, colorIn);
-	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
+	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
 }
 
 void Keyboard::beginColorEditing(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
@@ -518,7 +518,7 @@ void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
 		key->repaint();
 	}
 
-	pianoNode.setProperty(IDs::pianoHasCustomColor, true, undo);
+	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
 }
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
