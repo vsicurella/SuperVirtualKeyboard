@@ -169,7 +169,7 @@ Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, Val
 {
 	SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
 	preset->setModeSlot(modeNode, modeSlotNum);
-	DBG("Preset Mode slot size: " + String(preset->getModeSlotsSize()));
+	//DBG("Preset Mode slot size: " + String(preset->getModeSlotsSize()));
 
 	OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
 	slot->set(modeSlotNum, new Mode(modeNode, false));
@@ -254,30 +254,38 @@ void SvkPresetManager::refreshModeSlot(int presetSlotNum)
 
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
-	DBG("ID Selected: " + String(idIn));
-
     SvkPreset& preset = presetsLoaded.getReference(presetSlotNum);
     OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
     
-	int factoryModeTotalMenuSize = getNumMenuItems(true, true, false, false);
+	int numSortedModes = getNumMenuItems(true, false, false, false);
 
     int modeLibraryIndex = idIn - 1;
-    int favIdx = modeLibraryIndex - factoryModeTotalMenuSize;
+    int userModesIndex = modeLibraryIndex - numSortedModes;
+    int favIdx = userModesIndex - loadedUserModes.size();
     int slotIdx = favIdx - favoriteModes.size();
+    
+//    DBG("Sorted Index: " + String(modeLibraryIndex) + " out of " + String(numSortedModes));
+//    DBG("User Index: " + String(userModesIndex) + " out of " + String(loadedUserModes.size()));
+//    DBG("Fav Index: " + String(favIdx) + " out of " + String(favoriteModes.size()));
+//    DBG("Slot Index: " + String(slotIdx) + " out of " + String(modeSlots.size()));
 
 	int modeSlotNumber = modeBoxNumber;
 
     ValueTree modeSelected;
     
-    if (modeLibraryIndex < factoryModeTotalMenuSize)
+    if (modeLibraryIndex < numSortedModes)
     {
         modeSelected = getModeInLibrary(modeLibraryIndex);
+    }
+    else if (userModesIndex < loadedUserModes.size())
+    {
+        modeSelected = loadedUserModes[userModesIndex];
     }
     else if (favIdx < favoriteModes.size())
     {
         modeSelected = favoriteModes[favIdx];
     }
-	else if (slotIdx < slot->size() - 2)
+	else if (slotIdx < slot->size())
 	{
 		modeSelected = slot->getUnchecked(slotIdx)->modeNode;
 		modeSlotNumber = slotIdx;
@@ -514,6 +522,8 @@ void SvkPresetManager::createFactoryModes()
 			factoryMode = ValueTree();
 		}
 	}
+    
+    DBG("Amt of factory modes:" + String(loadedFactoryModes.size()));
 }
 
 void SvkPresetManager::loadModeDirectory()
@@ -548,6 +558,9 @@ void SvkPresetManager::loadModeDirectory()
 			}
 		}
 	}
+    
+    DBG("New amt of Factory Modes: " + String(loadedFactoryModes.size()));
+    DBG("Amt User Modes loaded: " + String(loadedUserModes.size()));
 }
 
 
@@ -666,6 +679,12 @@ void SvkPresetManager::requestModeMenu(ComboBox* comboBoxToUse)
                     break;
             }
         }
+    }
+    
+    // USERS
+    for (int i = 0; i < loadedUserModes.size(); i++)
+    {
+        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
     }
 
 	// FAVORITES
