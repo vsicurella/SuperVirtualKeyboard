@@ -648,13 +648,11 @@ void PluginControlComponent::setMode2BoxText(String textIn, NotificationType not
 void PluginControlComponent::setMode1BoxId(int idIn, NotificationType notify)
 {
 	mode1Box->setSelectedId(idIn, notify);
-	mode1BoxId = idIn;
 }
 
 void PluginControlComponent::setMode2BoxId(int idIn, NotificationType notify)
 {
 	mode2Box->setSelectedId(idIn, notify);
-	mode2BoxId = idIn;
 }
 
 void PluginControlComponent::setMode1View(bool isViewed, NotificationType notify)
