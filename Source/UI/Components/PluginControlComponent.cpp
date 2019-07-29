@@ -383,14 +383,14 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == mode1Box.get())
     {
         //[UserComboBoxCode_mode1Box] -- add your combo box handling code here..
-        DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
+        //DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
         //[/UserComboBoxCode_mode1Box]
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
         //[UserComboBoxCode_mode2Box] -- add your combo box handling code here..
-        DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
+        //DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
         //[/UserComboBoxCode_mode2Box]
     }

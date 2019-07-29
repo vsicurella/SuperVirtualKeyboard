@@ -526,7 +526,9 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	if (source == modeInfo)
 	{
 		pluginState->getPresetManager()->refreshModeSlot(pluginState->getPresetSlotNumViewed());
-		pluginState->updateToPreset();
+        updateUI();
+        pluginState->updateModeViewed(false);
+        pluginState->doMapping(); // probably should make this happen in PluginState
 	}
 }
 
