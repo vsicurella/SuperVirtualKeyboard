@@ -607,7 +607,8 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 
 void SvkPresetManager::requestModeMenu(ComboBox* comboBoxToUse)
 {
-	comboBoxToUse->clear();
+    PopupMenu* menuToUse = comboBoxToUse->getRootMenu();
+    menuToUse->clear();
     
 	PopupMenu scaleSizeMenu;
 	PopupMenu modeSizeMenu;
@@ -683,20 +684,20 @@ void SvkPresetManager::requestModeMenu(ComboBox* comboBoxToUse)
 		slotsMenu.addItem(++subMenuIndex, mode->getName());
 	}
 
-	comboBoxToUse->getRootMenu()->addSubMenu("by Scale Size", scaleSizeMenu);
-	comboBoxToUse->getRootMenu()->addSubMenu("by Mode Size", modeSizeMenu);
-	comboBoxToUse->getRootMenu()->addSubMenu("by Family", familyMenu);
-	comboBoxToUse->getRootMenu()->addSubMenu("User", userMenu);
-	comboBoxToUse->getRootMenu()->addSubMenu("Favorites", favMenu);
+    menuToUse->addSubMenu("by Scale Size", scaleSizeMenu);
+    menuToUse->addSubMenu("by Mode Size", modeSizeMenu);
+    menuToUse->addSubMenu("by Family", familyMenu);
+    menuToUse->addSubMenu("User", userMenu);
+    menuToUse->addSubMenu("Favorites", favMenu);
 
-	comboBoxToUse->getRootMenu()->addSeparator();
-	comboBoxToUse->getRootMenu()->addSubMenu("Slots", slotsMenu);
-	comboBoxToUse->getRootMenu()->addSeparator();
+    menuToUse->addSeparator();
+    menuToUse->addSubMenu("Slots", slotsMenu);
+    menuToUse->addSeparator();
 
-	String customModeName = "Custom Mode";
+    String customModeName = "Custom Mode";
 
-	if (modeCustom.get())
-		customModeName = modeCustom->getDescription();
+    if (modeCustom->getFamily() != "undefined")
+        customModeName = modeCustom->getDescription();
 
-	comboBoxToUse->getRootMenu()->addItem(++subMenuIndex, customModeName);
+    menuToUse->addItem(++subMenuIndex, customModeName);
 }
