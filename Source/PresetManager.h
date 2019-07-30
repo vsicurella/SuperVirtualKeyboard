@@ -89,6 +89,7 @@ public:
 
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
+    Mode* setModeCustom(Mode* modeIn);
 
 	void replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
 	int addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn);
