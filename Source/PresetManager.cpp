@@ -138,6 +138,13 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootN
     return modeCustom.get();
 }
 
+Mode* SvkPresetManager::setModeCustom(Mode* modeIn)
+{
+    modeCustom.reset(modeIn);
+    return modeCustom.get();
+}
+
+
 void SvkPresetManager::replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
 {
 	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
