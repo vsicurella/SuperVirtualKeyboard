@@ -30,7 +30,7 @@ class SvkPresetManager : public ChangeBroadcaster
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
        
-	Array<SvkPreset> presetsLoaded;
+	OwnedArray<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
 
