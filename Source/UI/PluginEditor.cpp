@@ -525,7 +525,8 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-		pluginState->updateModeCustom(pluginState->getModeCustom());
+
+		pluginState->commitModeInfo();
 	}
 }
 
