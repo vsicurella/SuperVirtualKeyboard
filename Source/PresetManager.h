@@ -17,6 +17,8 @@
 #include "Structures/Preset.h"
 #include "Structures/Mode.h"
 
+typedef Array<std::shared_ptr<Mode>> ModeSlot;
+
 class SvkPresetManager : public ChangeBroadcaster
 {
 	Array<ValueTree> loadedFactoryModes;
@@ -31,8 +33,9 @@ class SvkPresetManager : public ChangeBroadcaster
 	FamilyNameSorter familyNameSort;
        
 	OwnedArray<SvkPreset> presetsLoaded;
-	OwnedArray<OwnedArray<Mode>> modeSlots;
-	std::unique_ptr<Mode> modeCustom;
+    OwnedArray<ModeSlot> modeSlots;
+    
+	std::shared_ptr<Mode> modeCustom;
 
 	// Methods
 	void createFactoryModes();
