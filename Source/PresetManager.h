@@ -80,6 +80,7 @@ public:
 
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
+    Mode* setModeCustom(Mode* modeIn);
 
 	int setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
 	int addSlot(int presetSlotNum, ValueTree modeNode);
