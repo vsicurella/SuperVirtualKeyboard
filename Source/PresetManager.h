@@ -31,16 +31,7 @@ class SvkPresetManager : public ChangeBroadcaster
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
-    
-	//std::unique_ptr<PopupMenu> modeMenu;
- //   OwnedArray<PopupMenu> subMenus;
- //   PopupMenu* scaleSizeMenu;
- //   PopupMenu* modeSizeMenu;
- //   PopupMenu* familyMenu;
- //   PopupMenu* userMenu;
- //   PopupMenu* favMenu;
- //   PopupMenu* slotsMenu;
-    
+       
 	Array<SvkPreset> presetsLoaded;
 	OwnedArray<OwnedArray<Mode>> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
@@ -90,12 +81,10 @@ public:
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
 
-	void replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
-	int addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn);
-	int addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn);
-	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
-	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn);
-	Mode* loadModeIntoSlot(int presetSlotNum, int modeSlotNum, String absolutePath="");
+	int setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
+	int addSlot(int presetSlotNum, ValueTree modeNode);
+	int setSlotAndSelection(int presetSlotNum, int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
+	int addSlotAndSetSelection(int presetSlotNum, int modeSelectorNumber, ValueTree modeNode);
 
     void removeMode(int presetSlotNum, int modeSlotNum);
     void resetModeSlot(int presetSlotNum);
