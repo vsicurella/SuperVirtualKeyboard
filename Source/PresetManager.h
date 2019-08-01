@@ -23,8 +23,6 @@ class SvkPresetManager : public ChangeBroadcaster
 	Array<ValueTree> loadedUserModes;
 	Array<ValueTree> favoriteModes;
 
-	int numberOfModes = 0;
-
 	Array<Array<ValueTree>> modesSorted;
 	int numSortTypes = 4;
 
@@ -59,25 +57,13 @@ public:
 	~SvkPresetManager();
 
 	SvkPreset* getPresetLoaded(int slotNumIn=0);
-    int getPresetLoadedId(int slotNumIn=0);
-	ValueTree getPresetLoadedNode(int slotNumIn=0);
-    
-	Array<Array<ValueTree>>* getPresetsSorted();
-
-	int getNumModesLoaded();
-	int getNumModesInFavorites();
+    int getNumPresetsLoaded();
 	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
-
-	void requestModeMenu(ComboBox* comboBoxToUse);
 
 	ValueTree getModeInLibrary(int indexIn);
 	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
 	Mode* getModeCustom();
     
-	//PopupMenu* getModeMenu();
-    
-    void updateFavoritesMenu();
-
 	Mode* setModeCustom(ValueTree modeNodeIn);
 	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
     Mode* setModeCustom(Mode* modeIn);
@@ -108,4 +94,6 @@ public:
 	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
 	static ValueTree modeFromFile(String absoluteFilePath = "");
 	static ValueTree presetFromFile(String absoluteFilePath = "");
+    
+    void requestModeMenu(PopupMenu* comboBoxToUse);
 };

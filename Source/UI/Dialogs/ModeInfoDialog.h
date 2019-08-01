@@ -51,10 +51,10 @@ public:
 	void commitMode();
 
 
-	void textEditorTextChanged(TextEditor& textEditor);
-	void textEditorEscapeKeyPressed(TextEditor& textEditor);
-	void textEditorReturnKeyPressed(TextEditor& textEditor);
-	void textEditorFocusLost(TextEditor& textEditor);
+	void textEditorTextChanged(TextEditor& textEditor) override;
+	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
+	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+	void textEditorFocusLost(TextEditor& textEditor) override;
 
     //[/UserMethods]
 

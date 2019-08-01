@@ -471,10 +471,11 @@ bool SvkPluginState::savePresetViewedToFile()
 
 bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 {
+    // multi preset loading not yet implemented
 	int slotNumber = presetSlotNumViewed;
 
 	if (!replaceViewed)
-		slotNumber = presetManager->getNumModesLoaded();
+		slotNumber = presetManager->getNumPresetsLoaded();
 
 	ValueTree presetLoaded = presetManager->presetFromFile();
 

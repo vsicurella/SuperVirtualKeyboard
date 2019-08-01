@@ -36,31 +36,9 @@ SvkPreset* SvkPresetManager::getPresetLoaded(int slotNumIn)
 	return preset;
 }
 
-int SvkPresetManager::getPresetLoadedId(int slotNumIn)
+int SvkPresetManager::getNumPresetsLoaded()
 {
-	SvkPreset* preset = getPresetLoaded(slotNumIn);
-    return preset->parentNode[IDs::libraryIndexOfMode];
-}
-
-ValueTree SvkPresetManager::getPresetLoadedNode(int slotNumIn)
-{
-	SvkPreset* preset = getPresetLoaded(slotNumIn);
-	return preset->parentNode;
-}
-
-Array<Array<ValueTree>>* SvkPresetManager::getPresetsSorted()
-{
-	return &modesSorted;
-}
-
-int SvkPresetManager::getNumModesLoaded()
-{
-	return numberOfModes;
-}
-
-int SvkPresetManager::getNumModesInFavorites()
-{
-	return favoriteModes.size();
+    return presetsLoaded.size();
 }
 
 int SvkPresetManager::getNumMenuItems(bool withFactoryMenu , bool withUserMenu, bool withFavMenu, bool withSlots)
@@ -88,8 +66,8 @@ ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
     if (indexIn < 0)
         indexIn = 0;
     
-	int subMenu = indexIn / numberOfModes;
-	int index = indexIn % numberOfModes;
+	int subMenu = indexIn / getNumMenuItems(true, true, false, false);
+	int index = indexIn % getNumMenuItems(true, true, false, false);
     
     if (subMenu < modesSorted.size())
         if (index < modesSorted.getUnchecked(subMenu).size())
@@ -117,12 +95,6 @@ Mode* SvkPresetManager::getModeInSlots(int presetNumIn, int slotNumIn)
 Mode* SvkPresetManager::getModeCustom()
 {
 	return modeCustom.get();
-}
-
-
-void SvkPresetManager::updateFavoritesMenu()
-{
-    
 }
 
 Mode* SvkPresetManager::setModeCustom(Mode* modeIn)
@@ -555,7 +527,6 @@ int SvkPresetManager::addModeToLibrary(ValueTree modeNodeIn)
 		modeNodeIn.setProperty(IDs::libraryIndexOfMode, libraryIndex, nullptr);
 		
 		modeLibraryNode.appendChild(modeNodeIn, nullptr);
-		numberOfModes = modeLibraryNode.getNumChildren();
 
 		return libraryIndex;
 	}
@@ -586,9 +557,8 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
 	return ind;
 }
 
-void SvkPresetManager::requestModeMenu(ComboBox* comboBoxToUse)
+void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
 {
-    PopupMenu* menuToUse = comboBoxToUse->getRootMenu();
     menuToUse->clear();
     
 	PopupMenu scaleSizeMenu;

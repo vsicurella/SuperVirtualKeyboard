@@ -569,7 +569,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	if (mode1Box->getBounds().contains(e.getPosition()))
 	{
 		String display = mode1Box->getText();
-		pluginState->getPresetManager()->requestModeMenu(mode1Box.get());
+		pluginState->getPresetManager()->requestModeMenu(mode1Box->getRootMenu());
 		mode1Box->setText(display, dontSendNotification);
 		mode1Box->showPopup();
 	}
@@ -577,7 +577,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	if (mode2Box->getBounds().contains(e.getPosition()))
 	{
 		String display = mode2Box->getText();
-		pluginState->getPresetManager()->requestModeMenu(mode2Box.get());
+		pluginState->getPresetManager()->requestModeMenu(mode2Box->getRootMenu());
 		mode2Box->setText(display, dontSendNotification);
 		mode2Box->showPopup();
 	}
