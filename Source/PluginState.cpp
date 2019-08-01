@@ -297,7 +297,7 @@ void SvkPluginState::setModeCustom(String stepsIn)
 
 void SvkPluginState::updateModeCustom(Mode* modeIn)
 {
-	presetManager->setModeCustom(modeIn->modeNode);
+	presetManager->setModeCustom(modeIn);
 	presetManager->refreshModeSlot(presetSlotNumViewed);
 	updateModeViewed();
 	doMapping();

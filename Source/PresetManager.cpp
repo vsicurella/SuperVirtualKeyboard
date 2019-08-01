@@ -125,6 +125,11 @@ void SvkPresetManager::updateFavoritesMenu()
     
 }
 
+Mode* SvkPresetManager::setModeCustom(Mode* modeIn)
+{
+	modeCustom.reset(modeIn);
+	return modeCustom.get();
+}
 
 Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
 {
