@@ -138,60 +138,29 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootN
     return modeCustom.get();
 }
 
-void SvkPresetManager::replaceModeInPreset(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
+int SvkPresetManager::setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode)
 {
-	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
 	presetsLoaded.getReference(presetSlotNum).setModeSlot(modeNode, modeSlotNum);
-	
-	loadModeIntoSlot(presetSlotNum, modeSlotNum, modeNode);
+	modeSlots.getUnchecked(presetSlotNum)->set(modeSlotNum, new Mode(modeNode, false));
+	return modeSlotNum;
+}
+int SvkPresetManager::addSlot(int presetSlotNum, ValueTree modeNode)
+{
+	return setSlotToMode(presetSlotNum, presetsLoaded.getReference(presetSlotNum).getModeSlotsSize(), modeNode);
 }
 
-int SvkPresetManager::addModeToNewSlot(int presetSlotNum, int modeLibraryIndexIn)
+int SvkPresetManager::setSlotAndSelection(int presetSlotNum, int modeSlotNum, int modeSelectorNum, ValueTree modeNode)
 {
-	ValueTree modeNode = getModeInLibrary(modeLibraryIndexIn);
-	int slotNumberOut = presetsLoaded.getUnchecked(presetSlotNum).addMode(modeNode);
-
-	loadModeIntoSlot(presetSlotNum, slotNumberOut, modeNode);
-
-	return slotNumberOut;
+	modeSlotNum = setSlotToMode(presetSlotNum, modeSlotNum, modeNode);
+	presetsLoaded.getReference(presetSlotNum).setModeSelectorSlotNum(modeSelectorNum, modeSlotNum);
+	return modeSlotNum;
 }
 
-int SvkPresetManager::addModeToNewSlot(int presetSlotNum, ValueTree modePresetNodeIn)
+int SvkPresetManager::addSlotAndSetSelection(int presetSlotNum, int modeSelectorNumber, ValueTree modeNode)
 {
-	int slotNumberOut = presetsLoaded.getUnchecked(presetSlotNum).addMode(modePresetNodeIn);
-
-	loadModeIntoSlot(presetSlotNum, slotNumberOut, modePresetNodeIn);
-
-	return slotNumberOut;
-}
-
-Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, ValueTree modeNode)
-{
-	SvkPreset* preset = &presetsLoaded.getReference(presetSlotNum);
-	preset->setModeSlot(modeNode, modeSlotNum);
-	//DBG("Preset Mode slot size: " + String(preset->getModeSlotsSize()));
-
-	OwnedArray<Mode>* slot = modeSlots.getUnchecked(presetSlotNum);
-	slot->set(modeSlotNum, new Mode(modeNode, false));
-	
-	return slot->getUnchecked(modeSlotNum);
-}
-
-Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, int modeLibraryIndexIn)
-{
-	return loadModeIntoSlot(presetSlotNum, modeSlotNum, getModeInLibrary(modeLibraryIndexIn));
-}
-
-Mode* SvkPresetManager::loadModeIntoSlot(int presetSlotNum, int modeSlotNum, String absolutePath)
-{
-	ValueTree modeFromFile = nodeFromFile("Open Mode", "*.svk", absolutePath);
-
-	if (Mode::isValidMode(modeFromFile))
-	{
-		return loadModeIntoSlot(presetSlotNum, modeSlotNum, modeFromFile);
-	}
-
-	return nullptr;
+	int modeSlotNum = addSlot(presetSlotNum, modeNode);
+	presetsLoaded.getReference(presetSlotNum).setModeSelectorSlotNum(modeSelectorNumber, modeSlotNum);
+	return modeSlotNum;
 }
 
 
@@ -232,7 +201,7 @@ void SvkPresetManager::resetModeSlot(int presetSlotNum)
             preset->setModeSelectorSlotNum(i, 0);
         }
         
-        addModeToNewSlot(presetSlotNum, Mode::createNode("1"));
+        addSlot(presetSlotNum, Mode::createNode("1"));
     }
 }
 
@@ -287,7 +256,7 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     }
 	else if (slotIdx < slot->size())
 	{
-		modeSelected = slot->getUnchecked(slotIdx)->modeNode;
+		modeSelected = ValueTree();
 		modeSlotNumber = slotIdx;
 	}
 	else
@@ -299,16 +268,10 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     
     if (modeSelected.isValid())
     {
-        loadModeIntoSlot(presetSlotNum, modeBoxNumber, modeSelected);
-    }
-    else // if slot number exceeds the slot size, the custom mode will be used
-    {
-        preset.setModeSelectorSlotNum(modeBoxNumber, slotIdx);
-		modeSlotNumber = preset.getModeSlotsSize();
+        setSlotToMode(presetSlotNum, modeBoxNumber, modeSelected);
     }
     
 	preset.setModeSelectorSlotNum(modeBoxNumber, modeSlotNumber);
-   // updateSlotsMenu();
 }
 
 

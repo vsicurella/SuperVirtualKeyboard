@@ -84,6 +84,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 
     void handleModeSelection(int modeBoxNum, int idIn);
     void setModeCustom(String stepsIn);
+	void updateModeCustom(Mode* modeIn);
 
 	void setMode1Root(int rootNoteIn);
     void setMode2Root(int rootNoteIn);

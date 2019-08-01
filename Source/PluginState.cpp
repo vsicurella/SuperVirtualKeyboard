@@ -295,6 +295,14 @@ void SvkPluginState::setModeCustom(String stepsIn)
 	handleModeSelection(modeViewedNum, 999);
 }
 
+void SvkPluginState::updateModeCustom(Mode* modeIn)
+{
+	presetManager->setModeCustom(modeIn->modeNode);
+	presetManager->refreshModeSlot(presetSlotNumViewed);
+	updateModeViewed();
+	doMapping();
+}
+
 void SvkPluginState::setMode1Root(int rootNoteIn)
 {
     Mode* mode = getMode1();
@@ -377,6 +385,7 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
 
 void SvkPluginState::doMapping()
 {
+	DBG("Mapping new settings");
     doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
 }
 
@@ -478,8 +487,16 @@ bool SvkPluginState::saveModeViewedToFile()
 bool SvkPluginState::loadModeFromFile()
 {
 	// change this to mode directory when that's supported
-	presetManager->loadModeIntoSlot(presetSlotNumViewed, modeViewedNum, pluginSettingsNode[IDs::presetDirectory].toString());
-	updateModeViewed();
+	ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginSettings->getPresetPath());
+
+	if (Mode::isValidMode(modeNode))
+	{
+		presetManager->addSlotAndSetSelection(presetSlotNumViewed, modeViewedNum, modeNode);
+		updateModeViewed();
+		doMapping();
+		return true;
+	}
+
 	return false;
 }
 
