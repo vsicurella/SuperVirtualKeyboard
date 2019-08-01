@@ -295,14 +295,6 @@ void SvkPluginState::setModeCustom(String stepsIn)
 	handleModeSelection(modeViewedNum, 999);
 }
 
-void SvkPluginState::updateModeCustom(Mode* modeIn)
-{
-	presetManager->setModeCustom(modeIn);
-	presetManager->refreshModeSlot(presetSlotNumViewed);
-	updateModeViewed();
-	doMapping();
-}
-
 void SvkPluginState::setMode1Root(int rootNoteIn)
 {
     Mode* mode = getMode1();
@@ -429,6 +421,21 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 
 	if (sendChange)
 		sendChangeMessage();
+}
+
+void SvkPluginState::commitModeInfo()
+{
+	if (modeViewed == presetManager->getModeCustom())
+	{
+		// what i need to do here is to make it so that custom modes don't get added to slots
+		// when automation is implemented, the custom mode will be accessible with value 0
+		// this might also make menu related (selection id) things easier
+		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
+	}
+
+	presetManager->refreshModeSlot(presetSlotNumViewed);
+	updateModeViewed();
+	doMapping();
 }
 
 void SvkPluginState::commitPresetChanges()
