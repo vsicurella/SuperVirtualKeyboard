@@ -91,6 +91,18 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeSlotNumViewed))
 		setModeViewed(1);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode1OrderMapping))
+        setMapOrder1(0);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderMapping))
+        setMapOrder2(0);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode1OrderOffsetMapping))
+        setMapOrderOffset1(0);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
+        setMapOrderOffset2(0);
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
@@ -99,10 +111,15 @@ void SvkPluginState::updateToPreset(bool sendChange)
 
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
 
-	modeViewedNum = (int) presetViewed->thePropertiesNode.getProperty(IDs::modeSlotNumViewed);
-	isAutoMapping = (bool) presetViewed->thePropertiesNode.getProperty(IDs::autoRemapOn);
-	mapStyleSelected = (int)presetViewed->thePropertiesNode.getProperty(IDs::modeMappingStyle);
-
+	modeViewedNum = (int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed];
+	isAutoMapping = (bool) presetViewed->thePropertiesNode[IDs::autoRemapOn];
+	mapStyleSelected = (int) presetViewed->thePropertiesNode[IDs::modeMappingStyle];
+    
+    mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
+    mapOrder2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderMapping];
+    mapOrderOffset1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderOffsetMapping];
+    mapOrderOffset2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderOffsetMapping];
+    
 	updateModeViewed();
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
@@ -235,6 +252,26 @@ int SvkPluginState::getMode2Root()
 	return getMode2()->getRootNote();
 }
 
+int SvkPluginState::getMapOrder1()
+{
+    return mapOrder1;
+}
+
+int SvkPluginState::getMapOrder2()
+{
+    return mapOrder2;
+}
+
+int SvkPluginState::getMapOrderOffset1()
+{
+    return mapOrderOffset1;
+}
+
+int SvkPluginState::getMapOrderOffset2()
+{
+    return mapOrderOffset2;
+}
+
 int SvkPluginState::getPeriodShift()
 {
 	return midiProcessor->getPeriodShift();
@@ -334,6 +371,30 @@ void SvkPluginState::setMode2Root(int rootNoteIn)
 
     if (isAutoMapping)
         doMapping();
+}
+
+void SvkPluginState::setMapOrder1(int orderIn)
+{
+    mapOrder1 = orderIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::mode1OrderMapping, mapOrder1, nullptr);
+}
+
+void SvkPluginState::setMapOrder2(int orderIn)
+{
+    mapOrder2 = orderIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::mode2OrderMapping, mapOrder2, nullptr);
+}
+
+void SvkPluginState::setMapOrderOffset1(int offsetIn)
+{
+    mapOrderOffset1 = offsetIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::mode1OrderOffsetMapping, mapOrderOffset1, nullptr);
+}
+
+void SvkPluginState::setMapOrderOffset2(int offsetIn)
+{
+    mapOrderOffset2 = offsetIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::mode2OrderOffsetMapping, mapOrderOffset2, nullptr);
 }
 
 void SvkPluginState::setPeriodShift(int shiftIn)
