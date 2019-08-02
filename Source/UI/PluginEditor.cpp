@@ -170,6 +170,12 @@ bool SvkPluginEditor::exportAbletonMap()
 	return false;
 }
 
+void SvkPluginEditor::showSettingsDialog()
+{
+    pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
+    CallOutBox& callout = CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
+}
+
 void SvkPluginEditor::commitCustomScale()
 {
 	String scaleSteps = controlComponent->getScaleEntryText();
@@ -569,6 +575,7 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::loadMode,
 		IDs::CommandIDs::exportReaperMap,
 		IDs::CommandIDs::exportAbletonMap,
+        IDs::CommandIDs::showSettingsDialog,
 		IDs::CommandIDs::commitCustomScale,
 		IDs::CommandIDs::setMode1,
 		IDs::CommandIDs::setMode2,
@@ -623,6 +630,9 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 		break;
     case IDs::CommandIDs::showExportMenu:
         result.setInfo("Show Export Options", "Shows different ways you can export a mode or preset.", "Preset", 0);
+        break;
+    case IDs::CommandIDs::showSettingsDialog:
+        result.setInfo("Show Settings Dialog", "Change default directories", "Settings", 0);
         break;
 	case IDs::CommandIDs::commitCustomScale:
 		result.setInfo("Commit custom scale", "Registers the entered scale steps as the current custom scale.", "Preset", 0);
@@ -717,6 +727,11 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 			exportAbletonMap();
 			break;
 		}
+        case IDs::CommandIDs::showSettingsDialog:
+        {
+            showSettingsDialog();
+            break;
+        }
 		case IDs::CommandIDs::commitCustomScale:
 		{
 			commitCustomScale();

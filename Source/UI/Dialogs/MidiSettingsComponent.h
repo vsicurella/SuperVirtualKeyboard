@@ -25,7 +25,6 @@
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
 #include "../../Structures/ModeMapper.h"
-#include "../Components/MidiRemapTableModel.h"
 #include "../Components/ReferencedComboBox.h"
 //[/Headers]
 

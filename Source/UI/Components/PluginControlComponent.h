@@ -129,11 +129,11 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	SvkPluginState * pluginState;
 	ApplicationCommandManager* appCmdMgr;
-    
+
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
-    
+
     //[/UserVariables]
 
     //==============================================================================
@@ -165,6 +165,7 @@ private:
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<ComboBox> highlightStyleBox;
     std::unique_ptr<Viewport> keyboardViewport;
+    std::unique_ptr<TextButton> settingsButton;
 
 
     //==============================================================================

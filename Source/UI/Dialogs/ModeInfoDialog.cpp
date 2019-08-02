@@ -256,7 +256,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     intervalSizeReadout->setText(arrayToString(modeWorking.getIntervalSizeCount()), dontSendNotification);
 
     infoBox->setText(modeWorking.getInfo());
-    
+
     if (modeWorking.getModeSize() > 1)
         rotateSld->setRange(-(modeWorking.getModeSize() - 1), modeWorking.getModeSize() - 1, 1);
     else
@@ -396,7 +396,7 @@ void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
 			nameBox->setText(modeWorking.getDescription());
 		}
 	}
-	
+
 }
 
 void ModeInfoDialog::textEditorEscapeKeyPressed(TextEditor& textEditor)
