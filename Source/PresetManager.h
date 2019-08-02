@@ -90,7 +90,6 @@ public:
 	bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
 	bool savePresetToFile(int presetSlotNum = 0, String absolutePath="");
 	bool saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "");
-	bool saveModeToFile(String absolutePath="");
     
     bool commitPreset(int slotNumber, ValueTree presetNodeIn);
 
