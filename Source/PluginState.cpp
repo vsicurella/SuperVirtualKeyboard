@@ -445,6 +445,7 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
                                       *midiProcessor->getInputNoteMap());
 
     setMidiInputMap(noteMap);
+    sendMappingToKeyboard();
 }
 
 void SvkPluginState::doMapping()
