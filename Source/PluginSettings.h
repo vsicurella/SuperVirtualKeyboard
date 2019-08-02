@@ -18,15 +18,21 @@ class SvkPluginSettings
 {
 	const String appFolderName = "SuperVirtualKeyboard";
 	const String settingsFileName = "SuperVirtualKeyboard.settings";
+    const String presetSubDirectory = "Presets";
+    const String modeSubDirectory = "Modes";
 
 	File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
-	File factoryDefaultPresetLocations = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName);
+	File factoryDefaultPresetLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(presetSubDirectory);
+    File factoryDefaultModeLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(modeSubDirectory);
 
 	File currentSettingsLocation;
 	File currentPresetLocation;
+    File currentModeLocation;
 
 	bool createPresetFolder = true;
 	bool saveFactoryModes = false;
+    
+    bool resetDirectories = false;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 
@@ -42,9 +48,10 @@ public:
 
 	String getSettingsPath();
 	String getPresetPath();
+    String getModePath();
 
 	bool getCreatePresetFolder();
-	bool getSaveFactoryPresets();
+	bool getSaveFactoryModes();
 
 	void setCreatePresetFolder(bool shouldCreateFolder);
 	void setSaveFactoryPresets(bool shouldSavePresets);

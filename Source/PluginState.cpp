@@ -71,15 +71,23 @@ void SvkPluginState::recallState(ValueTree nodeIn)
 
 		updateToPreset();
 	}
-	else // Default settings
-	{
+    
+    // Default settings
+	
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::autoRemapOn))
 		setAutoMapping(1);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeMappingStyle))
 		setMapStyle(1);
+    
+    if (!presetViewed->theKeyboardNode.hasProperty(IDs::pianoKeyPlacementType))
 		setKeyStyle(1);
+    
+    if (!presetViewed->theKeyboardNode.hasProperty(IDs::pianoKeysHighlightStyle))
 		setHighlightStyle(1);
+    
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeSlotNumViewed))
 		setModeViewed(1);
-        return;
-	}
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
@@ -466,7 +474,7 @@ void SvkPluginState::commitPresetChanges()
 bool SvkPluginState::savePresetViewedToFile()
 {
     commitPresetChanges();
-    return presetManager->savePresetToFile(presetSlotNumViewed);
+    return presetManager->savePresetToFile(presetSlotNumViewed, pluginSettings->getPresetPath());
 }
 
 bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
@@ -477,7 +485,7 @@ bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 	if (!replaceViewed)
 		slotNumber = presetManager->getNumPresetsLoaded();
 
-	ValueTree presetLoaded = presetManager->presetFromFile();
+	ValueTree presetLoaded = presetManager->presetFromFile(pluginSettings->getPresetPath());
 
 	recallState(presetLoaded);
 
@@ -489,13 +497,12 @@ bool SvkPluginState::saveModeViewedToFile()
 	int modeSlotNumber = modeViewed ? 
 		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
 
-	return presetManager->saveModeToFile(presetSlotNumViewed, modeSlotNumber);
+	return presetManager->saveModeToFile(presetSlotNumViewed, modeSlotNumber, pluginSettings->getModePath());
 }
 
 bool SvkPluginState::loadModeFromFile()
 {
-	// change this to mode directory when that's supported
-	ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginSettings->getPresetPath());
+	ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginSettings->getModePath());
 
 	if (Mode::isValidMode(modeNode))
 	{
