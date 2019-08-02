@@ -226,10 +226,10 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     int favIdx = userModesIndex - loadedUserModes.size();
     int slotIdx = favIdx - favoriteModes.size();
     
-    DBG("Sorted Index: " + String(modeLibraryIndex) + " out of " + String(numSortedModes));
-    DBG("User Index: " + String(userModesIndex) + " out of " + String(loadedUserModes.size()));
-    DBG("Fav Index: " + String(favIdx) + " out of " + String(favoriteModes.size()));
-    DBG("Slot Index: " + String(slotIdx) + " out of " + String(modeSlots.size()));
+//    DBG("Sorted Index: " + String(modeLibraryIndex) + " out of " + String(numSortedModes));
+//    DBG("User Index: " + String(userModesIndex) + " out of " + String(loadedUserModes.size()));
+//    DBG("Fav Index: " + String(favIdx) + " out of " + String(favoriteModes.size()));
+//    DBG("Slot Index: " + String(slotIdx) + " out of " + String(modeSlots.size()));
 
 	int modeSlotNumber = modeBoxNumber;
 
@@ -593,11 +593,18 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
     String displayName;
     var separatorProperty;
     
+    int numModes = 0;
 	int subMenuIndex = 0;
     
-    for (int subMenu = 0; subMenu < SortType::user; subMenu++)
+    for (int subMenu = 0; subMenu <= SortType::user; subMenu++)
     {
-        for (int presetNum = 0; presetNum < modeLibraryNode.getNumChildren(); presetNum++)
+        
+        if (subMenu < SortType::user)
+            numModes = modeLibraryNode.getNumChildren();
+        else
+            numModes = loadedUserModes.size();
+        
+        for (int presetNum = 0; presetNum < numModes; presetNum++)
         {
             presetIn = modesSorted.getUnchecked(subMenu).getUnchecked(presetNum);
             
@@ -641,10 +648,10 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
     }
     
     // USERS
-    for (int i = 0; i < loadedUserModes.size(); i++)
-    {
-        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
-    }
+//    for (int i = 0; i < loadedUserModes.size(); i++)
+//    {
+//        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
+//    }
 
 	// FAVORITES
 	for (int i = 0; i < favoriteModes.size(); i++)

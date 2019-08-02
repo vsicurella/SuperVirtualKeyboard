@@ -256,6 +256,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 	autoMapBtn->setClickingTogglesState(true);
 	noteNumsBtn->setClickingTogglesState(true);
+    
+    scaleTextBox->setInputFilter(pluginState->textFilterIntOrSpace.get(), false);
 
 	// allows for implementing mouseDown() to update the menus
 	mode1Box->setInterceptsMouseClicks(false, false);
