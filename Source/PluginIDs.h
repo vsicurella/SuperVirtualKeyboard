@@ -117,6 +117,7 @@ namespace IDs
 		exportReaperMap,
 		exportAbletonMap,
         showExportMenu,
+        showSettingsDialog,
 		commitCustomScale,
 		setMode1,
 		setMode2,

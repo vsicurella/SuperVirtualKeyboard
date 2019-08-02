@@ -62,7 +62,10 @@ void SvkPluginState::recallState(ValueTree nodeIn)
 		childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
 
 		if (childNode.isValid())
+        {
 			pluginSettings->restoreNode(childNode);
+            pluginSettingsNode = pluginSettings->pluginSettingsNode;
+        }
 
 		childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
 
@@ -447,7 +450,7 @@ void SvkPluginState::commitModeInfo()
 }
 
 void SvkPluginState::commitPresetChanges()
-{
+{    
     virtualKeyboard->updatePianoNode();
 	presetViewed->parentNode.removeChild(presetViewed->theKeyboardNode, nullptr);
 	presetViewed->theKeyboardNode = pianoNode;

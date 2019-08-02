@@ -245,6 +245,11 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setScrollBarsShown (false, true);
 
+    settingsButton.reset (new TextButton ("Settings Button"));
+    addAndMakeVisible (settingsButton.get());
+    settingsButton->setButtonText (TRANS("Settings"));
+    settingsButton->addListener (this);
+
 
     //[UserPreSize]
 	scaleTextBox->addListener(this);
@@ -255,15 +260,15 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	// allows for implementing mouseDown() to update the menus
 	mode1Box->setInterceptsMouseClicks(false, false);
 	mode2Box->setInterceptsMouseClicks(false, false);
-    
+
     saveMenu.reset(new PopupMenu());
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::saveMode);
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::savePresetToFile);
-    
+
     loadMenu.reset(new PopupMenu());
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadMode);
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset);
-    
+
     exportMenu.reset(new PopupMenu());
     exportMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::exportReaperMap);
     exportMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::exportAbletonMap);
@@ -320,6 +325,7 @@ PluginControlComponent::~PluginControlComponent()
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
     keyboardViewport = nullptr;
+    settingsButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -343,18 +349,18 @@ void PluginControlComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    mode1Box->setBounds (getWidth() - 202, 16, 150, 24);
-    mode2Box->setBounds (getWidth() - 52 - 150, 48, 150, 24);
-    mode1RootSld->setBounds (getWidth() - 294, 16, 79, 24);
-    mode2RootSld->setBounds (getWidth() - 294, 48, 79, 24);
+    mode1Box->setBounds (getWidth() - 209, 16, 150, 24);
+    mode2Box->setBounds (getWidth() - 59 - 150, 48, 150, 24);
+    mode1RootSld->setBounds (getWidth() - 301, 16, 79, 24);
+    mode2RootSld->setBounds (getWidth() - 301, 48, 79, 24);
     scaleTextBox->setBounds ((getWidth() / 2) + -56 - (207 / 2), 16, 207, 24);
     scaleEntryBtn->setBounds ((getWidth() / 2) + 72 - (31 / 2), 16, 31, 24);
     modeInfoButton->setBounds ((getWidth() / 2) + -181 - (24 / 2), 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
-    mode1ViewBtn->setBounds (getWidth() - 50, 16, 31, 24);
-    mode2ViewBtn->setBounds (getWidth() - 50, 48, 31, 24);
-    mode1RootLbl->setBounds (getWidth() - 326, 16, 32, 24);
-    mode2RootLbl->setBounds (getWidth() - 326, 48, 32, 24);
+    mode1ViewBtn->setBounds (getWidth() - 57, 16, 31, 24);
+    mode2ViewBtn->setBounds (getWidth() - 57, 48, 31, 24);
+    mode1RootLbl->setBounds (getWidth() - 333, 16, 32, 24);
+    mode2RootLbl->setBounds (getWidth() - 333, 48, 32, 24);
     mapStyleBox->setBounds ((getWidth() / 2) + -29 - (150 / 2), 48, 150, 24);
     midiChannelSld->setBounds (292, getHeight() - 40, 86, 24);
     midiChannelLbl->setBounds (197, getHeight() - 40, 96, 24);
@@ -365,7 +371,8 @@ void PluginControlComponent::resized()
     keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
     mapStyleLbl->setBounds ((getWidth() / 2) + -152 - (96 / 2), 48, 96, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9518f), getHeight() - 132);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9380f), getHeight() - 132);
+    settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     //[UserResized] Add your own custom resize handling here..
 
 	Component* svk = keyboardViewport->getViewedComponent();
@@ -535,6 +542,12 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::beginMapEditing, true);
         //[/UserButtonCode_manualMapBtn]
     }
+    else if (buttonThatWasClicked == settingsButton.get())
+    {
+        //[UserButtonCode_settingsButton] -- add your button handler code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
+        //[/UserButtonCode_settingsButton]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -616,7 +629,7 @@ ReferencedComboBox* PluginControlComponent::getMode2Box()
 
 void PluginControlComponent::updateModeBoxMenus()
 {
-	
+
 }
 
 
@@ -790,18 +803,18 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="1000" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="Mode1 Box" id="197cbd0054b3ea6d" memberName="mode1Box"
-            virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="202R 16 150 24"
+            virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="209R 16 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <COMBOBOX name="Mode2 Box" id="e43718c6ce3f175" memberName="mode2Box" virtualName="ReferencedComboBox"
-            explicitFocusOrder="0" pos="52Rr 48 150 24" editable="0" layout="33"
+            explicitFocusOrder="0" pos="59Rr 48 150 24" editable="0" layout="33"
             items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="Mode1 Root Slider" id="e732568ad188d067" memberName="mode1RootSld"
-          virtualName="" explicitFocusOrder="0" pos="294R 16 79 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="301R 16 79 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="mode2RootSld" id="ae29d1ebf57b7bd7" memberName="mode2RootSld"
-          virtualName="" explicitFocusOrder="0" pos="294R 48 79 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="301R 48 79 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
@@ -821,18 +834,18 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TOGGLEBUTTON name="Mode1 View Button" id="bb818484022dae8c" memberName="mode1ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="50R 16 31 24" buttonText=""
+                virtualName="" explicitFocusOrder="0" pos="57R 16 31 24" buttonText=""
                 connectedEdges="0" needsCallback="1" radioGroupId="10" state="0"/>
   <TOGGLEBUTTON name="Mode2 View Button" id="a8183216fad07ec6" memberName="mode2ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="50R 48 31 24" buttonText=""
+                virtualName="" explicitFocusOrder="0" pos="57R 48 31 24" buttonText=""
                 connectedEdges="0" needsCallback="1" radioGroupId="10" state="1"/>
   <LABEL name="Mode1 Root Label" id="2df91047cc98faf4" memberName="mode1RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="326R 16 32 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="333R 16 32 24" edTextCol="ff000000"
          edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="Mode 2 Root Label" id="c21534178bfcff74" memberName="mode2RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="326R 48 32 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="333R 48 32 24" edTextCol="ff000000"
          edBkgCol="0" labelText="F5" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -893,9 +906,12 @@ BEGIN_JUCER_METADATA
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 95.182% 132M"
+            virtualName="" explicitFocusOrder="0" pos="24 80 93.812% 132M"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
+  <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
+              virtualName="" explicitFocusOrder="0" pos="792 40R 88 24" buttonText="Settings"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

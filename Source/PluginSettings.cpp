@@ -118,6 +118,24 @@ bool SvkPluginSettings::getSaveFactoryModes()
 	return saveFactoryModes;
 }
 
+void SvkPluginSettings::setPresetDirectory(File presetDirectoryIn)
+{
+    currentPresetLocation = presetDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::presetDirectory, currentPresetLocation.getFullPathName(), nullptr);
+}
+
+void SvkPluginSettings::setModeDirectory(File modeDirectoryIn)
+{
+    currentModeLocation = modeDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::modeDirectory, currentModeLocation.getFullPathName(), nullptr);
+}
+
+void SvkPluginSettings::setSettingsDirectory(File settingsDirectoryIn)
+{
+    currentSettingsLocation = settingsDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::settingsDirectory, currentSettingsLocation.getFullPathName(), nullptr);
+}
+
 void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
 {
 	createPresetFolder = shouldCreateFolder;

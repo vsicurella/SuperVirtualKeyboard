@@ -14,7 +14,6 @@
 #include "../PluginProcessor.h"
 
 #include "Components/PluginControlComponent.h"
-#include "Components/KeyboardEditorBar.h"
 #include "../Structures/Mode.h"
 #include "Components/VirtualKeyboard/Keyboard.h"
 
@@ -22,6 +21,7 @@
 #include "Dialogs/MidiSettingsWindow.h"
 #include "Dialogs/MidiSettingsComponent.h"
 #include "Dialogs/ModeInfoDialog.h"
+#include "Dialogs/PluginSettingsDialog.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -70,6 +70,8 @@ public:
 	bool exportReaperMap();
 	bool exportAbletonMap();
     void showExportMenu();
+    
+    void showSettingsDialog();
 
 	void commitCustomScale();
 
@@ -167,6 +169,7 @@ private:
     std::unique_ptr<ColourSelector> colorSelector;
 
 	ModeInfoDialog* modeInfo;
+    PluginSettingsDialog* pluginSettingsDialog;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };

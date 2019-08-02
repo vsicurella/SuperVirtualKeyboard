@@ -52,6 +52,10 @@ public:
 
 	bool getCreatePresetFolder();
 	bool getSaveFactoryModes();
+    
+    void setPresetDirectory(File presetDirectoryIn);
+    void setModeDirectory(File modeDirectoryIn);
+    void setSettingsDirectory(File settingsDirectoryIn);
 
 	void setCreatePresetFolder(bool shouldCreateFolder);
 	void setSaveFactoryPresets(bool shouldSavePresets);

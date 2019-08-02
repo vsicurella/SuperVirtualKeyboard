@@ -45,14 +45,6 @@
           <FILE id="nrWH1a" name="VirtualKeyboardKey.h" compile="0" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.h"/>
         </GROUP>
-        <FILE id="B3vqXM" name="KeyboardEditorBar.cpp" compile="0" resource="0"
-              file="Source/UI/Components/KeyboardEditorBar.cpp"/>
-        <FILE id="pnNKOq" name="KeyboardEditorBar.h" compile="0" resource="0"
-              file="Source/UI/Components/KeyboardEditorBar.h"/>
-        <FILE id="MWQPKn" name="MidiRemapTableModel.cpp" compile="0" resource="0"
-              file="Source/UI/Components/MidiRemapTableModel.cpp"/>
-        <FILE id="wf4Gan" name="MidiRemapTableModel.h" compile="0" resource="0"
-              file="Source/UI/Components/MidiRemapTableModel.h"/>
         <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
               file="Source/UI/Components/PluginControlComponent.cpp"/>
         <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"
@@ -77,6 +69,10 @@
               file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
         <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
               file="Source/UI/Dialogs/ModeInfoDialog.h"/>
+        <FILE id="qw1lej" name="PluginSettingsDialog.cpp" compile="1" resource="0"
+              file="Source/UI/Dialogs/PluginSettingsDialog.cpp"/>
+        <FILE id="becyrW" name="PluginSettingsDialog.h" compile="0" resource="0"
+              file="Source/UI/Dialogs/PluginSettingsDialog.h"/>
       </GROUP>
       <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
