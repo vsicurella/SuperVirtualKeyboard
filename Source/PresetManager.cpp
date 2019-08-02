@@ -359,8 +359,19 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 		mode = getModeInSlots(presetSlotNum, modeSlotNumber);
 	else
 		mode = modeCustom.get();
+    
+    bool saved = saveNodeToFile(mode->modeNode, "Save mode", "*.svk", absolutePath);
 
-	return saveNodeToFile(mode->modeNode, "Save mode", "*.svk", absolutePath);
+    if (saved)
+    {
+        addAndSortMode(mode->modeNode);
+        loadedUserModes.add(mode->modeNode);
+        
+        if (mode == modeCustom.get())
+            modeCustom = std::make_shared<Mode>("1");
+    }
+    
+    return saved;
 }
 
 ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath)
