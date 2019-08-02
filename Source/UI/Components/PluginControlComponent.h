@@ -55,8 +55,8 @@ public:
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
 
 	TextEditor* getScaleTextEditor();
-
 	Viewport* getViewport();
+    ComboBox* getMappingStyleBox();
 
 	ReferencedComboBox* getMode1Box();
 	ReferencedComboBox* getMode2Box();
@@ -166,6 +166,7 @@ private:
     std::unique_ptr<ComboBox> highlightStyleBox;
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<TextButton> settingsButton;
+    std::unique_ptr<TextButton> mapOrderEditBtn;
 
 
     //==============================================================================

@@ -173,7 +173,7 @@ bool SvkPluginEditor::exportAbletonMap()
 void SvkPluginEditor::showSettingsDialog()
 {
     pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
-    CallOutBox& callout = CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
+    CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -237,7 +237,7 @@ void SvkPluginEditor::showModeInfo()
 	modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
 	modeInfo->addChangeListener(this);
 
-	CallOutBox& callout = CallOutBox::launchAsynchronously(modeInfo, controlComponent->getScaleTextEditor()->getScreenBounds(), nullptr);
+	CallOutBox::launchAsynchronously(modeInfo, controlComponent->getScaleTextEditor()->getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::setMappingStyle()
@@ -248,6 +248,12 @@ void SvkPluginEditor::setMappingStyle()
 void SvkPluginEditor::setMappingStyle(int mapStyleId)
 {
 	pluginState->setMapStyle(mapStyleId);
+}
+
+void SvkPluginEditor::showMapOrderEditDialog()
+{
+    mapByOrderDialog = new MapByOrderDialog(pluginState);
+    CallOutBox::launchAsynchronously(mapByOrderDialog, controlComponent->getMappingStyleBox()->getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::applyMap()
@@ -585,6 +591,7 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::viewMode2,
 		IDs::CommandIDs::showModeInfo,
 		IDs::CommandIDs::setMappingStyle,
+        IDs::CommandIDs::showMapOrderEdit,
 		IDs::CommandIDs::applyMapping,
 		IDs::CommandIDs::setAutoMap,
 		IDs::CommandIDs::beginMapEditing,
@@ -661,6 +668,9 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	case IDs::CommandIDs::setMappingStyle:
 		result.setInfo("Mapping Style", "Choose a mapping style for remapping MIDI notes.", "Midi", 0);
 		break;
+    case IDs::CommandIDs::showMapOrderEdit:
+        result.setInfo("Edit Mappings by Order", "Choose how to map modes with the order mapping method.", "Preset", 0);
+        break;
 	case IDs::CommandIDs::applyMapping:
 		result.setInfo("Apply Mapping", "Map incoming MIDI notes to Mode 2 with the selected mapping style.", "Midi", 0);
 		break;
@@ -777,6 +787,11 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 			setMappingStyle();
 			break;
 		}
+        case IDs::CommandIDs::showMapOrderEdit:
+        {
+            showMapOrderEditDialog();
+            break;
+        }
 		case IDs::CommandIDs::applyMapping:
 		{
 			applyMap();

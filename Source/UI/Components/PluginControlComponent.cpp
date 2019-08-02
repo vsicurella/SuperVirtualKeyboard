@@ -250,13 +250,20 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     settingsButton->setButtonText (TRANS("Settings"));
     settingsButton->addListener (this);
 
+    mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
+    addAndMakeVisible (mapOrderEditBtn.get());
+    mapOrderEditBtn->setButtonText (TRANS("Edit"));
+    mapOrderEditBtn->addListener (this);
+
 
     //[UserPreSize]
+    mapOrderEditBtn->setVisible(false);
+    
 	scaleTextBox->addListener(this);
 
 	autoMapBtn->setClickingTogglesState(true);
 	noteNumsBtn->setClickingTogglesState(true);
-    
+
     scaleTextBox->setInputFilter(pluginState->textFilterIntOrSpace.get(), false);
 
 	// allows for implementing mouseDown() to update the menus
@@ -328,6 +335,7 @@ PluginControlComponent::~PluginControlComponent()
     highlightStyleBox = nullptr;
     keyboardViewport = nullptr;
     settingsButton = nullptr;
+    mapOrderEditBtn = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -373,8 +381,9 @@ void PluginControlComponent::resized()
     keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
     mapStyleLbl->setBounds ((getWidth() / 2) + -152 - (96 / 2), 48, 96, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9380f), getHeight() - 132);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9381f), getHeight() - 132);
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
+    mapOrderEditBtn->setBounds (((getWidth() / 2) + 72 - (32 / 2)) + 83 - 40, 48, 40, 24);
     //[UserResized] Add your own custom resize handling here..
 
 	Component* svk = keyboardViewport->getViewedComponent();
@@ -407,6 +416,12 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
+        
+        if (mapStyleBox->getSelectedId() == 3)
+            mapOrderEditBtn->setVisible(true);
+        else
+            mapOrderEditBtn->setVisible(false);
+        
         //[/UserComboBoxCode_mapStyleBox]
     }
     else if (comboBoxThatHasChanged == keyStyleBox.get())
@@ -550,6 +565,12 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
         appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
         //[/UserButtonCode_settingsButton]
     }
+    else if (buttonThatWasClicked == mapOrderEditBtn.get())
+    {
+        //[UserButtonCode_mapOrderEditBtn] -- add your button handler code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::showMapOrderEdit, true);
+        //[/UserButtonCode_mapOrderEditBtn]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -608,6 +629,10 @@ TextEditor* PluginControlComponent::getScaleTextEditor()
 	return scaleTextBox.get();
 }
 
+ComboBox* PluginControlComponent::getMappingStyleBox()
+{
+    return mapStyleBox.get();
+}
 
 String PluginControlComponent::getScaleEntryText()
 {
@@ -713,6 +738,11 @@ int PluginControlComponent::getMappingStyle()
 void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify)
 {
 	mapStyleBox->setSelectedId(idIn, notify);
+    
+    if (idIn == 3)
+        mapOrderEditBtn->setVisible(true);
+    else
+        mapOrderEditBtn->setVisible(false);
 }
 
 int PluginControlComponent::getMode1Root()
@@ -914,6 +944,9 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
               virtualName="" explicitFocusOrder="0" pos="792 40R 88 24" buttonText="Settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
+              virtualName="" explicitFocusOrder="0" pos="83r 48 40 24" posRelativeX="22ef34e38fed1212"
+              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -19,7 +19,7 @@
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
-#include "Dialogs/MidiSettingsComponent.h"
+#include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
 #include "Dialogs/PluginSettingsDialog.h"
 
@@ -94,6 +94,8 @@ public:
 
 	void setMappingStyle();
 	void setMappingStyle(int mapStyleId);
+    
+    void showMapOrderEditDialog();
 
 	void applyMap();
 
@@ -168,8 +170,9 @@ private:
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
 
-	ModeInfoDialog* modeInfo;
     PluginSettingsDialog* pluginSettingsDialog;
+	ModeInfoDialog* modeInfo;
+    MapByOrderDialog* mapByOrderDialog;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };

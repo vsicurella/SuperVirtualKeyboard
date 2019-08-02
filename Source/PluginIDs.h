@@ -132,6 +132,7 @@ namespace IDs
 		setMappingModeToMode,
 		setMappingModeToScale,
 		setMappingOrders,
+        showMapOrderEdit,
 		applyMapping,
 		setAutoMap,
 		beginMapEditing,

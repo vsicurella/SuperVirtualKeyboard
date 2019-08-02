@@ -67,6 +67,11 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	int getMode1Root();
 	int getMode2Root();
+    
+    int getMapOrder1();
+    int getMapOrder2();
+    int getMapOrderOffset1();
+    int getMapOrderOffset2();
 
 	int getPeriodShift();
 	int getMidiChannelOut();
@@ -87,6 +92,11 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void setMode1Root(int rootNoteIn);
     void setMode2Root(int rootNoteIn);
+    
+    void setMapOrder1(int orderIn);
+    void setMapOrder2(int orderIn);
+    void setMapOrderOffset1(int offsetIn);
+    void setMapOrderOffset2(int offsetIn);
     
     void setPeriodShift(int shiftIn);
     void setMidiChannel(int midiChannelIn);
