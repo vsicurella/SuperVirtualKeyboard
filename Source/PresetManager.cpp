@@ -316,16 +316,24 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, bool sendChangeSignal)
 bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath)
 {
 	File fileOut = File(absolutePath);
-
-	if (!fileOut.getParentDirectory().exists())
+    
+	if (fileOut.isDirectory())
 	{
 		FileChooser chooser(saveMsg,
-			pluginSettingsNode[IDs::presetDirectory].toString(),
-			fileEnding);
+            fileOut, fileEnding);
 
 		chooser.browseForFileToSave(true);
 		fileOut = chooser.getResult();
 	}
+    else if (!fileOut.exists())
+    {
+        FileChooser chooser(saveMsg,
+            File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory),
+            fileEnding);
+        
+        chooser.browseForFileToSave(true);
+        fileOut = chooser.getResult();
+    }
 
 	if (fileOut.getParentDirectory().exists())
 	{
@@ -352,12 +360,7 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 	else
 		mode = modeCustom.get();
 
-	return saveNodeToFile(mode->modeNode, "Save mode", "*.svk", pluginSettingsNode[IDs::modeDirectory]);
-}
-
-bool SvkPresetManager::saveModeToFile(String absolutePath)
-{
-	return saveNodeToFile(modeCustom->modeNode, "Save mode", "*.svk", pluginSettingsNode[IDs::modeDirectory]);
+	return saveNodeToFile(mode->modeNode, "Save mode", "*.svk", absolutePath);
 }
 
 ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath)

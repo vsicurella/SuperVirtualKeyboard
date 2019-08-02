@@ -450,7 +450,7 @@ void SvkPluginState::commitModeInfo()
 }
 
 void SvkPluginState::commitPresetChanges()
-{    
+{
     virtualKeyboard->updatePianoNode();
 	presetViewed->parentNode.removeChild(presetViewed->theKeyboardNode, nullptr);
 	presetViewed->theKeyboardNode = pianoNode;
