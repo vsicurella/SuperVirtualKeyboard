@@ -490,7 +490,7 @@ void SvkPresetManager::loadModeDirectory()
 
 	if ((bool)pluginSettingsNode[IDs::createPresetFolder])
 	{
-		File modeDirectory = File(pluginSettingsNode[IDs::presetDirectory]);
+		File modeDirectory = File(pluginSettingsNode[IDs::modeDirectory]);
 		Array<File> filesToLoad = modeDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.svk");
 
 		std::unique_ptr<XmlElement> xml;
