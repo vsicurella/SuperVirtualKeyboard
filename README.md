@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-06-22 (Coming soon)
+LATEST VERSION: Alpha 2019-08-03 (v0.02)
 
 SUMMARY:
 
@@ -24,13 +24,13 @@ FEATURES:
 
  - If you don't have a midi controller, here are some features you can take advantage of:
 
- 	- Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to de/retrigger held notes.
+ 	- Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to retrigger held notes.
 
  	- Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
 
  - Save your layout as a text file that Reaper can load as "MIDI Note Names" so that you can see the layout in Reaper's piano roll!
  
- - * Temporarily Disabled * Change the colors of the keys! Open up the color chooser from the Edit menu, select a color then click and use a modifier to paint      the keys. 
+ - Change the colors of the keys! Open up the color chooser from the Edit menu, select a color then click and use a modifier to paint      the keys. 
     - No modifiers will paint all keys of the same scale degree
     - Shift will paint all belonging to the same mode
     - Control will only paint the clicked key.
@@ -39,10 +39,16 @@ FEATURES:
 
   - View and Edit information about your mode in the "View Mode Info" dialog in the "Edit" menu
 
-  - Save and load your custom scales, midi mappings, and key colors!
+  - Save and load your custom scales and midi mappings!
+  
+New in version 0.02
+- Updated GUI
+- Custom mode folder scanning
+- Saving/Importing both modes and presets
+- MOS scales up through 23EDO
+- Bug: Colors don't stay on the right keys the first time you set them, but should work after that
 
 TO DO:
-
  - Customize key sizes and positions
  - Change keyboard orientation
  - Add note names
@@ -52,16 +58,12 @@ TO DO:
  - Add preset tags and improve preset browsing and management
  - Allow piano keys to be treggered by computer keyboard keys
  - Add preset slots to allow for automated scale switching
- - Add custom preset folder, browsable in plugin
- - Add plugin and midi settings dialog windows
  - Add MPE Tuning capability
  - More...
 
 BUGS:
-
  - Midi device doesn't get reconfigured when device settings change
  - Window resizing is bad funky
- - Colors aren't working
  - Mapping Mode by Order and setting offsets don't work as intended
  - Learn manual mapping needs to be re-implemented
  - More...
