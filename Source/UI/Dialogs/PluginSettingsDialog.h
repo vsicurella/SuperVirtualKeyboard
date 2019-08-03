@@ -21,8 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../../../JuceLibraryCode/JuceHeader.h"
-#include "../../CommonFunctions.h"
-#include "../../Structures/Mode.h"
+#include "../../PluginSettings.h"
 //[/Headers]
 
 
@@ -35,70 +34,48 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class ModeInfoDialog  : public Component,
-                        public ChangeBroadcaster,
-                        TextEditor::Listener,
-                        public Button::Listener,
-                        public Slider::Listener
+class PluginSettingsDialog  : public Component,
+                              public Button::Listener
 {
 public:
     //==============================================================================
-    ModeInfoDialog (Mode* modeIn);
-    ~ModeInfoDialog();
+    PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn);
+    ~PluginSettingsDialog();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void commitMode();
-
-
-	void textEditorTextChanged(TextEditor& textEditor) override;
-	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
-	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-	void textEditorFocusLost(TextEditor& textEditor) override;
-
+    File findDirectory(const String prompt);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    Mode modeWorking;
-    Mode* modeOriginal;
-    ValueTree modeNode;
+    SvkPluginSettings* pluginSettings;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TextEditor> familyBox;
-    std::unique_ptr<TextEditor> stepsBox;
-    std::unique_ptr<TextEditor> infoBox;
-    std::unique_ptr<Label> familyNameLbl;
-    std::unique_ptr<Label> stepsLbl;
-    std::unique_ptr<Label> intervalSizesLbl;
-    std::unique_ptr<Label> nameLabel;
-    std::unique_ptr<Label> modeSizeLbl;
-    std::unique_ptr<Label> scaleSizeLbl;
-    std::unique_ptr<ToggleButton> defaultNameBtn;
-    std::unique_ptr<Label> infoLbl;
-    std::unique_ptr<TextEditor> nameBox;
-    std::unique_ptr<TextButton> saveButton;
-    std::unique_ptr<Slider> rotateSld;
-    std::unique_ptr<Label> modeRotateLbl;
-    std::unique_ptr<Label> scaleSizeReadout;
-    std::unique_ptr<Label> modeSizeReadout;
-    std::unique_ptr<Label> intervalSizeReadout;
-    std::unique_ptr<TextButton> closeButton;
+    std::unique_ptr<TextEditor> presetDirectoryText;
+    std::unique_ptr<Label> presetDirectoryLbl;
+    std::unique_ptr<TextButton> presetDirectoryBtn;
+    std::unique_ptr<TextEditor> modeDirectoryText;
+    std::unique_ptr<Label> modeDirectoryLbl;
+    std::unique_ptr<TextButton> modeDirectoryBtn;
+    std::unique_ptr<TextEditor> settingsDirectoryText;
+    std::unique_ptr<Label> settingsDirectoryLbl;
+    std::unique_ptr<TextButton> settingsDirectoryBtn;
+    std::unique_ptr<ToggleButton> localDirectoryBtn;
+    std::unique_ptr<Label> headerLbl;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModeInfoDialog)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginSettingsDialog)
 };
 
 //[EndFile] You can add extra defines here...
-
 //[/EndFile]
 

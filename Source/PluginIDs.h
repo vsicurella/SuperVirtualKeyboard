@@ -17,17 +17,26 @@ namespace IDs
 {
 	// Plugin State & Presets
 	static Identifier pluginStateNode("PluginState");
-	static Identifier presetLibraryNode("ModeLibrary");
+	static Identifier modeLibraryNode("ModeLibrary");
 	static Identifier presetNode("Preset");
 	static Identifier modePresetNode("ModeLayout");
+	static Identifier modeCustomNode("CurrentCustomMode");
 
-	// Plugin Settings
-	static Identifier pluginSettingsNode("Preferences");
+	// Global Settings
+	static Identifier globalSettingsNode("Preferences");
 	static Identifier settingsDirectory("SettingsDirectory");
 	static Identifier presetDirectory("PresetDirectory");
+	static Identifier modeDirectory("ModeDirectory");
 	static Identifier createPresetFolder("CreatePresetFolder");
-	static Identifier saveFactoryPresets("SaveFactoryPresets");
-
+	static Identifier saveFactoryModes("SaveFactoryPresets");
+    
+    // Preset Properties
+    static Identifier presetProperties("PresetProperties");
+    static Identifier presetSlotViewed("PresetSlotViewed");
+    static Identifier modeSlotsNode("ModeSlots");
+	static Identifier modeSlotsNumberNode("ModeSlotNumbers");
+    static Identifier modeSlotNumber("SlotNumber");
+    static Identifier modeSlotNumViewed("ModeSlotViewed");
 
 	// Midi Settings
     static Identifier midiSettingsNode("MidiSettings");
@@ -39,6 +48,15 @@ namespace IDs
     static Identifier midiInputName("InputDevice");
     static Identifier midiOutputName("OutputDevice");
     static Identifier autoRemapOn("AutoRemapOn");
+    static Identifier midiMapInputCustom("Custom Midi Input Map");
+    static Identifier midiMapOutputCustom("Custom Midi Output Map");
+    static Identifier modeMapFromRootNote("ModeMapFromRootNote");
+    static Identifier modeMapFromPreset("ModeMapFromPreset");
+    static Identifier modeMappingStyle("ModeMappingType");
+	static Identifier mode1OrderMapping("Mode1OrderMapping");
+	static Identifier mode2OrderMapping("Mode2OrderMapping");
+	static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
+	static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
 
 	// Mode
 	static Identifier scaleSize("ScaleSize");
@@ -68,6 +86,8 @@ namespace IDs
 	static Identifier pianoWHRatio("WidthToHeightRatio");
 	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
+	static Identifier pianoKeysShowNoteNumbers("KeysShowNoteNumbers");
+	static Identifier pianoKeysHighlightStyle("KeysHighlightStyle");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
 	static Identifier pianoKeyColorSingle("KeySingleColors");
@@ -77,7 +97,6 @@ namespace IDs
 	static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 	static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 	static Identifier pianoKeyRatioSingle("KeySingleRatios");
-	static Identifier pianoKeyMidiNoteMappings("KeyMappedMidiNotes");
 
 
 	// Piano Key Component
@@ -88,23 +107,50 @@ namespace IDs
 
 	enum CommandIDs
 	{
-		saveCustomLayout = 1,
-		loadCustomLayout,
-		saveReaperMap,
-        showModeInfo,
-		setKeyColor,
-		setMidiNoteOffset,
-		pianoPlayMode,
-		pianoEditMode,
+		savePresetToFile = 1,
+		saveMode,
+        showSaveMenu,
+		loadPreset,
+		loadMode,
+        showLoadMenu,
+		exportPreset,
+		exportReaperMap,
+		exportAbletonMap,
+        showExportMenu,
+        showSettingsDialog,
+		commitCustomScale,
+		setMode1,
+		setMode2,
+		setMode1RootNote,
+		setMode2RootNote,
+		viewMode1,
+		viewMode2,
+		setMode1SlotNumber,
+		setMode2SlotNumber,
+		showModeInfo,
+		setMappingStyle,
+		setMappingModeToMode,
+		setMappingModeToScale,
+		setMappingOrders,
+        showMapOrderEdit,
+		applyMapping,
+		setAutoMap,
+		beginMapEditing,
+		setPeriodShift,
+		setMidiChannelOut,
+		beginColorEditing,
+		showMidiNoteNumbers,
+		setKeyboardOrientation,
 		setPianoHorizontal,
 		setPianoVerticalL,
 		setPianoVerticalR,
+		setKeyStyle,
 		setKeysNestedRight,
-		setKeysNestedCenter,
+		setKeysFlat,
 		setKeysAdjacent,
-		showMidiNoteNumbers,
-		remapMidiNotes,
-        autoRemap
+		setHighlightStyle,
+		setHighlightFullKey,
+		setHighlightDot,
 	};
 }
 

@@ -1,3 +1,6 @@
 /Builds
 /JuceLibraryCode
 .DS_STORE
+/Releases
+/Source/Sketch.cpp
+/Source/Sketch.h

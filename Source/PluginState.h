@@ -18,71 +18,153 @@
 #include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "UI/Components/VirtualKeyboard/Keyboard.h"
+#include "Structures/ModeMapper.h"
 
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
 {
 	ValueTree pluginStateNode;
-	ValueTree presetLibraryNode;
-	ValueTree pluginEditorNode;
-
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;
-	ValueTree modePresetNode;
+	ValueTree modeLibraryNode;
+	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
     
     SvkPluginState();
 	~SvkPluginState() {}
+    
+    void recallState(ValueTree nodeIn);
 
 	//==============================================================================
-
-	UndoManager* getUndoManager();
-
-    SvkMidiProcessor* getMidiProcessor();
-	SvkPreset* getPresetLoaded();
-	Mode* getModeLoaded();
-	VirtualKeyboard::Keyboard* getKeyboard();
+    
+    ApplicationCommandManager* getAppCmdMgr();
+    UndoManager* getUndoManager();
+    
+	SvkPresetManager* getPresetManager();
+	SvkMidiProcessor* getMidiProcessor();
+	SvkPluginSettings* getPluginSettings();
+    
+    VirtualKeyboard::Keyboard* getKeyboard();
+    ModeMapper* getModeMapper();
     
     NoteMap* getMidiInputMap();
     NoteMap* getMidiOutputMap();
+	bool isAutoMapOn();
+	int getMappingStyle();
+    
+    SvkPreset* getPresetinSlot(int slotNumIn=0);
+    SvkPreset* getPresetViewed();
+	int getPresetSlotNumViewed();
+	int getNumModesInPresetViewed();
+    
+    Mode* getModeInSlot(int slotNumIn);
+    Mode* getModeViewed();
+	int getModeViewedNum();
+
+    Mode* getMode1();
+    Mode* getMode2();
+    Mode* getModeCustom();
+
+	int getMode1Root();
+	int getMode2Root();
+    
+    int getMapOrder1();
+    int getMapOrder2();
+    int getMapOrderOffset1();
+    int getMapOrderOffset2();
+
+	int getPeriodShift();
+	int getMidiChannelOut();
+
+	bool isShowingNoteNums();
+	int getKeyStyle();
+	int getHighlightStyle();
+
+    //==============================================================================
     
     bool isPresetEdited();
 
-	void loadMode(int presetIndexIn);
-	void loadMode(ValueTree modeNodeIn);
+    void setPresetViewed(int presetViewedIn);
+	void setModeViewed(int modeViewedIn);
 
-	void setMidiRootNote(int rootNoteIn);
+    void handleModeSelection(int modeBoxNum, int idIn);
+    void setModeCustom(String stepsIn);
+
+	void setMode1Root(int rootNoteIn);
+    void setMode2Root(int rootNoteIn);
     
-    void updatePluginToPresetLoaded();
-    void updatePluginFromParentNode();
+    void setMapOrder1(int orderIn);
+    void setMapOrder2(int orderIn);
+    void setMapOrderOffset1(int offsetIn);
+    void setMapOrderOffset2(int offsetIn);
+    
+    void setPeriodShift(int shiftIn);
+    void setMidiChannel(int midiChannelIn);
+    
+	void setMidiInputMap(NoteMap noteMapIn);
+    void setMidiOutputMap(NoteMap noteMapIn);
+    void setAutoMapping(bool isAutoMappingIn);
+    
+    void setMapStyle(int mapStyleIn);
+    void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
+                   int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
+    void doMapping();
 
+	void sendMappingToKeyboard();
+	void sendMappingToKeyboard(ValueTree mapNodeIn);
+    
+	void setNoteNumsShowing(bool showNoteNumsIn);
+    void setKeyStyle(int keyStyleIn);
+    void setHighlightStyle(int highlightStyleIn);
+    
+	//==============================================================================
+
+	void updateModeViewed(bool sendChange=true);
+    void updateToPreset(bool sendChange = true);
+
+	void commitModeInfo();
     void commitPresetChanges();
-	bool savePreset();
-	bool loadPreset();
+	bool savePresetViewedToFile();
+	bool loadPresetFromFile(bool replaceViewed);
+
+	bool saveModeViewedToFile();
+	bool loadModeFromFile();
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
 	//==============================================================================
-	
-	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
-	std::unique_ptr<SvkPluginSettings> pluginSettings;
-	std::unique_ptr<SvkPresetManager> presetManager;
 
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
 
-	std::unique_ptr<UndoManager> undoManager;
-    std::unique_ptr<SvkMidiProcessor> midiProcessor;
-	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
-    SvkPreset presetWorking;
-    std::unique_ptr<Mode> modeLoaded;
-	
-	Array<ValueTree> loadedFactoryPresets;
-	Array<ValueTree> loadedUserPresets;
+	std::unique_ptr<SvkPresetManager> presetManager;
+	std::unique_ptr<SvkMidiProcessor> midiProcessor;
+	std::unique_ptr<SvkPluginSettings> pluginSettings;
 
-	Array<Array<int>> presetsSorted;
+	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
+	std::unique_ptr<UndoManager> undoManager;
+
+	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
+	std::unique_ptr<ModeMapper> modeMapper;
+
     bool presetEdited = false;
+
+    SvkPreset* presetViewed;
+	int presetSlotNumViewed = 0;
     
+    Mode* modeViewed; // What is currently on screen
+    int modeViewedNum = 1; // The mode box view selection
+	int modePresetSlotNum = 0; // The slot number of the mode in the current preset
+    
+	// Mapping parameters
+
+    bool isAutoMapping = true;
+    int mapStyleSelected = 1;
+    
+    int mapOrder1 = 0;
+    int mapOrder2 = 0;
+    int mapOrderOffset1 = 0;
+    int mapOrderOffset2 = 0;
 };

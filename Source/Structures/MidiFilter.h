@@ -22,11 +22,11 @@ public:
 	MidiFilter(Array<int> mapIn);
 	MidiFilter(NoteMap mapIn);
 
-	int getNoteRemapped(int midiNoteIn);
-	int getNoteMidi(int remappedNoteIn);
+	int getNoteRemapped(int midiNoteIn) const;
+	int getNoteMidi(int remappedNoteIn) const;
 	Array<int> getRemappedNotes();
 
-	Point<int> getNoteRange();
+	Point<int> getNoteRange() const;
 	NoteMap* getNoteMap();
 
 	int setNote(int noteIn, int noteOut);
@@ -35,7 +35,7 @@ public:
 	NoteMap* setNoteMap(Array<int> mapToCopy);
     NoteMap* setNoteMap(NoteMap mapToCopy);
 
-	int size();
+	int size() const;
 
 	String toString();
 

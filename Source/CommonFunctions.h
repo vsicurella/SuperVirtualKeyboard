@@ -209,6 +209,30 @@ static ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
     return nodeOut;
 }
 
+static Array<ValueTree> extractNodes(ValueTree nodeOrigin, Identifier nodeType)
+{
+	Array<ValueTree> nodesOut;
+	ValueTree childNode;
+	
+	int numChildren = nodeOrigin.getNumChildren();
+	int level = 0;
+
+	while (level < numChildren)
+	{
+		childNode = nodeOrigin.getChild(level);
+
+		if (childNode.hasType(nodeType))
+			nodesOut.add(childNode);
+
+		else if (childNode.getNumChildren() > 0)
+			nodesOut.addArray(extractNodes(childNode, nodeType));
+
+		level++;
+	}
+
+	return nodesOut;
+}
+
 template <class T>
 static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
 {
@@ -239,6 +263,8 @@ static void get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Ident
 	}
 }
 
+/* Adds a Colour array reduced to nontrivial items to a node represented in a ValueTree structure */
+
 static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId)
 {
 	ValueTree arrayTree = ValueTree(arrayID);
@@ -246,9 +272,13 @@ static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Id
 
 	for (int i = 0; i < arrayIn.size(); i++)
 	{
-		item = ValueTree(itemId);
-		item.setProperty("Value", arrayIn[i].toString(), nullptr);
-		arrayTree.addChild(item, i, nullptr);
+		if (arrayIn[i].isOpaque())
+		{
+			item = ValueTree(itemId);
+			item.setProperty("Key", i, nullptr);
+			item.setProperty("Value", arrayIn[i].toString(), nullptr);
+			arrayTree.addChild(item, i, nullptr);
+		}
 	}
 
 	nodeIn.addChild(arrayTree, -1, nullptr);
@@ -290,6 +320,24 @@ static void get_array_from_node(const ValueTree& nodeIn, Array<Colour>& arrayIn,
 			arrayIn.add(c);
 			c = Colours::transparentWhite;
 		}
+	}
+}
+
+/* Creates a Colour array from a node, and populates trivial and nontrivial keys */
+
+static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID, int arraySizeOut)
+{
+	ValueTree arrayNode;
+	ValueTree item;
+
+	arrayIn.resize(arraySizeOut);
+
+	arrayNode = nodeIn.getChildWithName(arrayID);
+
+	for (int i = 0; i < arrayNode.getNumChildren(); i++)
+	{
+		item = arrayNode.getChild(i);
+		arrayIn.set(item["Key"], Colour::fromString(item["Value"].toString()));
 	}
 }
 
@@ -348,7 +396,12 @@ static void set_value_in_array(ValueTree nodeIn, Identifier arrayID, int indexTo
 
 static int totalModulus(int numIn, int mod)
 {
-	return ((numIn % mod) + mod) % mod;
+	int val = 0;
+
+	if (mod != 0)
+		val = ((numIn % mod) + mod) % mod;
+
+	return val;
 }
 
 template <class T>

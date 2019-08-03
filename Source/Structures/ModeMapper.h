@@ -31,7 +31,8 @@ public:
     
     void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);
     
-    NoteMap map(const Mode& mode1, const Mode& mode2, int order1=0, int order2=0, int offset1=0, int offset2=0, NoteMap prevMap = NoteMap());
+    NoteMap map(const Mode& mode1, const Mode& mode2, int mapTypeIn = -1, int order1=0, int order2=0, int offset1=0, int offset2=0,
+                NoteMap prevMap = NoteMap());
 
 	static NoteMap mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn = Array<int>());
 
@@ -49,7 +50,7 @@ public:
     
     enum MapType
     {
-        ModeToMode = 0,
+        ModeToMode = 1,
         ModeToScale,
         ModeByOrder
     };

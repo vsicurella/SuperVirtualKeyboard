@@ -25,7 +25,6 @@
 #include "../../CommonFunctions.h"
 #include "../../PluginState.h"
 #include "../../Structures/ModeMapper.h"
-#include "../Components/MidiRemapTableModel.h"
 #include "../Components/ReferencedComboBox.h"
 //[/Headers]
 
@@ -39,78 +38,50 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class MidiSettingsComponent  : public Component,
-                               public Button::Listener,
-                               public Slider::Listener,
-                               public ComboBox::Listener
+class MapByOrderDialog  : public Component,
+                          public ComboBox::Listener,
+                          public Slider::Listener
 {
 public:
     //==============================================================================
-    MidiSettingsComponent (SvkPluginState* pluginStateIn);
-    ~MidiSettingsComponent();
+    MapByOrderDialog (SvkPluginState* pluginStateIn);
+    ~MapByOrderDialog();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setMode1SelectedId(int selectedIdIn);
-	void setMode2SelectedId(int selectedIdIn);
-	void setMode1(Mode* modeIn);
-	void setMode2(Mode* modeIn);
-    void setMode1RootNote(int rootNoteIn);
-    void setMode2RootNote(int rootNoteIn);
-
-    void updateModeMapper();
-    void setOrderMappingVisibility(bool isVisible);
 
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    std::unique_ptr<ModeMapper> modeMapper;
 
-	std::unique_ptr<Mode> modeSelected1;
-	std::unique_ptr<Mode> modeSelected2;
+    SvkPluginState* pluginState;
+    Mode* mode1;
+    Mode* mode2;
 
 	int boxW = 10;
 	int boxH = 8;
 
-	SvkPluginState* pluginState;
-	MidiFilter* midiInputFilter;
-	MidiFilter* midiOutputFilter;
-
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<Label> modeFromLbl;
-    std::unique_ptr<Label> modeToLbl;
-    std::unique_ptr<Label> rootNoteLabel;
-    std::unique_ptr<ReferencedComboBox> presetBox1;
-    std::unique_ptr<ReferencedComboBox> presetBox2;
-    std::unique_ptr<TextButton> mapModesBtn;
-    std::unique_ptr<ToggleButton> mapFullBtn;
-    std::unique_ptr<ToggleButton> mapModeToScaleBtn;
-    std::unique_ptr<ToggleButton> mapModeOrdersBtn;
-    std::unique_ptr<Slider> rootFromSld;
-    std::unique_ptr<Slider> rootToSld;
-    std::unique_ptr<Label> rootNoteFromLbl;
-    std::unique_ptr<Label> rootNoteToLbl;
-    std::unique_ptr<Label> ModeMapTypeLbl;
     std::unique_ptr<ComboBox> mode1OrderBox;
     std::unique_ptr<ComboBox> mode2OrderBox;
     std::unique_ptr<Label> orderSelectionLbl;
     std::unique_ptr<Slider> orderOffsetSld1;
     std::unique_ptr<Slider> orderOffsetSld2;
+    std::unique_ptr<Label> label;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiSettingsComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MapByOrderDialog)
 };
 
 //[EndFile] You can add extra defines here...
