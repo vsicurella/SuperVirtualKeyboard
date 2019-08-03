@@ -17,74 +17,85 @@
 #include "Structures/Preset.h"
 #include "Structures/Mode.h"
 
-class SvkPresetManager : public ComboBox::Listener,
-							public ChangeBroadcaster
+typedef Array<std::shared_ptr<Mode>> ModeSlot;
+
+class SvkPresetManager : public ChangeBroadcaster
 {
-	SvkPreset presetLoaded;
+	Array<ValueTree> loadedFactoryModes;
+	Array<ValueTree> loadedUserModes;
+	Array<ValueTree> favoriteModes;
 
-	Array<ValueTree> loadedFactoryPresets;
-	Array<ValueTree> loadedUserPresets;
-
-	int numberOfPresets = 0;
-
-	Array<Array<ValueTree>> presetsSorted;
+	Array<Array<ValueTree>> modesSorted;
 	int numSortTypes = 4;
 
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
+       
+	OwnedArray<SvkPreset> presetsLoaded;
+    OwnedArray<ModeSlot> modeSlots;
     
-    std::unique_ptr<PopupMenu> presetMenu;
-    OwnedArray<PopupMenu> presetSubMenus;
+	std::shared_ptr<Mode> modeCustom;
 
 	// Methods
-	void createFactoryPresets();
-	void resortPresetLibrary();
+	void createFactoryModes();
+	void resortModeLibrary();
+
+	void initializeModePresets();
+	void loadModeDirectory();
+
+	int addModeToLibrary(ValueTree presetNodeIn);
+	void addModeToSort(ValueTree presetNodeIn);
+	int addAndSortMode(ValueTree presetNodeIn);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 
 public:
 
 	ValueTree presetLibraryNode;
+	ValueTree modeLibraryNode;
 	ValueTree pluginSettingsNode;
-	ValueTree presetNode;
 
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
 
-	SvkPreset* getPresetLoaded();
-    int getPresetLoadedId();
+	SvkPreset* getPresetLoaded(int slotNumIn=0);
+    int getNumPresetsLoaded();
+	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
+
+	ValueTree getModeInLibrary(int indexIn);
+	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
+	Mode* getModeCustom();
     
-	Array<Array<ValueTree>>* getPresetsSorted();
+	Mode* setModeCustom(ValueTree modeNodeIn);
+	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
+    Mode* setModeCustom(Mode* modeIn);
 
-	ValueTree getPreset(int indexIn);
-	ValueTree getMode(int indexIn);
+	int setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
+	int addSlot(int presetSlotNum, ValueTree modeNode);
+	int setSlotAndSelection(int presetSlotNum, int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
+	int addSlotAndSetSelection(int presetSlotNum, int modeSelectorNumber, ValueTree modeNode);
+
+    void removeMode(int presetSlotNum, int modeSlotNum);
+    void resetModeSlot(int presetSlotNum);
+	void refreshModeSlot(int presetSlotNum);
+
+	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
+
+	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
+	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
+	bool loadPreset(int presetSlotNum, int presetLibraryId, bool sendChangeSignal=true);
+	bool loadPreset(int presetSlotNum, bool sendChangeSignal=true);
+
+	bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
+	bool savePresetToFile(int presetSlotNum = 0, String absolutePath="");
+	bool saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "");
     
-    PopupMenu* getPresetMenu();
-	
-	// Can load either full preset or just Mode
-	bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
-	bool loadPreset(int indexIn, bool sendChangeSignal=true);
-	bool loadPreset(SvkPreset* presetIn, bool sendChangeSignal=true);
-	bool loadPreset(bool sendChangeSignal=true);
+    bool commitPreset(int slotNumber, ValueTree presetNodeIn);
 
-	bool savePreset(String absolutePath="");
-    
-    bool commitPresetNode(ValueTree nodeIn);
-    bool commitModeNode(ValueTree modeNodeIn);
-    bool commitKeyboardNode(ValueTree keyboardNodeIn);
-    bool commitMapNode(ValueTree mapNodeIn);
-
-	void intializePresets();
-	void loadPresetDirectory();
-
-	int addPresetToLibrary(ValueTree presetNodeIn);
-	void addPresetToSort(ValueTree presetNodeIn);
-	int addAndSortPreset(ValueTree presetNodeIn);
-    
-    void buildPresetMenu();
-
-	void comboBoxChanged(ComboBox *comboBoxThatHasChanged) override;
-
+	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
+	static ValueTree modeFromFile(String absoluteFilePath = "");
 	static ValueTree presetFromFile(String absoluteFilePath = "");
+    
+    void requestModeMenu(PopupMenu* comboBoxToUse);
 };

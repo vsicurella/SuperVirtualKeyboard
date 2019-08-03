@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "Structures/MidiFilter.h"
 #include "CommonFunctions.h"
+#include "Structures/Mode.h"
 
 class SvkMidiProcessor : public MidiMessageCollector
 {
@@ -27,10 +28,17 @@ class SvkMidiProcessor : public MidiMessageCollector
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
+
+	Mode* modeViewed;
+	Mode* mode1;
+	Mode* mode2;
     
-    int scaleSize = 12;
     int rootMidiNote = 60;
+
     int periodShift = 0;
+	bool useModeSize = false;
+    
+	int midiChannelOut = 1;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;
@@ -38,7 +46,10 @@ class SvkMidiProcessor : public MidiMessageCollector
     bool midiInputPaused = false;
     bool isInputRemapped = true;
     bool isOutputRemapped = true;
-    bool autoRemap = true;
+    
+    bool setAutoMap = true;
+    bool inputMapIsCustom = false;
+    bool outputMapIsCustom = false;
     
     std::unique_ptr<MidiKeyboardState> keyboardState; // used for displaying on VirtualKeyboard
     
@@ -64,6 +75,7 @@ public:
     
     int getRootNote();
     int getPeriodShift();
+    int getMidiChannelOut();
 
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
@@ -78,10 +90,17 @@ public:
     
     String setMidiInput(int deviceIndex);
     String setMidiOutput(int deviceIndex);
+
+	void setModeViewed(Mode* modeViewedIn);
+	void setMode1(Mode* mode1In);
+	void setMode2(Mode* mode2In);
     
-    void setScaleSize(int scaleSizeIn);
     void setRootNote(int rootNoteIn);
-    void setPeriodShift(int shiftIn);
+    
+	void setPeriodShift(int shiftIn);
+	void periodUsesModeSize(bool useMode);
+
+    void setMidiChannelOut(int channelOut);
     
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);

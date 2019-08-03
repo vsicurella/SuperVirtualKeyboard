@@ -154,7 +154,7 @@ bool SvkAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SvkAudioProcessor::createEditor()
 {
-    return new SvkPluginEditor(*this, pluginState->appCmdMgr.get());
+    return new SvkPluginEditor(*this, pluginState->getAppCmdMgr());
 }
 
 //==============================================================================
@@ -166,7 +166,8 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
 	
 	MemoryOutputStream memOut(destData, true);
     pluginState->commitPresetChanges();
-    pluginState->getPresetLoaded()->parentNode.writeToStream(memOut);
+	pluginState->pluginStateNode.writeToStream(memOut);
+    DBG("Saving Plugin State node to internal memory:" + pluginState->pluginStateNode.toXmlString());
 }
 
 void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -176,7 +177,11 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	
 	MemoryInputStream memIn(data, sizeInBytes, false);
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
-    pluginState->presetManager->loadPreset(presetRecall);
+	DBG("Found this in memory:\n" + presetRecall.toXmlString());
+
+    //presetRecall = ValueTree(); // uncomment this line to test new instantiation
+
+	pluginState->recallState(presetRecall);
 }
 
 //==============================================================================

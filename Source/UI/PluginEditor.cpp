@@ -20,125 +20,104 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
-	
-	keyboardEditorBar = std::make_unique<KeyboardEditorBar>(pluginState, appCmdMgr);
-	keyboardEditorBar.get()->setName("Keyboard Editor Bar");
-	keyboardEditorBar.get()->setSize(640, 48);
-	addAndMakeVisible(keyboardEditorBar.get());
-    
-	piano = pluginState->getKeyboard();
+    appCmdMgr->registerAllCommandsForTarget(this);
+    appCmdMgr->setFirstCommandTarget(this);
 
-	view = std::make_unique<Viewport>("Piano Viewport");
-	addAndMakeVisible(view.get());
-	view.get()->setViewedComponent(piano, false);
-	view.get()->setTopLeftPosition(1, 49);
+	controlComponent.reset(new PluginControlComponent(pluginState));
+	controlComponent->setBounds(getBounds());
+	addAndMakeVisible(controlComponent.get());
     
-    /*
+	view = controlComponent->getViewport();
+	virtualKeyboard = pluginState->getKeyboard();
+	view->setViewedComponent(virtualKeyboard, false);
+    
+    keyboardScroll = &view->getHorizontalScrollBar();
+    keyboardScroll->addListener(this);
+    
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
 	colorChooserWindow->addChangeListener(this);
 	colorChooserWindow->addToDesktop();
-     */
-    
-    midiSettingsWindow = std::make_unique<MidiSettingsWindow>();
-    midiSettingsWindow->setSize(560, 150);
-    midiSettingsComponent = std::make_unique<MidiSettingsComponent>(pluginState);
-    midiSettingsComponent->setSize(560, 150);
-    midiSettingsWindow->setContentOwned(midiSettingsComponent.get(), true);
-    midiSettingsWindow->setAlwaysOnTop(true);
+
+	colorSelector.reset(new ColourSelector());
+	colorSelector->setSize(450, 450);
+	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
-
     pluginState->addChangeListener(this);
-    keyboardEditorBar->addChangeListener(this);
-    pluginState->getMidiProcessor()->getKeyboardState()->addListener(piano); // displays MIDI on Keyboard
-	initNodeData();
     
-    midiSettingsComponent->setMode1SelectedId(9);
-    midiSettingsComponent->setMode2SelectedId(9);
-
-    midiSettingsComponent->setMode1RootNote(60);
-    midiSettingsComponent->setMode2RootNote(60);
-    
-	appCmdMgr->registerAllCommandsForTarget(this);
-	appCmdMgr->registerAllCommandsForTarget(piano);
-
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
     setSize(1000, 250);
-	setResizeLimits(986, 100, 10e4, 10e4);
+	setResizeLimits(750, 100, 10e4, 10e4);
     
-	startTimerHz(20);
+    initNodeData();
+	startTimerHz(60);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
 {
     pluginState->removeChangeListener(this);
-    keyboardEditorBar->removeChangeListener(this);
-    pluginState->getMidiProcessor()->getKeyboardState()->removeListener(piano);
 }
 
 //==============================================================================
 
 void SvkPluginEditor::initNodeData()
 {
-	if (pluginState->pluginEditorNode.isValid())
+    // Gui is recreated
+	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        view.get()->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
+        view->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
 	}
+    // Intialization
 	else
 	{
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		pluginState->pluginEditorNode = pluginEditorNode;
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 
-		pluginEditorNode.addChild(pluginState->pianoNode, 0, nullptr);
-
-		view.get()->setViewPositionProportionately(0.52, 0);
+		view->setViewPositionProportionately(0.52, 0);
         pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
     
-    update_children_to_preset();
+    updateUI();
 }
 
 void SvkPluginEditor::updateNodeData()
 {
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	pluginEditorNode.setProperty(IDs::viewportPosition, view.get()->getViewPositionX(), nullptr);
+	pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
 }
 
-void SvkPluginEditor::update_children_to_preset()
+void SvkPluginEditor::updateUI()
 {
-	Mode* modeLoaded = pluginState->getModeLoaded();
-	
-	keyboardEditorBar->setModeReadoutText(modeLoaded->getStepsString());
-	keyboardEditorBar->setModeLibraryText(modeLoaded->getName());
-    keyboardEditorBar->setOffsetReadout(modeLoaded->getRootNote());
-
-	midiSettingsComponent->setMode2(pluginState->getModeLoaded());
+	controlComponent->setAutoMapState(pluginState->isAutoMapOn());
+	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
+	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
+	controlComponent->setMode1Root(pluginState->getMode1Root());
+	controlComponent->setMode2Root(pluginState->getMode2Root());
+	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
+	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
+	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
+	controlComponent->setPeriodShift(pluginState->getPeriodShift());
+	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
+	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
+	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
+	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
     
-    keyboardEditorBar->repaint();
 	DBG("Children Updated");
-}
-
-void SvkPluginEditor::beginColorEditing()
-{
-	colorChooserWindow->setVisible(true);
-	piano->setUIMode(UIMode::colorMode);
-	keyboardEditorBar->allowUserInput(false);
 }
 
 //==============================================================================
 
-
-bool SvkPluginEditor::save_preset()
+bool SvkPluginEditor::savePresetToFile()
 {
-    bool written = pluginState->savePreset();
+    bool written = pluginState->savePresetViewedToFile();
 	if (written)
 		DBG("file was saved");
 	else
@@ -147,23 +126,211 @@ bool SvkPluginEditor::save_preset()
 	return written;
 }
 
-bool SvkPluginEditor::load_preset()
+bool SvkPluginEditor::saveMode()
 {
-	bool loaded = pluginState->loadPreset();
-
-	if (loaded)
-	{
-		//piano->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
-		update_children_to_preset();
-	}
-
-	return loaded;
+	return pluginState->saveModeViewedToFile();
 }
 
-bool SvkPluginEditor::write_reaper_file()
+void SvkPluginEditor::showSaveMenu()
 {
-	ReaperWriter rpp = ReaperWriter(pluginState->getModeLoaded());
+    return;
+}
+
+bool SvkPluginEditor::loadPreset()
+{
+	if (pluginState->loadPresetFromFile(true))
+	{
+		//virtualKeyboard->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
+		updateUI();
+
+		return true;
+	}
+
+	return false;
+}
+
+bool SvkPluginEditor::loadMode()
+{
+	if (pluginState->loadModeFromFile())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool SvkPluginEditor::exportReaperMap()
+{
+	ReaperWriter rpp = ReaperWriter(pluginState->getModeViewed());
 	return rpp.write_file();
+}
+
+bool SvkPluginEditor::exportAbletonMap()
+{
+	return false;
+}
+
+void SvkPluginEditor::showSettingsDialog()
+{
+    pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
+    CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
+}
+
+void SvkPluginEditor::commitCustomScale()
+{
+	String scaleSteps = controlComponent->getScaleEntryText();
+	pluginState->setModeCustom(scaleSteps);
+}
+
+void SvkPluginEditor::setMode1()
+{
+	setMode1(controlComponent->getMode1BoxSelection());
+}
+
+void SvkPluginEditor::setMode1(int idIn)
+{
+    pluginState->handleModeSelection(0, idIn);
+}
+
+void SvkPluginEditor::setMode2()
+{
+	setMode2(controlComponent->getMode2BoxSelection());
+}
+
+void SvkPluginEditor::setMode2(int idIn)
+{
+    pluginState->handleModeSelection(1, idIn);
+}
+
+void SvkPluginEditor::setMode1Root()
+{
+	setMode1Root(controlComponent->getMode1Root());
+}
+
+void SvkPluginEditor::setMode1Root(int rootIn)
+{
+	pluginState->setMode1Root(rootIn);
+}
+
+void SvkPluginEditor::setMode2Root()
+{
+	setMode2Root(controlComponent->getMode2Root());
+}
+
+void SvkPluginEditor::setMode2Root(int rootIn)
+{
+	pluginState->setMode2Root(rootIn);
+}
+
+void SvkPluginEditor::setModeView()
+{
+	setModeView(controlComponent->getModeViewed());
+}
+
+void SvkPluginEditor::setModeView(int modeNumberIn)
+{
+	pluginState->setModeViewed(modeNumberIn);
+}
+
+void SvkPluginEditor::showModeInfo()
+{
+	modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
+	modeInfo->addChangeListener(this);
+
+	CallOutBox::launchAsynchronously(modeInfo, controlComponent->getScaleTextEditor()->getScreenBounds(), nullptr);
+}
+
+void SvkPluginEditor::setMappingStyle()
+{
+	setMappingStyle(controlComponent->getMappingStyle());
+}
+
+void SvkPluginEditor::setMappingStyle(int mapStyleId)
+{
+	pluginState->setMapStyle(mapStyleId);
+}
+
+void SvkPluginEditor::showMapOrderEditDialog()
+{
+    mapByOrderDialog = new MapByOrderDialog(pluginState);
+    CallOutBox::launchAsynchronously(mapByOrderDialog, controlComponent->getMappingStyleBox()->getScreenBounds(), nullptr);
+}
+
+void SvkPluginEditor::applyMap()
+{
+	pluginState->doMapping();
+}
+
+void SvkPluginEditor::setAutoMap()
+{
+	setAutoMap(controlComponent->getAutoMapState());
+}
+
+void SvkPluginEditor::setAutoMap(bool isAutoMapping)
+{
+	pluginState->setAutoMapping(isAutoMapping);
+}
+
+void SvkPluginEditor::beginMapEditing()
+{
+	// TODO
+}
+
+void SvkPluginEditor::setPeriodShift()
+{
+	setPeriodShift(controlComponent->getPeriodShift());
+}
+
+void SvkPluginEditor::setPeriodShift(int periodsIn)
+{
+	pluginState->setPeriodShift(periodsIn);
+}
+
+void SvkPluginEditor::setMidiChannel()
+{
+	setMidiChannel(controlComponent->getMidiChannel());
+}
+
+void SvkPluginEditor::setMidiChannel(int midiChannelIn)
+{
+	pluginState->setMidiChannel(midiChannelIn);
+}
+
+void SvkPluginEditor::beginColorEditing()
+{
+	colorChooserWindow->setVisible(true);
+	virtualKeyboard->setUIMode(UIMode::colorMode);
+}
+
+
+void SvkPluginEditor::setNoteNumsVisible()
+{
+	setNoteNumsVisible(controlComponent->getNoteNumsView());
+}
+
+void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
+{
+	pluginState->setNoteNumsShowing(noteNumsVisible);
+}
+
+void SvkPluginEditor::setKeyStyle()
+{
+	setKeyStyle(controlComponent->getKeyStyle());
+}
+
+void SvkPluginEditor::setKeyStyle(int keyStyleId)
+{
+	pluginState->setKeyStyle(keyStyleId);
+}
+
+void SvkPluginEditor::setHighlightStyle()
+{
+	setHighlightStyle(controlComponent->getHighlightStyle());
+}
+
+void SvkPluginEditor::setHighlightStyle(int highlightStyleId)
+{
+	pluginState->setHighlightStyle(highlightStyleId);
 }
 
 //==============================================================================
@@ -175,21 +342,24 @@ void SvkPluginEditor::paint(Graphics& g)
 
 void SvkPluginEditor::resized()
 {
-	int viewPositionKeyboardX = view->getViewPositionX();
+	float viewXProportion = (float) view->getViewPositionX() / view->getMaximumVisibleWidth();
 	AudioProcessorEditor::resized();
+	controlComponent->setSize(getWidth(), getHeight());
 
-	keyboardEditorBar->setBounds(0, 0, getWidth(), 36);
-	view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
-	piano->setBounds(0, 0, piano->getWidthFromHeight(view->getMaximumVisibleHeight()), view->getMaximumVisibleHeight()-1);
+	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
+	//virtualKeyboard->setSize(getWidth(), getHeight());
 	
-	view->setViewPosition(viewPositionKeyboardX, 0);
+	view->setViewPosition((int)(viewXProportion * view->getMaximumVisibleWidth()), 0);
+    
+    if (pluginEditorNode.isValid())
+        updateNodeData();
 }
 
 //==============================================================================
 
 void SvkPluginEditor::timerCallback()
 {
-	piano->repaint();
+	virtualKeyboard->repaint();
 }
 
 //==============================================================================
@@ -199,6 +369,7 @@ void SvkPluginEditor::userTriedToCloseWindow()
 	if (colorChooserWindow->isVisible())
 		colorChooserWindow->closeButtonPressed();
 
+    updateNodeData();
 	setVisible(false);
 }
 
@@ -206,32 +377,32 @@ void SvkPluginEditor::userTriedToCloseWindow()
 
 void SvkPluginEditor::mouseDown(const MouseEvent& e)
 {
-    Key* key = piano->getKeyFromPosition(e);
+    Key* key = virtualKeyboard->getKeyFromPosition(e);
 
-	if (piano->getUIMode() == UIMode::playMode)
+	if (virtualKeyboard->getUIMode() == UIMode::playMode)
 	{
 		if (key)
 		{
 			if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->activeState == 2)
 			{
 				// note off
-				//piano->lastKeyClicked = 0;
-				piano->triggerKeyNoteOff(key);
+				//virtualKeyboard->lastKeyClicked = 0;
+				virtualKeyboard->triggerKeyNoteOff(key);
 			}
 			else
 			{
 				if (e.mods.isAltDown())
 				{
-					Key* oldKey = piano->getKey(piano->getLastKeyClicked());
-					piano->triggerKeyNoteOff(oldKey);
+					Key* oldKey = virtualKeyboard->getKey(virtualKeyboard->getLastKeyClicked());
+					virtualKeyboard->triggerKeyNoteOff(oldKey);
 				}
 
-				piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
-				piano->setLastKeyClicked(key->keyNumber);
+				virtualKeyboard->triggerKeyNoteOn(key, virtualKeyboard->getKeyVelocity(key, e));
+				virtualKeyboard->setLastKeyClicked(key->keyNumber);
 			}
 		}
 	}
-	else if (piano->getUIMode() == UIMode::colorMode)
+	else if (virtualKeyboard->getUIMode() == UIMode::colorMode)
 	{
 		if (key)
 		{
@@ -239,63 +410,61 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 			{
 				if (e.mods.isShiftDown())
 				{
-					piano->resetKeyOrderColors(key->order, true);
+					virtualKeyboard->resetKeyOrderColors(key->order, true);
 				}
 				else if (e.mods.isCtrlDown())
 				{
-					piano->resetKeySingleColor(key->keyNumber);
+					virtualKeyboard->resetKeySingleColor(key->keyNumber);
 				}
 				else
 				{
-					piano->resetKeyDegreeColors(key->keyNumber);
+					virtualKeyboard->resetKeyDegreeColors(key->keyNumber);
 				}
 			}
 
 			else if (e.mods.isShiftDown())
 			{
-				if (piano->getKeyDegreeColor(key->scaleDegree).isOpaque())
-					piano->resetKeyDegreeColors(key->scaleDegree);
+				if (virtualKeyboard->getKeyDegreeColor(key->scaleDegree).isOpaque())
+					virtualKeyboard->resetKeyDegreeColors(key->scaleDegree);
 
-				else if (piano->getKeySingleColor(key->keyNumber).isOpaque())
-					piano->resetKeySingleColor(key->keyNumber);
+				else if (virtualKeyboard->getKeySingleColor(key->keyNumber).isOpaque())
+					virtualKeyboard->resetKeySingleColor(key->keyNumber);
 
-				piano->setKeyColorOrder(key->order, 3, colorChooserWindow->getColorSelected());
+				virtualKeyboard->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
 			}
 			else if (e.mods.isCtrlDown())
-				piano->setKeyColor(key->keyNumber, 3, colorChooserWindow->getColorSelected());
+				virtualKeyboard->beginColorEditing(key->keyNumber, 3, colorSelector->getCurrentColour());
 			else
-				piano->setKeyColorDegree(key->scaleDegree, 3, colorChooserWindow->getColorSelected());
-            
-            piano->repaint();
+				virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());       
 		}
 	}
-    else if (piano->getUIMode() == UIMode::mapMode)
+    else if (virtualKeyboard->getUIMode() == UIMode::mapMode)
     {
         if (key)
         {
-            piano->selectKeyToMap(key);
+            virtualKeyboard->selectKeyToMap(key);
         }
     }
 }
 
 void SvkPluginEditor::mouseDrag(const MouseEvent& e)
 {
-	if (piano->getUIMode() == UIMode::playMode)
+	if (virtualKeyboard->getUIMode() == UIMode::playMode)
 	{
-		Key* key = piano->getKeyFromPosition(e);
+		Key* key = virtualKeyboard->getKeyFromPosition(e);
 
 		if (key)
 		{
-			if (key->keyNumber != piano->getLastKeyClicked())
+			if (key->keyNumber != virtualKeyboard->getLastKeyClicked())
 			{
-				Key* oldKey = piano->getKey(piano->getLastKeyClicked());
+				Key* oldKey = virtualKeyboard->getKey(virtualKeyboard->getLastKeyClicked());
 				if (!e.mods.isShiftDown() || e.mods.isAltDown())
 				{
-					piano->triggerKeyNoteOff(oldKey);
+					virtualKeyboard->triggerKeyNoteOff(oldKey);
 				}
 
-				piano->triggerKeyNoteOn(key, piano->getKeyVelocity(key, e));
-				piano->setLastKeyClicked(key->keyNumber);
+				virtualKeyboard->triggerKeyNoteOn(key, virtualKeyboard->getKeyVelocity(key, e));
+				virtualKeyboard->setLastKeyClicked(key->keyNumber);
 				repaint();
 			}
 		}
@@ -304,15 +473,15 @@ void SvkPluginEditor::mouseDrag(const MouseEvent& e)
 
 void SvkPluginEditor::mouseUp(const MouseEvent& e)
 {
-	if (piano->getUIMode() == UIMode::playMode)
+	if (virtualKeyboard->getUIMode() == UIMode::playMode)
 	{
-		Key* key = piano->getKeyFromPosition(e);
+		Key* key = virtualKeyboard->getKeyFromPosition(e);
 
 		if (key)
 		{
 			if (!e.mods.isShiftDown())
 			{
-				piano->triggerKeyNoteOff(key);
+				virtualKeyboard->triggerKeyNoteOff(key);
 				key->activeState = 1;
 				repaint();
 			}
@@ -322,9 +491,9 @@ void SvkPluginEditor::mouseUp(const MouseEvent& e)
 
 void SvkPluginEditor::mouseMove(const MouseEvent& e)
 {
-	if (piano->getUIMode() != UIMode::colorMode)
+	if (virtualKeyboard->getUIMode() != UIMode::colorMode)
 	{
-		Key* key = piano->getKeyFromPosition(e);
+		Key* key = virtualKeyboard->getKeyFromPosition(e);
 
 		if (key)
 		{
@@ -344,53 +513,41 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     // New Mode loaded
     if (source == pluginState)
     {
-        piano->resetKeyColors(true);
-        piano->updatePianoNode();
-        update_children_to_preset();
+        updateUI();
+		pluginState->updateModeViewed(false);
     }
     
     // Color editing has finished
 	if (source == colorChooserWindow.get())
 	{
-		if (piano->getUIMode() == UIMode::colorMode)
+		if (virtualKeyboard->getUIMode() == UIMode::colorMode)
 		{
-			piano->updatePianoNode();
-
-			piano->applyMode(pluginState->getModeLoaded());
-			piano->setUIMode(UIMode::playMode);
-			keyboardEditorBar->allowUserInput();
+			virtualKeyboard->updatePianoNode();
+			virtualKeyboard->updateKeyColors();
+			virtualKeyboard->setUIMode(UIMode::playMode);
 		}
 	}
     
     // Prepare to play
     if (source == &processor)
     {
-        //pluginState->midiStateIn->addListener(piano);
-    }
-    
-    // Root note or Mapping button toggled 
-    if (source == keyboardEditorBar.get())
-    {
-        if (keyboardEditorBar->isMapButtonOn())
-        {
-            pluginState->getMidiProcessor()->pauseMidiInput();
-            piano->setUIMode(UIMode::mapMode);
-        }
-        else
-        {
-            pluginState->getMidiProcessor()->pauseMidiInput(false);
-            piano->setUIMode(UIMode::playMode);
-        }
-
-        midiSettingsComponent->setMode2RootNote(keyboardEditorBar->getOffsetReadout());
-		update_children_to_preset();
+        //pluginState->midiStateIn->addListener(virtualKeyboard);
     }
 
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-		pluginState->updatePluginToPresetLoaded();
+
+		pluginState->commitModeInfo();
 	}
+}
+
+void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
+{
+    if (scrollBarThatHasMoved == keyboardScroll)
+    {
+        pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
+    }
 }
 
 //==============================================================================
@@ -412,18 +569,39 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 
 ApplicationCommandTarget* SvkPluginEditor::getNextCommandTarget()
 {
-	return piano;// findFirstTargetParentComponent();
+    return findFirstTargetParentComponent();
 }
 
-void SvkPluginEditor::getAllCommands(Array< CommandID > &c)
+void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 {
 	Array<CommandID> commands{
-		IDs::CommandIDs::saveCustomLayout,
-		IDs::CommandIDs::loadCustomLayout,
-		IDs::CommandIDs::saveReaperMap,
-		IDs::CommandIDs::setKeyColor,
+		IDs::CommandIDs::savePresetToFile,
+		IDs::CommandIDs::saveMode,
+		IDs::CommandIDs::loadPreset,
+		IDs::CommandIDs::loadMode,
+		IDs::CommandIDs::exportReaperMap,
+		IDs::CommandIDs::exportAbletonMap,
+        IDs::CommandIDs::showSettingsDialog,
+		IDs::CommandIDs::commitCustomScale,
+		IDs::CommandIDs::setMode1,
+		IDs::CommandIDs::setMode2,
+		IDs::CommandIDs::setMode1RootNote,
+		IDs::CommandIDs::setMode2RootNote,
+		IDs::CommandIDs::viewMode1,
+		IDs::CommandIDs::viewMode2,
+		IDs::CommandIDs::showModeInfo,
+		IDs::CommandIDs::setMappingStyle,
+        IDs::CommandIDs::showMapOrderEdit,
+		IDs::CommandIDs::applyMapping,
+		IDs::CommandIDs::setAutoMap,
+		IDs::CommandIDs::beginMapEditing,
+		IDs::CommandIDs::setPeriodShift,
+		IDs::CommandIDs::setMidiChannelOut,
+		IDs::CommandIDs::beginColorEditing,
+		IDs::CommandIDs::showMidiNoteNumbers,
+		IDs::CommandIDs::setKeyStyle,
+		IDs::CommandIDs::beginColorEditing,
         IDs::CommandIDs::showModeInfo,
-		IDs::CommandIDs::remapMidiNotes
 	};
 
 	c.addArray(commands);
@@ -433,36 +611,93 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 {
 	switch (commandID)
 	{
-	case IDs::CommandIDs::saveCustomLayout:
-		result.setInfo("Save Layout", "Save your custom layout to a file.", "Piano", 0);
-		//result.setTicked(pianoOrientationSelected == PianoOrientation::horizontal);
-		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+	case IDs::CommandIDs::savePresetToFile:
+		result.setInfo("Save Preset", "Save your custom layout to a file.", "Preset", 0);
 		break;
-	case IDs::CommandIDs::loadCustomLayout:
-		result.setInfo("Load Layout", "Load a custom layout from a file.", "Piano", 0);
-		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalLeft);
-		//result.addDefaultKeypress('a', ModifierKeys::shiftModifier);
+	case IDs::CommandIDs::saveMode:
+		result.setInfo("Save Mode", "Save the currently viewed mode.", "Preset", 0);
 		break;
-	case IDs::CommandIDs::saveReaperMap:
-		result.setInfo("Save Reaper Note Names", "Save the current layout as a Reaper MIDI Note Name text file.", "Piano", 0);
-		//result.setTicked(pianoOrientationSelected == PianoOrientation::verticalRight);
-		//result.addDefaultKeypress('d', ModifierKeys::shiftModifier);
+    case IDs::CommandIDs::showSaveMenu:
+        result.setInfo("Show Saving Options", "Save current mode or whole preset.", "Preset", 0);
+        break;
+	case IDs::CommandIDs::loadPreset:
+		result.setInfo("Load Preset", "Load a custom layout from a file.", "Preset", 0);
 		break;
-	case IDs::CommandIDs::setKeyColor:
-		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Piano", 0);
-        result.setActive(false);
-		//result.addDefaultKeypress('c', ModifierKeys::shiftModifier);
+	case IDs::CommandIDs::loadMode:
+		result.setInfo("Load Mode", "Load only the mode of a preset.", "Preset", 0);
+		break;
+    case IDs::CommandIDs::showLoadMenu:
+        result.setInfo("Show Loading Options", "Load a mode or whole preset.", "Preset", 0);
+        break;
+	case IDs::CommandIDs::exportReaperMap:
+		result.setInfo("Export for Reaper", "Exports the current preset to a MIDI Note Name text file for use in Reaper's piano roll.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::exportAbletonMap:
+		result.setInfo("Export for Ableton", "Exports the mode mapping to a MIDI file for to use in Ableton's piano roll for folding.", "Preset", 0);
+		break;
+    case IDs::CommandIDs::showExportMenu:
+        result.setInfo("Show Export Options", "Shows different ways you can export a mode or preset.", "Preset", 0);
+        break;
+    case IDs::CommandIDs::showSettingsDialog:
+        result.setInfo("Show Settings Dialog", "Change default directories", "Settings", 0);
+        break;
+	case IDs::CommandIDs::commitCustomScale:
+		result.setInfo("Commit custom scale", "Registers the entered scale steps as the current custom scale.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::setMode1:
+		result.setInfo("Set Mode 1", "Loads the mode into the Mode 1 slot.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::setMode2:
+		result.setInfo("Set Mode 2", "Loads the mode into the Mode 2 slot.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::setMode1RootNote:
+		result.setInfo("Set Mode 1 Root", "Applies the selected root note for Mode 1.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::setMode2RootNote:
+		result.setInfo("Set Mode 2 Root", "Applies the selected root note for Mode 2.", "Preset", 0);
+		break;
+	case IDs::CommandIDs::viewMode1:
+		result.setInfo("View Mode 1", "Shows the Mode 1 slot on the keyboard.", "Keyboard", 0);
+		break;
+	case IDs::CommandIDs::viewMode2:
+		result.setInfo("View Mode 2", "Shows the Mode 2 slot on the keyboard.", "Keyboard", 0);
 		break;
     case IDs::CommandIDs::showModeInfo:
-        result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Modes", 0);
-        result.setActive(true);
-	case IDs::CommandIDs::remapMidiNotes:
-		result.setInfo("Set midi note mapping", "Allows you to remap your keyboard to trigger modal notes.", "Midi", 0);
+        result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Mode", 0);
 		break;
-    case IDs::CommandIDs::autoRemap:
-        result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
-        result.setTicked(pluginState->getMidiProcessor()->isAutoRemapping());
+	case IDs::CommandIDs::setMappingStyle:
+		result.setInfo("Mapping Style", "Choose a mapping style for remapping MIDI notes.", "Midi", 0);
+		break;
+    case IDs::CommandIDs::showMapOrderEdit:
+        result.setInfo("Edit Mappings by Order", "Choose how to map modes with the order mapping method.", "Preset", 0);
         break;
+	case IDs::CommandIDs::applyMapping:
+		result.setInfo("Apply Mapping", "Map incoming MIDI notes to Mode 2 with the selected mapping style.", "Midi", 0);
+		break;
+    case IDs::CommandIDs::setAutoMap:
+        result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
+        break;
+	case IDs::CommandIDs::beginMapEditing:
+		result.setInfo("Manual Map", "Map MIDI notes to on-screen keys by selecting desired key on screen and triggering the MIDI Note.", "Midi", 0);
+		break;
+	case IDs::CommandIDs::setPeriodShift:
+		result.setInfo("Shift by Mode 2 Period0", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
+		break;
+	case IDs::CommandIDs::setMidiChannelOut:
+		result.setInfo("Set MIDI Channel Out", "Set the outgoing MIDI Notes to the selected MIDI Channel.", "Midi", 0);
+		break;
+	case IDs::CommandIDs::beginColorEditing:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Keyboard", 0);
+		break;
+	case IDs::CommandIDs::showMidiNoteNumbers:
+		result.setInfo("Show Midi Note Numbers", "Shows incoming MIDI notes on Mode 1 and outgoing MIDI Notes on Mode 2.", "Keyboard", 0);
+		break;
+	case IDs::CommandIDs::setKeyStyle:
+		result.setInfo("Set Key Style", "Sets the selected style for drawing overlapping degrees between mode degrees.", "Keyboard", 0);
+		break;
+	case IDs::CommandIDs::setHighlightStyle:
+		result.setInfo("Set Highlight Style", "Sets the selected style for drawing triggered notes.", "Keyboard", 0);
+		break;
 	default:
 		break;
 	}
@@ -472,43 +707,136 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 {
     switch (info.commandID)
     {
-        case IDs::CommandIDs::saveCustomLayout:
+        case IDs::CommandIDs::savePresetToFile:
         {
-            save_preset();
+            savePresetToFile();
             break;
         }
-        case IDs::CommandIDs::loadCustomLayout:
+		case IDs::CommandIDs::saveMode:
+		{
+			saveMode();
+			break;
+		}
+        case IDs::CommandIDs::loadPreset:
         {
-            load_preset();
+            loadPreset();
             break;
         }
-        case IDs::CommandIDs::saveReaperMap:
+		case IDs::CommandIDs::loadMode:
+		{
+			loadMode();
+			break;
+		}
+        case IDs::CommandIDs::exportReaperMap:
         {
-            write_reaper_file();
+            exportReaperMap();
             break;
         }
-        case IDs::CommandIDs::setKeyColor:
+		case IDs::CommandIDs::exportAbletonMap:
+		{
+			exportAbletonMap();
+			break;
+		}
+        case IDs::CommandIDs::showSettingsDialog:
         {
-            beginColorEditing();
+            showSettingsDialog();
             break;
         }
-        case IDs::CommandIDs::showModeInfo:
+		case IDs::CommandIDs::commitCustomScale:
+		{
+			commitCustomScale();
+			break;
+		}
+		case IDs::CommandIDs::setMode1:
+		{
+			setMode1();
+			break;
+		}
+		case IDs::CommandIDs::setMode2:
+		{
+			setMode2();
+			break;
+		}
+		case IDs::CommandIDs::setMode1RootNote:
+		{
+			setMode1Root();
+			break;
+		}
+		case IDs::CommandIDs::setMode2RootNote:
+		{
+			setMode2Root();
+			break;
+		}
+		case IDs::CommandIDs::viewMode1:
+		{
+			setModeView(0);
+			break;
+		}
+		case IDs::CommandIDs::viewMode2:
+		{
+			setModeView(1);
+			break;
+		}
+		case IDs::CommandIDs::showModeInfo:
+		{
+			showModeInfo();
+			break;
+		}
+		case IDs::CommandIDs::setMappingStyle:
+		{
+			setMappingStyle();
+			break;
+		}
+        case IDs::CommandIDs::showMapOrderEdit:
         {
-            modeInfo = new ModeInfoDialog(pluginState->getModeLoaded());
-			modeInfo->addChangeListener(this);
-            CallOutBox::launchAsynchronously(modeInfo, getScreenBounds(), nullptr);
+            showMapOrderEditDialog();
             break;
         }
-        case IDs::CommandIDs::remapMidiNotes:
-        {
-            midiSettingsWindow->setVisible(true);
-            break;
-        }
-        case IDs::CommandIDs::autoRemap:
-        {
-            pluginState->getMidiProcessor()->setAutoRemapOn(!pluginState->getMidiProcessor()->isAutoRemapping());
-            break;
-        }
+		case IDs::CommandIDs::applyMapping:
+		{
+			applyMap();
+			break;
+		}
+		case IDs::CommandIDs::setAutoMap:
+		{
+			setAutoMap();
+			break;
+		}
+		case IDs::CommandIDs::beginMapEditing:
+		{
+			beginMapEditing();
+			break;
+		}
+		case IDs::CommandIDs::setPeriodShift:
+		{
+			setPeriodShift();
+			break;
+		}
+		case IDs::CommandIDs::setMidiChannelOut:
+		{
+			setMidiChannel();
+			break;
+		}
+		case IDs::CommandIDs::beginColorEditing:
+		{
+			beginColorEditing();
+			break;
+		}
+		case IDs::CommandIDs::showMidiNoteNumbers:
+		{
+			setNoteNumsVisible();
+			break;
+		}
+		case IDs::CommandIDs::setKeyStyle:
+		{
+			setKeyStyle();
+			break;
+		}
+		case IDs::CommandIDs::setHighlightStyle:
+		{
+			setHighlightStyle();
+			break;
+		}
         default:
         {
             return false;

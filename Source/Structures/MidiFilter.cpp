@@ -40,7 +40,7 @@ NoteMap* MidiFilter::setNoteMap(NoteMap mapToCopy)
     return midiNoteMapping.get();
 }
 
-int MidiFilter::getNoteRemapped(int midiNoteIn)
+int MidiFilter::getNoteRemapped(int midiNoteIn) const
 {
     int midiNoteOut = jlimit(noteRange.x, noteRange.y, midiNoteIn);
     
@@ -50,7 +50,7 @@ int MidiFilter::getNoteRemapped(int midiNoteIn)
     return midiNoteOut;//jlimit(noteRange.x, noteRange.y, midiNoteOut);
 }
 
-int MidiFilter::getNoteMidi(int remappedNoteIn)
+int MidiFilter::getNoteMidi(int remappedNoteIn) const
 {
 	int remappedNote = jlimit(noteRange.x, noteRange.y, remappedNoteIn);
 	
@@ -63,7 +63,7 @@ int MidiFilter::getNoteMidi(int remappedNoteIn)
 }
 
 
-Point<int> MidiFilter::getNoteRange()
+Point<int> MidiFilter::getNoteRange()  const
 {
     return noteRange;
 }
@@ -91,7 +91,7 @@ Array<int> MidiFilter::getRemappedNotes()
 	return midiNoteMapping->getValues();
 }
 
-int MidiFilter::size()
+int MidiFilter::size() const
 {
 	int sizeOut = 0;
 	if (midiNoteMapping.get())

@@ -14,9 +14,9 @@ SvkMidiProcessor::SvkMidiProcessor()
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
-    
-    midiSettingsNode.addChild(midiMapNode, -1, nullptr);
-       
+
+	midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+           
     midiInputFilter = std::make_unique<MidiFilter>();
     midiOutputFilter = std::make_unique<MidiFilter>();
 
@@ -94,8 +94,14 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         // Root note
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
-        // Note maps
-        setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
+		// Set Note Maps
+		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
+		{
+			midiMapNode = ValueTree(IDs::midiMapNode);
+			midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+		}
+
+		setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
 
         return true;
     }
@@ -145,6 +151,11 @@ int SvkMidiProcessor::getPeriodShift()
     return periodShift;
 }
 
+int SvkMidiProcessor::getMidiChannelOut()
+{
+    return midiChannelOut;
+}
+
 NoteMap* SvkMidiProcessor::getInputNoteMap()
 {
 	return midiInputFilter->getNoteMap();
@@ -177,7 +188,7 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 bool SvkMidiProcessor::isAutoRemapping()
 {
-    return autoRemap;
+    return setAutoMap;
 }
 
 
@@ -203,9 +214,19 @@ String SvkMidiProcessor::setMidiOutput(int deviceIndex)
     return midiOutput->getName();
 }
 
-void SvkMidiProcessor::setScaleSize(int scaleSizeIn)
+void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
 {
-    scaleSize = scaleSizeIn;
+	modeViewed = modeViewedIn;
+}
+
+void SvkMidiProcessor::setMode1(Mode* mode1In)
+{
+	mode1 = mode1In;
+}
+
+void SvkMidiProcessor::setMode2(Mode* mode2In)
+{
+	mode2 = mode2In;
 }
 
 void SvkMidiProcessor::setRootNote(int rootNoteIn)
@@ -218,6 +239,22 @@ void SvkMidiProcessor::setPeriodShift(int shiftIn)
 {
     midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
     periodShift = shiftIn;
+}
+
+void SvkMidiProcessor::periodUsesModeSize(bool useModeSizeIn)
+{
+	useModeSize = useModeSizeIn;
+}
+
+void SvkMidiProcessor::setMidiChannelOut(int channelOut)
+{
+    if (channelOut < 1)
+        channelOut = 1;
+    
+    channelOut = channelOut % 16;
+    
+    midiSettingsNode.setProperty(IDs::pianoMidiChannel, channelOut, nullptr);
+    midiChannelOut = channelOut;
 }
 
 void SvkMidiProcessor::setInputToRemap(bool doRemap)
@@ -301,8 +338,8 @@ void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn, bool updateNode)
 
 void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
 {
-    autoRemap = remapIn;
-    midiSettingsNode.setProperty(IDs::autoRemapOn, autoRemap, nullptr);
+    setAutoMap = remapIn;
+    midiSettingsNode.setProperty(IDs::autoRemapOn, setAutoMap, nullptr);
 }
 
 void SvkMidiProcessor::resetInputMap(bool updateNode)
@@ -349,9 +386,9 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             midiNote = msg.getNoteNumber();
             
             if (isInputRemapped)
-                midiNote =midiInputFilter->getNoteRemapped(msg.getNoteNumber());
+                midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
             
-            midiNote += scaleSize * periodShift;
+			midiNote += periodShift * mode2->getScaleSize();
             
             msg.setNoteNumber(midiNote);
             

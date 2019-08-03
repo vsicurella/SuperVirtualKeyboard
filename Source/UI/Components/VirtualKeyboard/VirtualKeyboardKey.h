@@ -29,6 +29,7 @@ namespace VirtualKeyboard
         int mappedNoteOut;
         int externalMidiState = 0;
         
+		bool isKeyboardOut = true;
         bool showNoteNumber = false;
         bool showNoteName = false;
         

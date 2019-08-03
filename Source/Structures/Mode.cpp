@@ -20,10 +20,10 @@ Mode::Mode()
 	steps = parse_steps(stepsString);
 	ordersDefault = steps_to_orders(steps);
 	mosClass = interval_sizes(steps);
-	scaleSize = ordersDefault.size();
-	modeSize = steps.size();
+    scaleSize = 1;
+    modeSize = 1;
 	name = getDescription();
-	offset = getOffset() * -1;
+    offset = 0;
 
 	orders = expand_orders(ordersDefault, offset);
 	modeDegrees = orders_to_modeDegrees(ordersDefault);
@@ -90,18 +90,15 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, S
 	updateNode(true);
 }
 
-Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
+Mode::Mode(ValueTree modeNodeIn, bool copyNode)
 : Mode()
 {
-	bool hasModeChild;
-
-	if (isValidMode(modeNodeIn, hasModeChild))
+	if (isValidMode(modeNodeIn))
 	{
-		if (hasModeChild)
-			modeNodeIn = modeNodeIn.getChildWithName(IDs::modePresetNode);
-
-        modeNode = ValueTree(IDs::modePresetNode);
-		modeNode.copyPropertiesAndChildrenFrom(modeNodeIn, nullptr);
+		if (copyNode)
+			modeNode = modeNodeIn.createCopy();
+		else
+			modeNode = modeNodeIn;
 
         stepsString = modeNode[IDs::stepString];
         steps = parse_steps(stepsString);
@@ -126,12 +123,16 @@ Mode::Mode(ValueTree modeNodeIn, int rootNoteIn)
         if (name == "")
             name = getDescription();
         
-		rootNote = rootNoteIn;
+		rootNote = modeNode[IDs::rootMidiNote];
+		if (rootNote < 0 || rootNote > 127)
+			rootNote = 60;
+
 		offset = getOffset() * -1;
 
 		orders = expand_orders(ordersDefault, offset);
 		modeDegrees = orders_to_modeDegrees(orders);
 		scaleDegrees = scale_degrees(scaleSize, offset);
+		keyboardOrdersSizes = interval_sizes(orders);
 		updateStepsOfOrders();
         
         updateNode();
@@ -158,13 +159,8 @@ void Mode::updateNode(bool initializeNode)
 
 void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 {
-	bool hasModeChild;
-
-	if (isValidMode(nodeIn, hasModeChild))
+	if (isValidMode(nodeIn))
 	{
-		if (hasModeChild)
-			nodeIn = nodeIn.getChildWithName(IDs::modePresetNode);
-
 		modeNode = nodeIn;
         
         stepsString = modeNode[IDs::stepString];
@@ -190,52 +186,52 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         if (name == "")
             name = getDescription();
         
-        if (useNodeRoot)
-            rootNote = totalModulus(modeNode[IDs::rootMidiNote], 128);
+		if (useNodeRoot)
+			rootNote = modeNode[IDs::rootMidiNote];
+
+		if (rootNote < 0 || rootNote > 127)
+			rootNote = 60;
         
         offset = -getOffset();
         
         orders = expand_orders(ordersDefault, offset);
-        modeDegrees = orders_to_modeDegrees(orders);
+        modeDegrees = orders_to_modeDegrees(orders); 
         scaleDegrees = scale_degrees(scaleSize, offset);
+		keyboardOrdersSizes = interval_sizes(orders);
         updateStepsOfOrders();
         
         updateNode();
 	}
 }
 
-bool Mode::isValidMode(ValueTree nodeIn, bool& hasModeChild)
+bool Mode::isValidMode(ValueTree nodeIn)
 {
-    bool isValid = true;
-	bool isMode = nodeIn.hasType(IDs::modePresetNode);
-	hasModeChild = nodeIn.getChildWithName(IDs::modePresetNode).isValid();
+	String steps = nodeIn.getProperty(IDs::stepString).toString();
+	Array<int> stepsArray = Mode::parse_steps(steps);
 
-	String steps;
+	int length = stepsArray.size();
+	int numDegrees = sumUpToIndex(stepsArray, length);
 
-	if (isMode)
-		steps = nodeIn.getProperty(IDs::stepString).toString();
-	else
-		steps = nodeIn.getChildWithName(IDs::modePresetNode).getProperty(IDs::stepString).toString();
-
-	int stepsLength = steps.length();
-	bool hasSteps = stepsLength > 0;
-    
-    return isValid && (isMode || hasModeChild) && hasSteps;
+    return length > 0 && numDegrees <= 128;
 }
 
 
-ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, String infoIn, bool factoryPreset)
+ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> steps = parse_steps(stepsIn);
 	Array<int> orders = steps_to_orders(steps);
 	Array<int> mosClass = interval_sizes(steps);
 
+	if (rootNoteIn < 0 || rootNoteIn > 127)
+		rootNoteIn = 60;
+
 	modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
 	modeNodeOut.setProperty(IDs::modeSize, steps.size(), nullptr);
 	modeNodeOut.setProperty(IDs::stepString, stepsIn, nullptr);
 	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
     modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
+	modeNodeOut.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
     if (nameIn == "")
@@ -249,18 +245,22 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, Strin
 	return modeNodeOut;
 }
 
-ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, String infoIn, bool factoryPreset)
+ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
 	Array<int> orders = steps_to_orders(stepsIn);
 	Array<int> mosClass = interval_sizes(stepsIn);
 	String stepsStr = steps_to_string(stepsIn);
 
+	if (rootNoteIn < 0 || rootNoteIn > 127)
+		rootNoteIn = 60;
+
 	modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
 	modeNodeOut.setProperty(IDs::modeSize, stepsIn.size(), nullptr);
 	modeNodeOut.setProperty(IDs::stepString, stepsStr, nullptr);
 	modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
     modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
+	modeNodeOut.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
 	modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
 
     if (nameIn == "")
@@ -306,6 +306,8 @@ void Mode::setRootNote(int rootNoteIn)
 		keyboardOrdersSizes = interval_sizes(orders);
 		updateStepsOfOrders();
 	}
+
+	modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
 }
 
 void Mode::addTag(String tagIn)

@@ -23,7 +23,11 @@ SvkPluginSettings::SvkPluginSettings()
         {
             settingsLoad = ValueTree::fromXml(*(xml.get()));
             restoreNode(settingsLoad);
+            DBG("Loaded these settings\n " + settingsLoad.toXmlString());
         }
+        
+        if (!pluginSettingsNode.hasProperty(IDs::modeDirectory))
+            resetDirectories = true;
 	}
 
 	if (currentSettingsLocation == File() || !currentSettingsLocation.exists())
@@ -31,36 +35,40 @@ SvkPluginSettings::SvkPluginSettings()
 		currentSettingsLocation = factoryDefaultSettingsLocation;
         currentSettingsLocation.createDirectory();
 
-		pluginSettingsNode = ValueTree(IDs::pluginSettingsNode);
-		updateNode(true);
+		pluginSettingsNode = ValueTree(IDs::globalSettingsNode);
 	}
 
-	if (currentPresetLocation == File() || !currentPresetLocation.exists())
+	if (currentPresetLocation == File() || !currentPresetLocation.exists() || resetDirectories)
 	{
-		currentPresetLocation = factoryDefaultPresetLocations;
+		currentPresetLocation = factoryDefaultPresetLocation;
+        currentModeLocation = factoryDefaultModeLocation;
+        
+        DBG("CurrentPresetLocations: " + currentPresetLocation.getFullPathName());
+        DBG("CurrentModeLocations: " + currentModeLocation.getFullPathName());
 
 		if (createPresetFolder)
+        {
 			currentPresetLocation.createDirectory();
+            currentModeLocation.createDirectory();
+        }
 	}
-}
-
-SvkPluginSettings::SvkPluginSettings(SvkPluginSettings& settingsToCopy)
-{
-	if (!restoreNode(settingsToCopy.pluginSettingsNode))
-		SvkPluginSettings();
+    
+    updateNode();
 }
 
 bool SvkPluginSettings::updateNode(bool writeSettings)
 {
-	pluginSettingsNode.setProperty(IDs::settingsDirectory, currentPresetLocation.getFullPathName(), nullptr);
-	pluginSettingsNode.setProperty(IDs::presetDirectory, currentSettingsLocation.getFullPathName(), nullptr);
+	pluginSettingsNode.setProperty(IDs::settingsDirectory, currentSettingsLocation.getFullPathName(), nullptr);
+	pluginSettingsNode.setProperty(IDs::presetDirectory, currentPresetLocation.getFullPathName(), nullptr);
+    pluginSettingsNode.setProperty(IDs::modeDirectory, currentModeLocation.getFullPathName(), nullptr);
 	pluginSettingsNode.setProperty(IDs::createPresetFolder, createPresetFolder, nullptr);
-	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+	pluginSettingsNode.setProperty(IDs::saveFactoryModes, saveFactoryModes, nullptr);
     
     if (writeSettings)
     {
+        DBG("Writing settings to: " + currentSettingsLocation.getFullPathName());
         std::unique_ptr<XmlElement> xml(pluginSettingsNode.createXml());
-        return xml->writeToFile(currentSettingsLocation.getChildFile(appFolderName), "");
+        return xml->writeToFile(currentSettingsLocation.getChildFile(settingsFileName), "");
     }
     
     return true;
@@ -68,15 +76,16 @@ bool SvkPluginSettings::updateNode(bool writeSettings)
 
 bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 {
-	if (pluginSettingsNodeIn.hasType(IDs::pluginSettingsNode))
+	if (pluginSettingsNodeIn.hasType(IDs::globalSettingsNode))
 	{
 		pluginSettingsNode = pluginSettingsNodeIn;
 
-		currentSettingsLocation = File(pluginSettingsNode.getProperty(IDs::settingsDirectory).toString());
-		currentPresetLocation = File(pluginSettingsNode.getProperty(IDs::presetDirectory).toString());
+		currentSettingsLocation = File(pluginSettingsNode[IDs::settingsDirectory].toString());
+		currentPresetLocation = File(pluginSettingsNode[IDs::presetDirectory].toString());
+        currentModeLocation = File(pluginSettingsNode[IDs::modeDirectory].toString());
 
-		createPresetFolder = (bool)pluginSettingsNode.getProperty(IDs::createPresetFolder);
-		saveFactoryPresets = (bool)pluginSettingsNode.getProperty(IDs::saveFactoryPresets);
+		createPresetFolder = (bool)pluginSettingsNode[IDs::createPresetFolder];
+		saveFactoryModes = (bool)pluginSettingsNode[IDs::saveFactoryModes];
 
 		return true;
 	}
@@ -94,14 +103,37 @@ String SvkPluginSettings::getPresetPath()
 	return currentPresetLocation.getFullPathName();
 }
 
+String SvkPluginSettings::getModePath()
+{
+    return currentModeLocation.getFullPathName();
+}
+
 bool SvkPluginSettings::getCreatePresetFolder()
 {
 	return createPresetFolder;
 }
 
-bool SvkPluginSettings::getSaveFactoryPresets()
+bool SvkPluginSettings::getSaveFactoryModes()
 {
-	return saveFactoryPresets;
+	return saveFactoryModes;
+}
+
+void SvkPluginSettings::setPresetDirectory(File presetDirectoryIn)
+{
+    currentPresetLocation = presetDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::presetDirectory, currentPresetLocation.getFullPathName(), nullptr);
+}
+
+void SvkPluginSettings::setModeDirectory(File modeDirectoryIn)
+{
+    currentModeLocation = modeDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::modeDirectory, currentModeLocation.getFullPathName(), nullptr);
+}
+
+void SvkPluginSettings::setSettingsDirectory(File settingsDirectoryIn)
+{
+    currentSettingsLocation = settingsDirectoryIn;
+    pluginSettingsNode.setProperty(IDs::settingsDirectory, currentSettingsLocation.getFullPathName(), nullptr);
 }
 
 void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
@@ -112,6 +144,6 @@ void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
 
 void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
 {
-	saveFactoryPresets = shouldSavePresets;
-	pluginSettingsNode.setProperty(IDs::saveFactoryPresets, saveFactoryPresets, nullptr);
+	saveFactoryModes = shouldSavePresets;
+	pluginSettingsNode.setProperty(IDs::saveFactoryModes, saveFactoryModes, nullptr);
 }

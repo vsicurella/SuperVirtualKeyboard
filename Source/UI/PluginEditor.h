@@ -13,14 +13,15 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginProcessor.h"
 
-#include "Components/KeyboardEditorBar.h"
+#include "Components/PluginControlComponent.h"
 #include "../Structures/Mode.h"
 #include "Components/VirtualKeyboard/Keyboard.h"
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
-#include "Dialogs/MidiSettingsComponent.h"
+#include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
+#include "Dialogs/PluginSettingsDialog.h"
 
 #include "../File IO/ReaperWriter.h"
 
@@ -32,6 +33,7 @@ using namespace VirtualKeyboard;
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
+                        private ScrollBar::Listener,
 						private Timer
 {
 public:
@@ -53,14 +55,70 @@ public:
     void initNodeData();
 	void updateNodeData();
 
-	void update_children_to_preset();
-	void beginColorEditing();
+	void updateUI();
 
 	//===============================================================================================
 
-	bool save_preset();
-	bool load_preset();
-	bool write_reaper_file();
+	bool savePresetToFile();
+	bool saveMode();
+    void showSaveMenu();
+
+	bool loadPreset();
+	bool loadMode();
+    void showLoadMenu();
+
+	bool exportReaperMap();
+	bool exportAbletonMap();
+    void showExportMenu();
+    
+    void showSettingsDialog();
+
+	void commitCustomScale();
+
+	void setMode1();
+	void setMode1(int idIn);
+
+	void setMode2();
+	void setMode2(int idIn);
+
+	void setMode1Root();
+	void setMode1Root(int rootIn);
+	
+	void setMode2Root();
+	void setMode2Root(int rootIn);
+
+	void setModeView();
+	void setModeView(int modeNumberIn);
+
+	void showModeInfo();
+
+	void setMappingStyle();
+	void setMappingStyle(int mapStyleId);
+    
+    void showMapOrderEditDialog();
+
+	void applyMap();
+
+	void setAutoMap();
+	void setAutoMap(bool isAutoMapping);
+	void beginMapEditing();
+
+	void setPeriodShift();
+	void setPeriodShift(int periodsIn);
+	
+	void setMidiChannel();
+	void setMidiChannel(int midiChannelIn);
+
+	void beginColorEditing();
+
+	void setNoteNumsVisible();
+	void setNoteNumsVisible(bool noteNumsVisible);
+	
+	void setKeyStyle();
+	void setKeyStyle(int keyStyleId);
+
+	void setHighlightStyle();
+	void setHighlightStyle(int highlightStyleId);
 
 	//===============================================================================================
 
@@ -75,6 +133,8 @@ public:
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+    
+    void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart) override;
 
 	 //==============================================================================
 
@@ -101,17 +161,18 @@ private:
 
 	ApplicationCommandManager* appCmdMgr;
 	
-	std::unique_ptr<Viewport> view;
-	Keyboard* piano;
-	std::unique_ptr<KeyboardEditorBar> keyboardEditorBar;
+	std::unique_ptr<PluginControlComponent> controlComponent;
+
+	Viewport* view;
+	Keyboard* virtualKeyboard;
+    ScrollBar* keyboardScroll;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
 
-	std::unique_ptr<MidiSettingsWindow> midiSettingsWindow;
-    std::unique_ptr<MidiSettingsComponent> midiSettingsComponent;
-
+    PluginSettingsDialog* pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;
+    MapByOrderDialog* mapByOrderDialog;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };

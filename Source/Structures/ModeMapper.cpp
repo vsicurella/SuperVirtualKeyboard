@@ -24,12 +24,17 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
     mapByOrderOffset2 = offset2;
 }
 
-
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int order1, int order2, int offset1, int offset2, NoteMap prevMap)
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapTypeIn, int order1, int order2, int offset1, int offset2,
+                        NoteMap prevMap)
 {
     NoteMap mapOut;
     
-    switch (mapType)
+    int mappingTypeUsed = mapType;
+    
+    if (mapTypeIn >= 0)
+        mappingTypeUsed = mapTypeIn;
+    
+    switch (mappingTypeUsed)
     {
         case ModeToScale:
             mapOut = mapToMode1Scale(mode1, mode2);
@@ -73,9 +78,9 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
 		}
 	}
 
-	DBG("Root note from mode 1 is " + String(mode1.getRootNote()) + 
-		" and it produces the note " + String(mappingOut.getValue(mode1.getRootNote())) + 
-		". Root note from mode 2 is " + String(mode2.getRootNote()));
+	//DBG("Root note from mode 1 is " + String(mode1.getRootNote()) + 
+	//	" and it produces the note " + String(mappingOut.getValue(mode1.getRootNote())) + 
+	//	". Root note from mode 2 is " + String(mode2.getRootNote()));
 
 	return mappingOut;
 }
@@ -131,8 +136,8 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
     int degreeOffset = rootNoteTo - (ceil(rootNoteTo / (float) mode2.getScaleSize())) * degreeMapIn.size();
 	int midiOffset = (int)(ceil(rootNoteTo / (float) mode2.getScaleSize())) * mode2.getScaleSize() - rootNoteTo + rootNoteOffset;
 
-    DBG("Degree Offset is " + String(degreeOffset));
-    DBG("Midi Offset is " + String(midiOffset));
+    //DBG("Degree Offset is " + String(degreeOffset));
+    //DBG("Midi Offset is " + String(midiOffset));
 
 	NoteMap mappingOut;
 
@@ -154,8 +159,8 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
         
         mappingOut.setValue(m, midiNote);
         
-		if (m == rootNoteFrom)
-			DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) + ")");
+		//if (m == rootNoteFrom)
+		//	DBG("Root Note From (" + String(rootNoteFrom) + ") produces note " + String(mappingOut.getValue(rootNoteFrom)) + " and comapre that to the Root note to (" + String(rootNoteTo) + ")");
 	}
     
 	return mappingOut;
@@ -193,8 +198,8 @@ NoteMap ModeMapper::mapToMode1Scale(const Mode& mode1, const Mode& mode2, int mo
         
         mappingOut.setValue(m, degToAdd);
         
-        if (m == mode1.getRootNote())
-            DBG("Root Note From (" + String(mode1.getRootNote()) + ") produces note " + String(mappingOut.getValue(mode1.getRootNote())) + " and comapre that to the Root note to (" + String(mode2.getRootNote()) + ")");
+        //if (m == mode1.getRootNote())
+        //    DBG("Root Note From (" + String(mode1.getRootNote()) + ") produces note " + String(mappingOut.getValue(mode1.getRootNote())) + " and comapre that to the Root note to (" + String(mode2.getRootNote()) + ")");
     }
     
     return mappingOut;
@@ -267,7 +272,7 @@ Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
     
-    DBG("Mode1 Root: " + String(mode1.getRootNote()) + "\tMode2Root: " + String(mode2.getRootNote()));
+    //DBG("Mode1 Root: " + String(mode1.getRootNote()) + "\tMode2Root: " + String(mode2.getRootNote()));
     
 	Array<int> mode1Steps = Mode::orders_to_steps(mode1.getOrders());
     Array<int> mode2Steps = Mode::orders_to_steps(mode2.getOrders());
@@ -279,9 +284,9 @@ Array<int> ModeMapper::degreeMapFullMode(const Mode& mode1, const Mode& mode2)
 	int mode2RootIndex = mode2MidiNotes.indexOf(mode2.getRootNote());
 	int rootIndexOffset = mode2RootIndex - mode1RootIndex;
     
-    DBG("Mode1 Root Index: " + String(mode1RootIndex) + "\tMode2Root: " + String(mode2RootIndex));
+    //DBG("Mode1 Root Index: " + String(mode1RootIndex) + "\tMode2Root: " + String(mode2RootIndex));
     
-    DBGArray(mode2MidiNotes, "Mode2 Midi Notes");
+    //DBGArray(mode2MidiNotes, "Mode2 Midi Notes");
 
     
     int mode2ScaleIndex = 0;

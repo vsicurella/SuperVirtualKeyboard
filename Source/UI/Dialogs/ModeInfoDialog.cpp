@@ -234,27 +234,33 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
 
     //[UserPreSize]
-    mode = modeIn;
-    modeNode = ValueTree(mode->modeNode);
+    modeOriginal = modeIn;
+    modeWorking = Mode(modeIn->modeNode);
+    modeNode = modeWorking.modeNode;
 
-    stepsBox->setText(mode->getStepsString());
-    familyBox->setText(mode->getFamily());
+	familyBox->addListener(this);
 
-    nameBox->setText(mode->getName());
+    stepsBox->setText(modeWorking.getStepsString());
+    familyBox->setText(modeWorking.getFamily());
+
+    nameBox->setText(modeWorking.getName());
 	nameBox->setEnabled(false);
 
 	defaultNameBtn->setClickingTogglesState(true);
-    if (mode->getName() != mode->getDescription())
+    if (modeWorking.getName() != modeWorking.getDescription())
         defaultNameBtn->setToggleState(false, sendNotification);
 
-	scaleSizeReadout->setText(String(mode->getScaleSize()), dontSendNotification);
-    modeSizeReadout->setText(String(mode->getModeSize()), dontSendNotification);
+	scaleSizeReadout->setText(String(modeWorking.getScaleSize()), dontSendNotification);
+    modeSizeReadout->setText(String(modeWorking.getModeSize()), dontSendNotification);
 
-    intervalSizeReadout->setText(arrayToString(mode->getIntervalSizeCount()), dontSendNotification);
+    intervalSizeReadout->setText(arrayToString(modeWorking.getIntervalSizeCount()), dontSendNotification);
 
-    infoBox->setText(mode->getInfo());
+    infoBox->setText(modeWorking.getInfo());
 
-	rotateSld->setRange(-(mode->getModeSize() - 1), mode->getModeSize() - 1, 1);
+    if (modeWorking.getModeSize() > 1)
+        rotateSld->setRange(-(modeWorking.getModeSize() - 1), modeWorking.getModeSize() - 1, 1);
+    else
+        rotateSld->setEnabled(false);
 
     //[/UserPreSize]
 
@@ -328,8 +334,10 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
 
 		if (defaultNameBtn->getToggleState())
 		{
-			nameBox->setText(mode->getDescription());
 			nameBox->setEnabled(false);
+            modeWorking.setFamily(familyBox->getText());
+            modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
+            nameBox->setText(modeWorking.getDescription());
 		}
 		else
 		{
@@ -364,7 +372,7 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         //[UserSliderCode_rotateSld] -- add your slider handling code here..
-		String modeRotatedSteps = mode->getStepsString(sliderThatWasMoved->getValue());
+		String modeRotatedSteps = modeWorking.getStepsString(sliderThatWasMoved->getValue());
 		modeNode.setProperty(IDs::stepString, modeRotatedSteps, nullptr);
 		stepsBox->setText(modeRotatedSteps);
         //[/UserSliderCode_rotateSld]
@@ -377,13 +385,43 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
+{
+	if (textEditor.getName() == familyBox->getName())
+	{
+		if (defaultNameBtn->getToggleState())
+		{
+			modeWorking.setFamily(familyBox->getText());
+			nameBox->setText(modeWorking.getDescription());
+		}
+	}
+
+}
+
+void ModeInfoDialog::textEditorEscapeKeyPressed(TextEditor& textEditor)
+{
+
+}
+
+void ModeInfoDialog::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+
+}
+
+void ModeInfoDialog::textEditorFocusLost(TextEditor& textEditor)
+{
+
+}
+
+
 void ModeInfoDialog::commitMode()
 {
 	modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
 	modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
 	modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
 
-	mode->restoreNode(modeNode);
+	modeOriginal->restoreNode(modeNode);
 }
 
 //[/MiscUserCode]
@@ -399,9 +437,10 @@ void ModeInfoDialog::commitMode()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="Mode* modeIn"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="340" initialHeight="525">
+                 parentClasses="public Component, public ChangeBroadcaster, TextEditor::Listener"
+                 constructorParams="Mode* modeIn" variableInitialisers="" snapPixels="8"
+                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
+                 initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
               virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone"

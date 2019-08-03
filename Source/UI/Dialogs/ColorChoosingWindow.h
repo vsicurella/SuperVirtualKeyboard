@@ -35,7 +35,7 @@ public:
 
 private:
 
-	std::unique_ptr<ColourSelector> colorChooser;
+	ColourSelector* colorChooser;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ColorChooserWindow)
