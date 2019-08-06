@@ -81,11 +81,18 @@ public:
     */
     void setInfo(String infoIn);
     
+    /*
+        Recalculates mode properties based on parameter change
+     */
+    void updateProperties();
+    
 	/*
 		Sets the offset of the mode and updates parameters so that the 
 		offset replaces the current visualization of the mode
 	*/
 	void setRootNote(int rootNoteIn);
+    
+    void rotate(int rotateAmt);
     
     void addTag(String tagIn);
     
@@ -148,6 +155,12 @@ public:
 	Array<int> getNotesOfOrder(int order = 0) const;
     
     int indexOfTag(String tagNameIn);
+    
+    /*
+     Returns -1 if modes are different, otherwise returns the number of rotations
+     needed to make the modes equivalent.
+     */
+    int isSimilarTo(Mode* modeToCompare) const;
 
 	/*
 	Simply parses a string reprsenting step sizes and returns a vector
