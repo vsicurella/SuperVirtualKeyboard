@@ -28,6 +28,7 @@
 
 //==============================================================================
 ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
+    : modeOriginal(modeIn), modeWorking(Mode(modeIn->modeNode)), modeNode(modeWorking.modeNode)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -234,10 +235,8 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
 
     //[UserPreSize]
-    modeOriginal = modeIn;
-    modeWorking = Mode(modeIn->modeNode);
-    modeNode = modeWorking.modeNode;
-
+    rotateSld->setIncDecButtonsMode(Slider::IncDecButtonMode::incDecButtonsDraggable_Horizontal);
+    
 	familyBox->addListener(this);
 
     stepsBox->setText(modeWorking.getStepsString());
@@ -372,7 +371,7 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         //[UserSliderCode_rotateSld] -- add your slider handling code here..
-		String modeRotatedSteps = modeWorking.getStepsString(sliderThatWasMoved->getValue());
+        String modeRotatedSteps = modeWorking.getStepsString(sliderThatWasMoved->getValue());
 		modeNode.setProperty(IDs::stepString, modeRotatedSteps, nullptr);
 		stepsBox->setText(modeRotatedSteps);
         //[/UserSliderCode_rotateSld]
@@ -438,9 +437,9 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
                  parentClasses="public Component, public ChangeBroadcaster, TextEditor::Listener"
-                 constructorParams="Mode* modeIn" variableInitialisers="" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="340" initialHeight="525">
+                 constructorParams="Mode* modeIn" variableInitialisers="modeOriginal(modeIn), modeWorking(Mode(modeIn-&gt;modeNode)), modeNode(modeWorking.modeNode)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="340" initialHeight="525">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
               virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone"

@@ -23,14 +23,8 @@ Mode::Mode()
     scaleSize = 1;
     modeSize = 1;
 	name = getDescription();
-    offset = 0;
-
-	orders = expand_orders(ordersDefault, offset);
-	modeDegrees = orders_to_modeDegrees(ordersDefault);
-	scaleDegrees = scale_degrees(scaleSize, offset);
-	keyboardOrdersSizes = interval_sizes(orders);
-	updateStepsOfOrders();
-
+    
+    updateProperties();
 	updateNode(true);
 }
 
@@ -53,12 +47,7 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String nameIn, Strin
     else
         name = nameIn;
 
-	orders = expand_orders(ordersDefault, offset);
-	modeDegrees = orders_to_modeDegrees(orders);
-	scaleDegrees = scale_degrees(scaleSize, offset);
-	keyboardOrdersSizes = interval_sizes(orders);
-	updateStepsOfOrders();
-
+    updateProperties();
 	updateNode(true);
 }
 
@@ -81,12 +70,7 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, S
     else
         name = nameIn;
 
-	orders = expand_orders(ordersDefault, offset);
-	modeDegrees = orders_to_modeDegrees(orders);
-	scaleDegrees = scale_degrees(scaleSize, offset);
-	keyboardOrdersSizes = interval_sizes(orders);
-    updateStepsOfOrders();
-    
+    updateProperties();
 	updateNode(true);
 }
 
@@ -127,14 +111,7 @@ Mode::Mode(ValueTree modeNodeIn, bool copyNode)
 		if (rootNote < 0 || rootNote > 127)
 			rootNote = 60;
 
-		offset = getOffset() * -1;
-
-		orders = expand_orders(ordersDefault, offset);
-		modeDegrees = orders_to_modeDegrees(orders);
-		scaleDegrees = scale_degrees(scaleSize, offset);
-		keyboardOrdersSizes = interval_sizes(orders);
-		updateStepsOfOrders();
-        
+        updateProperties();
         updateNode();
 	}
 }
@@ -192,14 +169,7 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 		if (rootNote < 0 || rootNote > 127)
 			rootNote = 60;
         
-        offset = -getOffset();
-        
-        orders = expand_orders(ordersDefault, offset);
-        modeDegrees = orders_to_modeDegrees(orders); 
-        scaleDegrees = scale_degrees(scaleSize, offset);
-		keyboardOrdersSizes = interval_sizes(orders);
-        updateStepsOfOrders();
-        
+        updateProperties();
         updateNode();
 	}
 }
@@ -274,6 +244,15 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, S
 	return modeNodeOut;
 }
 
+void Mode::updateProperties()
+{
+    offset = -getOffset();
+    orders = expand_orders(ordersDefault, offset);
+    modeDegrees = orders_to_modeDegrees(orders);
+    scaleDegrees = scale_degrees(scaleSize, offset);
+    keyboardOrdersSizes = interval_sizes(orders);
+    updateStepsOfOrders();
+}
 
 void Mode::setFamily(String familyIn)
 {
@@ -298,16 +277,22 @@ void Mode::setRootNote(int rootNoteIn)
 {
 	if (rootNote != rootNoteIn)
 	{
-		rootNote = rootNoteIn;
-		offset = getOffset() * -1;
-		orders = expand_orders(ordersDefault, offset);
-		modeDegrees = orders_to_modeDegrees(orders);
-		scaleDegrees = scale_degrees(scaleSize, offset);
-		keyboardOrdersSizes = interval_sizes(orders);
-		updateStepsOfOrders();
+        updateProperties();
 	}
 
 	modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
+}
+
+void Mode::rotate(int rotateAmt)
+{
+    int amt = totalModulus(rotateAmt, modeSize);
+    
+    for (int i = 0; i < amt; i++)
+        steps.move(0, steps.size());
+    
+    stepsString = steps_to_string(steps);
+    
+    updateProperties();
 }
 
 void Mode::addTag(String tagIn)
@@ -511,6 +496,24 @@ void Mode::updateStepsOfOrders()
 int Mode::indexOfTag(String tagNameIn)
 {
     return tags.indexOf(tagNameIn);
+}
+
+int Mode::isSimilarTo(Mode* modeToCompare) const
+{
+    Array<int> mode1Steps = steps;
+    Array<int> mode2Steps = modeToCompare->getSteps();
+    
+    int rotations = 0;
+    
+    if (mode1Steps.size() != mode2Steps.size())
+        return -1;
+    
+    while (mode1Steps != mode2Steps || rotations < mode1Steps.size())
+    {
+        mode2Steps.move(0, mode2Steps.size());
+    }
+    
+    return (rotations % (mode1Steps.size() + 1)) - 1;
 }
 
 Array<int> Mode::parse_steps(String stepsIn)
