@@ -95,13 +95,13 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     mode1ViewBtn->setButtonText (String());
     mode1ViewBtn->setRadioGroupId (10);
     mode1ViewBtn->addListener (this);
+    mode1ViewBtn->setToggleState (true, dontSendNotification);
 
     mode2ViewBtn.reset (new ToggleButton ("Mode2 View Button"));
     addAndMakeVisible (mode2ViewBtn.get());
     mode2ViewBtn->setButtonText (String());
     mode2ViewBtn->setRadioGroupId (10);
     mode2ViewBtn->addListener (this);
-    mode2ViewBtn->setToggleState (true, dontSendNotification);
 
     mode1RootLbl.reset (new Label ("Mode1 Root Label",
                                    TRANS("C4")));
@@ -125,7 +125,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     addAndMakeVisible (mapStyleBox.get());
     mapStyleBox->setEditableText (false);
     mapStyleBox->setJustificationType (Justification::centredLeft);
-    mapStyleBox->setTextWhenNothingSelected (String());
+    mapStyleBox->setTextWhenNothingSelected (TRANS("Mode To Mode"));
     mapStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     mapStyleBox->addItem (TRANS("Mode To Mode"), 1);
     mapStyleBox->addItem (TRANS("Scale To Mode"), 2);
@@ -203,21 +203,21 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     exportBtn->setButtonText (TRANS("Export"));
     exportBtn->addListener (this);
 
-    exportBtn->setBounds (136, 16, 88, 24);
+    exportBtn->setBounds (8, 256, 56, 24);
 
     autoMapBtn.reset (new TextButton ("AutoMap Button"));
     addAndMakeVisible (autoMapBtn.get());
     autoMapBtn->setButtonText (TRANS("Auto Map"));
     autoMapBtn->addListener (this);
 
-    autoMapBtn->setBounds (24, 48, 104, 24);
+    autoMapBtn->setBounds (0, 192, 104, 24);
 
     manualMapBtn.reset (new TextButton ("Manual Map Button"));
     addAndMakeVisible (manualMapBtn.get());
     manualMapBtn->setButtonText (TRANS("Manual Map"));
     manualMapBtn->addListener (this);
 
-    manualMapBtn->setBounds (136, 48, 88, 24);
+    manualMapBtn->setBounds (8, 224, 88, 24);
 
     mapStyleLbl.reset (new Label ("Mapping Style Label",
                                   TRANS("Mapping Style:")));
@@ -252,13 +252,26 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
     mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
     addAndMakeVisible (mapOrderEditBtn.get());
-    mapOrderEditBtn->setButtonText (TRANS("Edit"));
+    mapOrderEditBtn->setButtonText (TRANS("Edit Mapping"));
     mapOrderEditBtn->addListener (this);
+
+    mapModeBox.reset (new ComboBox ("Mapping Node Box"));
+    addAndMakeVisible (mapModeBox.get());
+    mapModeBox->setEditableText (false);
+    mapModeBox->setJustificationType (Justification::centredLeft);
+    mapModeBox->setTextWhenNothingSelected (TRANS("Mapping Off"));
+    mapModeBox->setTextWhenNoChoicesAvailable (TRANS("Mapping Off"));
+    mapModeBox->addItem (TRANS("Mapping Off"), 1);
+    mapModeBox->addItem (TRANS("Auto Map"), 2);
+    mapModeBox->addItem (TRANS("Manual Map"), 3);
+    mapModeBox->addListener (this);
+
+    mapModeBox->setBounds (136, 16, 152, 24);
 
 
     //[UserPreSize]
     mapOrderEditBtn->setVisible(false);
-    
+
 	scaleTextBox->addListener(this);
 
 	autoMapBtn->setClickingTogglesState(true);
@@ -336,6 +349,7 @@ PluginControlComponent::~PluginControlComponent()
     keyboardViewport = nullptr;
     settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
+    mapModeBox = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -363,27 +377,27 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 59 - 150, 48, 150, 24);
     mode1RootSld->setBounds (getWidth() - 301, 16, 79, 24);
     mode2RootSld->setBounds (getWidth() - 301, 48, 79, 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -56 - (207 / 2), 16, 207, 24);
-    scaleEntryBtn->setBounds ((getWidth() / 2) + 72 - (31 / 2), 16, 31, 24);
-    modeInfoButton->setBounds ((getWidth() / 2) + -181 - (24 / 2), 16, 24, 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (168 / 2), 16, 168, 24);
+    scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 16, 31, 24);
+    modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 57, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 57, 48, 31, 24);
     mode1RootLbl->setBounds (getWidth() - 333, 16, 32, 24);
     mode2RootLbl->setBounds (getWidth() - 333, 48, 32, 24);
-    mapStyleBox->setBounds ((getWidth() / 2) + -29 - (150 / 2), 48, 150, 24);
+    mapStyleBox->setBounds ((getWidth() / 2) + -233 - (152 / 2), 48, 152, 24);
     midiChannelSld->setBounds (292, getHeight() - 40, 86, 24);
     midiChannelLbl->setBounds (197, getHeight() - 40, 96, 24);
     noteNumsBtn->setBounds (392, getHeight() - 40, 24, 24);
     periodShiftLbl->setBounds (24, getHeight() - 40, 88, 24);
-    mapButton->setBounds ((getWidth() / 2) + 72 - (32 / 2), 48, 32, 24);
+    mapButton->setBounds ((getWidth() / 2) + -421 - (32 / 2), 296, 32, 24);
     editColorsBtn->setBounds (696, getHeight() - 40, 79, 24);
     keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
-    mapStyleLbl->setBounds ((getWidth() / 2) + -152 - (96 / 2), 48, 96, 24);
+    mapStyleLbl->setBounds ((getWidth() / 2) + -369 - (104 / 2), 48, 104, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9381f), getHeight() - 132);
+    keyboardViewport->setBounds (24, 80, proportionOfWidth (0.9383f), getHeight() - 132);
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
-    mapOrderEditBtn->setBounds (((getWidth() / 2) + 72 - (32 / 2)) + 83 - 40, 48, 40, 24);
+    mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
     //[UserResized] Add your own custom resize handling here..
 
 	Component* svk = keyboardViewport->getViewedComponent();
@@ -416,12 +430,12 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
-        
+
         if (mapStyleBox->getSelectedId() == 3)
             mapOrderEditBtn->setVisible(true);
         else
             mapOrderEditBtn->setVisible(false);
-        
+
         //[/UserComboBoxCode_mapStyleBox]
     }
     else if (comboBoxThatHasChanged == keyStyleBox.get())
@@ -435,6 +449,11 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
         //[/UserComboBoxCode_highlightStyleBox]
+    }
+    else if (comboBoxThatHasChanged == mapModeBox.get())
+    {
+        //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
+        //[/UserComboBoxCode_mapModeBox]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -738,7 +757,7 @@ int PluginControlComponent::getMappingStyle()
 void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify)
 {
 	mapStyleBox->setSelectedId(idIn, notify);
-    
+
     if (idIn == 3)
         mapOrderEditBtn->setVisible(true);
     else
@@ -851,14 +870,14 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-56.5Cc 16 207 24"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
+              virtualName="" explicitFocusOrder="0" pos="-25Cc 16 168 24" initialText=""
+              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
+              caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="72.5Cc 16 31 24" buttonText="OK"
+              virtualName="" explicitFocusOrder="0" pos="82.5Cc 16 31 24" buttonText="OK"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="-181Cc 16 24 24" buttonText="i"
+              virtualName="" explicitFocusOrder="0" pos="-129Cc 16 24 24" buttonText="i"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
           virtualName="" explicitFocusOrder="0" pos="108 40R 86 24" min="-10.0"
@@ -867,10 +886,10 @@ BEGIN_JUCER_METADATA
           needsCallback="1"/>
   <TOGGLEBUTTON name="Mode1 View Button" id="bb818484022dae8c" memberName="mode1ViewBtn"
                 virtualName="" explicitFocusOrder="0" pos="57R 16 31 24" buttonText=""
-                connectedEdges="0" needsCallback="1" radioGroupId="10" state="0"/>
+                connectedEdges="0" needsCallback="1" radioGroupId="10" state="1"/>
   <TOGGLEBUTTON name="Mode2 View Button" id="a8183216fad07ec6" memberName="mode2ViewBtn"
                 virtualName="" explicitFocusOrder="0" pos="57R 48 31 24" buttonText=""
-                connectedEdges="0" needsCallback="1" radioGroupId="10" state="1"/>
+                connectedEdges="0" needsCallback="1" radioGroupId="10" state="0"/>
   <LABEL name="Mode1 Root Label" id="2df91047cc98faf4" memberName="mode1RootLbl"
          virtualName="" explicitFocusOrder="0" pos="333R 16 32 24" edTextCol="ff000000"
          edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
@@ -882,9 +901,9 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Mapping Style Box" id="217ff7f7b6934ebe" memberName="mapStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="-29Cc 48 150 24" editable="0"
-            layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
+            virtualName="" explicitFocusOrder="0" pos="-233Cc 48 152 24"
+            editable="0" layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
+            textWhenNonSelected="Mode To Mode" textWhenNoItems="(no choices)"/>
   <SLIDER name="Midi Channel Slider" id="4f2d4d8b9051247f" memberName="midiChannelSld"
           virtualName="" explicitFocusOrder="0" pos="292 40R 86 24" min="1.0"
           max="16.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
@@ -904,8 +923,8 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Map Button" id="22ef34e38fed1212" memberName="mapButton"
-              virtualName="" explicitFocusOrder="0" pos="72Cc 48 32 24" buttonText="GO"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="-421Cc 296 32 24"
+              buttonText="GO" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Edit Colors Button" id="bc86137b1b6a5176" memberName="editColorsBtn"
               virtualName="" explicitFocusOrder="0" pos="696 40R 79 24" buttonText="Edit Colors"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -920,33 +939,38 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="80 16 48 24" buttonText="Load"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="exportButton" id="7db05d91d674ecfe" memberName="exportBtn"
-              virtualName="" explicitFocusOrder="0" pos="136 16 88 24" buttonText="Export"
+              virtualName="" explicitFocusOrder="0" pos="8 256 56 24" buttonText="Export"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="AutoMap Button" id="d0adb9765a43b7e2" memberName="autoMapBtn"
-              virtualName="" explicitFocusOrder="0" pos="24 48 104 24" buttonText="Auto Map"
+              virtualName="" explicitFocusOrder="0" pos="0 192 104 24" buttonText="Auto Map"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Manual Map Button" id="6ead157214bd613f" memberName="manualMapBtn"
-              virtualName="" explicitFocusOrder="0" pos="136 48 88 24" buttonText="Manual Map"
+              virtualName="" explicitFocusOrder="0" pos="8 224 88 24" buttonText="Manual Map"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="Mapping Style Label" id="27d88f1ce2d645c1" memberName="mapStyleLbl"
-         virtualName="" explicitFocusOrder="0" pos="-152Cc 48 96 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Mapping Style:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="-369Cc 48 104 24"
+         edTextCol="ff000000" edBkgCol="0" labelText="Mapping Style:"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="33"/>
   <COMBOBOX name="Highlight Style Box" id="ddae7c4ef2fca8a5" memberName="highlightStyleBox"
             virtualName="" explicitFocusOrder="0" pos="584 40R 96 24" editable="0"
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 93.812% 132M"
+            virtualName="" explicitFocusOrder="0" pos="24 80 93.827% 132M"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
               virtualName="" explicitFocusOrder="0" pos="792 40R 88 24" buttonText="Settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
-              virtualName="" explicitFocusOrder="0" pos="83r 48 40 24" posRelativeX="22ef34e38fed1212"
-              buttonText="Edit" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="400r 48 96 24" buttonText="Edit Mapping"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
+            virtualName="" explicitFocusOrder="0" pos="136 16 152 24" editable="0"
+            layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map" textWhenNonSelected="Mapping Off"
+            textWhenNoItems="Mapping Off"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

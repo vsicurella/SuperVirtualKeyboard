@@ -167,6 +167,7 @@ private:
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<TextButton> settingsButton;
     std::unique_ptr<TextButton> mapOrderEditBtn;
+    std::unique_ptr<ComboBox> mapModeBox;
 
 
     //==============================================================================

@@ -186,12 +186,6 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
     return midiOutputFilter->getNoteRemapped(midiNoteIn);
 }
 
-bool SvkMidiProcessor::isAutoRemapping()
-{
-    return setAutoMap;
-}
-
-
 //==============================================================================
 
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
@@ -334,12 +328,6 @@ void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn, bool updateNode)
 		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputMap), nullptr);
 		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
 	}
-}
-
-void SvkMidiProcessor::setAutoRemapOn(bool remapIn)
-{
-    setAutoMap = remapIn;
-    midiSettingsNode.setProperty(IDs::autoRemapOn, setAutoMap, nullptr);
 }
 
 void SvkMidiProcessor::resetInputMap(bool updateNode)

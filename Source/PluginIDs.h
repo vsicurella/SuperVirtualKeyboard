@@ -47,11 +47,11 @@ namespace IDs
     static Identifier midiOutputMap("OutputMappint");
     static Identifier midiInputName("InputDevice");
     static Identifier midiOutputName("OutputDevice");
-    static Identifier autoRemapOn("AutoRemapOn");
     static Identifier midiMapInputCustom("Custom Midi Input Map");
     static Identifier midiMapOutputCustom("Custom Midi Output Map");
     static Identifier modeMapFromRootNote("ModeMapFromRootNote");
     static Identifier modeMapFromPreset("ModeMapFromPreset");
+    static Identifier mappingMode("MappingMode");
     static Identifier modeMappingStyle("ModeMappingType");
 	static Identifier mode1OrderMapping("Mode1OrderMapping");
 	static Identifier mode2OrderMapping("Mode2OrderMapping");

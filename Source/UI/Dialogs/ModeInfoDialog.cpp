@@ -236,7 +236,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
     //[UserPreSize]
     rotateSld->setIncDecButtonsMode(Slider::IncDecButtonMode::incDecButtonsDraggable_Horizontal);
-    
+
 	familyBox->addListener(this);
 
     stepsBox->setText(modeWorking.getStepsString());
