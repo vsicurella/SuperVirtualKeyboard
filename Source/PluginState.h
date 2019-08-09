@@ -49,8 +49,9 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     NoteMap* getMidiInputMap();
     NoteMap* getMidiOutputMap();
-	bool isAutoMapOn();
+	int getMappingMode();
 	int getMappingStyle();
+    bool isAutoMapping();
     
     SvkPreset* getPresetinSlot(int slotNumIn=0);
     SvkPreset* getPresetViewed();
@@ -103,8 +104,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);
-    void setAutoMapping(bool isAutoMappingIn);
     
+    void setMapMode(int mapModeSelectionIn);
     void setMapStyle(int mapStyleIn);
     void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
@@ -160,7 +161,7 @@ private:
     
 	// Mapping parameters
 
-    bool isAutoMapping = true;
+    int mapModeSelected = 0;
     int mapStyleSelected = 1;
     
     int mapOrder1 = 0;

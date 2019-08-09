@@ -77,8 +77,8 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     // Default settings
 	
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::autoRemapOn))
-		setAutoMapping(1);
+    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mappingMode))
+		setMapMode(0);
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeMappingStyle))
 		setMapStyle(1);
@@ -112,7 +112,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
 
 	modeViewedNum = (int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed];
-	isAutoMapping = (bool) presetViewed->thePropertiesNode[IDs::autoRemapOn];
+	mapModeSelected = (bool) presetViewed->thePropertiesNode[IDs::mappingMode];
 	mapStyleSelected = (int) presetViewed->thePropertiesNode[IDs::modeMappingStyle];
     
     mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
@@ -182,15 +182,21 @@ NoteMap* SvkPluginState::getMidiOutputMap()
     return midiProcessor->getMidiOutputFilter()->getNoteMap();
 }
 
-bool SvkPluginState::isAutoMapOn()
+int SvkPluginState::getMappingMode()
 {
-	return isAutoMapping;
+	return mapModeSelected;
 }
 
 int SvkPluginState::getMappingStyle()
 {
 	return mapStyleSelected;
 }
+
+bool SvkPluginState::isAutoMapping()
+{
+    return mapModeSelected == 1;
+}
+
 
 SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
 {
@@ -330,7 +336,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 	else
 		sendChangeMessage();
 
-	if (isAutoMapping)
+	if (isAutoMapping())
 		doMapping();
 
     presetEdited = true;
@@ -354,7 +360,7 @@ void SvkPluginState::setMode1Root(int rootNoteIn)
     
 	updateModeViewed();
     
-    if (isAutoMapping)
+    if (isAutoMapping())
         doMapping();
 }
 
@@ -369,7 +375,7 @@ void SvkPluginState::setMode2Root(int rootNoteIn)
     
 	updateModeViewed();
 
-    if (isAutoMapping)
+    if (isAutoMapping())
         doMapping();
 }
 
@@ -418,10 +424,29 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 	midiProcessor->setMidiOutputMap(noteMapIn);
 }
 
-void SvkPluginState::setAutoMapping(bool isAutoMappingIn)
+void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    isAutoMapping = isAutoMappingIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::autoRemapOn, isAutoMapping, nullptr);
+    mapModeSelected = mapModeSelectionIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelected, nullptr);
+    
+    if (mapModeSelected == 1) // Auto Mapping
+    {
+        doMapping();
+    }
+    
+    else if (mapModeSelected == 2) // Manual Mapping
+    {
+        ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
+        midiProcessor->setMidiMaps(midiMaps);
+    }
+    
+    else // Mapping Off
+    {
+        midiProcessor->setMidiInputMap(NoteMap());
+        midiProcessor->setMidiOutputMap(NoteMap());
+    }
+
+    sendChangeMessage();
 }
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
@@ -429,7 +454,7 @@ void SvkPluginState::setMapStyle(int mapStyleIn)
 	mapStyleSelected = mapStyleIn;
     presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
     
-    if (isAutoMapping)
+    if (isAutoMapping())
     {
         doMapping();
     }
@@ -523,7 +548,7 @@ void SvkPluginState::commitPresetChanges()
 	customModeNode.addChild(presetManager->getModeCustom()->modeNode, -1, nullptr);
 	presetViewed->parentNode.addChild(customModeNode, -1, nullptr);
 
-	if (isAutoMapping)
+	if (isAutoMapping())
 	{
 		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiMapNode), nullptr);
 	}

@@ -47,7 +47,6 @@ class SvkMidiProcessor : public MidiMessageCollector
     bool isInputRemapped = true;
     bool isOutputRemapped = true;
     
-    bool setAutoMap = true;
     bool inputMapIsCustom = false;
     bool outputMapIsCustom = false;
     
