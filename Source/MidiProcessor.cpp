@@ -191,7 +191,7 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
 {
     midiInput->stop();
-    midiInput = MidiInput::openDevice(deviceIndex, this);
+    midiInput = MidiInput::openDevice(deviceIndex, this).get();
     midiInput->start();
     inputSelected = deviceIndex;
     midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
@@ -201,7 +201,7 @@ String SvkMidiProcessor::setMidiInput(int deviceIndex)
 String SvkMidiProcessor::setMidiOutput(int deviceIndex)
 {
     midiOutput->stopBackgroundThread();
-    midiOutput = MidiOutput::openDevice(deviceIndex);
+    midiOutput = MidiOutput::openDevice(deviceIndex).get();
     midiOutput->startBackgroundThread();
     outputSelected = deviceIndex;
     midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);

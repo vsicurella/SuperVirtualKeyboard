@@ -116,8 +116,6 @@ public:
     
     void resetInputMap(bool updateNode=true);
     void resetOutputMap(bool updateNode=true);
-
-	void setAutoRemapOn(bool remapIn = true);
     
     void processMidi(MidiBuffer& midiMessages);
     
