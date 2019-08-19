@@ -81,7 +81,6 @@ void SvkPluginEditor::initNodeData()
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 
 		view->setViewPositionProportionately(0.52, 0);
-        pluginState->getMidiProcessor()->setAutoRemapOn();
 	}
     
     updateUI();
@@ -96,7 +95,21 @@ void SvkPluginEditor::updateNodeData()
 
 void SvkPluginEditor::updateUI()
 {
-	controlComponent->setAutoMapState(pluginState->isAutoMapOn());
+    controlComponent->setMappingMode(pluginState->getMappingMode());
+
+    if (pluginState->getMappingMode() == 2) // Auto
+    {
+        controlComponent->hideMappingUi();
+    }
+    else if (pluginState->getMappingMode() == 3) // Manual
+    {
+        controlComponent->hideMappingUi();
+    }
+    else // off
+    {
+        //controlComponent->showMappingUi(false);
+    }
+    
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
 	controlComponent->setMode1Root(pluginState->getMode1Root());
@@ -261,14 +274,14 @@ void SvkPluginEditor::applyMap()
 	pluginState->doMapping();
 }
 
-void SvkPluginEditor::setAutoMap()
+void SvkPluginEditor::setMappingMode()
 {
-	setAutoMap(controlComponent->getAutoMapState());
+	setMappingMode(controlComponent->getMappingMode());
 }
 
-void SvkPluginEditor::setAutoMap(bool isAutoMapping)
+void SvkPluginEditor::setMappingMode(int mappingModeId)
 {
-	pluginState->setAutoMapping(isAutoMapping);
+	pluginState->setMapMode(mappingModeId);
 }
 
 void SvkPluginEditor::beginMapEditing()
@@ -590,10 +603,10 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::viewMode1,
 		IDs::CommandIDs::viewMode2,
 		IDs::CommandIDs::showModeInfo,
+        IDs::CommandIDs::setMappingMode,
 		IDs::CommandIDs::setMappingStyle,
         IDs::CommandIDs::showMapOrderEdit,
 		IDs::CommandIDs::applyMapping,
-		IDs::CommandIDs::setAutoMap,
 		IDs::CommandIDs::beginMapEditing,
 		IDs::CommandIDs::setPeriodShift,
 		IDs::CommandIDs::setMidiChannelOut,
@@ -674,7 +687,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	case IDs::CommandIDs::applyMapping:
 		result.setInfo("Apply Mapping", "Map incoming MIDI notes to Mode 2 with the selected mapping style.", "Midi", 0);
 		break;
-    case IDs::CommandIDs::setAutoMap:
+    case IDs::CommandIDs::setMappingMode:
         result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
         break;
 	case IDs::CommandIDs::beginMapEditing:
@@ -797,9 +810,9 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 			applyMap();
 			break;
 		}
-		case IDs::CommandIDs::setAutoMap:
+		case IDs::CommandIDs::setMappingMode:
 		{
-			setAutoMap();
+			setMappingMode();
 			break;
 		}
 		case IDs::CommandIDs::beginMapEditing:

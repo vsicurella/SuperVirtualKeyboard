@@ -99,8 +99,8 @@ public:
 
 	void applyMap();
 
-	void setAutoMap();
-	void setAutoMap(bool isAutoMapping);
+	void setMappingMode();
+	void setMappingMode(int mappingModeId);
 	void beginMapEditing();
 
 	void setPeriodShift();

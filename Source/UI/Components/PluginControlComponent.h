@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -81,8 +81,8 @@ public:
 
 	int getModeViewed();
 
-	bool getAutoMapState();
-	void setAutoMapState(bool isAutoMapping, NotificationType notify = NotificationType::dontSendNotification);
+	int getMappingMode();
+	void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
 
 	int getMappingStyle();
 	void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
@@ -107,6 +107,8 @@ public:
 
 	int getHighlightStyle();
 	void setHighlightStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
+
+    void hideMappingUi(bool showUi=true);
 
 	void textEditorTextChanged(TextEditor& textEditor) override;
 	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
@@ -133,6 +135,8 @@ private:
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
+    
+    bool inMappingMode = false;
 
     //[/UserVariables]
 

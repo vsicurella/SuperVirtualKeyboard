@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -404,6 +404,9 @@ void PluginControlComponent::resized()
 	if (svk)
 		svk->setBounds(0, 0, keyboardViewport->getMaximumVisibleWidth(), keyboardViewport->getMaximumVisibleHeight());
 
+    if (mapModeBox->getSelectedId() > 1)
+        hideMappingUi();
+
     //[/UserResized]
 }
 
@@ -453,6 +456,7 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
 
@@ -569,7 +573,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == autoMapBtn.get())
     {
         //[UserButtonCode_autoMapBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setAutoMap, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserButtonCode_autoMapBtn]
     }
     else if (buttonThatWasClicked == manualMapBtn.get())
@@ -739,14 +743,15 @@ int PluginControlComponent::getModeViewed()
 	return mode1ViewBtn->getToggleState() ? 0 : 1;
 }
 
-bool PluginControlComponent::getAutoMapState()
+int PluginControlComponent::getMappingMode()
 {
-	return autoMapBtn->getToggleState();
+    return mapModeBox->getSelectedId();
 }
 
-void PluginControlComponent::setAutoMapState(bool isAutoMapping, NotificationType notify)
+void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType notify)
 {
-	autoMapBtn->setToggleState(isAutoMapping, notify);
+	mapModeBox->setSelectedId(mappingModeId, notify);
+    
 }
 
 int PluginControlComponent::getMappingStyle()
@@ -833,6 +838,34 @@ int PluginControlComponent::getHighlightStyle()
 void PluginControlComponent::setHighlightStyleId(int idIn, NotificationType notify)
 {
 	highlightStyleBox->setSelectedId(idIn, notify);
+}
+
+void PluginControlComponent::hideMappingUi(bool showUi)
+{
+    mapStyleLbl->setVisible(false);
+    mapStyleBox->setVisible(false);
+    mapOrderEditBtn->setVisible(false);
+    mode1RootLbl->setVisible(false);
+    mode1RootSld->setVisible(false);
+    mode1Box->setVisible(false);
+    mode1ViewBtn->setVisible(false);
+
+    mode2ViewBtn->setToggleState(true, sendNotification);
+
+    mode2RootLbl->setTopLeftPosition(mode2RootLbl->getX(), mode2RootLbl->getY() - 24);
+    mode2RootSld->setTopLeftPosition(mode2RootSld->getX(), mode2RootSld->getY() - 24);
+    mode2Box->setTopLeftPosition(mode2Box->getX(), mode2Box->getY() - 24);
+    mode2ViewBtn->setTopLeftPosition(mode2ViewBtn->getX(), mode2ViewBtn->getY() - 24);
+    keyboardViewport->setTopLeftPosition(keyboardViewport->getX(), keyboardViewport->getY() - 24);
+    periodShiftLbl->setTopLeftPosition(periodShiftLbl->getX(), periodShiftLbl->getY() - 24);
+    periodShiftSld->setTopLeftPosition(periodShiftSld->getX(), periodShiftSld->getY() - 24);
+    midiChannelLbl->setTopLeftPosition(midiChannelLbl->getX(), periodShiftLbl->getY() - 24);
+    midiChannelSld->setTopLeftPosition(midiChannelSld->getX(), midiChannelSld->getY() - 24);
+    noteNumsBtn->setTopLeftPosition(noteNumsBtn->getX(), noteNumsBtn->getY() - 24);
+    keyStyleBox->setTopLeftPosition(keyStyleBox->getX(), keyStyleBox->getY() - 24);
+    highlightStyleBox->setTopLeftPosition(highlightStyleBox->getX(), highlightStyleBox->getX() - 24);
+    editColorsBtn->setTopLeftPosition(editColorsBtn->getX(), editColorsBtn->getY() - 24);
+    settingsButton->setTopLeftPosition(settingsButton->getX(), settingsButton->getY() - 24);
 }
 
 //[/MiscUserCode]
@@ -958,7 +991,7 @@ BEGIN_JUCER_METADATA
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 93.827% 132M"
+            virtualName="" explicitFocusOrder="0" pos="24 80 93.834% 132M"
             vscroll="0" hscroll="1" scrollbarThickness="8" contentType="0"
             jucerFile="" contentClass="" constructorParams=""/>
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
