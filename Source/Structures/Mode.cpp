@@ -277,6 +277,7 @@ void Mode::setRootNote(int rootNoteIn)
 {
 	if (rootNote != rootNoteIn)
 	{
+        rootNote = rootNoteIn;
         updateProperties();
 	}
 

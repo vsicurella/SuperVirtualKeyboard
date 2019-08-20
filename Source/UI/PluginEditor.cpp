@@ -230,6 +230,7 @@ void SvkPluginEditor::setModeView()
 void SvkPluginEditor::setModeView(int modeNumberIn)
 {
 	pluginState->setModeViewed(modeNumberIn);
+    controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 }
 
 void SvkPluginEditor::showModeInfo()
