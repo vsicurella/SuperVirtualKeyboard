@@ -78,7 +78,7 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     // Default settings
 	
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::mappingMode))
-		setMapMode(0);
+		setMapMode(1);
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeMappingStyle))
 		setMapStyle(1);
@@ -112,7 +112,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
 
 	modeViewedNum = (int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed];
-	mapModeSelected = (bool) presetViewed->thePropertiesNode[IDs::mappingMode];
+	mapModeSelected = (int) presetViewed->thePropertiesNode[IDs::mappingMode];
 	mapStyleSelected = (int) presetViewed->thePropertiesNode[IDs::modeMappingStyle];
     
     mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
@@ -429,12 +429,12 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
     mapModeSelected = mapModeSelectionIn;
     presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelected, nullptr);
     
-    if (mapModeSelected == 1) // Auto Mapping
+    if (mapModeSelected == 2) // Auto Mapping
     {
         doMapping();
     }
     
-    else if (mapModeSelected == 2) // Manual Mapping
+    else if (mapModeSelected == 3) // Manual Mapping
     {
         ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
         midiProcessor->setMidiMaps(midiMaps);
@@ -444,6 +444,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
     {
         midiProcessor->setMidiInputMap(NoteMap());
         midiProcessor->setMidiOutputMap(NoteMap());
+        setModeViewed(1);
     }
 
     sendChangeMessage();
@@ -517,8 +518,9 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->updateKeyboard(modeViewed);
 
-	if (sendChange)
-		sendChangeMessage();
+//    
+//    if (sendChange)
+//        sendChangeMessage();
 }
 
 void SvkPluginState::commitModeInfo()
