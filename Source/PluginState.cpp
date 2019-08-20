@@ -517,10 +517,6 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->updateKeyboard(modeViewed);
-
-//    
-//    if (sendChange)
-//        sendChangeMessage();
 }
 
 void SvkPluginState::commitModeInfo()
