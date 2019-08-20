@@ -108,8 +108,6 @@ public:
 	int getHighlightStyle();
 	void setHighlightStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 
-    void hideMappingUi(bool showUi=true);
-
 	void textEditorTextChanged(TextEditor& textEditor) override;
 	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
 	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
@@ -135,7 +133,7 @@ private:
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
-    
+
     bool inMappingMode = false;
 
     //[/UserVariables]
@@ -158,14 +156,10 @@ private:
     std::unique_ptr<Label> midiChannelLbl;
     std::unique_ptr<TextButton> noteNumsBtn;
     std::unique_ptr<Label> periodShiftLbl;
-    std::unique_ptr<TextButton> mapButton;
     std::unique_ptr<TextButton> editColorsBtn;
     std::unique_ptr<ComboBox> keyStyleBox;
     std::unique_ptr<TextButton> saveBtn;
     std::unique_ptr<TextButton> loadBtn;
-    std::unique_ptr<TextButton> exportBtn;
-    std::unique_ptr<TextButton> autoMapBtn;
-    std::unique_ptr<TextButton> manualMapBtn;
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<ComboBox> highlightStyleBox;
     std::unique_ptr<Viewport> keyboardViewport;

@@ -49,7 +49,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
-    setSize(1000, 250);
+    setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
     
     initNodeData();
@@ -96,19 +96,6 @@ void SvkPluginEditor::updateNodeData()
 void SvkPluginEditor::updateUI()
 {
     controlComponent->setMappingMode(pluginState->getMappingMode());
-
-    if (pluginState->getMappingMode() == 2) // Auto
-    {
-        controlComponent->hideMappingUi();
-    }
-    else if (pluginState->getMappingMode() == 3) // Manual
-    {
-        controlComponent->hideMappingUi();
-    }
-    else // off
-    {
-        //controlComponent->showMappingUi(false);
-    }
     
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
@@ -314,7 +301,6 @@ void SvkPluginEditor::beginColorEditing()
 	colorChooserWindow->setVisible(true);
 	virtualKeyboard->setUIMode(UIMode::colorMode);
 }
-
 
 void SvkPluginEditor::setNoteNumsVisible()
 {
@@ -600,8 +586,7 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::setMode2,
 		IDs::CommandIDs::setMode1RootNote,
 		IDs::CommandIDs::setMode2RootNote,
-		IDs::CommandIDs::viewMode1,
-		IDs::CommandIDs::viewMode2,
+		IDs::CommandIDs::setModeViewed,
 		IDs::CommandIDs::showModeInfo,
         IDs::CommandIDs::setMappingMode,
 		IDs::CommandIDs::setMappingStyle,
@@ -669,11 +654,8 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	case IDs::CommandIDs::setMode2RootNote:
 		result.setInfo("Set Mode 2 Root", "Applies the selected root note for Mode 2.", "Preset", 0);
 		break;
-	case IDs::CommandIDs::viewMode1:
-		result.setInfo("View Mode 1", "Shows the Mode 1 slot on the keyboard.", "Keyboard", 0);
-		break;
-	case IDs::CommandIDs::viewMode2:
-		result.setInfo("View Mode 2", "Shows the Mode 2 slot on the keyboard.", "Keyboard", 0);
+	case IDs::CommandIDs::setModeViewed:
+		result.setInfo("Set Mode Viewed", "Shows the mode slot on the keyboard.", "Keyboard", 0);
 		break;
     case IDs::CommandIDs::showModeInfo:
         result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Mode", 0);
@@ -780,14 +762,9 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 			setMode2Root();
 			break;
 		}
-		case IDs::CommandIDs::viewMode1:
+		case IDs::CommandIDs::setModeViewed:
 		{
-			setModeView(0);
-			break;
-		}
-		case IDs::CommandIDs::viewMode2:
-		{
-			setModeView(1);
+			setModeView();
 			break;
 		}
 		case IDs::CommandIDs::showModeInfo:
