@@ -16,6 +16,9 @@
       <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
     </GROUP>
     <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
+      <FILE id="YBCQwi" name="MappingHelper.cpp" compile="1" resource="0"
+            file="Source/Structures/MappingHelper.cpp"/>
+      <FILE id="DZVjmF" name="MappingHelper.h" compile="0" resource="0" file="Source/Structures/MappingHelper.h"/>
       <FILE id="x6boMo" name="ModeMapper.cpp" compile="1" resource="0" file="Source/Structures/ModeMapper.cpp"/>
       <FILE id="kIMFVq" name="ModeMapper.h" compile="0" resource="0" file="Source/Structures/ModeMapper.h"/>
       <FILE id="vATes6" name="NoteMap.cpp" compile="1" resource="0" file="Source/Structures/NoteMap.cpp"/>

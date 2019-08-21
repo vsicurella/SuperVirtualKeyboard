@@ -460,27 +460,17 @@ void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
 {
     waitingForKeyMapInput = true;
     
-    if (mapAllPeriods)
-    {
-        keysToMap = getKeysByScaleDegree(keyIn->scaleDegree);
-    }
-    else
-    {
-        keysToMap = Array<Key*>(keyIn);
-    }
-    
     keys.getUnchecked(lastKeyClicked)->activeState = 0;
     lastKeyClicked = keyIn->keyNumber;
     
-    highlightKeysForMapping(keysToMap);
 }
 
-void Keyboard::highlightKeysForMapping(Array<Key*> keysToHighlight, bool highlightOn)
+void Keyboard::highlightKeysForMapping(Array<int> keysToHighlight, bool highlightOn)
 {
     Key* key;
     for (int i = 0; keysToHighlight.size(); i++)
     {
-        key = keysToHighlight[i];
+        key = keys.getUnchecked(keysToHighlight[i]);
         
         if (highlightOn)
         {
@@ -1094,19 +1084,6 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     {
         key = keys.getUnchecked(keyTriggered);
         key->externalMidiState = midiChannel;
-    }
-    else if (uiModeSelected == mapMode && waitingForKeyMapInput)
-    {
-        int notePeriod = midiNote / mode1->getScaleSize();
-        
-        for (int i = 0; i < keysToMap.size(); i++)
-        {
-            key = keysToMap[i];
-            key->mappedNoteIn = midiNote + (i - notePeriod) * mode1->getScaleSize();
-        }
-        
-        highlightKeysForMapping(keysToMap, false);
-        waitingForKeyMapInput = false;
     }
 }
 
