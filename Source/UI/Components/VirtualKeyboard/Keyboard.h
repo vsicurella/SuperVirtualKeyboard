@@ -147,7 +147,7 @@ namespace VirtualKeyboard
 
         void selectKeyToMap(Key* keyIn, bool mapAllPeriods=false);
         
-        void highlightKeysForMapping(Array<Key*> keysToHighlight, bool highlightOn=true);
+        void highlightKeysForMapping(Array<int> keysToHighlight, bool highlightOn=true);
     
         //===============================================================================================
         

@@ -272,6 +272,12 @@ void SvkPluginEditor::setMappingMode()
 void SvkPluginEditor::setMappingMode(int mappingModeId)
 {
 	pluginState->setMapMode(mappingModeId);
+    
+    if (mappingModeId == 3)
+    {
+        mappingHelper.reset(new MappingHelper(*pluginState->getMidiInputMap(), pluginState->getMode1(), pluginState->getMode2()));
+        
+    }
 }
 
 void SvkPluginEditor::beginMapEditing()
@@ -444,7 +450,12 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
     {
         if (key)
         {
+            bool allPeriods = true;
             
+            if (e.mods.isCtrlDown())
+                allPeriods = false;
+            
+            mappingHelper->setKeysToMap(key->keyNumber, allPeriods);
         }
     }
 }

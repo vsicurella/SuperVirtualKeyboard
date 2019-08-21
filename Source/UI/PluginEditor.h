@@ -13,8 +13,10 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginProcessor.h"
 
-#include "Components/PluginControlComponent.h"
 #include "../Structures/Mode.h"
+#include "../Structures/MappingHelper.h"
+
+#include "Components/PluginControlComponent.h"
 #include "Components/VirtualKeyboard/Keyboard.h"
 
 #include "Dialogs/ColorChoosingWindow.h"
@@ -162,6 +164,7 @@ private:
 	ApplicationCommandManager* appCmdMgr;
 	
 	std::unique_ptr<PluginControlComponent> controlComponent;
+    std::unique_ptr<MappingHelper> mappingHelper;
 
 	Viewport* view;
 	Keyboard* virtualKeyboard;
