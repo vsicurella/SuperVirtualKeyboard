@@ -80,7 +80,7 @@ namespace VirtualKeyboard
         
         //===============================================================================================
 
-        void updateMode(Mode* modeIn);
+        void updateModeViewed(Mode* modeIn);
 
 		void updateKeyPlacement();
         
@@ -94,9 +94,9 @@ namespace VirtualKeyboard
         
 		Key* getKey(int keyNumIn);
 
-		Array<Key*>* getKeysByOrder(int orderIn);
+		Array<Key*>* getKeysByOrder(int orderIn, Mode* modeToReference=nullptr);
 
-		Array<Key*> getKeysByScaleDegree(int scaleDegreeIn);
+		Array<Key*> getKeysByScaleDegree(int scaleDegreeIn, Mode* modeToReference=nullptr);
 
 		int getLastKeyClicked();
         
@@ -121,8 +121,9 @@ namespace VirtualKeyboard
 		int getHighlightStyle();
 
 		//===============================================================================================
-
-
+        
+        void setModes(Mode* mode1In, Mode* mode2In);
+        
         void setUIMode(UIMode uiModeIn);
         
         void setKeyPlacementStyle(int placementIn);
@@ -144,8 +145,10 @@ namespace VirtualKeyboard
         
         //===============================================================================================
 
-        void selectKeyToMap(Key* keyIn);
-
+        void selectKeyToMap(Key* keyIn, bool mapAllPeriods=false);
+        
+        void highlightKeysForMapping(Array<Key*> keysToHighlight, bool highlightOn=true);
+    
         //===============================================================================================
         
         Colour getKeyColor(Key* keyIn);
@@ -228,6 +231,7 @@ namespace VirtualKeyboard
         MidiKeyboardState* keyboardState;
         MidiBuffer buffer;
 		Array<Key*> keysPause;
+        Array<Key*> keysToMap;
 
 		// Parameters
 		int uiModeSelected = 0;
@@ -244,7 +248,9 @@ namespace VirtualKeyboard
         
         Array<Array<Key*>> keysOrder;
         Array<Key*> keysOn;
-        Mode* mode;
+        Mode* modeViewed;
+        Mode* mode1;
+        Mode* mode2;
 
 		Array<int> keyMidiNoteMappings;
                 
@@ -275,6 +281,8 @@ namespace VirtualKeyboard
 
         float pianoWidth;
         float minWindowHeight;
+        
+        bool waitingForKeyMapInput = false;
         
         // Locks
         bool rightMouseHeld = false;

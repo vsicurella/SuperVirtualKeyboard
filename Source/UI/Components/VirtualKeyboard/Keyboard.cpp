@@ -121,29 +121,29 @@ ValueTree Keyboard::getNode()
 
 //===============================================================================================
 
-void Keyboard::updateMode(Mode* modeIn)
+void Keyboard::updateModeViewed(Mode* modeIn)
 {
-    mode = modeIn;
-    modeOffset = mode->getOffset();
-	numOrder0Keys = mode->getKeyboardOrdersSize(0);
+    modeViewed = modeIn;
+    modeOffset = modeViewed->getOffset();
+	numOrder0Keys = modeViewed->getKeyboardOrdersSize(0);
         
     keysOrder.clear();
-    keysOrder.resize(mode->getMaxStep());
+    keysOrder.resize(modeViewed->getMaxStep());
     
-    keyColorsDegree.ensureStorageAllocated(mode->getScaleSize());
+    keyColorsDegree.ensureStorageAllocated(modeViewed->getScaleSize());
     
     Key* key;
     for (int i = 0; i < keys.size(); i++)
     {
         key = keys.getUnchecked(i);
         
-        key->order = mode->getOrders()[i];
+        key->order = modeViewed->getOrders()[i];
         keysOrder.getReference(key->order).add(key);
         
-        key->scaleDegree = totalModulus(key->keyNumber - mode->getOffset(), mode->getScaleSize());
-        key->modeDegree = mode->getModalDegrees()[i];
+        key->scaleDegree = totalModulus(key->keyNumber - modeViewed->getOffset(), modeViewed->getScaleSize());
+        key->modeDegree = modeViewed->getModalDegrees()[i];
         
-        key->step = mode->getStepsOfOrders()[i];
+        key->step = modeViewed->getStepsOfOrders()[i];
     }
 
 	// bring all keys to front with highest orders frontmost
@@ -157,7 +157,7 @@ void Keyboard::updateMode(Mode* modeIn)
 
 void Keyboard::updateKeyPlacement()
 {
-	grid.reset(new KeyboardGrid(mode));
+	grid.reset(new KeyboardGrid(modeViewed));
 
 	Key* key;
 	for (int i = 0; i < keys.size(); i++)
@@ -190,7 +190,7 @@ void Keyboard::updateKeyColors()
 
 void Keyboard::updateKeyboard(Mode* modeIn)
 {
-    updateMode(modeIn);
+    updateModeViewed(modeIn);
     updateKeyColors();
 }
 
@@ -213,14 +213,19 @@ Key* Keyboard::getKey(int keyNumIn)
 	return keys.getUnchecked(keyNumIn);
 }
 
-Array<Key*>* Keyboard::getKeysByOrder(int orderIn)
+Array<Key*>* Keyboard::getKeysByOrder(int orderIn, Mode* modeToReference)
 {
+    // needs to reference mode
 	return &keysOrder.getReference(orderIn & keysOrder.size());
 }
 
-Array<Key*> Keyboard::getKeysByScaleDegree(int scaleDegreeIn)
+Array<Key*> Keyboard::getKeysByScaleDegree(int scaleDegreeIn, Mode* modeToReference)
 {
-	int deg = scaleDegreeIn % mode->getScaleSize();
+    if (!modeToReference)
+        modeToReference = modeViewed;
+    
+	int deg = scaleDegreeIn % modeToReference->getScaleSize();
+    
 	Key* key = keys.getUnchecked(deg);
 	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
 	Array<Key*> degreeArray;
@@ -229,7 +234,7 @@ Array<Key*> Keyboard::getKeysByScaleDegree(int scaleDegreeIn)
 	{
 		key = orderArray->getUnchecked(i);
 
-		if (key->keyNumber % mode->getScaleSize() == deg)
+		if (key->keyNumber % modeToReference->getScaleSize() == deg)
 			degreeArray.add(key);
 	}
 
@@ -292,7 +297,7 @@ int Keyboard::getWidthFromHeight(int heightIn)
     int wOut = 100;
     
     if (displayIsReady)
-        wOut = mode->getKeyboardOrdersSize(0) * heightIn * defaultKeyWHRatio;
+        wOut = modeViewed->getKeyboardOrdersSize(0) * heightIn * defaultKeyWHRatio;
     
     return wOut;
 }
@@ -320,6 +325,12 @@ int Keyboard::getHighlightStyle()
 }
 
 //===============================================================================================
+
+void Keyboard::setModes(Mode* mode1In, Mode* mode2In)
+{
+    mode1 = mode1In;
+    mode2 = mode2In;
+}
 
 void Keyboard::setUIMode(UIMode uiModeIn)
 {
@@ -349,6 +360,8 @@ void Keyboard::setUIMode(UIMode uiModeIn)
             key->activeState = 0;
         }
 	}
+    
+    waitingForKeyMapInput = false;
     
 	pianoNode.setProperty(IDs::pianoUIMode, uiModeIn, nullptr);
     repaint();
@@ -443,13 +456,42 @@ int Keyboard::getMidiChannelOut()
 
 //===============================================================================================
 
-void Keyboard::selectKeyToMap(Key* keyIn)
+void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
 {
-    keys.getUnchecked(lastKeyClicked)->activeState = 0;
+    waitingForKeyMapInput = true;
     
+    if (mapAllPeriods)
+    {
+        keysToMap = getKeysByScaleDegree(keyIn->scaleDegree);
+    }
+    else
+    {
+        keysToMap = Array<Key*>(keyIn);
+    }
+    
+    keys.getUnchecked(lastKeyClicked)->activeState = 0;
     lastKeyClicked = keyIn->keyNumber;
-    keyIn->setColour(4, getKeyColor(keyIn).interpolatedWith(Colours::yellow, 0.618f));
-    keyIn->activeState = 4;
+    
+    highlightKeysForMapping(keysToMap);
+}
+
+void Keyboard::highlightKeysForMapping(Array<Key*> keysToHighlight, bool highlightOn)
+{
+    Key* key;
+    for (int i = 0; keysToHighlight.size(); i++)
+    {
+        key = keysToHighlight[i];
+        
+        if (highlightOn)
+        {
+            key->setColour(4, getKeyColor(key).interpolatedWith(Colours::yellow, 0.618f));
+            key->activeState = 4;
+        }
+        else
+        {
+            key->activeState = 0;
+        }
+    }
 }
 
 //===============================================================================================
@@ -458,7 +500,7 @@ Colour Keyboard::getKeyColor(Key* keyIn)
 {
 	Colour c;
 	
-	int offsetKeyNum = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
+	int offsetKeyNum = totalModulus(keyIn->keyNumber - modeViewed->getOffset(), 128);
 
 	// If has its own color, or else if it has a degree color, or else the default order color
 	if (keyColorsSingle[offsetKeyNum].isOpaque())
@@ -478,7 +520,7 @@ Colour Keyboard::getKeyOrderColor(int orderIn)
 
 Colour Keyboard::getKeyDegreeColor(int degIn)
 {
-	int deg = totalModulus(degIn, mode->getScaleSize());
+	int deg = totalModulus(degIn, modeViewed->getScaleSize());
 	return keyColorsDegree[deg];
 }
 
@@ -494,7 +536,7 @@ void Keyboard::beginColorEditing(Key* keyIn, int colorIndex, Colour colorIn, boo
 	keyIn->customColor = useColor;
 	keyIn->repaint();
 
-	int keyNumOffset = totalModulus(keyIn->keyNumber - mode->getOffset(), 128);
+	int keyNumOffset = totalModulus(keyIn->keyNumber - modeViewed->getOffset(), 128);
 	keyColorsSingle.set(keyNumOffset, colorIn);
 	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
 }
@@ -556,10 +598,10 @@ void Keyboard::resetKeyOrderColors(int orderIn, bool resetDegrees)
 		key = orderArray->getUnchecked(i);
 		key->customColor = false;
 
-		degOffset = (key->keyNumber + mode->getOffset()) % mode->getScaleSize();
-		if (keyColorsDegree[degOffset % mode->getScaleSize()].isOpaque())
+		degOffset = (key->keyNumber + modeViewed->getOffset()) % modeViewed->getScaleSize();
+		if (keyColorsDegree[degOffset % modeViewed->getScaleSize()].isOpaque())
 		{
-			keyColorsDegree.set(degOffset % mode->getScaleSize(), Colours::transparentBlack);
+			keyColorsDegree.set(degOffset % modeViewed->getScaleSize(), Colours::transparentBlack);
 		}
 
 		key->setColour(3, getKeyOrderColor(key->order));
@@ -591,7 +633,7 @@ void Keyboard::resetKeySingleColor(int keyNumberIn)
 	Key* key = keys.getUnchecked(totalModulus(keyNumberIn, keys.size()));
 	key->customColor = false;
 
-	int keyNumOffset = totalModulus(key->keyNumber - mode->getOffset(), 128);
+	int keyNumOffset = totalModulus(key->keyNumber - modeViewed->getOffset(), 128);
 
 	keyColorsSingle.set(keyNumOffset, Colours::transparentBlack);
 	key->setColour(3, getKeyOrderColor(key->order));
@@ -1053,10 +1095,18 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
         key = keys.getUnchecked(keyTriggered);
         key->externalMidiState = midiChannel;
     }
-    else if (uiModeSelected == mapMode)
+    else if (uiModeSelected == mapMode && waitingForKeyMapInput)
     {
-        key = keys.getUnchecked(lastKeyClicked);
-        key->mappedNoteIn = midiNote;
+        int notePeriod = midiNote / mode1->getScaleSize();
+        
+        for (int i = 0; i < keysToMap.size(); i++)
+        {
+            key = keysToMap[i];
+            key->mappedNoteIn = midiNote + (i - notePeriod) * mode1->getScaleSize();
+        }
+        
+        highlightKeysForMapping(keysToMap, false);
+        waitingForKeyMapInput = false;
     }
 }
 

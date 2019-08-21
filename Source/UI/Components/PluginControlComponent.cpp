@@ -242,6 +242,13 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
     mapModeBox->setBounds (136, 16, 152, 24);
 
+    mapApplyBtn.reset (new TextButton ("new button"));
+    addAndMakeVisible (mapApplyBtn.get());
+    mapApplyBtn->setButtonText (TRANS("Apply"));
+    mapApplyBtn->addListener (this);
+
+    mapApplyBtn->setBounds (408, 48, 55, 24);
+
 
     //[UserPreSize]
     mapOrderEditBtn->setVisible(false);
@@ -316,6 +323,7 @@ PluginControlComponent::~PluginControlComponent()
     settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
+    mapApplyBtn = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -421,10 +429,16 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
 
-        if (mapStyleBox->getSelectedId() == 3 && inMappingMode)
+        if (inMappingMode && (mapStyleBox->getSelectedId() == 3 || mapModeBox->getSelectedId() == 3))
+        {
             mapOrderEditBtn->setVisible(true);
+            mapApplyBtn->setVisible(true);
+        }
         else
+        {
             mapOrderEditBtn->setVisible(false);
+            mapApplyBtn->setVisible(false);
+        }
 
         //[/UserComboBoxCode_mapStyleBox]
     }
@@ -555,6 +569,12 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapOrderEditBtn] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::showMapOrderEdit, true);
         //[/UserButtonCode_mapOrderEditBtn]
+    }
+    else if (buttonThatWasClicked == mapApplyBtn.get())
+    {
+        //[UserButtonCode_mapApplyBtn] -- add your button handler code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::applyMapping, true);
+        //[/UserButtonCode_mapApplyBtn]
     }
 
     //[UserbuttonClicked_Post]
@@ -725,6 +745,17 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
     mode1ViewBtn->setVisible(inMappingMode);
     mode2ViewBtn->setVisible(inMappingMode);
 
+    if (mappingModeId == 3 || mapStyleBox->getSelectedId() == 3)
+    {
+        mapOrderEditBtn->setVisible(true);
+        mapApplyBtn->setVisible(true);
+    }
+    else
+    {
+        mapOrderEditBtn->setVisible(false);
+        mapApplyBtn->setVisible(false);
+    }
+
     if (inMappingMode)
         mode2ViewBtn->setToggleState(true, sendNotification);
 
@@ -740,10 +771,16 @@ void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify
 {
 	mapStyleBox->setSelectedId(idIn, notify);
 
-    if (idIn == 3 && inMappingMode)
+    if (inMappingMode && (idIn == 3 || mapModeBox->getSelectedId() == 3))
+    {
         mapOrderEditBtn->setVisible(true);
+        mapApplyBtn->setVisible(true);
+    }
     else
+    {
         mapOrderEditBtn->setVisible(false);
+        mapApplyBtn->setVisible(false);
+    }
 }
 
 int PluginControlComponent::getMode1Root()
@@ -940,6 +977,9 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="136 16 152 24" editable="0"
             layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map" textWhenNonSelected="Mapping Off"
             textWhenNoItems="Mapping Off"/>
+  <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
+              virtualName="" explicitFocusOrder="0" pos="408 48 55 24" buttonText="Apply"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

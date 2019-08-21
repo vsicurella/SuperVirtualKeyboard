@@ -40,8 +40,7 @@
 */
 class MapByOrderDialog  : public Component,
                           public ComboBox::Listener,
-                          public Slider::Listener,
-                          public Button::Listener
+                          public Slider::Listener
 {
 public:
     //==============================================================================
@@ -57,7 +56,6 @@ public:
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -80,7 +78,6 @@ private:
     std::unique_ptr<Slider> orderOffsetSld1;
     std::unique_ptr<Slider> orderOffsetSld2;
     std::unique_ptr<Label> label;
-    std::unique_ptr<TextButton> mapApplyBtn;
 
 
     //==============================================================================

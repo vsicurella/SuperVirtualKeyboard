@@ -166,6 +166,7 @@ private:
     std::unique_ptr<TextButton> settingsButton;
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
+    std::unique_ptr<TextButton> mapApplyBtn;
 
 
     //==============================================================================
