@@ -95,13 +95,6 @@ MapByOrderDialog::MapByOrderDialog (SvkPluginState* pluginStateIn)
 
     label->setBounds (12, 48, 64, 40);
 
-    mapApplyBtn.reset (new TextButton ("new button"));
-    addAndMakeVisible (mapApplyBtn.get());
-    mapApplyBtn->setButtonText (TRANS("Apply"));
-    mapApplyBtn->addListener (this);
-
-    mapApplyBtn->setBounds (120, 120, 55, 24);
-
 
     //[UserPreSize]
 
@@ -124,7 +117,7 @@ MapByOrderDialog::MapByOrderDialog (SvkPluginState* pluginStateIn)
 
     //[/UserPreSize]
 
-    setSize (250, 148);
+    setSize (250, 130);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -143,7 +136,6 @@ MapByOrderDialog::~MapByOrderDialog()
     orderOffsetSld1 = nullptr;
     orderOffsetSld2 = nullptr;
     label = nullptr;
-    mapApplyBtn = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -216,22 +208,6 @@ void MapByOrderDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-void MapByOrderDialog::buttonClicked (Button* buttonThatWasClicked)
-{
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
-    if (buttonThatWasClicked == mapApplyBtn.get())
-    {
-        //[UserButtonCode_mapApplyBtn] -- add your button handler code here..
-        pluginState->doMapping();
-        //[/UserButtonCode_mapApplyBtn]
-    }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
-}
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -280,9 +256,6 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Degree&#10;Offsets:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
-              virtualName="" explicitFocusOrder="0" pos="120 120 55 24" buttonText="Apply"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

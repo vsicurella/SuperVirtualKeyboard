@@ -440,11 +440,11 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());       
 		}
 	}
-    else if (virtualKeyboard->getUIMode() == UIMode::mapMode)
+    else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
     {
         if (key)
         {
-            virtualKeyboard->selectKeyToMap(key);
+            
         }
     }
 }

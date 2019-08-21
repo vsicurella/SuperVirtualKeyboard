@@ -330,6 +330,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
     
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
+    virtualKeyboard->setModes(getMode1(), getMode2());
 
 	if (modeViewedNum == modeBoxNum)
 		updateModeViewed();
