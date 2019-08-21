@@ -194,7 +194,7 @@ int SvkPluginState::getMappingStyle()
 
 bool SvkPluginState::isAutoMapping()
 {
-    return mapModeSelected == 1;
+    return mapModeSelected == 2;
 }
 
 

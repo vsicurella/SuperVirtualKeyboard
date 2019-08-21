@@ -38,4 +38,4 @@ private:
     
     Array<int> keysToMap;
     bool waitingForKeyInput = false;
-}
+};
