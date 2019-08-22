@@ -202,7 +202,7 @@ String SvkMidiProcessor::setMidiInput(int deviceIndex)
     midiInput->start();
     inputSelected = deviceIndex;
     midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
-    return /midiInput->getName();
+    return midiInput->getName();
 }
 
 String SvkMidiProcessor::setMidiOutput(int deviceIndex)
