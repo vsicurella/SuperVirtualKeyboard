@@ -9,7 +9,7 @@ larger ones, easier to digest and compose with.
 
 FEATURES:
 
-* This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. *
+** This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. **
 
  - Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
 
