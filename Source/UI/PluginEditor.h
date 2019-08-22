@@ -103,7 +103,6 @@ public:
 
 	void setMappingMode();
 	void setMappingMode(int mappingModeId);
-	void beginMapEditing();
 
 	void setPeriodShift();
 	void setPeriodShift(int periodsIn);
@@ -172,6 +171,7 @@ private:
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
+    bool isColorEditing = false;
 
     PluginSettingsDialog* pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;

@@ -24,7 +24,9 @@ SvkMidiProcessor::SvkMidiProcessor()
     midiInput = nullptr;
     midiOutput = nullptr;
     
-    keyboardState.reset(new MidiKeyboardState());
+    originalKeyboardState.reset(new MidiKeyboardState());
+    remappedKeyboardState.reset(new MidiKeyboardState());
+    
     // default sample rate
     reset(41000);
     
@@ -54,9 +56,8 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
         midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
-
-        /*
         
+        /*
         // Open Input Device
         int deviceIndex = MidiInput::getDefaultDeviceIndex();
         String deviceName = midiSettingsNode.getProperty(IDs::midiInputName);
@@ -72,6 +73,7 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         }
     
         setMidiInput(deviceIndex);
+        
         
         // Open Output Device
         deviceIndex = MidiOutput::getDefaultDeviceIndex();
@@ -136,9 +138,15 @@ MidiOutput*  SvkMidiProcessor::getOutputDevice()
     return midiOutput;
 }
 
-MidiKeyboardState* SvkMidiProcessor::getKeyboardState()
+MidiKeyboardState* SvkMidiProcessor::getOriginalKeyboardState()
 {
-    return keyboardState.get();
+    return originalKeyboardState.get();
+}
+
+
+MidiKeyboardState* SvkMidiProcessor::getRemappedKeyboardState()
+{
+    return remappedKeyboardState.get();
 }
 
 int SvkMidiProcessor::getRootNote()
@@ -190,12 +198,11 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
 {
-    midiInput->stop();
     midiInput = MidiInput::openDevice(deviceIndex, this).get();
     midiInput->start();
     inputSelected = deviceIndex;
     midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
-    return midiInput->getName();
+    return /midiInput->getName();
 }
 
 String SvkMidiProcessor::setMidiOutput(int deviceIndex)
@@ -371,6 +378,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
     {
         while (midiEvent.getNextEvent(msg, smpl))
         {
+            originalKeyboardState->processNextMidiEvent(msg);
             midiNote = msg.getNoteNumber();
             
             if (isInputRemapped)
@@ -383,7 +391,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
 			if (midiNote >= 0 && midiNote < 128)
 			{
 				msg.setTimeStamp(++msgCount);
-				keyboardState->processNextMidiEvent(msg);
+				remappedKeyboardState->processNextMidiEvent(msg);
 				addMessageToQueue(msg);
 			}
         }
@@ -446,6 +454,5 @@ void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     if (isInputRemapped && !midiInputPaused)
         myMsg.setNoteNumber(midiInputFilter->getNoteRemapped(myMsg.getNoteNumber()));
     
-    //myMsg.addToTimeStamp(++msgCount);
     addMessageToQueue(myMsg);
 }

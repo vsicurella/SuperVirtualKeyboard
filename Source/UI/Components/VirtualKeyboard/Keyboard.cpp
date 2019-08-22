@@ -465,6 +465,21 @@ void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
     
 }
 
+void Keyboard::highlightKeyForMapping(int keyNumberIn, bool highlightOn)
+{
+    Key* key = keys.getUnchecked(keyNumberIn);
+    
+    if (highlightOn)
+    {
+        key->setColour(4, getKeyColor(key).interpolatedWith(Colours::yellow, 0.618f));
+        key->activeState = 4;
+    }
+    else
+    {
+        key->activeState = 0;
+    }
+}
+
 void Keyboard::highlightKeysForMapping(Array<int> keysToHighlight, bool highlightOn)
 {
     Key* key;

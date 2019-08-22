@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "../PluginState.h"
 #include "../MidiProcessor.h"
 #include "NoteMap.h"
 
@@ -19,23 +20,28 @@ class MappingHelper : public MidiKeyboardStateListener
     
 public:
     
-    MappingHelper();
-    MappingHelper(NoteMap& noteMapToEdit, Mode* mode1In, Mode* mode2In);
+    MappingHelper(SvkPluginState* pluginStateIn);
     ~MappingHelper();
     
-    Array<int> setKeysToMap(int keyClicked, bool mapAllPeriods);
+    bool isWaitingForKeyInput();
+    int getVirtualKeyToMap();
+    bool isMappingAllPeriods();
     
-    Array<int> getKeyInAllPeriods(int keyClicked, Mode* modeToReference);
+    void prepareKeyToMap(int virtualKeyClicked, bool allPeriodsIn);
+    void mapKeysToMidiNotes(int midiNoteTriggered, bool mapAllPeriods);
+    void cancelKeyMap();
+    
+    Array<int> getKeyInAllPeriods(int keyNumber, Mode* modeToReference);
     
 private:
     
+    // Will receive the actual MIDI note and connect it to the Virtual Keys waiting to be mapped.
     void handleNoteOn(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity) override;
 
-    NoteMap& noteMap;
-    Mode* mode1;
-    Mode* mode2;
+    SvkPluginState* pluginState;
     
-    Array<int> keysToMap;
+    int virtualKeyToMap = -1;
+    bool allPeriods = false;
     bool waitingForKeyInput = false;
 };
