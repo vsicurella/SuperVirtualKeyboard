@@ -10,47 +10,82 @@
 
 #include "MappingHelper.h"
 
-MappingHelper::MappingHelper(NoteMap& noteMapToEdit, Mode* mode1In, Mode* mode2In)
-: noteMap(noteMapToEdit)
+MappingHelper::MappingHelper(SvkPluginState* pluginStateIn)
 {
-    mode1 = mode1In;
-    mode2 = mode2In;
+    virtualKeyToMap = -1;
+    waitingForKeyInput = false;
+    allPeriods = false;
 }
 
 MappingHelper::~MappingHelper()
 {
-    mode1 = nullptr;
-    mode2 = nullptr;
+
 }
 
-Array<int> MappingHelper::setKeysToMap(int keyClicked, bool mapAllPeriods)
+bool MappingHelper::isWaitingForKeyInput()
 {
-    if (mapAllPeriods)
-    {
-        keysToMap = getKeyInAllPeriods(keyClicked, mode1);
-    }
-    else
-    {
-        keysToMap = Array<int>(keyClicked);
-    }
-    
-    waitingForKeyInput = true;
-    
-    return keysToMap;
+    return waitingForKeyInput;
 }
 
-Array<int> MappingHelper::getKeyInAllPeriods(int keyClicked, Mode* modeToReference)
+int MappingHelper::getVirtualKeyToMap()
+{
+    if (waitingForKeyInput)
+        return virtualKeyToMap;
+    else
+        return -1;
+}
+
+bool MappingHelper::isMappingAllPeriods()
+{
+    return allPeriods;
+}
+
+void MappingHelper::prepareKeyToMap(int virtualKeyClicked, bool allPeriodsIn)
+{
+    virtualKeyToMap = virtualKeyClicked;
+    allPeriods = allPeriodsIn;
+    waitingForKeyInput = true;
+}
+
+void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods)
+{
+    if (waitingForKeyInput)
+    {
+        if (allPeriods)
+        {
+            Array<int> triggeredPeriods = getKeyInAllPeriods(midiNoteTriggered, pluginState->getMode1());
+            Array<int> virtualKeyPeriods = getKeyInAllPeriods(virtualKeyToMap, pluginState->getMode2());
+        }
+        
+        else
+        {
+            pluginState->getMidiInputMap()->setValue(midiNoteTriggered, virtualKeyToMap);
+        }
+        
+        DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(pluginState->getMidiInputMap()->getValue(midiNoteTriggered)));
+        waitingForKeyInput = false;
+    }
+}
+
+void MappingHelper::cancelKeyMap()
+{
+    virtualKeyToMap = -1;
+    waitingForKeyInput = false;
+}
+
+
+Array<int> MappingHelper::getKeyInAllPeriods(int keyNumber, Mode* modeToReference)
 {
     Array<int> keyNumsOut;
     
     int scaleSize = modeToReference->getScaleSize();
     int totalNumPeriods = 128 / scaleSize;
-    int keyPeriod = keyClicked / scaleSize;
+    int keyPeriod = keyNumber / scaleSize;
     int keyNum;
     
     for (int i = 0; i < totalNumPeriods; i++)
     {
-        keyNum = (i - keyPeriod) * scaleSize + keyClicked;
+        keyNum = (i - keyPeriod) * scaleSize + keyNumber;
         
         if (keyNum >= 0 && keyNum < 128)
             keyNumsOut.add(keyNum);
@@ -59,30 +94,12 @@ Array<int> MappingHelper::getKeyInAllPeriods(int keyClicked, Mode* modeToReferen
     return keyNumsOut;
 }
 
-// For assigning the selected keys
 void MappingHelper::handleNoteOn(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity)
 {
-    int key = 0;
-    int mappedMidiNote;
-    
-    if (waitingForKeyInput)
-    {
-        int notePeriod = midiNoteNumber / mode1->getScaleSize();
-        
-        for (int i = 0; i < keysToMap.size(); i++)
-        {
-            key = keysToMap[i];
-            mappedMidiNote = midiNoteNumber + (i - notePeriod) * mode1->getScaleSize();
-            
-            noteMap.setValue(key, mappedMidiNote);
-        }
-
-        waitingForKeyInput = false;
-    }
+    mapKeysToMidiNotes(midiNoteNumber, allPeriods);
 }
 
 void MappingHelper::handleNoteOff(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity)
 {
 
 }
-

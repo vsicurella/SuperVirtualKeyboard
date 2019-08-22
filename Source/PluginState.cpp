@@ -34,7 +34,7 @@ SvkPluginState::SvkPluginState()
 	virtualKeyboard->addListener(midiProcessor.get());
 	pianoNode = virtualKeyboard->getNode();
     
-    midiProcessor->getKeyboardState()->addListener(virtualKeyboard.get());
+    midiProcessor->getRemappedKeyboardState()->addListener(virtualKeyboard.get());
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());

@@ -50,7 +50,8 @@ class SvkMidiProcessor : public MidiMessageCollector
     bool inputMapIsCustom = false;
     bool outputMapIsCustom = false;
     
-    std::unique_ptr<MidiKeyboardState> keyboardState; // used for displaying on VirtualKeyboard
+    std::unique_ptr<MidiKeyboardState> originalKeyboardState; // used for sending unchanged MIDI messages
+    std::unique_ptr<MidiKeyboardState> remappedKeyboardState; // used for displaying on VirtualKeyboard
     
 public:
     
@@ -70,7 +71,9 @@ public:
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
-    MidiKeyboardState* getKeyboardState();
+    
+    MidiKeyboardState* getOriginalKeyboardState();
+    MidiKeyboardState* getRemappedKeyboardState();
     
     int getRootNote();
     int getPeriodShift();

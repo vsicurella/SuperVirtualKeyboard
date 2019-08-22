@@ -46,6 +46,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
     pluginState->addChangeListener(this);
     
+    mappingHelper.reset(new MappingHelper(pluginState));
+    pluginState->getMidiProcessor()->getOriginalKeyboardState()->addListener(mappingHelper.get());
+    
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
@@ -96,7 +99,6 @@ void SvkPluginEditor::updateNodeData()
 void SvkPluginEditor::updateUI()
 {
     controlComponent->setMappingMode(pluginState->getMappingMode());
-    
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
 	controlComponent->setMode1Root(pluginState->getMode1Root());
@@ -271,18 +273,7 @@ void SvkPluginEditor::setMappingMode()
 
 void SvkPluginEditor::setMappingMode(int mappingModeId)
 {
-	pluginState->setMapMode(mappingModeId);
-    
-    if (mappingModeId == 3)
-    {
-        mappingHelper.reset(new MappingHelper(*pluginState->getMidiInputMap(), pluginState->getMode1(), pluginState->getMode2()));
-        
-    }
-}
-
-void SvkPluginEditor::beginMapEditing()
-{
-	// TODO
+    pluginState->setMapMode(mappingModeId);
 }
 
 void SvkPluginEditor::setPeriodShift()
@@ -309,6 +300,7 @@ void SvkPluginEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
 	virtualKeyboard->setUIMode(UIMode::colorMode);
+    isColorEditing = true;
 }
 
 void SvkPluginEditor::setNoteNumsVisible()
@@ -383,11 +375,13 @@ void SvkPluginEditor::userTriedToCloseWindow()
 
 //==============================================================================
 
+// All this stuff needs to be moved to a separate VirtualKeyboard Controller class
+
 void SvkPluginEditor::mouseDown(const MouseEvent& e)
 {
     Key* key = virtualKeyboard->getKeyFromPosition(e);
 
-	if (virtualKeyboard->getUIMode() == UIMode::playMode)
+	if (!isColorEditing)
 	{
 		if (key)
 		{
@@ -397,6 +391,23 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				//virtualKeyboard->lastKeyClicked = 0;
 				virtualKeyboard->triggerKeyNoteOff(key);
 			}
+            else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
+            {
+                if (mappingHelper->isWaitingForKeyInput())
+                {
+                    virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                }
+                
+                bool allPeriods = true;
+                
+                if (e.mods.isCtrlDown())
+                    allPeriods = false;
+                
+                mappingHelper->prepareKeyToMap(key->keyNumber, false);
+                virtualKeyboard->highlightKeyForMapping(key->keyNumber);
+                DBG("Preparing to map key: " + String(key->keyNumber));
+            
+            }
 			else
 			{
 				if (e.mods.isAltDown())
@@ -407,10 +418,25 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 
 				virtualKeyboard->triggerKeyNoteOn(key, virtualKeyboard->getKeyVelocity(key, e));
 				virtualKeyboard->setLastKeyClicked(key->keyNumber);
+                
+                if (mappingHelper->isWaitingForKeyInput())
+                {
+                    virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                    mappingHelper->cancelKeyMap();
+                }
+                
 			}
 		}
+        else
+        {
+            if (mappingHelper->isWaitingForKeyInput())
+            {
+                virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                mappingHelper->cancelKeyMap();
+            }
+        }
 	}
-	else if (virtualKeyboard->getUIMode() == UIMode::colorMode)
+	else if (isColorEditing)
 	{
 		if (key)
 		{
@@ -446,23 +472,11 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());       
 		}
 	}
-    else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
-    {
-        if (key)
-        {
-            bool allPeriods = true;
-            
-            if (e.mods.isCtrlDown())
-                allPeriods = false;
-            
-            mappingHelper->setKeysToMap(key->keyNumber, allPeriods);
-        }
-    }
 }
 
 void SvkPluginEditor::mouseDrag(const MouseEvent& e)
 {
-	if (virtualKeyboard->getUIMode() == UIMode::playMode)
+	if (virtualKeyboard->getUIMode() == UIMode::playMode && !e.mods.isRightButtonDown())
 	{
 		Key* key = virtualKeyboard->getKeyFromPosition(e);
 
@@ -492,7 +506,7 @@ void SvkPluginEditor::mouseUp(const MouseEvent& e)
 
 		if (key)
 		{
-			if (!e.mods.isShiftDown())
+			if (!e.mods.isShiftDown() && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
 			{
 				virtualKeyboard->triggerKeyNoteOff(key);
 				key->activeState = 1;
@@ -539,6 +553,8 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 			virtualKeyboard->updateKeyColors();
 			virtualKeyboard->setUIMode(UIMode::playMode);
 		}
+        
+        isColorEditing = false;
 	}
     
     // Prepare to play
@@ -550,7 +566,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
-
 		pluginState->commitModeInfo();
 	}
 }
@@ -606,7 +621,6 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::setMappingStyle,
         IDs::CommandIDs::showMapOrderEdit,
 		IDs::CommandIDs::applyMapping,
-		IDs::CommandIDs::beginMapEditing,
 		IDs::CommandIDs::setPeriodShift,
 		IDs::CommandIDs::setMidiChannelOut,
 		IDs::CommandIDs::beginColorEditing,
@@ -686,9 +700,7 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
     case IDs::CommandIDs::setMappingMode:
         result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
         break;
-	case IDs::CommandIDs::beginMapEditing:
-		result.setInfo("Manual Map", "Map MIDI notes to on-screen keys by selecting desired key on screen and triggering the MIDI Note.", "Midi", 0);
-		break;
+
 	case IDs::CommandIDs::setPeriodShift:
 		result.setInfo("Shift by Mode 2 Period0", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
 		break;
@@ -804,11 +816,6 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		case IDs::CommandIDs::setMappingMode:
 		{
 			setMappingMode();
-			break;
-		}
-		case IDs::CommandIDs::beginMapEditing:
-		{
-			beginMapEditing();
 			break;
 		}
 		case IDs::CommandIDs::setPeriodShift:
