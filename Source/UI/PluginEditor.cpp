@@ -47,7 +47,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     pluginState->addChangeListener(this);
     
     mappingHelper.reset(new MappingHelper(pluginState));
-    pluginState->getMidiProcessor()->getOriginalKeyboardState()->addListener(mappingHelper.get());
+    //pluginState->getMidiProcessor()->getOriginalKeyboardState()->addListener(mappingHelper.get());
     
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
@@ -567,6 +567,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	if (source == modeInfo)
 	{
 		pluginState->commitModeInfo();
+        updateUI();
 	}
 }
 

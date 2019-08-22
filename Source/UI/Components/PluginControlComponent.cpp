@@ -281,6 +281,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     //[Constructor] You can add your own custom stuff here..
 
 	// DISABLED BECAUSE NOT IMPLEMENTED
+    editColorsBtn->setEnabled(false);
+    mapModeBox->setItemEnabled(3, false);
 	keyStyleBox->setItemEnabled(2, false);
 	keyStyleBox->setItemEnabled(4, false);
 	highlightStyleBox->setItemEnabled(2, false);

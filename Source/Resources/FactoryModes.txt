@@ -17,7 +17,7 @@
 2 1 2 1 2 1 2 1 1, Orwell; MOS from 3\13, not considered suitable for accurate Orwell
 2 1 1 2 1 1 2 1 1 1, Sephiroth; MOS from 4\13
 2 2 1 2 2 1 2 1, Father; MOS from 5\13
-2 1 2 1 2 1 2 1 1, Thuja; MOS from 6\13, the generator is close to a tritone or 11/8
+4 1 1 4 1 1 1, Thuja; MOS from 6\13, the generator is close to a tritone or 11/8
 2 2 2 2 1 2 2 1, Hedgehog; MODMOS from 2\7, close to the Porcupine temperament
 1 2 1 2 1 2 1 2 2, Titanium; MOS from 3\14
 1 1 3 1 1 3 1 3, Sidi; MOS from 5\14
@@ -100,23 +100,23 @@
 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 1, Valentine; MOS from 2\31. A quasi-equal 16 tone scale.
 3 3	3 3	3 3 3 3 3 3 1, Miracle; MOS from 3\31, an interval named "secor".
 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 2 1 1, Miracle; MOS from 3\31, also known as "Blackjack"
-1 3	1 3	1 3	1 3	1 3	1 3	1 3	3, Nusecond; MOS from 4\31, a neutral second.
+1 3 1 3 1 3 1 3 1 3 1 3 1 3 3, Nusecond; MOS from 4\31, a neutral second.
 4 1 4 1 4 1 4 1 4 1 4 1 1, Hemithirds; MOS from 5\31.
 6 6 6 6 6 1, Mothra; MOS from 6\31
 5 1 5 1 5 1 5 1 5 1 1, Mothra; MOS from 6\31
 4 3 4 3 4 3 4 3 3, Orwell; MOS from 7\31. The Orwell temperament divides the twelth into 7-equal steps, does well in 7-limit and decent 11-limit.
-1 3	3 1	3 3	1 3 3 1	3 3	3, Orwell; MOS from 7\31. The Orwell temperament divides the twelth into 7-equal steps, does well in 7-limit and decent 11-limit.
-1 7	1 7	1 7	7, Myna; MOS from 8\31, a good 6/5 approximation.
+1 3 3 1 3 3 1 3 3 1 3 3 3, Orwell; MOS from 7\31. The Orwell temperament divides the twelth into 7-equal steps, does well in 7-limit and decent 11-limit.
+1 7 1 7 1 7 7, Myna; MOS from 8\31, a good 6/5 approximation.
 5 4 5 4 5 4 4, Mohajira; MOS from 9\31, a neutral third.
-1 4	4 1	4 4	1 4	4 4, Mohajira; MOS from 9\31, a neutral third.
-9 1	9 1	9 1 1, Wurshmidt; MOS from 10\31, very close to 5\4 but not flat enough to generate the Magic Temperament.
-2 2	7 2	2 7	2 7, Squares; MOS from 11\31, a supermajor third, similar to the sixth degree in 17edo.	
-5 5	2 5	5 2	5 2, Semisept; MOS from 12\31.
+1 4 4 1 4 4 1 4 4 4, Mohajira; MOS from 9\31, a neutral third.
+9 1 9 1 9 1 1, Wurshmidt; MOS from 10\31, very close to 5\4 but not flat enough to generate the Magic Temperament.
+2 2 7 2 2 7 2 7, Squares; MOS from 11\31, a supermajor third, similar to the sixth degree in 17edo.	
+5 5 2 5 5 2 5 2, Semisept; MOS from 12\31.
 5 5 3 5 5 5 3, Meantone; MOS from 13\31, and very close to quarter-comma meantone. This has a slightly flatter fifth than 12-edo (at ~697) but nearly spot-on 5/4 major thirds.
 3 2 3 2 3 3 2 3 2 3 2 3, Meantone; MOS from 13\31, and very close to quarter-comma meantone. This has a slightly flatter fifth than 12-edo (at ~697) but nearly spot-on 5/4 major thirds.
-8 3	3 8	3 3	3, Casablanca; MOS from 14\31
-5 3	3 3	5 3	3 3 3, Casablanca; MOS from 14\31	
-9 1	1 1 1 1	1 9	1 1	1 1	1 1	1, Tritonic; MOS from 15\31
+3 3 8 3 3 3 8, Casablanca; MOS from 14\31
+5 3 3 3 5 3 3 3 3, Casablanca; MOS from 14\31	
+9 1 1 1 1 1 1 9 1 1 1 1 1 1 1, Tritonic; MOS from 15\31
 7 7 3 7 7 7 3, Schismatic
 4 3 4 3 3 4 3 4 3 4 3 3, Schismatic
 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 1, Magic

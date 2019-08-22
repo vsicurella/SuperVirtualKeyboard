@@ -334,8 +334,8 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 
 	if (modeViewedNum == modeBoxNum)
 		updateModeViewed();
-	else
-		sendChangeMessage();
+	
+    sendChangeMessage();
 
 	if (isAutoMapping())
 		doMapping();
