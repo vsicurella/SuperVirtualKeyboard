@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
-              jucerVersion="5.4.4" companyName="Everytone" companyEmail="sicurella12@gmail.com"
+              jucerVersion="5.4.3" companyName="Everytone" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
               pluginAUMainType="'aumi'">
@@ -37,8 +37,14 @@
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">
         <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
-          <FILE id="zI44G5" name="Keyboard.cpp" compile="1" resource="0" file="Source/UI/Components/VirtualKeyboard/Keyboard.cpp"/>
-          <FILE id="kxFSq5" name="Keyboard.h" compile="0" resource="0" file="Source/UI/Components/VirtualKeyboard/Keyboard.h"/>
+          <FILE id="zI44G5" name="KeyboardComponent.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.cpp"/>
+          <FILE id="kxFSq5" name="KeyboardComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.h"/>
+          <FILE id="mtt2tt" name="KeyboardController.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardController.cpp"/>
+          <FILE id="EzMc1u" name="KeyboardController.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardController.h"/>
           <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
           <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"

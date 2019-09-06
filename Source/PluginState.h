@@ -17,7 +17,7 @@
 #include "MidiProcessor.h"
 #include "PresetManager.h"
 #include "Structures/Preset.h"
-#include "UI/Components/VirtualKeyboard/Keyboard.h"
+#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 #include "Structures/ModeMapper.h"
 
 struct SvkPluginState : public ChangeBroadcaster,

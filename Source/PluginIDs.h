@@ -97,13 +97,20 @@ namespace IDs
 	static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 	static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 	static Identifier pianoKeyRatioSingle("KeySingleRatios");
-
-
+    
 	// Piano Key Component
-	static Identifier pianoKeyColorIsCustom("KeyColorIsCustom");
-	static Identifier pianoKeyColorHighlighted("KeyColorHighlighted");
-	static Identifier pianoKeyColorPressed("KeyColorPressed");
-	static Identifier pianoKeyColorExternal("KeyColorMidiInput");
+	static Identifier pianoKeyTreeNode("PianoKeyTree");
+	static Identifier pianoKeyNode("PianoKeyNode");
+	static Identifier pianoKeyNumber("KeyNumber");
+	static Identifier pianoKeyPitchName("PitchName");
+	static Identifier pianoKeyWidthMod("WidthMod");
+	static Identifier pianoKeyHeightMod("HeighMod");
+	static Identifier pianoKeyXOffset("XOffset");
+	static Identifier pianoKeyYOffset("YOffset");
+	static Identifier pianoKeyShowNumber("ShowNumber");
+	static Identifier pianoKeyShowName("ShowName");
+	static Identifier pianoKeyColor("KeyColor");
+
 
 	enum CommandIDs
 	{

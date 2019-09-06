@@ -17,7 +17,7 @@
 #include "../Structures/MappingHelper.h"
 
 #include "Components/PluginControlComponent.h"
-#include "Components/VirtualKeyboard/Keyboard.h"
+#include "Components/VirtualKeyboard/KeyboardComponent.h"
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
