@@ -14,52 +14,32 @@
 
 namespace VirtualKeyboard
 {
-    struct Key : public Button
-    {        
-        // Parameters
-        int keyNumber;
-        
+    struct Key
+    {   
+		Key();
+		Key(int keyNumIn);
+		Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
+			String pitchNameIn = "", int widthModIn = 0, int heightModIn = 0, int xOff = 0, int yOff = 0,
+			bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack);
+		Key(ValueTree nodeIn);
+
+		ValueTree node;
+
+		// Properties
+		int keyNumber = 0;
+		int order = 0; // front most keys are 0, "black" keys are 1, etc
+		int scaleDegree = 0; // corresponds to chromatic degree in the period
+		float modeDegree = 0; // fractional degree. in Meantone[7] in 12edo set in C, F# would be 3.5
+		int step = 0; // the interval step that this note is a part of
+
+		// Parameters
+		String pitchName = "";
         float widthMod = -1;
         float heightMod = -1;
         float xOffset = 0;
         float yOffset = 0;
-        
-        //Pitch* mappedPitch = nullptr;
-        int mappedNoteIn;
-        int mappedNoteOut;
-        int externalMidiState = 0;
-        
-		bool isKeyboardOut = true;
         bool showNoteNumber = false;
         bool showNoteName = false;
-        
-        // Properties
-        int order; // front most keys are 0, "black" keys are 1, etc
-		int scaleDegree; // corresponds to chromatic degree in the period
-        float modeDegree; // fractional degree. in Meantone[7], F# would be 3.5
-        int step; // the interval step that this note is a part of
-        
-        float degreeWidthRatio;
-        float degreeHeightRatio;
-        float velocity = 0;
-
-		bool customColor = false;
-        
-        // more of a "status" flag
-		// 0 = no interaction, 1 = mouseover, 2 = mouse down, 3 = color selecting, 4 = note map selecting
-        int activeState = 0;
-        
-        // Methods
-        
-        Key(String nameIn, int keyNumIn);
-        
-        // returns the decimal part of the mode degree
-        float getDegree();
-        
-        void paintButton(Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
-        
-		//==============================================================================
-
-		void mouseExit(const MouseEvent& e) override;
+		Colour color = Colours::transparentBlack;
     };
 }

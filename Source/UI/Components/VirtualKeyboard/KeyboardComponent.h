@@ -214,9 +214,9 @@ namespace VirtualKeyboard
         
         //===============================================================================================
         
-        void triggerKeyNoteOn(Key* key, float velocityIn);
+        void triggerKeyNoteOn(int midiChannelIn, int keyNumberIn, float velocityIn);
         
-        void triggerKeyNoteOff(Key* key);
+        void triggerKeyNoteOff(int midiChannelIn, int keyNumberIn);
         
         void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
         
@@ -245,30 +245,11 @@ namespace VirtualKeyboard
                 
         // Data
         ValueTree pianoNode;
-        OwnedArray<Key> keys;
-        
-        Array<Array<Key*>> keysOrder;
-        Array<Key*> keysOn;
-        Mode* modeViewed;
-        Mode* mode1;
-        Mode* mode2;
-
-		Array<int> keyMidiNoteMappings;
-                
-		Array<Colour> keyColorsOrder = { Colours::white, Colours::black, Colours::crimson.withSaturation(1.0f), Colours::cornflowerblue.withSaturation(0.8f), Colours::mediumseagreen.withSaturation(0.9f),
-            Colours::gold.withBrightness(0.75f), Colours::mediumpurple, Colours::orangered, Colours::saddlebrown };
-		
-		Array<Colour> keyColorsDegree;
-		Array<Colour> keyColorsSingle; // organized by (keyNumber - Mode offset)
-
-		Array<Point<int>> keyPlacesOrder;
-		Array<Point<int>> keyPlacesDegree;
-		Array<Point<int>> keyPlacesSingle;
-
-		Array<Point<int>> keyRatioOrder;
-		Array<Point<int>> keyRatioDegree;
-		Array<Point<int>> keyRatioSingle;
-		        
+        Array<Key>* keys;
+        Array<Array<int>> keysOrder;
+        Array<int> keysOn;
+		Mode* mode;
+                		        
         // Properties
         int keyWidth = 50;
         int keyHeight = 200;
@@ -282,9 +263,7 @@ namespace VirtualKeyboard
 
         float pianoWidth;
         float minWindowHeight;
-        
-        bool waitingForKeyMapInput = false;
-        
+                
         // Locks
         bool rightMouseHeld = false;
         bool shiftHeld = false;
