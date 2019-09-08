@@ -454,8 +454,8 @@ void SvkPresetManager::initializeModePresets()
 	setModeCustom("1");
     
 	loadPreset(0, ValueTree(IDs::presetNode), false);
-    handleModeSelection(0, 0, 14);
-    handleModeSelection(0, 1, 14);
+    handleModeSelection(0, 0, 15);
+    handleModeSelection(0, 1, 15);
 }
 
 

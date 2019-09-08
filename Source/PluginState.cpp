@@ -130,7 +130,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	virtualKeyboard->restoreDataNode(pianoNode);
 	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
 
-	sendMappingToKeyboard();
+	doMapping();
 
 	if (sendChange)
 		sendChangeMessage();
@@ -477,8 +477,16 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
 
 void SvkPluginState::doMapping()
 {
-	DBG("Mapping new settings");
-    doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+	if (mapModeSelected > 1)
+	{
+		DBG("Mapping new settings");
+		doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+	}
+	else
+	{
+		midiProcessor->setMidiInputMap(NoteMap());
+		sendMappingToKeyboard();
+	}
 }
 
 void SvkPluginState::sendMappingToKeyboard()
