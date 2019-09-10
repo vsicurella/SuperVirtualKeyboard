@@ -4,6 +4,8 @@
  VirtualKeyboardKey.h
  Created: 17 Apr 2019 2:11:53pm
  Author:  Vincenzo
+
+ Struct for holding virtual keyboard key data.
  
  ==============================================================================
  */
@@ -40,6 +42,7 @@ namespace VirtualKeyboard
         float yOffset = 0;
         bool showNoteNumber = false;
         bool showNoteName = false;
+		float velocityFixed = 1;
 		Colour color = Colours::transparentBlack;
     };
 }

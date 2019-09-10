@@ -142,7 +142,7 @@ bool SvkPluginEditor::loadPreset()
 {
 	if (pluginState->loadPresetFromFile(true))
 	{
-		//virtualKeyboard->restoreDataNode(pluginState->getPresetLoaded()->theKeyboardNode);
+		//virtualKeyboard->restoreNode(pluginState->getPresetLoaded()->theKeyboardNode);
 		updateUI();
 
 		return true;
@@ -448,7 +448,7 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 				}
 				else if (e.mods.isCtrlDown())
 				{
-					virtualKeyboard->resetKeySingleColor(key->keyNumber);
+					virtualKeyboard->resetKeyColor(key->keyNumber);
 				}
 				else
 				{
@@ -462,7 +462,7 @@ void SvkPluginEditor::mouseDown(const MouseEvent& e)
 					virtualKeyboard->resetKeyDegreeColors(key->scaleDegree);
 
 				else if (virtualKeyboard->getKeySingleColor(key->keyNumber).isOpaque())
-					virtualKeyboard->resetKeySingleColor(key->keyNumber);
+					virtualKeyboard->resetKeyColor(key->keyNumber);
 
 				virtualKeyboard->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
 			}

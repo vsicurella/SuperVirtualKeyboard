@@ -38,7 +38,7 @@ Keyboard::Keyboard()
 
 //===============================================================================================
 
-void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
+void Keyboard::restoreNode(ValueTree pianoNodeIn)
 {
 	if (pianoNodeIn.hasType(IDs::pianoNode))
 	{
@@ -47,11 +47,11 @@ void Keyboard::restoreDataNode(ValueTree pianoNodeIn)
 		orientationSelected = pianoNode[IDs::pianoOrientation];
 		keyPlacementSelected = pianoNode[IDs::pianoKeyPlacementType];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
-		defaultKeyWHRatio = (float) pianoNode[IDs::pianoWHRatio];
+		keySizeRatio = (float) pianoNode[IDs::pianoWHRatio];
         
         // safeguard
-        if (defaultKeyWHRatio < 0.01)
-            defaultKeyWHRatio = 0.25f;
+        if (keySizeRatio < 0.01)
+            keySizeRatio = 0.25f;
 
 		if (pianoNode.getChildWithName(IDs::pianoKeyColorsOrder).isValid())
 		{
@@ -121,7 +121,7 @@ ValueTree Keyboard::getNode()
 
 //===============================================================================================
 
-void Keyboard::updateModeViewed(Mode* modeIn)
+void Keyboard::applyMode(Mode* modeIn)
 {
     modeViewed = modeIn;
     modeOffset = modeViewed->getOffset();
@@ -190,7 +190,7 @@ void Keyboard::updateKeyColors()
 
 void Keyboard::updateKeyboard(Mode* modeIn)
 {
-    updateModeViewed(modeIn);
+    applyMode(modeIn);
     updateKeyColors();
 }
 
@@ -297,7 +297,7 @@ int Keyboard::getWidthFromHeight(int heightIn)
     int wOut = 100;
     
     if (displayIsReady)
-        wOut = modeViewed->getKeyboardOrdersSize(0) * heightIn * defaultKeyWHRatio;
+        wOut = modeViewed->getKeyboardOrdersSize(0) * heightIn * keySizeRatio;
     
     return wOut;
 }
@@ -633,7 +633,7 @@ void Keyboard::resetKeyDegreeColors(int tuningDegreeIn)
 
 }
 
-void Keyboard::resetKeySingleColor(int keyNumberIn)
+void Keyboard::resetKeyColor(int keyNumberIn)
 {
 	Key* key = keys.getUnchecked(totalModulus(keyNumberIn, keys.size()));
 	key->customColor = false;
@@ -700,7 +700,7 @@ void Keyboard::isolateLastNote()
 }
 
 
-bool Keyboard::keysAreInSameOrder(int& orderDetected)
+bool Keyboard::getOrderOfNotesOn(int& orderDetected)
 {
     orderDetected = keysOn.getUnchecked(0)->order;
     
@@ -756,7 +756,7 @@ Key* Keyboard::transposeKeyChromatically(Key* key, int stepsIn)
 bool Keyboard::transposeKeysOnModally(int modalStepsIn)
 {
     int theOrder;
-    if (keysAreInSameOrder(theOrder))
+    if (getOrderOfNotesOn(theOrder))
     {
         Array<Key*> oldKeys = Array<Key*>(keysOn);
         Array<Key*> newKeys;
@@ -855,7 +855,7 @@ void Keyboard::resized()
     {
 		// Calculate key sizes
 		keyHeight = getHeight();
-		keyWidth = keyHeight * defaultKeyWHRatio;
+		keyWidth = keyHeight * keySizeRatio;
 
 		// Adjust Parent bounds and grid
 		pianoWidth = numOrder0Keys * keyWidth;

@@ -5,6 +5,8 @@
     Created: 1 Sep 2019 8:22:03pm
     Author:  Vincenzo
 
+	Will be used for higher level keyboard controlling.
+
   ==============================================================================
 */
 
@@ -22,8 +24,6 @@ namespace VirtualKeyboard
 	public:
 
 		SvkController(Keyboard* keyboardIn);
-		SvkController(Keyboard* keyboardIn, ValueTree nodeIn);
-		SvkController(SvkController& controllerToCopy);
 		~SvkController();
 
 		ValueTree getNode();
