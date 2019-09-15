@@ -100,7 +100,7 @@ void ReaperWriter::setup_default_symbols()
 bool ReaperWriter::write_file()
 {
     Array<int> modeOrders = mode->getOrders();
-    Array<float> modeDegrees = Mode::orders_to_modeDegrees(modeOrders);
+    Array<float> modeDegrees = Mode::ordersToModalDegrees(modeOrders);
     
     if (!fileOut.getParentDirectory().exists())
         return false;

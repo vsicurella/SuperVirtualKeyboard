@@ -20,8 +20,8 @@ Key::Key(int keyNumIn)
 }
 
 Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
-	String pitchNameIn = "", int widthModIn = 0, int heightModIn = 0, int xOff = 0, int yOff = 0,
-	bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack)
+	String pitchNameIn, int widthModIn, int heightModIn, int xOff, int yOff,
+	bool showNoteNumIn, bool showNoteNameIn, Colour colorIn)
 {
 	keyNumber = keyNumIn;
 	order = orderIn;
@@ -38,7 +38,7 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 	color = colorIn;
 }
 
-Key::Key(ValueTree nodeIn)
+void Key::applyParameters(ValueTree nodeIn)
 {
 	Identifier id;
 

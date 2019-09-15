@@ -67,18 +67,6 @@ namespace VirtualKeyboard
 		bool showInput = true;
 		bool showInputFiltered = false;
 
-		Array<Colour> colorsDefaultOrders = { 
-			Colours::white, 
-			Colours::black, 
-			Colours::crimson.withSaturation(1.0f),
-			Colours::cornflowerblue.withSaturation(0.8f), 
-			Colours::mediumseagreen.withSaturation(0.9f),
-			Colours::gold.withBrightness(0.75f), 
-			Colours::mediumpurple, 
-			Colours::orangered, 
-			Colours::saddlebrown 
-		};
-
 		Array<Colour> colorsDegrees;
 
 		Array<Point<int>> offsetsByOrder;

@@ -84,26 +84,35 @@ namespace VirtualKeyboard
         //===============================================================================================
         
         Keyboard(MidiKeyboardState& keyboardStateIn);
-		Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn);
+		Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn, Array<Key>* keysIn, 
+			Array<Colour>* keyColorsOrdersIn=nullptr, Array<Colour>* keyColorsDegreesIn=nullptr,
+			Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
 		~Keyboard() {};
         
         //===============================================================================================
                 
-        void restoreNode(ValueTree keyboardNodeIn);
+        void restoreNode(ValueTree keyboardNodeIn, bool resetIfInvalid=false);
         
         ValueTree getNode();
+
+		void reset();
         
         //===============================================================================================
 
 		/*
 			Rearranges the keys to fit the current mode, without changing other key data.
 		*/
-        void applyMode(Mode* modeIn, int newRootNote=-1);
+        void applyMode(Mode* modeIn);
 
 		/*
 			Applies the key data to the keyboard so that it matches the data passed in.
 		*/
-		void applyKeyData(ValueTree keyDataNodeIn);
+		void applyKeyData(ValueTree keyDataTreeIn);
+
+		/*
+		Allows the keyboard to listen the filtered midi input
+		*/
+		void setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn);
         
         //===============================================================================================
         
@@ -118,9 +127,19 @@ namespace VirtualKeyboard
 		ValueTree getKeyNode(int keyNumIn);
 
 		/*
-			Returns an array of pointers to the keys corresponding to the given integer array.
+			Returns an array of pointers to the keys corresponding to the given order.
 		*/
-		Array<Key*> getKeysByOrder(Array<int> keyNumsIn);
+		Array<Key*> getKeysByOrder(int orderIn);
+
+		/*
+		Returns an array of pointers to the keys corresponding to the given order.
+		*/
+		Array<Key*> getKeysByScaleDegree(int degreeIn);
+
+		/*
+		Returns an array of pointers to the keys corresponding to the given order.
+		*/
+		Array<Key*> getKeysByModalDegree(int degreeIn);
 
 		/*
 			Returns the number of the last key clicked by the user.
@@ -138,17 +157,17 @@ namespace VirtualKeyboard
 		Rectangle<int> getKeyAreaRelative(int midiNoteIn);
 
 		/*
-		Returns the current proportion of key width to height.
+			Returns the current proportion of key width to height.
 		*/
 		float getKeySizeRatio(int keyNumIn);
 
 		/*
-		Returns the current size of the keys within the given order.
+			Returns the current size of the keys within the given order.
 		*/
 		Point<int> getKeyOrderSize(int orderIn);
 
 		/*
-		Returns the current size of the keys within the given scale degree.
+			Returns the current size of the keys within the given scale degree.
 		*/
 		Point<int> getKeyDegreeSize(int degreeIn);
 
@@ -214,27 +233,32 @@ namespace VirtualKeyboard
 		/*
 			Sets the keyboards UI mode.
 		*/
-        void setUIMode(UIMode uiModeIn);
+        void setUIMode(int uiModeIn);
+
+		/*
+			Sets the orientation of the keyboard.
+		*/
+		void setOrientation(int orientationIn);
         
 		/*
 			Sets the style of which the keys are nested in.
 		*/
         void setKeyPlacementStyle(int placementIn);
         
-
-		// might want to restructure these so this is not necessary
-        void setKeyProportions(Key* keyIn);
-		void setLastKeyClicked(int keyNumIn);
-
-		/*
-			Set whether note numbers are showing
-		*/
-		void setNoteNumbersVisible(bool showNoteNumsIn);
-
 		/*
 			Set the way the keys are highlighted
 		*/
 		void setHighlightStyle(int styleIn);
+
+		/*
+		Sets the velocity behavior of the keyboard
+		*/
+		void setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity = false);
+
+		/*
+		Sets the scrolling style of the keyboard.
+		*/
+		void setScrollingStyle(int scrollingStyleIn);
 
 		/*
 			Set the Midi Channel that the keyboard outputs on clicks.
@@ -242,24 +266,34 @@ namespace VirtualKeyboard
 		void setMidiChannelOut(int midiChannelOutIn);
 
 		/*
-			Sets the velocity behavior of the keyboard
-		*/
-		void setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity=false);
-
-		/*
 			Set the fixed output velocity
 		*/
 		void setVelocityFixed(float velocityIn);
 
 		/*
-			Sets the scrolling style of the keyboard.
+			Sets whether or not midi input velocity should be scaled
 		*/
-		void setScrollingStyle(int scrollingStyleIn);
+		void setInputVelocityScaled(bool shouldBeScaled);
 
 		/*
-			Allows the keyboard to listen the filtered midi input
+			Set whether note numbers are showing
 		*/
-		void setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn);
+		void setShowNoteNumbers(bool shouldShowNumbers);
+
+		/*
+			Set whether filtered note numbers are showing
+		*/
+		void setShowFilteredNumbers(bool shouldShowNumbers);
+
+		/*
+			Set whether pitch names are shown
+		*/
+		void setShowPitchNames(bool shouldShowPitchNames);
+
+		// might want to restructure these so this is not necessary
+		void setKeyProportions(Key* keyIn);
+		void setLastKeyClicked(int keyNumIn);
+
         
         //===============================================================================================
 
@@ -280,7 +314,7 @@ namespace VirtualKeyboard
 			If a blink rate above 0 is given, the keys will alternate between default and highlight color every
 			given number of milliseconds.
 		*/
-		void hightlightKeys(Array<int> keyNumsIn, Colour colorIn = Colours::transparentBlack, int blinkRateMs = 0);
+		void highlightKeys(Array<int> keyNumsIn, Colour colorIn = Colours::transparentBlack, int blinkRateMs = 0);
 
         //===============================================================================================
         
@@ -311,9 +345,8 @@ namespace VirtualKeyboard
 
 		/*
 			Resets the color of all the keys in the given order to the current order color.
-			If resetDegrees is true, it will set the keys their current degree color if non-default.
 		*/
-		void resetKeyColorsInOrder(int orderIn, bool resetDegrees = false);
+		void resetKeyColorsInOrder(int orderIn);
 
 		/*
 			Resets the color of all the keys of the scale degree to the current order color.
@@ -328,7 +361,7 @@ namespace VirtualKeyboard
 		/*
 			Reset all keys to the current colors of their orders.
 		*/
-		void resetKeyColors(bool resetDegrees=false);
+		void resetKeyColors();
 
 		//===============================================================================================
 
@@ -363,7 +396,7 @@ namespace VirtualKeyboard
 		/*
 			Will trigger a midi messages for the key numbers given with the given velocity.
 		*/
-		void triggerNotes(Array<int> keyNumbers, bool noteOn = true, float velocity = 1);
+		void triggerNotes(Array<int> keyNumbers, bool doNoteOn = true, float velocity = 1);
         
 		/*
 			Returns the order of which all held notes are a part of.
@@ -374,12 +407,12 @@ namespace VirtualKeyboard
 		/*
 			Transposes the given key (if on) to a certain amount of modal steps.
 		*/
-        Key* transposeKeyModally(int keyNumIn, int stepsIn);
+        int transposeKeyModally(int keyNumIn, int stepsIn);
         
 		/*
 			Transposes the given key (if on) to a certain amount of scale degrees.
 		*/
-        Key* transposeKeyChromatically(int keyNumIn, int degreesIn);
+        int transposeKeyChromatically(int keyNumIn, int degreesIn);
         
 		/*
 			Transposes the keys on to a certain amount of modal steps.
@@ -431,14 +464,15 @@ namespace VirtualKeyboard
 		// Functionality
 		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
+		std::unique_ptr<Viewport> viewport;
 
-        MidiKeyboardState& keyboardInputState;
-		MidiKeyboardState& keyboardInputFilteredState;
-		NoteMap& inputFilterMap;
+        const MidiKeyboardState& keyboardInputState;
+		const MidiKeyboardState* keyboardInputFilteredState;
+		NoteMap* inputFilterMap;
         
 		MidiBuffer buffer;
 		Array<Key*> keysPause;
-        Array<Key*> keysToMap;
+		Array<Key*> keysToMap;
 
 		// Parameters
 		int uiModeSelected = 0;
@@ -462,9 +496,25 @@ namespace VirtualKeyboard
         // Data
         ValueTree pianoNode;
         Array<Key>* keys;
-        Array<Array<int>> keysOrder;
-        Array<int> keysOn;
 		Mode* mode;
+
+		Array<Colour>* keyColorsOrders;
+		Array<Colour>* keyColorsDegrees;
+
+		Mode modeDefault;
+		Array<Key> keysDefault; // if key data is not supplied
+
+		Array<Colour> colorsDefaultOrders = {
+			Colours::white,
+			Colours::black,
+			Colours::crimson.withSaturation(1.0f),
+			Colours::cornflowerblue.withSaturation(0.8f),
+			Colours::mediumseagreen.withSaturation(0.9f),
+			Colours::gold.withBrightness(0.75f),
+			Colours::mediumpurple,
+			Colours::orangered,
+			Colours::saddlebrown
+		};
                 		        
         // Properties
         int keyWidth = 50;
@@ -477,6 +527,11 @@ namespace VirtualKeyboard
 
         float pianoWidth;
         float minWindowHeight;
+
+		Array<Array<int>> keysOrder;
+		Array<Array<int>> keysScaleDegree;
+		Array<Array<int>> keysModalDegree;
+		Array<int> keysOn;
                 
         // Locks
         bool rightMouseHeld = false;

@@ -86,8 +86,13 @@ namespace IDs
 	static Identifier pianoWHRatio("WidthToHeightRatio");
 	static Identifier pianoHasCustomColor("PresetHasCustomColor");
 	static Identifier pianoKeyPlacementType("KeyPlacementType");
-	static Identifier pianoKeysShowNoteNumbers("KeysShowNoteNumbers");
-	static Identifier pianoKeysHighlightStyle("KeysHighlightStyle");
+	static Identifier pianoKeysShowNoteNumbers("PianoShowNoteNumbers");
+	static Identifier pianoKeysShowFilteredNotes("PianoShowFilteredNotes");
+	static Identifier pianoKeysHighlightStyle("PianoHighlightStyle");
+	static Identifier pianoVelocityBehavior("PianoVelocityBehavior");
+	static Identifier pianoVelocityScaleInput("PianoVelocityScaleInput");
+	static Identifier pianoVelocityValue("PianoVelocityValue");
+	static Identifier pianoScrollingStyle("PianoScrollingStyle");
 	static Identifier pianoKeyColorsOrder("KeyOrderColors");
 	static Identifier pianoKeyColorsDegree("KeyDegreeColors");
 	static Identifier pianoKeyColorSingle("KeySingleColors");

@@ -23,7 +23,8 @@ namespace VirtualKeyboard
 		Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
 			String pitchNameIn = "", int widthModIn = 0, int heightModIn = 0, int xOff = 0, int yOff = 0,
 			bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack);
-		Key(ValueTree nodeIn);
+
+		void applyParameters(ValueTree nodeIn);
 
 		ValueTree node;
 
@@ -33,6 +34,8 @@ namespace VirtualKeyboard
 		int scaleDegree = 0; // corresponds to chromatic degree in the period
 		float modeDegree = 0; // fractional degree. in Meantone[7] in 12edo set in C, F# would be 3.5
 		int step = 0; // the interval step that this note is a part of
+
+		float velocity = 0; // recorded when key is clicked
 
 		// Parameters
 		String pitchName = "";

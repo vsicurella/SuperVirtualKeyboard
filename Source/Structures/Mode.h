@@ -43,10 +43,6 @@ class Mode
     Array<int> stepsOfOrders; // each index is the step which the note is associated with
     Array<int> keyboardOrdersSizes; // amount of keys in each key order groupings
     
-    // Hopefully I come up with a better way to either resize keyboard keys, give keys a step value, or
-    // place keys in a grid such that I won't need this
-    void updateStepsOfOrders();
-    
 public:
     
 	ValueTree modeNode;
@@ -92,6 +88,9 @@ public:
 	*/
 	void setRootNote(int rootNoteIn);
     
+	/*
+		Rotates the mode to the amount of given steps
+	*/
     void rotate(int rotateAmt);
     
     void addTag(String tagIn);
@@ -122,6 +121,8 @@ public:
     
     Array<int> getStepsOfOrders() const;
 
+	int getNoteStep(int noteNumberIn) const;
+
 	Array<int> getSteps(int rotationIn=0) const;
 
 	String getStepsString(int rotationIn=0) const;
@@ -129,6 +130,8 @@ public:
 	Array<int> getOrdersDefault() const;
 
 	Array<int> getOrders() const;
+
+	int getOrder(int noteNumberIn) const;
 
 	Array<float> getModalDegrees() const;
 
@@ -163,62 +166,79 @@ public:
     int isSimilarTo(Mode* modeToCompare) const;
 
 	/*
+		Returns a table of note numbers (with current root) organized by key order.
+	*/
+	Array<Array<int>> getNotesOrders();
+
+	/*
+		Returns a table of note numbers (with current root) organized by scale degree.
+	*/
+	Array<Array<int>> getNotesInScaleDegrees();
+
+	/*
+		Returns a table of note numbers (with current root) organized by modal degree.
+	*/
+	Array<Array<int>> getNotesInModalDegrees();
+
+	/*
 	Simply parses a string reprsenting step sizes and returns a vector
 	*/
-	static Array<int> parse_steps(String stepsIn);
+	static Array<int> parseIntStringToArray(String stepsIn);
     
+	/*
+	Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
+	Returns a string like "2 2 1 2 2 2 1"
+	*/
+	static String intArrayToString(Array<int> stepsIn);
+
     /*
-     Takes in step vector like {2, 2, 1, 2, 2, 2, 1}
-     Returns a vector of each index repeated by it's own magnitude {2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1}
+     Takes in a vector like {2, 2, 1, 2, 2, 2, 1} and a mask like {0, 0, 2, 0, 0, 0, 2}
+     Returns a vector of each index repeated by the mask {2, 2, 1, 1, 2, 2, 2, 1, 1}
+	 If no mask supplied, then it uses it's own magnitudes.
      */
-    static Array<int> expand_steps(Array<int> ordersIn);
-    
-    /*
-     Takes in step vector like {2, 2 , 1 , 2 , 2 , 2 , 1}
-     Returns a string like "2 2 1 2 2 2 1"
-     */
-    static String steps_to_string(Array<int> stepsIn);
+    static Array<int> repeatIndicies(Array<int> arrayToRepeat, Array<int> repeatMask=Array<int>());
 
 	/*
 	Takes in step vector like {2, 2, 1, 2, 2, 2, 1}
 	Returns a vector of key orders {0, 1, 0, 1, 0, 0, 1,...}
 	*/
-	static Array<int> steps_to_orders(Array<int> stepsIn);
+	static Array<int> unfoldStepsToOrders(Array<int> stepsIn);
 
-	/*
-	Takes in a period-size vector of key orders and offset
-	Returns a keyboard-size vector of offset key orders
-	*/
-	static Array<int> expand_orders(Array<int> ordersIn, int offsetIn);
-    
 	/*
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "2, 2, 1, 2,..."
 	*/
-	static Array<int> orders_to_steps(Array<int> layoutIn);
+	static Array<int> foldOrdersToSteps(Array<int> layoutIn);
+
+	/*
+		Takes in a period-size vector, a new vector size, and an offset
+		Returns a vector at new size using original vector's period for repetition with the given offset
+	*/
+	// needs revision to allow for notes to start in the middle of a step
+	static Array<int> repeatArray(Array<int> ordersIn, int sizeIn, int offsetIn=0);
 
 	/*
 	Takes in array of a scale layout of note orders (1:1) {0, 1, 0, 1 , 0, 0, 1,...}
 	and returns scale step size layout "0, 0.5, 1, 1.5,..."
 	*/
-	static Array<float> orders_to_modeDegrees(Array<int> ordersIn);
+	static Array<float> ordersToModalDegrees(Array<int> ordersIn);
 
 	/*
 	Simply creates an array of scale degrees based off of scale size and offset
 	*/
-	static Array<int> scale_degrees(int scaleSize, int offset = 0);
+	static Array<int> generateScaleDegrees(int scaleSize, int offset = 0);
 
 	/*
 	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
 	Returns a vector of sizes large->small like {5, 2} 
 	*/
-	static Array<int> interval_sizes(Array<int> stepsIn);
+	static Array<int> intervalAmounts(Array<int> stepsIn);
 
 	/*
 	Takes in a vector like {2, 2, 1, 2, 2, 2, 1}
 	And returns a sum of the previous indicies at each index like {0, 2, 4, 5, 7, 9, 11}
 	*/
-	static Array<int> sum_of_steps(Array<int> stepsIn, int offsetIn = 0, bool includePeriod = false);
+	static Array<int> sumArray(Array<int> stepsIn, int offsetIn = 0, bool includePeriod = false);
 
 };
 
