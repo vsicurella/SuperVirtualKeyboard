@@ -30,7 +30,7 @@ SvkPluginState::SvkPluginState()
 	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
-	virtualKeyboard.reset(new VirtualKeyboard::Keyboard());
+	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(midiProcessor->getOriginalKeyboardState(), pianoNode));
 	virtualKeyboard->addListener(midiProcessor.get());
 	pianoNode = virtualKeyboard->getNode();
     

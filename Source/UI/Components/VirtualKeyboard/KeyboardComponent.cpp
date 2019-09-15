@@ -9,36 +9,47 @@
  */
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
-#include "Keyboard.h"
+#include "KeyboardComponent.h"
 
 using namespace VirtualKeyboard;
 
-Keyboard::Keyboard()
-{
-    removeMouseListener(this);
-       
-    // Create children (virtualKeyboard keys)
-    for (int i = 0; i < 128; i++)
-    {
-        String keyName = "Key " + String(i);
-        Key* key = new Key(keyName, i);
-        addChildComponent(keys.add(key));
-    }
-	
-	keyColorsSingle.resize(keys.size());
+Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
+	: keyboardInputState(keyboardStateIn)
+{       
+	reset();
 
-    toBack();
+	keysDefault = Array<Key>();
+	keysDefault.resize(128);
+	keys = &keysDefault;
 
-    pianoNode = ValueTree(IDs::pianoNode);
-    updatePianoNode();
+	applyMode(mode);
     
     setSize(1000, 250);
     setOpaque(true);
 }
 
+Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn, Array<Key>* keysIn,
+	Array<Colour>* keyColorsOrdersIn, Array<Colour>* keyColorsDegreesIn, Mode* modeIn, NoteMap* inputFilterMapIn)
+	: keyboardInputState(keyboardStateIn)
+{
+	restoreNode(pianoNode);
+
+	keys = keysIn;
+	inputFilterMap = inputFilterMapIn;
+	keyColorsOrders = keyColorsOrdersIn;
+	keyColorsDegrees = keyColorsDegreesIn;
+	
+	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
+	mode = modeIn;
+	applyMode(mode);
+
+	setSize(1000, 250);
+	setOpaque(true);
+}
+
 //===============================================================================================
 
-void Keyboard::restoreNode(ValueTree pianoNodeIn)
+void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 {
 	if (pianoNodeIn.hasType(IDs::pianoNode))
 	{
@@ -52,66 +63,16 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn)
         // safeguard
         if (keySizeRatio < 0.01)
             keySizeRatio = 0.25f;
-
-		if (pianoNode.getChildWithName(IDs::pianoKeyColorsOrder).isValid())
-		{
-			keyColorsOrder.clear();
-			get_array_from_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, 9);
-		}
-
-		if (pianoNode.getChildWithName(IDs::pianoKeyColorsDegree).isValid())
-		{
-			keyColorsDegree.clear();
-			get_array_from_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, keys.size());
-		}
-
-		if (pianoNode.getChildWithName(IDs::pianoKeyColorSingle).isValid())
-		{
-			keyColorsSingle.clear();
-			get_array_from_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, keys.size());
-		}
 	}
-}
-
-void Keyboard::updatePianoNode()
-{
-    pianoNode.setProperty(IDs::pianoUIMode, UIMode::playMode, nullptr);
-    pianoNode.setProperty(IDs::pianoMPEToggle, false, nullptr);
-    pianoNode.setProperty(IDs::pianoWHRatio, 0.25f, nullptr);
-    pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
-	
-	pianoNode.setProperty(IDs::pianoOrientation, Orientation::horizontal, nullptr);
-	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
-	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
-    
-	if (pianoNode[IDs::pianoHasCustomColor])
+	else
 	{
-		// Colors
-		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsOrder), nullptr);
-		add_array_to_node(pianoNode, keyColorsOrder, IDs::pianoKeyColorsOrder, "Color");
-
-		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorsDegree), nullptr);
-		add_array_to_node(pianoNode, keyColorsDegree, IDs::pianoKeyColorsDegree, "Color");
-
-		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyColorSingle), nullptr);
-		add_array_to_node(pianoNode, keyColorsSingle, IDs::pianoKeyColorSingle, "Color");
+		DBG("Invalid Piano Node.");
+		if (resetIfInvalid)
+		{
+			reset();
+			DBG("Keyboard is reset.");
+		}
 	}
-    
-    // Placements
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceOrder), nullptr);
-    add_array_to_node(pianoNode, keyPlacesOrder, IDs::pianoKeyPlaceOrder, "Place");
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceDegree), nullptr);
-    add_array_to_node(pianoNode, keyPlacesDegree, IDs::pianoKeyPlaceDegree, "Place");
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyPlaceSingle), nullptr);
-    add_array_to_node(pianoNode, keyPlacesSingle, IDs::pianoKeyPlaceSingle, "Place");
-    
-    // Ratios
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioOrder), nullptr);
-    add_array_to_node(pianoNode, keyRatioOrder, IDs::pianoKeyRatioOrder, "Ratio");
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioDegree), nullptr);
-    add_array_to_node(pianoNode, keyRatioDegree, IDs::pianoKeyRatioDegree, "Ratio");
-    pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyRatioSingle), nullptr);
-    add_array_to_node(pianoNode, keyRatioSingle, IDs::pianoKeyRatioSingle, "Ratio");
 }
 
 ValueTree Keyboard::getNode()
@@ -119,126 +80,136 @@ ValueTree Keyboard::getNode()
     return pianoNode;
 }
 
+void Keyboard::reset()
+{
+	if (!pianoNode.isValid())
+		pianoNode = ValueTree();
+
+	pianoNode.removeAllChildren(nullptr);
+	pianoNode.removeAllProperties(nullptr);
+
+	setUIMode(UIMode::playMode);
+	setOrientation(Orientation::horizontal);
+	setKeyPlacementStyle(KeyPlacementType::nestedRight);
+	setHighlightStyle(HighlightStyle::full);
+	setVelocityBehavior(VelocityStyle::linear);
+	setScrollingStyle(ScrollingStyle::smooth);
+
+	setShowPitchNames(false);
+	setShowNoteNumbers(false);
+	setShowFilteredNumbers(false);
+	
+	setMidiChannelOut(1);
+	setVelocityFixed(1);
+	setInputVelocityScaled(false);
+
+	setKeySizeRatio(0.25f);
+	setKeyOrderSizeScalar(1);
+
+	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
+	mode = nullptr;
+}
+
+
 //===============================================================================================
 
 void Keyboard::applyMode(Mode* modeIn)
 {
-    modeViewed = modeIn;
-    modeOffset = modeViewed->getOffset();
-	numOrder0Keys = modeViewed->getKeyboardOrdersSize(0);
+    mode = modeIn;
+
+	if (mode == nullptr)
+		mode = &modeDefault;
         
-    keysOrder.clear();
-    keysOrder.resize(modeViewed->getMaxStep());
-    
-    keyColorsDegree.ensureStorageAllocated(modeViewed->getScaleSize());
-    
-    Key* key;
-    for (int i = 0; i < keys.size(); i++)
+    for (int i = 0; i < keys->size(); i++)
     {
-        key = keys.getUnchecked(i);
+		Key& key = keys->getUnchecked(i);
         
-        key->order = modeViewed->getOrders()[i];
-        keysOrder.getReference(key->order).add(key);
-        
-        key->scaleDegree = totalModulus(key->keyNumber - modeViewed->getOffset(), modeViewed->getScaleSize());
-        key->modeDegree = modeViewed->getModalDegrees()[i];
-        
-        key->step = modeViewed->getStepsOfOrders()[i];
+		key.order = mode->getOrder(i);        
+		key.scaleDegree = mode->getScaleDegree(i);
+		key.modeDegree = mode->getModeDegree(i);
+		key.step = mode->getNoteStep(i);
     }
 
-	// bring all keys to front with highest orders frontmost
-	for (int o = 0; o < keysOrder.size(); o++)
-		for (int k = 0; k < keysOrder.getUnchecked(o).size(); k++)
-			keysOrder.getReference(o).getReference(k)->toFront(false);
+	// needs to be implemented
+	keysOrder = mode->getNotesOrders();
+	keysScaleDegree = mode->getNotesInScaleDegrees();
+	keysModalDegree = mode->getNotesInModalDegrees();
 
+	// resize based on new properties
+	keyColorsOrders->clear();
+	keyColorsOrders->resize(mode->getMaxStep());
+
+	keyColorsDegrees->clear();
+	keyColorsDegrees->resize(mode->getScaleSize());
+}
+
+void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
+{
+	ValueTree keyNode;
+
+	int numKeys = jmin(keys->size(), keyDataTreeIn.getNumChildren());
 	
-	updateKeyPlacement();
-}
-
-void Keyboard::updateKeyPlacement()
-{
-	grid.reset(new KeyboardGrid(modeViewed));
-
-	Key* key;
-	for (int i = 0; i < keys.size(); i++)
+	for (int i = 0; i < numKeys; i++)
 	{
-		key = keys.getUnchecked(i);
-
-		setKeyProportions(key);
-		key->setVisible(true);
+		Key& key = keys->getUnchecked(i);
+		key.applyParameters(keyDataTreeIn.getChild(i));	
 	}
-
-	// Calculate properties
-	displayIsReady = true;
-	resized();
 }
 
-void Keyboard::updateKeyColors()
+void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn)
 {
-    Key* key;
-    for (int i = 0; i < keys.size(); i++)
-    {
-        key = keys.getUnchecked(i);
-        
-        key->setColour(0, getKeyColor(key));
-        key->setColour(1, key->findColour(0).contrasting(0.25));
-        key->setColour(2, key->findColour(0).contrasting(0.75));
-    }
-
-	repaint();
-}
-
-void Keyboard::updateKeyboard(Mode* modeIn)
-{
-    applyMode(modeIn);
-    updateKeyColors();
-}
-
-void Keyboard::updateKeyMapping(const MidiFilter* inputMap, const MidiFilter* outputMap)
-{
-	Key* key;
-	for (int i = 0; i < keys.size(); i++)
-	{
-		key = keys.getUnchecked(i);
-
-		key->mappedNoteIn = inputMap->getNoteRemapped(i);
-		key->mappedNoteOut = outputMap->getNoteRemapped(i);
-	}
+	keyboardInputFilteredState = &filteredInputStateIn;
 }
 
 //===============================================================================================
 
 Key* Keyboard::getKey(int keyNumIn)
 {
-	return keys.getUnchecked(keyNumIn);
+	return &keys->getUnchecked(keyNumIn);
 }
 
-Array<Key*>* Keyboard::getKeysByOrder(int orderIn, Mode* modeToReference)
+ValueTree Keyboard::getKeyNode(int keyNumIn)
 {
-    // needs to reference mode
-	return &keysOrder.getReference(orderIn & keysOrder.size());
+	return keys->getUnchecked(keyNumIn).node;
 }
 
-Array<Key*> Keyboard::getKeysByScaleDegree(int scaleDegreeIn, Mode* modeToReference)
+Array<Key*> Keyboard::getKeysByOrder(int orderIn)
 {
-    if (!modeToReference)
-        modeToReference = modeViewed;
-    
-	int deg = scaleDegreeIn % modeToReference->getScaleSize();
-    
-	Key* key = keys.getUnchecked(deg);
-	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
-	Array<Key*> degreeArray;
+	Array<Key*> keysOut;
+	Array<int> orderArray = keysOrder[orderIn];
 
-	for (int i = 0; i < orderArray->size(); i++)
+	for (int i = 0; i < orderArray.size(); i++)
 	{
-		key = orderArray->getUnchecked(i);
-
-		if (key->keyNumber % modeToReference->getScaleSize() == deg)
-			degreeArray.add(key);
+		keysOut.add(&keys->getUnchecked(orderArray[i]));
 	}
 
-	return degreeArray;
+	return keysOut;
+}
+
+Array<Key*> Keyboard::getKeysByScaleDegree(int degreeIn)
+{
+	Array<Key*> keysOut;
+	Array<int> degreeArray = keysScaleDegree[degreeIn];
+
+	for (int i = 0; i < degreeArray.size(); i++)
+	{
+		keysOut.add(&keys->getUnchecked(degreeArray[i]));
+	}
+
+	return keysOut;
+}
+
+Array<Key*> Keyboard::getKeysByModalDegree(int degreeIn)
+{
+	Array<Key*> keysOut;
+	Array<int> degreeArray = keysModalDegree[degreeIn];
+
+	for (int i = 0; i < degreeArray.size(); i++)
+	{
+		keysOut.add(&keys->getUnchecked(degreeArray[i]));
+	}
+
+	return keysOut;
 }
 
 int Keyboard::getLastKeyClicked()
@@ -246,60 +217,54 @@ int Keyboard::getLastKeyClicked()
 	return lastKeyClicked;
 }
 
-Point<int> Keyboard::getPositionOfKey(int midiNoteIn)
+Rectangle<int> Keyboard::getKeyArea(int midiNoteIn)
 {
-    Key* key = keys.getUnchecked(midiNoteIn % keys.size());
-    return key->getPosition();
+
+}
+
+Rectangle<int> Keyboard::getKeyAreaRelative(int midiNoteIn)
+{
+
+}
+
+float Keyboard::getKeySizeRatio(int keyNumIn)
+{
+	return keySizeRatio;
+}
+
+Point<int> Keyboard::getKeyOrderSize(int orderIn)
+{
+	//use the scalar
 }
 
 Key* Keyboard::getKeyFromPosition(Point<int> posIn)
 {
-    Key* keyOut = nullptr;
-    
-    if (reallyContains(posIn, true))
-    {
-        Component* c = getComponentAt(posIn);
-        
-        if (c->getName().startsWith("Key"))
-            keyOut = dynamic_cast<Key*>(c);
-    }
-    
-    return keyOut;
+	Key* keyOut = nullptr;
+
+	if (reallyContains(posIn, true))
+	{
+		Component* c = getComponentAt(posIn);
+
+		if (c->getName().startsWith("Key"))
+			keyOut = dynamic_cast<Key*>(c);
+	}
+
+	return keyOut;
 }
 
-Key* Keyboard::getKeyFromPosition(const MouseEvent& e)
+Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
 {
-    Key* keyOut = nullptr;
-    Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
-    
-    if (e.eventComponent->getName().startsWith("Key") &&
-        reallyContains(mousePosition, true))
-    {
-        keyOut = dynamic_cast<Key*>(getComponentAt(mousePosition));
-    }
-    
-    return keyOut;
+	return nullptr;
 }
 
-
-float Keyboard::getKeyVelocity(Key* keyIn, const MouseEvent& e)
+float Keyboard::getKeyVelocity(Key* keyIn, Point<int> posIn)
 {
-    Point<int> mousePosition = e.getScreenPosition() - getScreenBounds().getPosition();
-    Point<int> mouseInKey = mousePosition.withX(mousePosition.x - e.eventComponent->getX());
-    
-    float velocity = (float)mouseInKey.y / (float)keyIn->getHeight();
-    
-    return velocity;
+
 }
 
-int Keyboard::getWidthFromHeight(int heightIn)
+int Keyboard::getMidiChannelOut()
 {
-    int wOut = 100;
-    
-    if (displayIsReady)
-        wOut = modeViewed->getKeyboardOrdersSize(0) * heightIn * keySizeRatio;
-    
-    return wOut;
+	return midiChannelOut;
 }
 
 //===============================================================================================
@@ -324,56 +289,108 @@ int Keyboard::getHighlightStyle()
 	return highlightSelected;
 }
 
-//===============================================================================================
-
-void Keyboard::setModes(Mode* mode1In, Mode* mode2In)
+int Keyboard::getVelocityStyle()
 {
-    mode1 = mode1In;
-    mode2 = mode2In;
+	return velocitySelected;
 }
 
-void Keyboard::setUIMode(UIMode uiModeIn)
+bool Keyboard::isInputVelocityScaled()
+{
+	return scaleMidiInputVelocity;
+}
+
+int Keyboard::getScrollingStyle()
+{
+	return scrollingSelected;
+}
+
+
+//===============================================================================================
+
+void Keyboard::setUIMode(int uiModeIn)
 {
     uiModeSelected = uiModeIn;
-    
-	Key* key;
-	for (int i = 0; i < keys.size(); i++)
-	{
-		key = keys.getUnchecked(i);
-        
-        if (uiModeIn == UIMode::colorMode)
-        {
-            key->activeState = 3;
-            key->setColour(3, key->findColour(0));
-            key->showNoteNumber = showNoteNumbers;
-        }
-        
-        else if (uiModeIn == UIMode::mapMode)
-        {
-            key->showNoteNumber = true;
-            key->activeState = 0;
-        }
-        
-        else
-        {
-            key->showNoteNumber = showNoteNumbers;
-            key->activeState = 0;
-        }
-	}
-    
-    waitingForKeyMapInput = false;
-    
-	pianoNode.setProperty(IDs::pianoUIMode, uiModeIn, nullptr);
-    repaint();
+	pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
+	
+	// Do stuff
+}
+
+void Keyboard::setOrientation(int orientationIn)
+{
+	orientationSelected = orientationIn;
+	pianoNode.setProperty(IDs::pianoOrientation, orientationSelected, nullptr);
+
+	// do stuff
 }
 
 void Keyboard::setKeyPlacementStyle(int placementIn)
 {
 	keyPlacementSelected = placementIn;
-	pianoNode.setProperty(IDs::pianoKeyPlacementType, placementIn, nullptr);
-	updateKeyPlacement();
+	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
+	
+	// do stuff
 }
 
+void Keyboard::setHighlightStyle(int styleIn)
+{
+	highlightSelected = styleIn;
+	pianoNode.setProperty(IDs::pianoKeysHighlightStyle, highlightSelected, nullptr);
+}
+
+void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity = false)
+{
+	velocitySelected = behaviorNumIn;
+	pianoNode.setProperty(IDs::pianoVelocityBehavior, velocitySelected, nullptr);
+
+	scaleMidiInputVelocity = scaleInputVelocity;
+	pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
+}
+
+void Keyboard::setScrollingStyle(int scrollingStyleIn)
+{
+	scrollingSelected = scrollingStyleIn;
+	pianoNode.setProperty(IDs::pianoScrollingStyle, scrollingSelected, nullptr);
+
+	// do stuff?
+}
+
+void Keyboard::setMidiChannelOut(int midiChannelOutIn)
+{
+	midiChannelOut = jlimit(1, 16, midiChannelOutIn);
+	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelOut, nullptr);
+}
+
+void Keyboard::setVelocityFixed(float velocityIn)
+{
+	velocityFixed = velocityIn;
+	pianoNode.setProperty(IDs::pianoVelocityValue, velocityFixed, nullptr);
+}
+
+void Keyboard::setInputVelocityScaled(bool shouldBeScaled)
+{
+	scaleMidiInputVelocity = shouldBeScaled;
+	pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
+}
+
+void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
+{
+	showNoteNumbers = shouldShowNumbers;
+	pianoNode.setProperty(IDs::pianoKeyShowNumber, showNoteNumbers, nullptr);
+}
+
+void Keyboard::setShowFilteredNumbers(bool shouldShowNumbers)
+{
+	showFilteredNoteNums = shouldShowNumbers;
+	pianoNode.setProperty(IDs::pianoKeysShowFilteredNotes, showFilteredNoteNums, nullptr);
+}
+
+void Keyboard::setShowPitchNames(bool shouldShowPitchNames)
+{
+	showPitchNames = shouldShowPitchNames;
+	pianoNode.setProperty(IDs::pianoKeyShowName, showPitchNames, nullptr);
+}
+
+// should be replaced, but keeping here just in case
 void Keyboard::setKeyProportions(Key* keyIn)
 {
 	float spread = 4;
@@ -411,9 +428,6 @@ void Keyboard::setKeyProportions(Key* keyIn)
         keyHeight = 1;
         width = 1;
     }
-    
-    keyIn->degreeWidthRatio = width;
-    keyIn->degreeHeightRatio = keyHeight;
 }
 
 void Keyboard::setLastKeyClicked(int keyNumIn)
@@ -422,307 +436,217 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
 	pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 }
 
-void Keyboard::setNoteNumbersVisible(bool showNoteNumsIn)
-{
-	showNoteNumbers = showNoteNumsIn;
-	pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, showNoteNumbers, nullptr);
-
-	for (int i = 0; i < keys.size(); i++)
-	{
-		keys.getUnchecked(i)->showNoteNumber = showNoteNumbers;
-		//keys.getUnchecked(i)->isKeyboardOut = true;
-	}
-
-	repaint();
-}
-
-void Keyboard::setHighlightStyle(int styleIn)
-{
-	highlightSelected = styleIn;
-	pianoNode.setProperty(IDs::pianoKeysHighlightStyle, highlightSelected, nullptr);
-}
-
-void Keyboard::setMidiChannelOut(int midiChannelOutIn)
-{
-	midiChannelOut = jlimit(1, 16, midiChannelOutIn);
-}
-
-//===============================================================================================
-
-int Keyboard::getMidiChannelOut()
-{
-	return midiChannelOut;
-}
-
 //===============================================================================================
 
 void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
 {
-    waitingForKeyMapInput = true;
-    
-    keys.getUnchecked(lastKeyClicked)->activeState = 0;
-    lastKeyClicked = keyIn->keyNumber;
-    
+    // do stuff
 }
 
-void Keyboard::highlightKeyForMapping(int keyNumberIn, bool highlightOn)
+void Keyboard::highlightKey(int keyNumberIn, Colour colorIn, int blinkRateMs)
 {
-    Key* key = keys.getUnchecked(keyNumberIn);
-    
-    if (highlightOn)
-    {
-        key->setColour(4, getKeyColor(key).interpolatedWith(Colours::yellow, 0.618f));
-        key->activeState = 4;
-    }
-    else
-    {
-        key->activeState = 0;
-    }
+	// do stuff
+
 }
 
-void Keyboard::highlightKeysForMapping(Array<int> keysToHighlight, bool highlightOn)
+void Keyboard::highlightKeys(Array<int> keyNumsIn, Colour colorIn, int blinkRateMs)
 {
-    Key* key;
-    for (int i = 0; keysToHighlight.size(); i++)
-    {
-        key = keys.getUnchecked(keysToHighlight[i]);
-        
-        if (highlightOn)
-        {
-            key->setColour(4, getKeyColor(key).interpolatedWith(Colours::yellow, 0.618f));
-            key->activeState = 4;
-        }
-        else
-        {
-            key->activeState = 0;
-        }
-    }
+	// do stuff
 }
 
 //===============================================================================================
 
-Colour Keyboard::getKeyColor(Key* keyIn)
+Colour Keyboard::getKeyColor(int keyNumIn)
 {
 	Colour c;
-	
-	int offsetKeyNum = totalModulus(keyIn->keyNumber - modeViewed->getOffset(), 128);
+	Key& key = keys->getUnchecked(keyNumIn);
 
-	// If has its own color, or else if it has a degree color, or else the default order color
-	if (keyColorsSingle[offsetKeyNum].isOpaque())
-		c = keyColorsSingle[offsetKeyNum];
-	else if (keyColorsDegree[keyIn->scaleDegree].isOpaque())
-		c = keyColorsDegree[keyIn->scaleDegree];
+	if (key.color.isOpaque())
+		c = key.color;
+
+	else if (keyColorsDegrees)
+	{
+		if (keyColorsDegrees->getUnchecked(key.scaleDegree).isOpaque())
+			c = keyColorsDegrees->getUnchecked(key.scaleDegree);
+	}
+
+	else if (keyColorsOrders)
+	{
+		if (keyColorsOrders->getUnchecked(key.order).isOpaque())
+			c = keyColorsOrders->getUnchecked(key.order);
+	}
+
 	else
-		c = keyColorsOrder[keyIn->order % keyColorsOrder.size()];
-
-	return c;
+		c = colorsDefaultOrders[key.order];
 }
 
 Colour Keyboard::getKeyOrderColor(int orderIn)
 {
-	return keyColorsOrder[orderIn % keyColorsOrder.size()];
+	Colour c;
+
+	if (keyColorsOrders)
+	{
+		if (keyColorsOrders->getUnchecked(orderIn).isOpaque())
+			c = keyColorsOrders->getUnchecked(orderIn);
+	}
+	else
+		c = colorsDefaultOrders[orderIn];
+
+	return c;
 }
 
 Colour Keyboard::getKeyDegreeColor(int degIn)
 {
-	int deg = totalModulus(degIn, modeViewed->getScaleSize());
-	return keyColorsDegree[deg];
-}
+	Colour c;
 
-Colour Keyboard::getKeySingleColor(int keyIn)
-{
-	int keyNum = totalModulus(keyIn, keys.size());
-	return keyColorsSingle[keyNum];
-}
-
-void Keyboard::beginColorEditing(Key* keyIn, int colorIndex, Colour colorIn, bool useColor)
-{
-	keyIn->setColour(colorIndex, colorIn);
-	keyIn->customColor = useColor;
-	keyIn->repaint();
-
-	int keyNumOffset = totalModulus(keyIn->keyNumber - modeViewed->getOffset(), 128);
-	keyColorsSingle.set(keyNumOffset, colorIn);
-	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
-}
-
-void Keyboard::beginColorEditing(int keyNumIn, int colorIndex, Colour colorIn, bool useColor)
-{
-	beginColorEditing(keys.getUnchecked(keyNumIn), colorIndex, colorIn, useColor);
-}
-
-void Keyboard::setKeyColorOrder(int orderIn, int colorIndex, Colour colorIn)
-{
-	keyColorsOrder.set(orderIn % keyColorsOrder.size(), colorIn);
-	Array<Key*>* orderArray = &keysOrder.getReference(orderIn % keysOrder.size());
-
-	Key* key;
-	for (int i = 0; i < orderArray->size(); i++)
+	if (keyColorsDegrees)
 	{
-		key = orderArray->getUnchecked(i);
-		key->customColor = false; // reset key so that it changes no matter what
-		key->setColour(colorIndex, getKeyColor(key));
-		key->repaint();
+		if (keyColorsDegrees->getUnchecked(degIn).isOpaque())
+			c = keyColorsDegrees->getUnchecked(degIn);
 	}
+	else // this deg->order conversion is probably wrong
+		c = colorsDefaultOrders[mode->getOrder(degIn)];
 
-	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
+	return c;
 }
 
-void Keyboard::setKeyColorDegree(int tuningDegreeIn, int colorIndex, Colour colorIn)
+void Keyboard::setKeyColorOrder(int orderIn, Colour colorIn)
 {
-	Key* key = keys.getUnchecked(tuningDegreeIn);
-
-	int deg = key->scaleDegree;
-	keyColorsDegree.set(deg, colorIn);
-
-	// needed to display changes
-	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
-
-	for (int i = 0; i < orderArray->size(); i++)
+	if (keyColorsOrders)
 	{
-		key = orderArray->getUnchecked(i);
-
-		if (key->scaleDegree == deg && !key->customColor)
-		{
-			key->setColour(colorIndex, colorIn);
-			key->repaint();
-		}
-	}
-
-	pianoNode.setProperty(IDs::pianoHasCustomColor, true, nullptr);
-}
-
-void Keyboard::resetKeyOrderColors(int orderIn, bool resetDegrees)
-{
-	Key* key;
-	Array<Key*>* orderArray = &keysOrder.getReference(orderIn % keysOrder.size());
-	int degOffset;
-
-	for (int i = 0; i < orderArray->size(); i++)
-	{
-		key = orderArray->getUnchecked(i);
-		key->customColor = false;
-
-		degOffset = (key->keyNumber + modeViewed->getOffset()) % modeViewed->getScaleSize();
-		if (keyColorsDegree[degOffset % modeViewed->getScaleSize()].isOpaque())
-		{
-			keyColorsDegree.set(degOffset % modeViewed->getScaleSize(), Colours::transparentBlack);
-		}
-
-		key->setColour(3, getKeyOrderColor(key->order));
+		keyColorsOrders->set(orderIn, colorIn);
 	}
 }
 
-void Keyboard::resetKeyDegreeColors(int tuningDegreeIn)
+void Keyboard::setKeyColorDegree(int tuningDegreeIn, Colour colorIn)
 {
-	keyColorsDegree.set(tuningDegreeIn, Colours::transparentBlack);
-
-	// needed to display changes
-	Key* key = keys.getUnchecked(tuningDegreeIn);
-	Array<Key*>* orderArray = &keysOrder.getReference(key->order);
-
-	for (int i = 0; i < orderArray->size(); i++)
+	if (keyColorsDegrees)
 	{
-		key = orderArray->getUnchecked(i);
-
-		if (key->scaleDegree == tuningDegreeIn)
-		{
-			key->setColour(3, getKeyOrderColor(key->order));
-		}
+		keyColorsDegrees->set(tuningDegreeIn, colorIn);
 	}
+}
 
+void Keyboard::resetKeyColorsInOrder(int orderIn)
+{
+	if (keyColorsOrders)
+	{
+		keyColorsOrders->clear();
+		keyColorsOrders->resize(mode->getMaxStep());
+	}
+}
+
+void Keyboard::resetDegreeColors(int tuningDegreeIn)
+{
+	if (keyColorsDegrees)
+	{
+		keyColorsDegrees->clear();
+		keyColorsDegrees->resize(mode->getScaleSize());
+	}
 }
 
 void Keyboard::resetKeyColor(int keyNumberIn)
 {
-	Key* key = keys.getUnchecked(totalModulus(keyNumberIn, keys.size()));
-	key->customColor = false;
-
-	int keyNumOffset = totalModulus(key->keyNumber - modeViewed->getOffset(), 128);
-
-	keyColorsSingle.set(keyNumOffset, Colours::transparentBlack);
-	key->setColour(3, getKeyOrderColor(key->order));
+	Key& key = keys->getUnchecked(keyNumberIn);
+	key.color = Colours::transparentBlack;
 }
 
 
-void Keyboard::resetKeyColors(bool resetDegrees)
+void Keyboard::resetKeyColors()
 {
-	Key* key;
 
-	for (int i = 0; i < keys.size(); i++)
+	for (int i = 0; i < keys->size(); i++)
 	{
-		key = keys.getUnchecked(i);
-		key->customColor = false;
-		keyColorsSingle.set(totalModulus(key->keyNumber - modeOffset, keys.size()), Colours::transparentBlack);
-	}
-
-	if (resetDegrees)
-	{
-		keyColorsDegree.clear();
-		pianoNode.setProperty(IDs::pianoHasCustomColor, false, nullptr);
+		resetKeyColor(i);
 	}
 }
-
 
 //===============================================================================================
 
-
-void Keyboard::allNoteOff()
+void Keyboard::setKeySizeRatio(float keySizeRatioIn)
 {
-    Key* key;
-    
-    for (int i = 0; i < keys.size(); i++)
-    {
-        key = keys.getUnchecked(i);
-        triggerKeyNoteOff(key);
-    }
-    repaint();
+	keySizeRatio = keySizeRatioIn;
+	pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
 }
+
+void Keyboard::setKeyWidthSize(int widthSizeIn)
+{
+	// do stuff
+}
+
+void setKeyOrderSizeScalar(float scalarIn)
+{
+	// do stuff
+}
+
+//===============================================================================================
 
 void Keyboard::isolateLastNote()
 {
     if (lastKeyClicked >= 0 && lastKeyClicked < 128)
     {
-        Key* last = keys.getUnchecked(lastKeyClicked);
-        Key* key;
-        
-        for (int i = 0; i < keys.size(); i++)
-        {
-            key = keys.getUnchecked(i);
-            
-            if (key == last)
-                continue;
-            
-            triggerKeyNoteOff(key);
-        }
-        repaint();
+		for (int i = 0; i < keys->size(); i++)
+		{
+			if (i != lastKeyClicked)
+				noteOff(midiChannelOut, i, 0);
+		}
     }
 }
 
-
-bool Keyboard::getOrderOfNotesOn(int& orderDetected)
+void Keyboard::retriggerNotes()
 {
-    orderDetected = keysOn.getUnchecked(0)->order;
+	Array<int> retrigger = Array<int>(keysOn);
+
+	allNotesOff(midiChannelOut);
+
+	for (int i = 0; i < retrigger.size(); i++)
+		noteOn(midiChannelOut, retrigger[i], 0.6f);
+}
+
+void Keyboard::triggerNotes(Array<int> keyNumbers, bool doNoteOn, float velocity)
+{
+	for (int i = 0; i < keyNumbers.size(); i++)
+	{
+		if (doNoteOn)
+		{
+			noteOn(midiChannelOut, keyNumbers[i], velocity);
+		}
+		else
+		{
+			noteOff(midiChannelOut, keyNumbers[i], 0);
+		}
+	}
+}
+
+int Keyboard::getOrderOfNotesOn()
+{
+	float orderSum = 0;
+	int orderDetected;
     
-    for (int i = 1; i < keysOn.size(); i++)
+    for (int i = 0; i < keysOn.size(); i++)
     {
-        if (keysOn.getUnchecked(i)->order != orderDetected)
-            return false;
+		Key& key = keys->getUnchecked(keysOn[i]);
+		orderSum += (key.order + 1);
     }
-    
-    return true;
+
+	orderDetected = orderSum / keysOn.size();
+
+	if (orderDetected == (int)orderDetected)
+		orderDetected -= 1;
+	else
+		orderDetected = -1;
+
+    return orderDetected;
 }
 
-Key* Keyboard::transposeKeyModally(Key* key, int stepsIn)
+int Keyboard::transposeKeyModally(int keyNumIn, int stepsIn)
 {
-    Key* keyOut = nullptr;
+	Key& key = keys->getUnchecked(keyNumIn);
+	Array<int> orderArray = keysOrder[key.order];
     int newKey = -1;
-    int theOrder = key->order;
-	Array<Key*>* orderArray = &keysOrder.getReference(theOrder);
     
-    for (int i = 0; i < orderArray->size(); i++)
-    {
-		if (key->modeDegree == orderArray->getUnchecked(i)->modeDegree)
+    for (int i = 0; i < orderArray.size(); i++)
+	{
+		if (key.keyNumber == orderArray.getUnchecked(i))
         {
             newKey = i;
             break;
@@ -731,113 +655,109 @@ Key* Keyboard::transposeKeyModally(Key* key, int stepsIn)
     
     newKey += stepsIn;
     
-    if (newKey >= 0 && newKey < orderArray->size())
-        keyOut = orderArray->getUnchecked(newKey);
-    
-    return keyOut;
+	if (newKey >= 0 && newKey < orderArray.size())
+		return orderArray[newKey];
+	else
+		return -1;
 }
 
-Key* Keyboard::transposeKeyChromatically(Key* key, int stepsIn)
+int Keyboard::transposeKeyChromatically(int keyNumIn, int stepsIn)
 {
-    Key* keyOut = nullptr;
-    int newKey;
+    int newKey = keyNumIn + stepsIn;
     
-    newKey = key->keyNumber + stepsIn;
-    
-    if (newKey >= 0 && newKey <= 127)
-    {
-        keyOut = keys.getUnchecked(newKey);
-    }
-    
-    return keyOut;
+	if (newKey >= 0 && newKey <= keys->size())
+		return newKey;
+	else
+		return -1;
 }
 
-
-bool Keyboard::transposeKeysOnModally(int modalStepsIn)
+void Keyboard::transposeKeysOnModally(int modalStepsIn, bool needsSameOrder, bool useLastClickedRoot)
 {
-    int theOrder;
-    if (getOrderOfNotesOn(theOrder))
-    {
-        Array<Key*> oldKeys = Array<Key*>(keysOn);
-        Array<Key*> newKeys;
-		Array<Key*>* orderSelected = &keysOrder.getReference(theOrder);
+	int keyRoot;
+	int rootOrder;
 
-        Key* key;
-        Key* newKey;
-        int newDeg = -1;
-        float velocity;
-        
-        for (int i = 0; i < oldKeys.size(); i++)
-        {
-            key = oldKeys.getUnchecked(i);
-            velocity = key->velocity;
+	int newKey;
+	Array<int> oldKeys = Array<int>(keysOn);
+	Array<int> newKeys;
 
-			newDeg = orderSelected->indexOf(key) + modalStepsIn;
-            
-            if (newDeg < 0 || newDeg >= orderSelected->size())
-                continue;
-            
-            newKey = orderSelected->getUnchecked(newDeg);
-            newKey->velocity = velocity;
-            
-            if (lastKeyClicked == key->keyNumber)
-                lastKeyClicked = newKey->keyNumber;
-            
-            newKeys.add(newKey);
-        }
-        
+	if (needsSameOrder)
+	{
+		rootOrder = keys->getUnchecked(keysOn[0]).order;
+
+		if (rootOrder != getOrderOfNotesOn())
+			return;
+
 		for (int i = 0; i < oldKeys.size(); i++)
-			triggerKeyNoteOff(oldKeys.getReference(i));
-        
-        for (int i = 0; i < newKeys.size(); i++)
-            triggerKeyNoteOn(newKeys.getReference(i), newKeys.getReference(i)->velocity);
-        
-        return true;
-    }
-    return false;
+		{
+			newKey = transposeKeyModally(oldKeys[i], modalStepsIn);
+
+			if (newKey > -1)
+				newKeys.add(newKey);
+		}
+	}
+
+	else
+	{
+		int stepsToUse; // TODO: implement this so that the chord quality is retained
+
+		if (useLastClickedRoot)
+		{
+			keyRoot = lastKeyClicked;
+		}
+		else // find lowest key
+		{
+			keyRoot = keys->size();
+
+			for (int i = 0; i < keysOn.size(); i++)
+			{
+				if (keysOn[i] < keyRoot)
+					keyRoot = keysOn[i];
+			}
+		}
+
+		rootOrder = keys->getUnchecked(keyRoot).order;
+
+		for (int i = 0; i < oldKeys.size(); i++)
+		{
+			newKey = transposeKeyModally(oldKeys[i], modalStepsIn);
+
+			if (newKey > -1)
+				newKeys.add(newKey);
+		}
+	}
+
+	// TODO: implement velocities further
+	lastKeyClicked = transposeKeyModally(lastKeyClicked, modalStepsIn);
+	triggerNotes(oldKeys, false, 0);
+	triggerNotes(newKeys);
 }
 
 void Keyboard::transposeKeysOnChromatically(int stepsIn)
 {
-    Array<Key*> oldKeys = Array<Key*>(keysOn);
-	Array<Key*> newKeys;
-    Key* key;
-    Key* newKey;
+    Array<int> oldKeys = Array<int>(keysOn);
+	Array<int> newKeys;
+    int keyNum;
+    int newKey;
+
     int newKeyInd;
     float velocity;
     
     for (int i = 0; i < oldKeys.size(); i++)
     {
-        key = oldKeys.getUnchecked(i);
-        velocity = key->velocity;
-        newKeyInd = key->keyNumber + stepsIn;
+		keyNum = oldKeys.getUnchecked(i);
+
+		Key& key = keys->getUnchecked(keyNum);
+        velocity = key.velocity;
+
+		newKeyInd = transposeKeyChromatically(keyNum, stepsIn);
         
-        if (newKeyInd < 0 || newKeyInd > 127)
-            continue;
-        
-        if (lastKeyClicked == key->keyNumber)
-            lastKeyClicked = newKeyInd;
-        
-        newKey = keys.getUnchecked(newKeyInd);
-        newKey->velocity = velocity;
-        newKeys.add(newKey);
+		if (newKeyInd > -1)
+			newKeys.add(newKey);
     }
     
-    for (int i = 0; i < oldKeys.size(); i++)
-        triggerKeyNoteOff(oldKeys.getReference(i));
-    
-    for (int i = 0; i < newKeys.size(); i++)
-        triggerKeyNoteOn(newKeys.getReference(i), newKeys.getReference(i)->velocity);
-}
-
-void Keyboard::retriggerNotes()
-{
-	Array<Key*> retrigger = Array <Key*>(keysOn);
-    
-    allNoteOff();
-    
-    for (int i = 0; i < retrigger.size(); i++)
-        triggerKeyNoteOn(retrigger.getReference(i), retrigger.getUnchecked(i)->velocity);
+	// TODO: implement velocities further
+	triggerNotes(oldKeys, false);
+	triggerNotes(newKeys, true);
 }
 
 //===============================================================================================
@@ -862,6 +782,7 @@ void Keyboard::resized()
 		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 		// Resize keys
+		/*
 		Key* key;
 		int w, h;
 		for (int i = 0; i < keys.size(); i++)
@@ -875,6 +796,7 @@ void Keyboard::resized()
 		}
 
 		setSize(keys.getLast()->getPosition().x + keyWidth, keyHeight);
+		*/
     }
 }
 
@@ -885,7 +807,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
 {
 	if (uiModeSelected == UIMode::playMode)
 	{
-		Key* key = getKeyFromPosition(e);
+		Key* key = getKeyFromPosition(e.getPosition());
 
 		if (key)
 		{
@@ -968,8 +890,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
 		{
 			if (shiftHeld && keysOn.size() > 0)
 			{
-				if (transposeKeysOnModally(-1))
-					repaint();
+				transposeKeysOnModally(-1);
 			}
 		}
         return true;
@@ -982,8 +903,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
 		{
 			if (shiftHeld && keysOn.size() > 0)
 			{
-				if (transposeKeysOnModally(1))
-					repaint();
+				transposeKeysOnModally(1);
 			}
 		}
         return true;
@@ -1030,10 +950,11 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 		{
 			isolateLastNote();
 
-			Key* key = keys.getUnchecked(lastKeyClicked);
-
+			Key& key = keys->getUnchecked(lastKeyClicked);
+			/*
 			if (!(key->isMouseOver() && key->isMouseButtonDownAnywhere()))
 				triggerKeyNoteOff(keys.getUnchecked(lastKeyClicked));
+				*/
 
 			repaint();
 		}
@@ -1067,38 +988,14 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 
 //===============================================================================================
 
-void Keyboard::triggerKeyNoteOn(Key* key, float velocityIn)
-{
-    if (velocityIn > 0)
-    {
-        noteOn(midiChannelOut, key->keyNumber, velocityIn);
-		key->activeState = 2;
-		key->velocity = velocityIn;
-        keysOn.add(key);
-    }
-}
-
-void Keyboard::triggerKeyNoteOff(Key* key)
-{
-    noteOff(midiChannelOut, key->keyNumber, 0);
-
-	if (key->isMouseOver())
-		key->activeState = 1;
-	else
-		key->activeState = 0;
-
-	keysOn.removeAllInstancesOf(key);
-}
-
 void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    Key* key;
     int keyTriggered = midiNote;
 
     if (uiModeSelected == playMode)
     {
-        key = keys.getUnchecked(keyTriggered);
-        key->externalMidiState = midiChannel;
+        Key& key = keys->getUnchecked(keyTriggered);
+		// TODO : show keys lit up
     }
 }
 
@@ -1109,7 +1006,7 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
 
     if (uiModeSelected == playMode)
     {
-        key = keys.getUnchecked(keyTriggered);
-        key->externalMidiState = 0;
+        Key& key = keys->getUnchecked(keyTriggered);
+		// TODO : show keys lit up
     }
 }

@@ -17,9 +17,9 @@ Mode::Mode()
 	family = "undefined";
 	rootNote = 60;
 
-	steps = parse_steps(stepsString);
-	ordersDefault = steps_to_orders(steps);
-	mosClass = interval_sizes(steps);
+	steps = parseIntStringToArray(stepsString);
+	ordersDefault = unfoldStepsToOrders(steps);
+	mosClass = intervalAmounts(steps);
     scaleSize = 1;
     modeSize = 1;
 	name = getDescription();
@@ -35,9 +35,9 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String nameIn, Strin
 	rootNote = rootNoteIn;
     info = infoIn;
 
-	steps = parse_steps(stepsIn);
-	ordersDefault = steps_to_orders(steps);
-	mosClass = interval_sizes(steps);
+	steps = parseIntStringToArray(stepsIn);
+	ordersDefault = unfoldStepsToOrders(steps);
+	mosClass = intervalAmounts(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	offset = getOffset() * -1;
@@ -53,14 +53,14 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String nameIn, Strin
 
 Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
-	stepsString = steps_to_string(stepsIn);
+	stepsString = intArrayToString(stepsIn);
 	family = familyIn;
 	rootNote = rootNoteIn;
     info = infoIn;
 
 	steps = stepsIn;
-	ordersDefault = steps_to_orders(steps);
-	mosClass = interval_sizes(steps);
+	ordersDefault = unfoldStepsToOrders(steps);
+	mosClass = intervalAmounts(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	offset = getOffset() * -1;
@@ -85,9 +85,9 @@ Mode::Mode(ValueTree modeNodeIn, bool copyNode)
 			modeNode = modeNodeIn;
 
         stepsString = modeNode[IDs::stepString];
-        steps = parse_steps(stepsString);
-        mosClass = interval_sizes(steps);
-        ordersDefault = steps_to_orders(steps);
+        steps = parseIntStringToArray(stepsString);
+        mosClass = intervalAmounts(steps);
+        ordersDefault = unfoldStepsToOrders(steps);
         
         scaleSize = modeNode[IDs::scaleSize];
         if (scaleSize == 0)
@@ -141,9 +141,9 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 		modeNode = nodeIn;
         
         stepsString = modeNode[IDs::stepString];
-        steps = parse_steps(stepsString);
-        mosClass = interval_sizes(steps);
-        ordersDefault = steps_to_orders(steps);
+        steps = parseIntStringToArray(stepsString);
+        mosClass = intervalAmounts(steps);
+        ordersDefault = unfoldStepsToOrders(steps);
         
         scaleSize = modeNode[IDs::scaleSize];
         if (scaleSize == 0)
@@ -177,7 +177,7 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 bool Mode::isValidMode(ValueTree nodeIn)
 {
 	String steps = nodeIn.getProperty(IDs::stepString).toString();
-	Array<int> stepsArray = Mode::parse_steps(steps);
+	Array<int> stepsArray = Mode::parseIntStringToArray(steps);
 
 	int length = stepsArray.size();
 	int numDegrees = sumUpToIndex(stepsArray, length);
@@ -189,9 +189,9 @@ bool Mode::isValidMode(ValueTree nodeIn)
 ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
-	Array<int> steps = parse_steps(stepsIn);
-	Array<int> orders = steps_to_orders(steps);
-	Array<int> mosClass = interval_sizes(steps);
+	Array<int> steps = parseIntStringToArray(stepsIn);
+	Array<int> orders = unfoldStepsToOrders(steps);
+	Array<int> mosClass = intervalAmounts(steps);
 
 	if (rootNoteIn < 0 || rootNoteIn > 127)
 		rootNoteIn = 60;
@@ -218,9 +218,9 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, Strin
 ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
 	ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
-	Array<int> orders = steps_to_orders(stepsIn);
-	Array<int> mosClass = interval_sizes(stepsIn);
-	String stepsStr = steps_to_string(stepsIn);
+	Array<int> orders = unfoldStepsToOrders(stepsIn);
+	Array<int> mosClass = intervalAmounts(stepsIn);
+	String stepsStr = intArrayToString(stepsIn);
 
 	if (rootNoteIn < 0 || rootNoteIn > 127)
 		rootNoteIn = 60;
@@ -247,11 +247,11 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, S
 void Mode::updateProperties()
 {
     offset = -getOffset();
-    orders = expand_orders(ordersDefault, offset);
-    modeDegrees = orders_to_modeDegrees(orders);
-    scaleDegrees = scale_degrees(scaleSize, offset);
-    keyboardOrdersSizes = interval_sizes(orders);
-    updateStepsOfOrders();
+    orders = repeatArray(ordersDefault, offset);
+    modeDegrees = ordersToModalDegrees(orders);
+    scaleDegrees = generateScaleDegrees(scaleSize, offset);
+    keyboardOrdersSizes = intervalAmounts(orders);
+	stepsOfOrders = repeatIndicies(foldOrdersToSteps(orders));
 }
 
 void Mode::setFamily(String familyIn)
@@ -291,7 +291,7 @@ void Mode::rotate(int rotateAmt)
     for (int i = 0; i < amt; i++)
         steps.move(0, steps.size());
     
-    stepsString = steps_to_string(steps);
+    stepsString = intArrayToString(steps);
     
     updateProperties();
 }
@@ -331,12 +331,17 @@ int Mode::getModeSize() const
 
 Array<int> Mode::getIntervalSizeCount() const
 {
-    return interval_sizes(steps);
+    return intervalAmounts(steps);
 }
 
 Array<int> Mode::getStepsOfOrders()  const
 {
 	return stepsOfOrders;
+}
+
+int Mode::getNoteStep(int noteNumberIn) const
+{
+	return stepsOfOrders[noteNumberIn];
 }
 
 String Mode::getFamily() const
@@ -383,7 +388,7 @@ String Mode::getStepsString(int rotationIn)  const
 	{
 		// lol feelin lazy about this boring function
 		Array<int> stepsRotated = getSteps(rotationIn);
-		return steps_to_string(stepsRotated);
+		return intArrayToString(stepsRotated);
 	}
 }
 
@@ -408,6 +413,11 @@ Array<int> Mode::getOrders() const
 	return orders;
 }
 
+int Mode::getOrder(int noteNumberIn) const
+{
+	return orders[noteNumberIn];
+}
+
 Array<float> Mode::getModalDegrees() const
 {
 	return modeDegrees;
@@ -420,7 +430,7 @@ Array<int> Mode::getScaleDegrees() const
 
 int Mode::getScaleDegree(int midiNoteIn) const
 {
-	return totalModulus(midiNoteIn - rootNote, scaleSize);
+	return scaleDegrees[midiNoteIn];
 }
 
 float Mode::getModeDegree(int midiNoteIn) const
@@ -489,11 +499,6 @@ String Mode::getModeDescription()  const
 	return String(modeSize) + " " + family + " " + String(scaleSize);
 }
 
-void Mode::updateStepsOfOrders()
-{
-	stepsOfOrders = expand_steps(orders_to_steps(orders));
-}
-
 int Mode::indexOfTag(String tagNameIn)
 {
     return tags.indexOf(tagNameIn);
@@ -517,7 +522,26 @@ int Mode::isSimilarTo(Mode* modeToCompare) const
     return (rotations % (mode1Steps.size() + 1)) - 1;
 }
 
-Array<int> Mode::parse_steps(String stepsIn)
+Array<Array<int>> Mode::getNotesOrders()
+{
+	Array<Array<int>> notesOut;
+	notesOut.resize(getMaxStep());
+}
+
+Array<Array<int>> Mode::getNotesInScaleDegrees()
+{
+	Array<Array<int>> notesOut;
+	notesOut.resize(getScaleSize());
+}
+
+Array<Array<int>> Mode::getNotesInModalDegrees()
+{
+	Array<Array<int>> notesOut;
+	notesOut.resize(getModeSize());
+}
+
+
+Array<int> Mode::parseIntStringToArray(String stepsIn)
 {
 	Array<int> stepsOut;
 
@@ -554,21 +578,24 @@ Array<int> Mode::parse_steps(String stepsIn)
 	return stepsOut;
 }
 
-Array<int> Mode::expand_steps(Array<int> stepsIn)
+Array<int> Mode::repeatIndicies(Array<int> arrayToRepeat, Array<int> repeatMask)
 {
     Array<int> stepsOut;
+
+	if (repeatMask.size() == 0)
+		repeatMask = arrayToRepeat;
     
-    for (int i = 0; i < stepsIn.size(); i++)
+    for (int i = 0; i < arrayToRepeat.size(); i++)
     {
-        for (int s = 0; s < stepsIn[i]; s++)
-            stepsOut.add(stepsIn[i]);
+        for (int s = 0; s < repeatMask[i % repeatMask.size()]; s++)
+            stepsOut.add(arrayToRepeat[i]);
     }
     
     stepsOut.minimiseStorageOverheads();
     return stepsOut;
 }
 
-String Mode::steps_to_string(Array<int> stepsIn)
+String Mode::intArrayToString(Array<int> stepsIn)
 {
 	String out;
 
@@ -583,7 +610,7 @@ String Mode::steps_to_string(Array<int> stepsIn)
 	return out;
 }
 
-Array<int> Mode::steps_to_orders(Array<int> stepsIn)
+Array<int> Mode::unfoldStepsToOrders(Array<int> stepsIn)
 {
 	Array<int> ordersOut;
 
@@ -597,7 +624,8 @@ Array<int> Mode::steps_to_orders(Array<int> stepsIn)
 	return ordersOut;
 }
 
-Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
+// needs revision to allow for notes to start in the middle of a step
+Array<int> Mode::repeatArray(Array<int> ordersIn, int sizeIn, int offsetIn)
 {
 	Array<int> ordersOut;
 	int period = ordersIn.size();
@@ -605,10 +633,9 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 
 	int index;
 
-	for (int i = 0; i < 128; i++)
+	for (int i = 0; i < sizeIn; i++)
 	{
 		index = (off + i) % period;
-
 
 		// adjust first few notes if it starts in the middle of a whole step
 		if (i == 0 && ordersIn[index] != 0)
@@ -632,7 +659,7 @@ Array<int> Mode::expand_orders(Array<int> ordersIn, int offsetIn)
 	return ordersOut;
 }
 
-Array<int> Mode::orders_to_steps(Array<int> layoutIn)
+Array<int> Mode::foldOrdersToSteps(Array<int> layoutIn)
 {
 	Array<int> stepsOut;
 
@@ -660,7 +687,7 @@ Array<int> Mode::orders_to_steps(Array<int> layoutIn)
 	return stepsOut;
 }
 
-Array<float> Mode::orders_to_modeDegrees(Array<int> ordersIn)
+Array<float> Mode::ordersToModalDegrees(Array<int> ordersIn)
 {
 	Array<float> degreesOut;
 	float deg = -1;
@@ -688,15 +715,13 @@ Array<float> Mode::orders_to_modeDegrees(Array<int> ordersIn)
 	return degreesOut;
 }
 
-Array<int> Mode::scale_degrees(int scaleSize, int offset)
+Array<int> Mode::generateScaleDegrees(int scaleSize, int offset)
 {
 	Array<int> degreesOut;
 
-	auto mod = [](int a, int n) {return ((a % n) + n) % n; };
-
 	for (int i = 0; i < scaleSize; i++)
 	{
-		degreesOut.add(mod(i - offset, scaleSize));
+		degreesOut.add(totalModulus(i - offset, scaleSize));
 	}
 
 	degreesOut.minimiseStorageOverheads();
@@ -704,7 +729,7 @@ Array<int> Mode::scale_degrees(int scaleSize, int offset)
 }
 
 
-Array<int> Mode::interval_sizes(Array<int> stepsIn)
+Array<int> Mode::intervalAmounts(Array<int> stepsIn)
 {
 	Array<int> intervals;
 	Array<int> intervalsOut;
@@ -733,7 +758,7 @@ Array<int> Mode::interval_sizes(Array<int> stepsIn)
 	return intervalsOut;
 }
 
-Array<int> Mode::sum_of_steps(Array<int> stepsIn, int offsetIn, bool includePeriod)
+Array<int> Mode::sumArray(Array<int> stepsIn, int offsetIn, bool includePeriod)
 {
 	Array<int> sumsOut;
 	int sum = -offsetIn;
