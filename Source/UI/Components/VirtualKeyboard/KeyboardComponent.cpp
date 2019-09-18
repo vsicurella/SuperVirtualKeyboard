@@ -804,11 +804,15 @@ void Keyboard::paint(Graphics& g)
         
         for (int k = 0; k < orderArray.size(); k++)
         {
+            Key& key = keys->getReference(orderArray[k]);
             // check if key is pressed or moused over, or midi input
                 // set appropriate color
+            g.setColour(getKeyColor(key.keyNumber));
                 // check highlight style
             
-            // check if note numbers or pitch names shown
+            g.fillRect(key.area);
+
+            // check if note numbers or pitch names shown            
         }
     }
 }
@@ -826,21 +830,19 @@ void Keyboard::resized()
 		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
 
 		// Resize keys
-		/*
-		Key* key;
+		
 		int w, h;
-		for (int i = 0; i < keys.size(); i++)
+		for (int i = 0; i < keys->size(); i++)
 		{
-			key = keys.getUnchecked(i);
-			w = keyWidth * key->degreeWidthRatio;
-			h = keyHeight * key->degreeHeightRatio;
-			key->setSize(w, h);
-
+			Key& key = keys->getReference(i);
+			w = keyWidth * key.widthMod;
+			h = keyHeight * key.heightMod;
+            
+            grid->resizeKey(key);
 			grid->placeKey(key);
 		}
 
-		setSize(keys.getLast()->getPosition().x + keyWidth, keyHeight);
-		*/
+		setSize(keys->getLast().area.getX() + keyWidth, keyHeight);
     }
 }
 

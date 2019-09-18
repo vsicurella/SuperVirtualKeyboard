@@ -17,26 +17,26 @@ KeyboardGrid::KeyboardGrid(Mode* modeIn)
 {
 }
 
-void KeyboardGrid::resizeKey(Key* key)
+void KeyboardGrid::resizeKey(Key& key)
 {
-	/*
-    key->degreeHeightRatio = orderedKeyRatios[key->keyNumber % mode->getScaleSize()];
-    key->degreeWidthRatio = 1.0f - (key->order > 0) * 1.25f * key->order / 8.0f;
-	*/
+	
+    key.area.setHeight(orderedKeyRatios[key.keyNumber % mode->getScaleSize()]);
+    key.area.setWidth(1.0f - (key.order > 0) * 1.25f * key.order / 8.0f);
+	
 }
 
-void KeyboardGrid::placeKey(Key* key)
+void KeyboardGrid::placeKey(Key& key)
 {
-	/*
+	
     Point<int> pt;
     
-    float colToPlace = ceil(key->modeDegree);
-    int offset = (key->order > 0) * (int)(getColumnSize() / 2.0);
+    float colToPlace = ceil(key.modeDegree);
+    int offset = (key.order > 0) * (int)(getColumnSize() / 2.0);
     
     offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
     
     pt = Point<int>((int)((colToPlace + 1) * (getColumnSize() + getColumnGap()) - offset), 0 + getRowGap());
     
-    key->setTopRightPosition(pt.x, pt.y);
-	*/
+    key.area.setPosition(pt);
+	
 }

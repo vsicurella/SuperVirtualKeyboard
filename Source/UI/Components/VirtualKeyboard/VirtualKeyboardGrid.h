@@ -26,7 +26,7 @@ namespace VirtualKeyboard
         KeyboardGrid(Mode* modeIn);
         ~KeyboardGrid() {};
                 
-        void resizeKey(Key* key);
-        void placeKey(Key* key);
+        void resizeKey(Key& key);
+        void placeKey(Key& key);
     };
 }
