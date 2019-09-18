@@ -84,9 +84,8 @@ namespace VirtualKeyboard
         //===============================================================================================
         
         Keyboard(MidiKeyboardState& keyboardStateIn);
-		Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn, Array<Key>* keysIn, 
-			Array<Colour>* keyColorsOrdersIn=nullptr, Array<Colour>* keyColorsDegreesIn=nullptr,
-			Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
+		Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
+            Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
 		~Keyboard() {};
         
         //===============================================================================================
@@ -293,7 +292,11 @@ namespace VirtualKeyboard
 		// might want to restructure these so this is not necessary
 		void setKeyProportions(Key* keyIn);
 		void setLastKeyClicked(int keyNumIn);
-
+  
+        /*
+            Set the Input NoteMap being used.
+        */
+        void setInputNoteMap(NoteMap* noteMapIn);
         
         //===============================================================================================
 
@@ -383,7 +386,12 @@ namespace VirtualKeyboard
 
 		//===============================================================================================
         
-		/*
+        /*
+            Turns all notes off with the selected midi channel
+		*/
+        void allNotesOff();
+        
+        /*
 			Turns all notes off except for the last one clicked.
 		*/
         void isolateLastNote();
@@ -468,7 +476,7 @@ namespace VirtualKeyboard
 
         const MidiKeyboardState& keyboardInputState;
 		const MidiKeyboardState* keyboardInputFilteredState;
-		NoteMap* inputFilterMap;
+		NoteMap* inputNoteMap;
         
 		MidiBuffer buffer;
 		Array<Key*> keysPause;
@@ -495,14 +503,12 @@ namespace VirtualKeyboard
                 
         // Data
         ValueTree pianoNode;
-        Array<Key>* keys;
-		Mode* mode;
-
-		Array<Colour>* keyColorsOrders;
-		Array<Colour>* keyColorsDegrees;
-
+        std::unique_ptr<Array<Key>> keys;
+		std::unique_ptr<Array<Colour>> keyColorsOrders;
+		std::unique_ptr<Array<Colour>> keyColorsDegrees;
+        
+        Mode* mode;
 		Mode modeDefault;
-		Array<Key> keysDefault; // if key data is not supplied
 
 		Array<Colour> colorsDefaultOrders = {
 			Colours::white,

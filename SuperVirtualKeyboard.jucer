@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
-              jucerVersion="5.4.3" companyName="Everytone" companyEmail="sicurella12@gmail.com"
+              jucerVersion="5.4.4" companyName="Everytone" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginIsSynth,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Analyzer" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
               pluginAUMainType="'aumi'">

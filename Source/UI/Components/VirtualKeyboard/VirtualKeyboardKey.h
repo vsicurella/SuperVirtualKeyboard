@@ -23,7 +23,8 @@ namespace VirtualKeyboard
 		Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
 			String pitchNameIn = "", int widthModIn = 0, int heightModIn = 0, int xOff = 0, int yOff = 0,
 			bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack);
-
+        Key(ValueTree keyNodeIn);
+        
 		void applyParameters(ValueTree nodeIn);
 
 		ValueTree node;
@@ -36,6 +37,7 @@ namespace VirtualKeyboard
 		int step = 0; // the interval step that this note is a part of
 
 		float velocity = 0; // recorded when key is clicked
+        Rectangle<int> area; // calculated by the Keyboard Grid
 
 		// Parameters
 		String pitchName = "";
