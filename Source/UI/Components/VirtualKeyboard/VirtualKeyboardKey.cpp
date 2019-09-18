@@ -38,6 +38,12 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 	color = colorIn;
 }
 
+Key::Key(ValueTree keyNodeIn)
+    : Key()
+{
+    applyParameters(keyNodeIn);
+}
+
 void Key::applyParameters(ValueTree nodeIn)
 {
 	Identifier id;
@@ -61,6 +67,6 @@ void Key::applyParameters(ValueTree nodeIn)
 		else if (id == IDs::pianoKeyShowName)
 			showNoteName = nodeIn.getProperty(id);
 		else if (id == IDs::pianoKeyColor)
-			color = Colour::fromString((String)nodeIn.getProperty(id));
+			color = Colour::fromString(nodeIn.getProperty(id).toString());
 	}
 }

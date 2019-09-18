@@ -247,7 +247,7 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, S
 void Mode::updateProperties()
 {
     offset = -getOffset();
-    orders = repeatArray(ordersDefault, offset);
+    orders = repeatArray(ordersDefault, 128, offset);
     modeDegrees = ordersToModalDegrees(orders);
     scaleDegrees = generateScaleDegrees(scaleSize, offset);
     keyboardOrdersSizes = intervalAmounts(orders);
@@ -526,18 +526,24 @@ Array<Array<int>> Mode::getNotesOrders()
 {
 	Array<Array<int>> notesOut;
 	notesOut.resize(getMaxStep());
+    
+    return notesOut;
 }
 
 Array<Array<int>> Mode::getNotesInScaleDegrees()
 {
 	Array<Array<int>> notesOut;
 	notesOut.resize(getScaleSize());
+    
+    return notesOut;
 }
 
 Array<Array<int>> Mode::getNotesInModalDegrees()
 {
 	Array<Array<int>> notesOut;
 	notesOut.resize(getModeSize());
+    
+    return notesOut;
 }
 
 
