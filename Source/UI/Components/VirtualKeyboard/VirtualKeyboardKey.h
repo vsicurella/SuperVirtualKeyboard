@@ -38,6 +38,7 @@ namespace VirtualKeyboard
 
 		float velocity = 0; // recorded when key is clicked
         Rectangle<int> area; // calculated by the Keyboard Grid
+        
 
 		// Parameters
 		String pitchName = "";
