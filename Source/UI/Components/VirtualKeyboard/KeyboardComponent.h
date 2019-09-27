@@ -114,7 +114,11 @@ namespace VirtualKeyboard
 		void setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn);
         
         //===============================================================================================
-        
+
+		/*
+			Returns a pointer to the viewport
+		*/
+		Viewport* getViewport();
 		/*
 			Returns a struct with the given key's data.
 		*/
@@ -192,6 +196,7 @@ namespace VirtualKeyboard
         
 		//===============================================================================================
 
+
 		/*
 			Returns the UI mode of which the keyboard is in.
 		*/
@@ -229,6 +234,10 @@ namespace VirtualKeyboard
 
 		//===============================================================================================
         
+		/*
+			Sets the viewport used
+		*/
+		void setViewport(Viewport* viewportIn);
 		/*
 			Sets the keyboards UI mode.
 		*/
@@ -472,7 +481,7 @@ namespace VirtualKeyboard
 		// Functionality
 		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
-		std::unique_ptr<Viewport> viewport;
+		Viewport* viewport;
 
         const MidiKeyboardState& keyboardInputState;
 		const MidiKeyboardState* keyboardInputFilteredState;

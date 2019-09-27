@@ -20,7 +20,7 @@ KeyboardGrid::KeyboardGrid(Mode* modeIn)
 void KeyboardGrid::resizeKey(Key& key)
 {
 	
-    key.area.setHeight(orderedKeyRatios[key.keyNumber % mode->getScaleSize()]);
+    key.area.setHeight(1);
     key.area.setWidth(1.0f - (key.order > 0) * 1.25f * key.order / 8.0f);
 	
 }

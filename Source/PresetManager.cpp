@@ -338,7 +338,7 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
 	if (fileOut.getParentDirectory().exists())
 	{
 		std::unique_ptr<XmlElement> xml(nodeToSave.createXml());
-		return xml->writeTo(fileOut);
+		return xml->writeToFile(fileOut, "");
 	}
 
 	return false;
