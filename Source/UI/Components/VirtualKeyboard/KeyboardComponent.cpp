@@ -32,11 +32,14 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
 	: keyboardInputState(keyboardStateIn)
 {
     keys.reset(new Array<Key>());
+	keys->resize(128); // todo: load keyboard six=ze
+
 	restoreNode(pianoNode);
 	
 	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	mode = modeIn;
 	applyMode(mode);
+
 
 	setSize(1000, 250);
 	setOpaque(true);
@@ -68,6 +71,10 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
                 keys->add(Key(keyNode));
         }
         
+		// workaround until key data is finished
+		if (keys->size() < 128)
+			keys->resize(128);
+
         // unpack color data
         
 	}
@@ -126,6 +133,11 @@ void Keyboard::applyMode(Mode* modeIn)
 
 	if (mode == nullptr)
 		mode = &modeDefault;
+
+	grid.reset(new KeyboardGrid(mode));
+
+	keysOrder.clear();
+	keysOrder.resize(mode->getMaxStep());
         
     for (int i = 0; i < keys->size(); i++)
     {
@@ -135,10 +147,12 @@ void Keyboard::applyMode(Mode* modeIn)
 		key.scaleDegree = mode->getScaleDegree(i);
 		key.modeDegree = mode->getModeDegree(i);
 		key.step = mode->getNoteStep(i);
+
+		keysOrder.getReference(key.order).add(key.keyNumber);
     }
 
 	// needs to be implemented
-	keysOrder = mode->getNotesOrders();
+	//keysOrder = mode->getNotesOrders();
 	keysScaleDegree = mode->getNotesInScaleDegrees();
 	keysModalDegree = mode->getNotesInModalDegrees();
 
@@ -154,6 +168,9 @@ void Keyboard::applyMode(Mode* modeIn)
         keyColorsDegrees->clear();
         keyColorsDegrees->resize(mode->getScaleSize());
     }
+
+	resized();
+	repaint();
 }
 
 void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
@@ -175,6 +192,10 @@ void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInpu
 }
 
 //===============================================================================================
+Viewport* Keyboard::getViewport()
+{
+	return viewport;
+}
 
 Key* Keyboard::getKey(int keyNumIn)
 {
@@ -325,6 +346,17 @@ int Keyboard::getScrollingStyle()
 
 //===============================================================================================
 
+void Keyboard::setViewport(Viewport* viewportIn)
+{
+	viewport = viewportIn;
+
+	if (viewportIn)
+	{
+		viewport->setViewedComponent(this, false);
+		setSize(getWidth(), viewport->getHeight());
+	}
+}
+
 void Keyboard::setUIMode(int uiModeIn)
 {
     uiModeSelected = uiModeIn;
@@ -446,6 +478,9 @@ void Keyboard::setKeyProportions(Key* keyIn)
         keyHeight = 1;
         width = 1;
     }
+
+	keyIn->area.setHeight(keyHeight);
+	keyIn->area.setWidth(keyWidth);
 }
 
 void Keyboard::setLastKeyClicked(int keyNumIn)
@@ -807,7 +842,8 @@ void Keyboard::paint(Graphics& g)
             Key& key = keys->getReference(orderArray[k]);
             // check if key is pressed or moused over, or midi input
                 // set appropriate color
-            g.setColour(getKeyColor(key.keyNumber));
+			Colour c = getKeyColor(key.keyNumber);
+            g.setColour(c);
                 // check highlight style
             
             g.fillRect(key.area);
@@ -815,11 +851,21 @@ void Keyboard::paint(Graphics& g)
             // check if note numbers or pitch names shown            
         }
     }
+
+	//for (int x = 0; x < getWidth() / 8; x++)
+	//{
+	//	float f = getWidth() / 8.0f;
+	//	Rectangle<int> r = Rectangle<int>(x * f, 0, f, getHeight());
+	//	g.setColour(Colours::black);
+	//	g.drawRect(r);
+	//	//g.setColour(Colours::white);
+	//	//g.fillRect(r);
+	//}
 }
 
 void Keyboard::resized()
 {
-    if (displayIsReady)
+    if (true)
     {
 		// Calculate key sizes
 		keyHeight = getHeight();
@@ -838,11 +884,13 @@ void Keyboard::resized()
 			w = keyWidth * key.widthMod;
 			h = keyHeight * key.heightMod;
             
-            grid->resizeKey(key);
+			setKeyProportions(&key);
+            //grid->resizeKey(key);
+			key.area.setHeight(keyHeight * key.area.getHeight());
 			grid->placeKey(key);
 		}
 
-		setSize(keys->getLast().area.getX() + keyWidth, keyHeight);
+		setSize(keysOrder.getReference(0).size() * keyWidth, keyHeight);
     }
 }
 

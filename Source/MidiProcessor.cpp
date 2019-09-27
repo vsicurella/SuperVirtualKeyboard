@@ -198,20 +198,20 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
 {
-    midiInput = MidiInput::openDevice(deviceIndex, this).get();
-    midiInput->start();
-    inputSelected = deviceIndex;
-    midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
+    //midiInput = MidiInput::openDevice(deviceIndex, this).get();
+    //midiInput->start();
+    //inputSelected = deviceIndex;
+    //midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
     return midiInput->getName();
 }
 
 String SvkMidiProcessor::setMidiOutput(int deviceIndex)
 {
-    midiOutput->stopBackgroundThread();
-    midiOutput = MidiOutput::openDevice(deviceIndex).get();
-    midiOutput->startBackgroundThread();
-    outputSelected = deviceIndex;
-    midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);
+    //midiOutput->stopBackgroundThread();
+    //midiOutput = MidiOutput::openDevice(deviceIndex).get();
+    //midiOutput->startBackgroundThread();
+    //outputSelected = deviceIndex;
+    //midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);
     return midiOutput->getName();
 }
 

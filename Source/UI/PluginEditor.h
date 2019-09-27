@@ -165,7 +165,6 @@ private:
 	std::unique_ptr<PluginControlComponent> controlComponent;
     std::unique_ptr<MappingHelper> mappingHelper;
 
-	Viewport* view;
 	Keyboard* virtualKeyboard;
     ScrollBar* keyboardScroll;
 
