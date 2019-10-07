@@ -138,14 +138,17 @@ void Keyboard::applyMode(Mode* modeIn)
 
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
+
+	int period = 0;
         
     for (int i = 0; i < keys->size(); i++)
     {
 		Key& key = keys->getReference(i);
-        
+		period = i / mode->getScaleSize();
+
 		key.order = mode->getOrder(i);        
-		key.scaleDegree = mode->getScaleDegree(i);
-		key.modeDegree = mode->getModeDegree(i);
+		key.scaleDegree = mode->getScaleDegree(i) + period * mode->getScaleSize();
+		key.modeDegree = mode->getModeDegree(i) + period * mode->getModeSize();
 		key.step = mode->getNoteStep(i);
 
 		keysOrder.getReference(key.order).add(key.keyNumber);
@@ -376,9 +379,8 @@ void Keyboard::setOrientation(int orientationIn)
 void Keyboard::setKeyPlacementStyle(int placementIn)
 {
 	keyPlacementSelected = placementIn;
+	grid->setKeyPlacement(keyPlacementSelected);
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
-	
-	// do stuff
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
@@ -832,25 +834,35 @@ void Keyboard::paint(Graphics& g)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-    
-    for (int order = 0; order < keysOrder.size(); order++)
-    {
-        Array<int>& orderArray = keysOrder.getReference(order);
-        
-        for (int k = 0; k < orderArray.size(); k++)
-        {
-            Key& key = keys->getReference(orderArray[k]);
-            // check if key is pressed or moused over, or midi input
-                // set appropriate color
-			Colour c = getKeyColor(key.keyNumber);
-            g.setColour(c);
-                // check highlight style
-            
-            g.fillRect(key.area);
+    //temp debug thing
+	for (int i = 0; i < keys->size(); i++)
+	{
+		Key& key = keys->getReference(i);
 
-            // check if note numbers or pitch names shown            
-        }
-    }
+		Colour c = getKeyColor(key.keyNumber);
+		g.setColour(c);
+
+		g.fillRect(key.area);
+	}
+   // for (int order = 0; order < keysOrder.size(); order++)
+   // {
+   //     Array<int>& orderArray = keysOrder.getReference(order);
+   //     
+   //     for (int k = 0; k < orderArray.size(); k++)
+   //     {
+   //         Key& key = keys->getReference(orderArray[k]);
+   //         // check if key is pressed or moused over, or midi input
+   //             // set appropriate color
+			//Colour c = getKeyColor(key.keyNumber);
+   //         g.setColour(c);
+   //             // check highlight style
+   //         
+   //         g.fillRect(key.area);
+
+   //         // check if note numbers or pitch names shown            
+   //     }
+   // }
+	DBG("keyboard painted");
 
 	//for (int x = 0; x < getWidth() / 8; x++)
 	//{
@@ -865,33 +877,27 @@ void Keyboard::paint(Graphics& g)
 
 void Keyboard::resized()
 {
-    if (true)
-    {
-		// Calculate key sizes
-		keyHeight = getHeight();
-		keyWidth = keyHeight * keySizeRatio;
+	// Calculate key sizes
+	keyHeight = getHeight();
+	keyWidth = keyHeight * keySizeRatio;
 
-		// Adjust Parent bounds and grid
-		pianoWidth = numOrder0Keys * keyWidth;
-		grid->setBounds(Rectangle<int>(0, 0, pianoWidth, getHeight()));
+	// Adjust Parent bounds and grid
+	pianoWidth = numOrder0Keys * keyWidth;
+	grid->setBounds(Rectangle<int>(0, 0, pianoWidth, keyHeight));
+	grid->setDefaultKeySize(keyWidth, keyHeight);
 
-		// Resize keys
-		
-		int w, h;
-		for (int i = 0; i < keys->size(); i++)
-		{
-			Key& key = keys->getReference(i);
-			w = keyWidth * key.widthMod;
-			h = keyHeight * key.heightMod;
+	// Resize keys
+	for (int i = 0; i < keys->size(); i++)
+	{
+		Key& key = keys->getReference(i);
             
-			setKeyProportions(&key);
-            //grid->resizeKey(key);
-			key.area.setHeight(keyHeight * key.area.getHeight());
-			grid->placeKey(key);
-		}
+        grid->resizeKey(key);
+		grid->placeKey(key);
+		int a = key.area.getHeight();
+	}
 
-		setSize(keysOrder.getReference(0).size() * keyWidth, keyHeight);
-    }
+	DBG("keyboard resized");
+
 }
 
 //===============================================================================================

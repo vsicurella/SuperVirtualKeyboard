@@ -42,14 +42,6 @@ namespace VirtualKeyboard
         verticalLeft,
         verticalRight
     };
-    
-    enum KeyPlacementType
-    {
-        nestedRight = 1,
-        nestedCenter,
-		flat,
-        adjacent
-    };
 
 	enum HighlightStyle
 	{
