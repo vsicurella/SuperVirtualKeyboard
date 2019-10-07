@@ -57,7 +57,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setResizeLimits(750, 100, 10e4, 10e4);
     
     initNodeData();
-	startTimerHz(60);
+	//startTimerHz(60);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -112,7 +112,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
 	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
 	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
-    
+
 	DBG("Children Updated");
 }
 

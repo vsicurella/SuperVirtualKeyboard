@@ -16,16 +16,31 @@
 
 namespace VirtualKeyboard
 {
+	enum KeyPlacementType
+	{
+		nestedRight = 1,
+		nestedCenter,
+		flat,
+		adjacent
+	};
+
     class KeyboardGrid : public FractionalGrid
     {
         Mode* mode;
         std::vector<float> orderedKeyRatios;
+
+		int keyPlacement = 1;
+		int keyWidth = 1;
+		int keyHeight = 1;
         
     public:
                 
-        KeyboardGrid(Mode* modeIn);
+		KeyboardGrid(Mode* modeIn, int keyPlacementType=1);
         ~KeyboardGrid() {};
                 
+		void setKeyPlacement(int keyPlacementTypeIn);
+		void setDefaultKeySize(int widthIn, int heightIn);
+
         void resizeKey(Key& key);
         void placeKey(Key& key);
     };
