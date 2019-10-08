@@ -17,9 +17,8 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
 	: keyboardInputState(keyboardStateIn)
 {       
 	reset();
+	initializeKeys();
 
-	keys.reset(new Array<Key>());
-	keys->resize(128);
 
     modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	applyMode(mode);
@@ -31,8 +30,7 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
 Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterMapIn)
 	: keyboardInputState(keyboardStateIn)
 {
-    keys.reset(new Array<Key>());
-	keys->resize(128); // todo: load keyboard six=ze
+	initializeKeys(); // todo: load keyboard size
 
 	restoreNode(pianoNode);
 	
@@ -73,7 +71,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
         
 		// workaround until key data is finished
 		if (keys->size() < 128)
-			keys->resize(128);
+			initializeKeys();
 
         // unpack color data
         
@@ -124,6 +122,16 @@ void Keyboard::reset()
 	mode = nullptr;
 }
 
+void Keyboard::initializeKeys(int size)
+{
+	keys.reset(new Array<Key>());
+	keys->resize(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		keys->getReference(i).keyNumber = i;
+	}
+}
 
 //===============================================================================================
 
@@ -843,6 +851,9 @@ void Keyboard::paint(Graphics& g)
 		g.setColour(c);
 
 		g.fillRect(key.area);
+
+		g.setColour(c.contrasting());
+		g.drawText(String(key.keyNumber), key.area, Justification::centred);
 	}
    // for (int order = 0; order < keysOrder.size(); order++)
    // {
@@ -863,16 +874,6 @@ void Keyboard::paint(Graphics& g)
    //     }
    // }
 	DBG("keyboard painted");
-
-	//for (int x = 0; x < getWidth() / 8; x++)
-	//{
-	//	float f = getWidth() / 8.0f;
-	//	Rectangle<int> r = Rectangle<int>(x * f, 0, f, getHeight());
-	//	g.setColour(Colours::black);
-	//	g.drawRect(r);
-	//	//g.setColour(Colours::white);
-	//	//g.fillRect(r);
-	//}
 }
 
 void Keyboard::resized()
@@ -896,7 +897,7 @@ void Keyboard::resized()
 		int a = key.area.getHeight();
 	}
 
-	DBG("keyboard resized");
+	DBG("keyboard resized, piano width is: " + String(pianoWidth));
 
 }
 
