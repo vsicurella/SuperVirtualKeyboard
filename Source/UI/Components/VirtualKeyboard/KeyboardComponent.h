@@ -87,6 +87,8 @@ namespace VirtualKeyboard
         ValueTree getNode();
 
 		void reset();
+
+		void initializeKeys(int size=128);
         
         //===============================================================================================
 
