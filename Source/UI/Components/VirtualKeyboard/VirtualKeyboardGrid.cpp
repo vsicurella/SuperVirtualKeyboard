@@ -22,14 +22,6 @@ void KeyboardGrid::setKeyPlacement(int keyPlacementTypeIn)
 	keyPlacement = keyPlacementTypeIn;
 }
 
-void KeyboardGrid::setDefaultKeySize(int widthIn, int heightIn)
-{
-	keyWidth = widthIn;
-	keyHeight = heightIn;
-}
-
-
-
 void KeyboardGrid::resizeKey(Key& key)
 {
 	float spread = 4;
@@ -69,19 +61,18 @@ void KeyboardGrid::resizeKey(Key& key)
 			{
 				float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
 				height = stepHeight - stepHeight * (key.order - 1) / key.step;
-				width = 1.0f - 5 * key.order / 32.0f;
-				//width = 0.8 - (key.order - 1) * 0.1;
+				width = 0.8 - (key.order - 1) * 0.1;
 			}
 		}
 	}
 
-	key.area.setWidth(width * keyWidth);
-    key.area.setHeight(height * keyHeight);
+	key.area.setWidth(width * getColumnWidth());
+	key.area.setHeight(height * getRowHeight());
 }
 
 void KeyboardGrid::placeKey(Key& key)
 {
-	Point<int> pt;
+	int xPosition = 0;
 
 	switch (keyPlacement)
 	{
@@ -99,16 +90,18 @@ void KeyboardGrid::placeKey(Key& key)
 
 		default: // 0 & 1, key nested right & flat
 		{
-			float colToPlace = ceil(key.modeDegree);
-			float offset = (key.order > 0) * (getColumnSize() / 2.0);
+			int colToPlace = ceil(key.modeDegree);
+			float offset = (key.order > 0) * (getColumnWidth() / 2.0f);
 
-			//offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
+			offset = (int)(offset * 0.8); // not sure why i have to do this to center the ordered keys
 
-			pt = Point<int>((int)((colToPlace + 1) * (getColumnSize() + getColumnGap()) - offset), 0 + getRowGap());
+			xPosition = colToPlace * (getColumnWidth() + getColumnGap()) - offset;
+
+			DBG("keyNumber=" + String(key.keyNumber) + " modeDegree=" + String(key.modeDegree) + " colToPlace=" + String(colToPlace) + " offset=" + String(offset) + " x=" + String(xPosition));
 
 			break;
 		}
 	}
     
-    key.area.setPosition(pt);
+    key.area.setPosition(xPosition, 0);
 }

@@ -445,6 +445,8 @@ namespace VirtualKeyboard
 
 		void resized() override;
 
+		void scaleToHeight(int heightIn);
+
 		//===============================================================================================
 
 		void mouseMove(const MouseEvent& e) override;

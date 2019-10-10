@@ -42,14 +42,22 @@ public:
     Rectangle<int> setBounds(int x, int y, int w, int h);
 
     Rectangle<int> setBounds(Rectangle<int> rectIn);
+
+	Rectangle<int> getBounds();
+
+	void scaleToColumnWidth(float columnWidthIn);
+
+	void scaleToRowHeight(float rowHeightIn);
+
+	void scaleToProportion(float proportion, float factor);
     
     float getColumns();
     
     float getRows();
 
-    float getColumnSize();
+    float getColumnWidth();
 
-    float getRowSize();
+    float getRowHeight();
     
     int getColumnGap();
     

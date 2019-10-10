@@ -400,9 +400,12 @@ void PluginControlComponent::resized()
         settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     }
 
-	Component* svk = keyboardViewport->getViewedComponent();
+	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
 	if (svk)
-		svk->setBounds(0, 0, keyboardViewport->getMaximumVisibleWidth(), keyboardViewport->getMaximumVisibleHeight());
+	{
+		//svk->scaleToHeight(keyboardViewport->getMaximumVisibleHeight());
+		svk->setBounds(0, 0, getWidth(), keyboardViewport->getMaximumVisibleHeight());
+	}
 
     //[/UserResized]
 }

@@ -18,7 +18,7 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
 {       
 	reset();
 	initializeKeys();
-
+	pianoNode = ValueTree(IDs::pianoNode);
 
     modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	applyMode(mode);
@@ -32,12 +32,11 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
 {
 	initializeKeys(); // todo: load keyboard size
 
-	restoreNode(pianoNode);
+	restoreNode(keyboardNodeIn, true);
 	
 	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	mode = modeIn;
 	applyMode(mode);
-
 
 	setSize(1000, 250);
 	setOpaque(true);
@@ -94,11 +93,7 @@ ValueTree Keyboard::getNode()
 
 void Keyboard::reset()
 {
-	if (!pianoNode.isValid())
-		pianoNode = ValueTree();
-
-	pianoNode.removeAllChildren(nullptr);
-	pianoNode.removeAllProperties(nullptr);
+	pianoNode = ValueTree(IDs::pianoNode);
 
 	setUIMode(UIMode::playMode);
 	setOrientation(Orientation::horizontal);
@@ -146,6 +141,7 @@ void Keyboard::applyMode(Mode* modeIn)
 
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
+	numOrder0Keys = mode->getKeyboardOrdersSize(0);
 
 	int period = 0;
         
@@ -155,8 +151,8 @@ void Keyboard::applyMode(Mode* modeIn)
 		period = i / mode->getScaleSize();
 
 		key.order = mode->getOrder(i);        
-		key.scaleDegree = mode->getScaleDegree(i) + period * mode->getScaleSize();
-		key.modeDegree = mode->getModeDegree(i) + period * mode->getModeSize();
+		key.scaleDegree = mode->getScaleDegree(i);
+		key.modeDegree = mode->getModeDegree(i);
 		key.step = mode->getNoteStep(i);
 
 		keysOrder.getReference(key.order).add(key.keyNumber);
@@ -387,7 +383,10 @@ void Keyboard::setOrientation(int orientationIn)
 void Keyboard::setKeyPlacementStyle(int placementIn)
 {
 	keyPlacementSelected = placementIn;
-	grid->setKeyPlacement(keyPlacementSelected);
+	
+	if (grid)
+		grid->setKeyPlacement(keyPlacementSelected);
+	
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
 }
 
@@ -842,50 +841,40 @@ void Keyboard::paint(Graphics& g)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
-    //temp debug thing
-	for (int i = 0; i < keys->size(); i++)
-	{
-		Key& key = keys->getReference(i);
 
-		Colour c = getKeyColor(key.keyNumber);
-		g.setColour(c);
+    for (int order = 0; order < keysOrder.size(); order++)
+    {
+        Array<int>& orderArray = keysOrder.getReference(order);
+        
+        for (int k = 0; k < orderArray.size(); k++)
+        {
+            Key& key = keys->getReference(orderArray[k]);
+            // check if key is pressed or moused over, or midi input
+                // set appropriate color
+			Colour c = getKeyColor(key.keyNumber);
+            g.setColour(c);
+                // check highlight style
+            
+            g.fillRect(key.area);
 
-		g.fillRect(key.area);
-
-		g.setColour(c.contrasting());
-		g.drawText(String(key.keyNumber), key.area, Justification::centred);
-	}
-   // for (int order = 0; order < keysOrder.size(); order++)
-   // {
-   //     Array<int>& orderArray = keysOrder.getReference(order);
-   //     
-   //     for (int k = 0; k < orderArray.size(); k++)
-   //     {
-   //         Key& key = keys->getReference(orderArray[k]);
-   //         // check if key is pressed or moused over, or midi input
-   //             // set appropriate color
-			//Colour c = getKeyColor(key.keyNumber);
-   //         g.setColour(c);
-   //             // check highlight style
-   //         
-   //         g.fillRect(key.area);
-
-   //         // check if note numbers or pitch names shown            
-   //     }
-   // }
-	DBG("keyboard painted");
+            // check if note numbers or pitch names shown            
+        }
+    }
 }
 
 void Keyboard::resized()
 {
-	// Calculate key sizes
-	keyHeight = getHeight();
-	keyWidth = keyHeight * keySizeRatio;
+	//if (keyHeight != getHeight())
+	//{
+		// Calculate key sizes
+		keyHeight = getHeight();
+		keyWidth = keyHeight * keySizeRatio;
+		pianoWidth = numOrder0Keys * keyWidth;
 
-	// Adjust Parent bounds and grid
-	pianoWidth = numOrder0Keys * keyWidth;
-	grid->setBounds(Rectangle<int>(0, 0, pianoWidth, keyHeight));
-	grid->setDefaultKeySize(keyWidth, keyHeight);
+		grid->setColumnGap(2);
+		grid->setRowGap(1);
+		grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() + numOrder0Keys, keyHeight);
+	//}
 
 	// Resize keys
 	for (int i = 0; i < keys->size(); i++)
@@ -894,12 +883,25 @@ void Keyboard::resized()
             
         grid->resizeKey(key);
 		grid->placeKey(key);
-		int a = key.area.getHeight();
 	}
-
-	DBG("keyboard resized, piano width is: " + String(pianoWidth));
-
 }
+
+void Keyboard::scaleToHeight(int heightIn)
+{
+	if (heightIn < 1)
+		throw "Cannot have size less than one.";
+
+	keyHeight = heightIn;
+	keyWidth = keyHeight * keySizeRatio;
+	pianoWidth = keyWidth * numOrder0Keys;
+
+	grid->setColumnGap(1);
+	grid->setRowGap(1);
+	grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() * numOrder0Keys, keyHeight);
+
+	setSize(grid->getBounds().getWidth(), keyHeight);
+}
+
 
 //===============================================================================================
 
