@@ -430,12 +430,12 @@ Array<int> Mode::getScaleDegrees() const
 
 int Mode::getScaleDegree(int midiNoteIn) const
 {
-	return scaleDegrees[midiNoteIn % scaleSize];
+	return totalModulus(midiNoteIn - rootNote, scaleSize);
 }
 
 float Mode::getModeDegree(int midiNoteIn) const
 {
-	return modeDegrees[getScaleDegree(midiNoteIn)];
+	return modeDegrees[midiNoteIn % 128];
 }
 
 int Mode::getMidiNote(int scaleDegreeIn) const

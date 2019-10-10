@@ -14,6 +14,8 @@ FractionalGrid::FractionalGrid(float columsIn, float rowsIn)
 {
     columns = columsIn;
     rows = rowsIn;
+
+	bounds = Rectangle<int>();
 }
 
 FractionalGrid::~FractionalGrid() {}
@@ -34,6 +36,38 @@ Rectangle<int> FractionalGrid::setBounds(Rectangle<int> rectIn)
     return bounds;
 }
 
+Rectangle<int> FractionalGrid::getBounds()
+{
+	return bounds;
+}
+
+
+void FractionalGrid::scaleToColumnWidth(float columnWidthIn)
+{
+	float factor = columnWidthIn / getColumnWidth();
+	bounds = bounds.withWidth((getColumnWidth() * factor + columnGap) * columns);
+	bounds = bounds.withHeight((getRowHeight() * factor + rowGap) * rows);
+
+	updateGrid();
+}
+
+void FractionalGrid::scaleToRowHeight(float rowHeightIn)
+{
+	float factor = rowHeightIn / getRowHeight();
+	bounds = bounds.withWidth((getColumnWidth() * factor + columnGap) * columns);
+	bounds = bounds.withHeight((getRowHeight() * factor + rowGap) * rows);
+
+	updateGrid();
+}
+
+void FractionalGrid::scaleToProportion(float proportion, float rowSizeIn)
+{
+	bounds = bounds.withWidth((rowSizeIn * proportion + columnGap) * columns);
+	bounds = bounds.withHeight((rowSizeIn + rowGap) * rows);
+
+	updateGrid();
+}
+
 void FractionalGrid::updateGrid()
 {
     colFraction = 1.0 / columns;
@@ -43,12 +77,12 @@ void FractionalGrid::updateGrid()
     rowSize = (bounds.getHeight() + rows * rowGap) / rows;
 }
 
-float FractionalGrid::getColumnSize()
+float FractionalGrid::getColumnWidth()
 {
     return colSize;
 }
 
-float FractionalGrid::getRowSize()
+float FractionalGrid::getRowHeight()
 {
     return rowSize;
 }

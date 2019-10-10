@@ -30,8 +30,6 @@ namespace VirtualKeyboard
         std::vector<float> orderedKeyRatios;
 
 		int keyPlacement = 1;
-		int keyWidth = 1;
-		int keyHeight = 1;
         
     public:
                 
@@ -39,7 +37,6 @@ namespace VirtualKeyboard
         ~KeyboardGrid() {};
                 
 		void setKeyPlacement(int keyPlacementTypeIn);
-		void setDefaultKeySize(int widthIn, int heightIn);
 
         void resizeKey(Key& key);
         void placeKey(Key& key);
