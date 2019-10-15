@@ -16,16 +16,23 @@
 
 namespace VirtualKeyboard
 {
-    struct Key
-    {   
+    class Key : public Component
+    {
+        
+    public:
+        
 		Key();
 		Key(int keyNumIn);
 		Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
 			String pitchNameIn = "", int widthModIn = 0, int heightModIn = 0, int xOff = 0, int yOff = 0,
 			bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack);
         Key(ValueTree keyNodeIn);
+        Key(const Key& keyToCopy);
         
 		void applyParameters(ValueTree nodeIn);
+        
+        void paint(Graphics& g) override;
+        void resized() override;
 
 		ValueTree node;
 
@@ -37,8 +44,7 @@ namespace VirtualKeyboard
 		int step = 0; // the interval step that this note is a part of
 
 		float velocity = 0; // recorded when key is clicked
-        Rectangle<int> area; // calculated by the Keyboard Grid
-        
+        // consider the bounding rect a property created by grid
 
 		// Parameters
 		String pitchName = "";

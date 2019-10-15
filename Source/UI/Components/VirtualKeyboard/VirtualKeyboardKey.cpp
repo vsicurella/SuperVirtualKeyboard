@@ -12,9 +12,13 @@
 
 using namespace VirtualKeyboard;
 
-Key::Key() {};
+Key::Key()
+{
+    node = ValueTree(IDs::pianoKeyNode);
+}
 
 Key::Key(int keyNumIn)
+: Key()
 {
     keyNumber = keyNumIn;
 }
@@ -22,6 +26,7 @@ Key::Key(int keyNumIn)
 Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
 	String pitchNameIn, int widthModIn, int heightModIn, int xOff, int yOff,
 	bool showNoteNumIn, bool showNoteNameIn, Colour colorIn)
+: Key()
 {
 	keyNumber = keyNumIn;
 	order = orderIn;
@@ -41,8 +46,21 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 Key::Key(ValueTree keyNodeIn)
     : Key()
 {
-    applyParameters(keyNodeIn);
+    if (keyNodeIn.hasType(IDs::pianoKeyNode))
+    {
+        applyParameters(keyNodeIn);
+        node = keyNodeIn;
+    }
 }
+
+Key::Key(const Key& keyToCopy)
+: Key(keyToCopy.keyNumber, keyToCopy.order, keyToCopy.scaleDegree, keyToCopy.modeDegree, keyToCopy.step,
+      keyToCopy.pitchName, keyToCopy.widthMod, keyToCopy.heightMod, keyToCopy.xOffset, keyToCopy.yOffset,
+      keyToCopy.showNoteNumber, keyToCopy.showNoteName, keyToCopy.color)
+{
+    node = keyToCopy.node.createCopy();
+}
+
 
 void Key::applyParameters(ValueTree nodeIn)
 {
@@ -69,4 +87,18 @@ void Key::applyParameters(ValueTree nodeIn)
 		else if (id == IDs::pianoKeyColor)
 			color = Colour::fromString(nodeIn.getProperty(id).toString());
 	}
+}
+
+void Key::paint(Graphics& g)
+{
+    g.setColour(color);
+    g.fillRect(getLocalBounds());
+    
+    //g.setColour(Colours::black);
+    //g.drawRect(getLocalBounds());
+}
+
+void Key::resized()
+{
+    
 }
