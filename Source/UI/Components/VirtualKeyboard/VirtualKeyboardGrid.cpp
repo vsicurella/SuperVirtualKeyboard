@@ -38,7 +38,9 @@ void KeyboardGrid::resizeKey(Key& key)
 		{
 			case(KeyPlacementType::nestedCenter):
 			{
-
+                float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
+                height = stepHeight - stepHeight * (key.order - 1) / (key.step * 1.08);
+                width = 0.75 - (key.order - 1) * 0.1;
 				break;
 			}
 
@@ -47,13 +49,13 @@ void KeyboardGrid::resizeKey(Key& key)
 				float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
 				height = stepHeight - stepHeight * (key.order - 1) / key.step;
 				width = 0.8;
-
 				break;
 			}
 
 			case(KeyPlacementType::adjacent):
 			{
-
+                height = 0.55;
+                width = 1.0f / (key.step);
 				break;
 			}
 
@@ -65,9 +67,8 @@ void KeyboardGrid::resizeKey(Key& key)
 			}
 		}
 	}
-
-	key.area.setWidth(width * getColumnWidth());
-	key.area.setHeight(height * getRowHeight());
+    
+    key.setSize(width*getColumnWidth(), height*getRowHeight());
 }
 
 void KeyboardGrid::placeKey(Key& key)
@@ -78,13 +79,22 @@ void KeyboardGrid::placeKey(Key& key)
 	{
 		case(KeyPlacementType::nestedCenter):
 		{
-			
-			break;
+            int colToPlace = ceil(key.modeDegree);
+            float offset = (key.order > 0) * (getColumnWidth() / 2.0f);
+            offset = (int)(offset * 1.1);
+            xPosition = colToPlace * (getColumnWidth() + getColumnGap()) - offset;
+            xPosition *= 1.0f + (0.001 * 10 * key.order > 1);
+            key.setCentrePosition(xPosition, key.getHeight()/2.0f);
+            break;
 		}
 
 		case(KeyPlacementType::adjacent):
 		{
-			
+            int colToPlace = (int)(key.modeDegree);
+            float offset = (key.modeDegree - colToPlace) * key.step > 2 * (key.step-1) * (key.getWidth() * 2);
+            xPosition = colToPlace * (getColumnWidth() + getColumnGap()) + offset;
+            key.setTopLeftPosition(xPosition, 0);
+
 			break;
 		}
 
@@ -93,15 +103,16 @@ void KeyboardGrid::placeKey(Key& key)
 			int colToPlace = ceil(key.modeDegree);
 			float offset = (key.order > 0) * (getColumnWidth() / 2.0f);
 
-			offset = (int)(offset * 0.8); // not sure why i have to do this to center the ordered keys
+			offset = (int)(offset * 1.2); // not sure why i have to do this to center the ordered keys
 
 			xPosition = colToPlace * (getColumnWidth() + getColumnGap()) - offset;
 
-			DBG("keyNumber=" + String(key.keyNumber) + " modeDegree=" + String(key.modeDegree) + " colToPlace=" + String(colToPlace) + " offset=" + String(offset) + " x=" + String(xPosition));
+			//DBG("keyNumber=" + String(key.keyNumber) + " modeDegree=" + String(key.modeDegree) + " colToPlace=" + String(colToPlace) + " offset=" + String(offset) + " x=" + String(xPosition));
 
+            key.setTopRightPosition(xPosition, 0);
 			break;
 		}
 	}
     
-    key.area.setPosition(xPosition, 0);
+    
 }

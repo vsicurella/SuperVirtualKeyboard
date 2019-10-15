@@ -57,7 +57,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setResizeLimits(750, 100, 10e4, 10e4);
     
     initNodeData();
-	//startTimerHz(60);
+	//startTimerHz(30);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -322,6 +322,7 @@ void SvkPluginEditor::setKeyStyle()
 void SvkPluginEditor::setKeyStyle(int keyStyleId)
 {
 	pluginState->setKeyStyle(keyStyleId);
+    virtualKeyboard->resized(); // would like to move this to the VK class itself
 }
 
 void SvkPluginEditor::setHighlightStyle()

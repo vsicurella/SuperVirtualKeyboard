@@ -138,7 +138,8 @@ void Keyboard::applyMode(Mode* modeIn)
 		mode = &modeDefault;
 
 	grid.reset(new KeyboardGrid(mode));
-
+    removeAllChildren();
+    
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
 	numOrder0Keys = mode->getKeyboardOrdersSize(0);
@@ -148,7 +149,7 @@ void Keyboard::applyMode(Mode* modeIn)
     for (int i = 0; i < keys->size(); i++)
     {
 		Key& key = keys->getReference(i);
-		period = i / mode->getScaleSize();
+        period = i / mode->getScaleSize();
 
 		key.order = mode->getOrder(i);        
 		key.scaleDegree = mode->getScaleDegree(i);
@@ -175,7 +176,18 @@ void Keyboard::applyMode(Mode* modeIn)
         keyColorsDegrees->clear();
         keyColorsDegrees->resize(mode->getScaleSize());
     }
-
+    
+    // add from back to front
+    for (int o = 0; o < keysOrder.size(); o++)
+    {
+        Array<int>& orderArray = keysOrder.getReference(o);
+        
+        for (int keyNum = 0; keyNum < orderArray.size(); keyNum++)
+        {
+            Key& key = keys->getReference((orderArray.getReference(keyNum)));
+            addAndMakeVisible(key);
+        }
+    }
 	resized();
 	repaint();
 }
@@ -388,6 +400,7 @@ void Keyboard::setKeyPlacementStyle(int placementIn)
 		grid->setKeyPlacement(keyPlacementSelected);
 	
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
+    //rresized();
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
@@ -488,8 +501,7 @@ void Keyboard::setKeyProportions(Key* keyIn)
         width = 1;
     }
 
-	keyIn->area.setHeight(keyHeight);
-	keyIn->area.setWidth(keyWidth);
+	keyIn->setSize(keyHeight, keyWidth);
 }
 
 void Keyboard::setLastKeyClicked(int keyNumIn)
@@ -528,7 +540,7 @@ Colour Keyboard::getKeyColor(int keyNumIn)
 	Colour c;
 	Key& key = keys->getReference(keyNumIn);
 
-	if (key.color.isOpaque())
+	if (key.color.isOpaque() && false) // need to fix this for switching modes
 		c = key.color;
 
 	else if (keyColorsDegrees)
@@ -544,7 +556,10 @@ Colour Keyboard::getKeyColor(int keyNumIn)
 	}
 
 	else
+    {
 		c = colorsDefaultOrders[key.order];
+    }
+
   
   return c;
 }
@@ -842,24 +857,32 @@ void Keyboard::paint(Graphics& g)
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
+    /*
     for (int order = 0; order < keysOrder.size(); order++)
     {
         Array<int>& orderArray = keysOrder.getReference(order);
         
         for (int k = 0; k < orderArray.size(); k++)
         {
-            Key& key = keys->getReference(orderArray[k]);
+     */
+    for (int k = 0; k < keys->size(); k++)
+    {
+            Key& key = keys->getReference(k);
             // check if key is pressed or moused over, or midi input
                 // set appropriate color
 			Colour c = getKeyColor(key.keyNumber);
-            g.setColour(c);
+           // g.setColour(c);
+            key.color = c;
+        key.setColour(0, c);
                 // check highlight style
-            
-            g.fillRect(key.area);
 
-            // check if note numbers or pitch names shown            
+        // g.fillRect(key.getBounds());
+
+            // check if note numbers or pitch names shown
+     
         }
-    }
+    //}
+
 }
 
 void Keyboard::resized()

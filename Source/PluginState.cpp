@@ -129,6 +129,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
     pianoNode = presetViewed->theKeyboardNode;
 	virtualKeyboard->restoreNode(pianoNode);
 	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
+    virtualKeyboard->applyMode(modeViewed);
 
 	doMapping();
 
