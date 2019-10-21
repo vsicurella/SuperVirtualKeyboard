@@ -15,13 +15,15 @@ using namespace VirtualKeyboard;
 
 Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
 	: keyboardInputState(keyboardStateIn)
-{       
+{
 	reset();
 	initializeKeys();
 	pianoNode = ValueTree(IDs::pianoNode);
-
+    
     modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	applyMode(mode);
+    
+    addMouseListener(this, true);
     
     setSize(1000, 250);
     setOpaque(true);
@@ -31,12 +33,13 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
 	: keyboardInputState(keyboardStateIn)
 {
 	initializeKeys(); // todo: load keyboard size
-
 	restoreNode(keyboardNodeIn, true);
 	
 	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
 	mode = modeIn;
 	applyMode(mode);
+    
+    addMouseListener(this, true);
 
 	setSize(1000, 250);
 	setOpaque(true);
@@ -933,14 +936,16 @@ void Keyboard::mouseMove(const MouseEvent& e)
 {
 	if (uiModeSelected == UIMode::playMode)
 	{
-		Key* key = getKeyFromPosition(e.getPosition());
+        keys->getReference(lastKeyOver).repaint();
+        
+		Key* key = getKeyFromPosition(Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY()));
 
 		if (key)
 		{
 			lastKeyOver = key->keyNumber;
+            key->repaint();
 		}
 	}
-
 }
 
 
