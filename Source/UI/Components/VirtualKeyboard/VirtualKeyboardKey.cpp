@@ -14,6 +14,7 @@ using namespace VirtualKeyboard;
 
 Key::Key()
 {
+    setName("Key");
     node = ValueTree(IDs::pianoKeyNode);
 }
 
@@ -92,6 +93,12 @@ void Key::applyParameters(ValueTree nodeIn)
 void Key::paint(Graphics& g)
 {
     g.setColour(color);
+    
+    if (isMouseOver())
+    {
+        g.setColour(color.contrasting(0.5));
+    }
+    
     g.fillRect(getLocalBounds());
     
     //g.setColour(Colours::black);
@@ -101,4 +108,9 @@ void Key::paint(Graphics& g)
 void Key::resized()
 {
     
+}
+
+void Key::mouseExit(const MouseEvent& e)
+{
+    repaint();
 }

@@ -33,6 +33,8 @@ namespace VirtualKeyboard
         
         void paint(Graphics& g) override;
         void resized() override;
+        
+        void mouseExit(const MouseEvent& e) override;
 
 		ValueTree node;
 
