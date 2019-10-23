@@ -92,17 +92,25 @@ void Key::applyParameters(ValueTree nodeIn)
 
 void Key::paint(Graphics& g)
 {
-    g.setColour(color);
+    Colour colorToUse = color;
+    float contrast = 0;
     
     if (isMouseOver())
     {
-        g.setColour(color.contrasting(0.5));
+        contrast = 0.5f;
     }
     
-    g.fillRect(getLocalBounds());
+    if (isPressed)
+    {
+        contrast = 1;
+    }
+    else if (exInputColor.isOpaque())
+    {
+        colorToUse = exInputColor;
+    }
     
-    //g.setColour(Colours::black);
-    //g.drawRect(getLocalBounds());
+    g.setColour(colorToUse.contrasting(contrast));
+    g.fillRect(getLocalBounds());
 }
 
 void Key::resized()
