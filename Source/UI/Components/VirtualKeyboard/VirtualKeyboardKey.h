@@ -46,7 +46,8 @@ namespace VirtualKeyboard
 		int step = 0; // the interval step that this note is a part of
 
 		float velocity = 0; // recorded when key is clicked
-        // consider the bounding rect a property created by grid
+        bool isPressed = false;
+        Colour exInputColor; // for midi controller input, will use this color if it's opaque
 
 		// Parameters
 		String pitchName = "";
