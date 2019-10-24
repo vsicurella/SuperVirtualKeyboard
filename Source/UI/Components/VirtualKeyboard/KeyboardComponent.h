@@ -179,6 +179,11 @@ namespace VirtualKeyboard
         Key* getKeyFromPositionRelative(Point<int> posIn);
 
 		/*
+			Returns the key which holds the given MouseEvent point relative to the top left corner of the component.
+		*/
+		Key* getKeyFromPositionMouseEvent(const MouseEvent& e);
+
+		/*
 			Returns the velocity for a given key and point relative to the key's top left corner
 		*/
         float getKeyVelocity(Key* keyIn, Point<int> posIn);
@@ -405,9 +410,14 @@ namespace VirtualKeyboard
         void retriggerNotes();
 		
 		/*
+			Will trigger a midi message for the key number given
+		*/
+		void triggerKey(int keyNumberIn, bool doNoteOn = true, float velocity = 1);
+
+		/*
 			Will trigger a midi messages for the key numbers given with the given velocity.
 		*/
-		void triggerNotes(Array<int> keyNumbers, bool doNoteOn = true, float velocity = 1);
+		void triggerKeys(Array<int> keyNumbers, bool doNoteOn = true, float velocity = 1);
         
 		/*
 			Returns the order of which all held notes are a part of.
@@ -450,6 +460,8 @@ namespace VirtualKeyboard
 		//===============================================================================================
 
 		void mouseMove(const MouseEvent& e) override;
+
+		void mouseExit(const MouseEvent& e) override;
         
         void mouseDown(const MouseEvent& e) override;
         

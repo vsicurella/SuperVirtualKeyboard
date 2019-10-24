@@ -24,6 +24,7 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
 	applyMode(mode);
     
     addMouseListener(this, true);
+	setWantsKeyboardFocus(true);
     
     setSize(1000, 250);
     setOpaque(true);
@@ -40,6 +41,7 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
 	applyMode(mode);
     
     addMouseListener(this, true);
+	setWantsKeyboardFocus(true);
 
 	setSize(1000, 250);
 	setOpaque(true);
@@ -315,6 +317,12 @@ Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
 {
     //TODO
 	return nullptr;
+}
+
+Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
+{
+	Point<int> ep = Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY());
+	return getKeyFromPosition(ep);
 }
 
 float Keyboard::getKeyVelocity(Key* keyIn, Point<int> posIn)
@@ -670,6 +678,11 @@ void Keyboard::setKeyOrderSizeScalar(float scalarIn)
 void Keyboard::allNotesOff()
 {
     MidiKeyboardState::allNotesOff(midiChannelOut);
+
+	for (int i = 0; i < keys->size(); i++)
+	{
+			triggerKey(i, false);
+	}
 }
 
 void Keyboard::isolateLastNote()
@@ -679,7 +692,7 @@ void Keyboard::isolateLastNote()
 		for (int i = 0; i < keys->size(); i++)
 		{
 			if (i != lastKeyClicked)
-				noteOff(midiChannelOut, i, 0);
+				triggerKey(i, false);
 		}
     }
 }
@@ -694,18 +707,32 @@ void Keyboard::retriggerNotes()
 		noteOn(midiChannelOut, retrigger[i], 0.6f);
 }
 
-void Keyboard::triggerNotes(Array<int> keyNumbers, bool doNoteOn, float velocity)
+void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
+{
+	Key& key = keys->getReference(keyNumberIn);
+
+	if (doNoteOn)
+	{
+		noteOn(midiChannelOut, keyNumberIn, velocity);
+		key.isPressed = true;
+		keysOn.add(keyNumberIn);
+	}
+	else
+	{
+		noteOff(midiChannelOut, keyNumberIn, 0);
+		key.isPressed = false;
+		keysOn.removeAllInstancesOf(keyNumberIn);
+	}
+
+	key.repaint();
+}
+
+
+void Keyboard::triggerKeys(Array<int> keyNumbers, bool doNoteOn, float velocity)
 {
 	for (int i = 0; i < keyNumbers.size(); i++)
 	{
-		if (doNoteOn)
-		{
-			noteOn(midiChannelOut, keyNumbers[i], velocity);
-		}
-		else
-		{
-			noteOff(midiChannelOut, keyNumbers[i], 0);
-		}
+		triggerKey(keyNumbers[i], doNoteOn, velocity);
 	}
 }
 
@@ -820,8 +847,8 @@ void Keyboard::transposeKeysOnModally(int modalStepsIn, bool needsSameOrder, boo
 
 	// TODO: implement velocities further
 	lastKeyClicked = transposeKeyModally(lastKeyClicked, modalStepsIn);
-	triggerNotes(oldKeys, false, 0);
-	triggerNotes(newKeys);
+	triggerKeys(oldKeys, false);
+	triggerKeys(newKeys);
 }
 
 void Keyboard::transposeKeysOnChromatically(int stepsIn)
@@ -831,7 +858,6 @@ void Keyboard::transposeKeysOnChromatically(int stepsIn)
     int keyNum;
     int newKey;
 
-    int newKeyInd;
     float velocity;
     
     for (int i = 0; i < oldKeys.size(); i++)
@@ -841,15 +867,16 @@ void Keyboard::transposeKeysOnChromatically(int stepsIn)
 		Key& key = keys->getReference(keyNum);
         velocity = key.velocity;
 
-		newKeyInd = transposeKeyChromatically(keyNum, stepsIn);
+		newKey = transposeKeyChromatically(keyNum, stepsIn);
         
-		if (newKeyInd > -1)
+		if (newKey > -1)
 			newKeys.add(newKey);
     }
     
 	// TODO: implement velocities further
-	triggerNotes(oldKeys, false);
-	triggerNotes(newKeys, true);
+	lastKeyClicked = transposeKeyChromatically(lastKeyClicked, stepsIn);
+	triggerKeys(oldKeys, false);
+	triggerKeys(newKeys);
 }
 
 //===============================================================================================
@@ -937,7 +964,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
 	{
         keys->getReference(lastKeyOver).repaint();
         
-		Key* key = getKeyFromPosition(Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY()));
+		Key* key = getKeyFromPositionMouseEvent(e);
 
 		if (key)
 		{
@@ -947,147 +974,153 @@ void Keyboard::mouseMove(const MouseEvent& e)
 	}
 }
 
+void Keyboard::mouseExit(const MouseEvent& e)
+{
+	if (uiModeSelected == UIMode::playMode)
+	{
+		if (!shiftHeld && !isMouseButtonDownAnywhere())
+		{
+			allNotesOff();
+		}
+	}
+}
+
 void Keyboard::mouseDown(const MouseEvent& e)
 {
-    //Key* key = virtualKeyboard->getKeyFromPosition(e.getPosition());
+    Key* key = getKeyFromPositionMouseEvent(e);
     
-    //    if (!isColorEditing)
-    //    {
-    //        if (key)
-    //        {
-    //            if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->activeState == 2)
-    //            {
-    //                // note off
-    //                virtualKeyboard->lastKeyClicked = 0;
-    //                virtualKeyboard->triggerKeyNoteOff(key);
-    //            }
-    //            else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
-    //            {
-    //                if (mappingHelper->isWaitingForKeyInput())
-    //                {
-    //                    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-    //                }
-    //
-    //                bool allPeriods = true;
-    //
-    //                if (e.mods.isCtrlDown())
-    //                    allPeriods = false;
-    //
-    //                mappingHelper->prepareKeyToMap(key->keyNumber, false);
-    //                //virtualKeyboard->highlightKeyForMapping(key->keyNumber);
-    //                DBG("Preparing to map key: " + String(key->keyNumber));
-    //
-    //            }
-    //            else
-    //            {
-    //                if (e.mods.isAltDown())
-    //                {
-    //                    Key* oldKey = virtualKeyboard->getKey(virtualKeyboard->getLastKeyClicked());
-    //                    //virtualKeyboard->triggerKeyNoteOff(oldKey);
-    //                }
-    //
-    //                //virtualKeyboard->triggerKeyNoteOn(key, virtualKeyboard->getKeyVelocity(key, e));
-    //                virtualKeyboard->setLastKeyClicked(key->keyNumber);
-    //
-    //                if (mappingHelper->isWaitingForKeyInput())
-    //                {
-    //                    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-    //                    mappingHelper->cancelKeyMap();
-    //                }
-    //
-    //            }
-    //        }
-    //        else
-    //        {
-    //            if (mappingHelper->isWaitingForKeyInput())
-    //            {
-    //                //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-    //                mappingHelper->cancelKeyMap();
-    //            }
-    //        }
-    //    }
-    //    else if (isColorEditing)
-    //    {
-    //        if (key)
-    //        {
-    //            if (e.mods.isRightButtonDown())
-    //            {
-    //                if (e.mods.isShiftDown())
-    //                {
-    //                    //virtualKeyboard->resetKeyOrderColors(key->order, true);
-    //                }
-    //                else if (e.mods.isCtrlDown())
-    //                {
-    //                    virtualKeyboard->resetKeyColor(key->keyNumber);
-    //                }
-    //                else
-    //                {
-    //                    //virtualKeyboard->resetKeyDegreeColors(key->keyNumber);
-    //                }
-    //            }
-    //
-    //            else if (e.mods.isShiftDown())
-    //            {
-    //                //if (virtualKeyboard->getKeyDegreeColor(key->scaleDegree).isOpaque())
-    //                    //virtualKeyboard->resetKeyDegreeColors(key->scaleDegree);
-    //
-    //                //else if (virtualKeyboard->getKeySingleColor(key->keyNumber).isOpaque())
-    //                //    virtualKeyboard->resetKeyColor(key->keyNumber);
-    //
-    //                //virtualKeyboard->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
-    //            //}
-    //            //else if (e.mods.isCtrlDown())
-    //            //    virtualKeyboard->beginColorEditing(key->keyNumber, 3, colorSelector->getCurrentColour());
-    //            //else
-    //            //    virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());
-    //        }
-    //    }
+        if (uiModeSelected == UIMode::playMode)
+        {
+            if (key)
+            {
+				if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->isPressed)
+				{
+					// note off
+					lastKeyClicked = key->keyNumber;
+					triggerKey(key->keyNumber, false);
+
+				}
+                //else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
+                //{
+                //    if (mappingHelper->isWaitingForKeyInput())
+                //    {
+                //        //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                //    }
+    
+                //    bool allPeriods = true;  
+    
+                //    if (e.mods.isCtrlDown())
+                //        allPeriods = false;
+    
+                //    mappingHelper->prepareKeyToMap(key->keyNumber, false);
+                //    //virtualKeyboard->highlightKeyForMapping(key->keyNumber);
+                //    DBG("Preparing to map key: " + String(key->keyNumber));
+                //}
+                else
+                {
+					// need to implement a velocity class
+					triggerKey(key->keyNumber);
+					lastKeyClicked = key->keyNumber;
+
+                    if (e.mods.isAltDown())
+                    {
+						isolateLastNote();
+                    }
+
+                    //if (mappingHelper->isWaitingForKeyInput())
+                    //{
+                    //    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                    //    mappingHelper->cancelKeyMap();
+                    //}
+    
+                }
+            }
+            else
+            {
+                //if (mappingHelper->isWaitingForKeyInput())
+                //{
+                //    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
+                //    mappingHelper->cancelKeyMap();
+                //}
+            }
+        }
+		else if (uiModeSelected == UIMode::editMode)
+		{
+			if (key)
+			{
+				if (e.mods.isRightButtonDown())
+				{
+					if (e.mods.isShiftDown())
+					{
+						//virtualKeyboard->resetKeyOrderColors(key->order, true);
+					}
+					else if (e.mods.isCtrlDown())
+					{
+						//virtualKeyboard->resetKeyColor(key->keyNumber);
+					}
+					else
+					{
+						//virtualKeyboard->resetKeyDegreeColors(key->keyNumber);
+					}
+				}
+
+				else if (e.mods.isShiftDown())
+				{
+					//if (virtualKeyboard->getKeyDegreeColor(key->scaleDegree).isOpaque())
+						//virtualKeyboard->resetKeyDegreeColors(key->scaleDegree);
+
+					//else if (virtualKeyboard->getKeySingleColor(key->keyNumber).isOpaque())
+					//    virtualKeyboard->resetKeyColor(key->keyNumber);
+
+					//virtualKeyboard->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
+				//}
+				//else if (e.mods.isCtrlDown())
+				//    virtualKeyboard->beginColorEditing(key->keyNumber, 3, colorSelector->getCurrentColour());
+				//else
+				//    virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());
+				}
+			}
+		}
 }
 
 void Keyboard::mouseDrag(const MouseEvent& e)
 {
-    /*
-    if (virtualKeyboard->getUIMode() == UIMode::playMode && !e.mods.isRightButtonDown())
+    if (uiModeSelected == UIMode::playMode && !e.mods.isRightButtonDown())
     {
-        Key* key = virtualKeyboard->getKeyFromPosition(e.getPosition());
+        Key* key = getKeyFromPositionMouseEvent(e);
         
         if (key)
         {
-            if (key->keyNumber != virtualKeyboard->getLastKeyClicked())
+            if (key->keyNumber != lastKeyClicked)
             {
-                Key* oldKey = virtualKeyboard->getKey(virtualKeyboard->getLastKeyClicked());
-                if (!e.mods.isShiftDown() || e.mods.isAltDown())
+                Key* oldKey = getKey(lastKeyClicked);
+                if (oldKey && (!e.mods.isShiftDown() || e.mods.isAltDown()))
                 {
-                    //virtualKeyboard->triggerKeyNoteOff(oldKey);
+					triggerKey(oldKey->keyNumber, false);
                 }
                 
-                //virtualKeyboard->triggerKeyNoteOn(key, virtualKeyboard->getKeyVelocity(key, e));
-                virtualKeyboard->setLastKeyClicked(key->keyNumber);
-                repaint();
+                triggerKey(key->keyNumber);
+				lastKeyClicked = key->keyNumber;
             }
         }
     }
-     */
+     
 }
 
 void Keyboard::mouseUp(const MouseEvent& e)
 {
-    /*
-    if (virtualKeyboard->getUIMode() == UIMode::playMode)
+    if (uiModeSelected == UIMode::playMode)
     {
-        Key* key = virtualKeyboard->getKeyFromPosition(e.getPosition());
+        Key* key = getKeyFromPositionMouseEvent(e);
         
         if (key)
         {
-            if (!e.mods.isShiftDown() && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
+            if (!e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
             {
-                //virtualKeyboard->triggerKeyNoteOff(key);
-                //key->activeState = 1;
-                repaint();
+                triggerKey(key->keyNumber, false);
             }
         }
     }
-     */
 }
 
 //===============================================================================================
@@ -1226,12 +1259,10 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 			isolateLastNote();
 
 			Key& key = keys->getReference(lastKeyClicked);
-			/*
-			if (!(key->isMouseOver() && key->isMouseButtonDownAnywhere()))
-				triggerKeyNoteOff(keys.getUnchecked(lastKeyClicked));
-				*/
-
-			repaint();
+			
+			if (!(key.isMouseOver() && key.isMouseButtonDownAnywhere()))
+				triggerKey(lastKeyClicked, false);
+				
 		}
     }
     
