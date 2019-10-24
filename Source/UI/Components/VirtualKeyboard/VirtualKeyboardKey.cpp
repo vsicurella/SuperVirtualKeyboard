@@ -92,26 +92,40 @@ void Key::applyParameters(ValueTree nodeIn)
 
 void Key::paint(Graphics& g)
 {
-    Colour colorToUse = color;
-    float contrast = 0;
-    
-    if (isMouseOver())
-    {
-        contrast = 0.5f;
-    }
-    
-    if (isPressed)
-    {
-        contrast = 1;
-    }
-    else if (exInputColor.isOpaque())
-    {
-        colorToUse = exInputColor;
-    }
-    
-    g.setColour(colorToUse.contrasting(contrast));
-    g.fillRect(getLocalBounds());
+	Colour colorToUse = color;
+	float contrast = 0;
+
+	if (isMouseOver())
+	{
+		contrast = 0.25f;
+	}
+
+	if (isPressed)
+	{
+		contrast = 0.75f;
+	}
+	else if (exInputColor.isOpaque())
+	{
+		colorToUse = exInputColor;
+	}
+
+	g.setColour(colorToUse.contrasting(contrast));
+	g.fillRect(getLocalBounds());
+
+	Rectangle<int> outline = getLocalBounds().expanded(1, 1);
+	g.setColour(Colours::black);
+	g.drawRect(outline, 1.2f);
+
+	if (showNoteNumber)
+	{
+		g.setColour(color.contrasting());
+		String numTxt = String(keyNumber);
+		Rectangle<int> txtArea = getLocalBounds();
+		txtArea.removeFromBottom(6);
+		g.drawText(numTxt, txtArea,	Justification::centredBottom);
+	}
 }
+
 
 void Key::resized()
 {
