@@ -134,5 +134,8 @@ void Key::resized()
 
 void Key::mouseExit(const MouseEvent& e)
 {
-    repaint();
+	if (!isPressed && !e.mods.isShiftDown())
+	{
+		repaint();
+	}
 }
