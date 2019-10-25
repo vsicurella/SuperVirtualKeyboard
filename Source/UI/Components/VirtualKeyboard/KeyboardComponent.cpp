@@ -287,6 +287,21 @@ Rectangle<int> Keyboard::getKeyAreaRelative(int midiNoteIn)
     return Rectangle<int>();
 }
 
+int Keyboard::getKeyWidth()
+{
+	return keyWidth;
+}
+
+int Keyboard::getKeyHeight()
+{
+	return keyHeight;
+}
+
+int Keyboard::getPianoWidth(int heightIn)
+{
+	return numOrder0Keys * (keyWidth + grid->getColumnGap());
+}
+
 float Keyboard::getKeySizeRatio(int keyNumIn)
 {
 	return keySizeRatio;

@@ -403,8 +403,8 @@ void PluginControlComponent::resized()
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
 	if (svk)
 	{
-		//svk->scaleToHeight(keyboardViewport->getMaximumVisibleHeight());
-		svk->setBounds(0, 0, getWidth(), keyboardViewport->getMaximumVisibleHeight());
+		int height = keyboardViewport->getMaximumVisibleHeight();
+		svk->setBounds(0, 0, svk->getPianoWidth(height), height);
 	}
 
     //[/UserResized]

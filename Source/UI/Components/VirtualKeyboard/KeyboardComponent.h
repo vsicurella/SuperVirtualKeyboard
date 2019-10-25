@@ -154,6 +154,21 @@ namespace VirtualKeyboard
 		Rectangle<int> getKeyAreaRelative(int midiNoteIn);
 
 		/*
+			Returns the key width in pixels.
+		*/
+		int getKeyWidth();
+
+		/* 
+			Returns the key height in pixels.
+		*/
+		int getKeyHeight();
+
+		/*
+			Returns the piano width from given height
+		*/
+		int getPianoWidth(int heightIn);
+
+		/*
 			Returns the current proportion of key width to height.
 		*/
 		float getKeySizeRatio(int keyNumIn);
