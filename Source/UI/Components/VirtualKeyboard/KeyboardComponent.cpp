@@ -730,7 +730,7 @@ void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 	{
 		noteOn(midiChannelOut, keyNumberIn, velocity);
 		key.isPressed = true;
-		keysOn.add(keyNumberIn);
+		keysOn.addIfNotAlreadyThere(keyNumberIn);
 	}
 	else
 	{
@@ -1106,6 +1106,30 @@ void Keyboard::mouseDrag(const MouseEvent& e)
         
         if (key)
         {
+			bool alreadyDown = false;
+
+			for (int i = 0; i < keysOn.size(); i++)
+			{
+				Key& keyOn = keys->getReference(keysOn[i]);
+
+				if (!keyOn.isMouseOver() && !shiftHeld)
+				{
+					triggerKey(keyOn.keyNumber, false);
+				}
+
+				if (keyOn.keyNumber == key->keyNumber)
+				{
+					alreadyDown = true;
+				}
+			}
+
+			if (!alreadyDown)
+			{
+				triggerKey(key->keyNumber);
+				lastKeyClicked = key->keyNumber;
+			}
+
+			/*
             if (key->keyNumber != lastKeyClicked)
             {
                 Key* oldKey = getKey(lastKeyClicked);
@@ -1113,10 +1137,9 @@ void Keyboard::mouseDrag(const MouseEvent& e)
                 {
 					triggerKey(oldKey->keyNumber, false);
                 }
-                
-                triggerKey(key->keyNumber);
-				lastKeyClicked = key->keyNumber;
-            }
+                */
+
+            //}
         }
     }
      
@@ -1134,6 +1157,7 @@ void Keyboard::mouseUp(const MouseEvent& e)
             {
                 triggerKey(key->keyNumber, false);
             }
+
         }
     }
 }
