@@ -576,6 +576,7 @@ namespace VirtualKeyboard
 		Array<Array<int>> keysScaleDegree;
 		Array<Array<int>> keysModalDegree;
 		Array<int> keysOn;
+		Array<int> keysByMouseTouch;
                 
         // Locks
         bool rightMouseHeld = false;

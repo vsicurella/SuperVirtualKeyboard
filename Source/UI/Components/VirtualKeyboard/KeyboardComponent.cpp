@@ -131,6 +131,9 @@ void Keyboard::initializeKeys(int size)
 	{
 		keys->getReference(i).keyNumber = i;
 	}
+
+	keysOn = Array<int>();
+	keysByMouseTouch = Array<int>();
 }
 
 //===============================================================================================
@@ -970,7 +973,6 @@ void Keyboard::scaleToHeight(int heightIn)
 	setSize(grid->getBounds().getWidth(), keyHeight);
 }
 
-
 //===============================================================================================
 
 void Keyboard::mouseMove(const MouseEvent& e)
@@ -993,9 +995,16 @@ void Keyboard::mouseExit(const MouseEvent& e)
 {
 	if (uiModeSelected == UIMode::playMode)
 	{
-		if (!shiftHeld && !isMouseButtonDownAnywhere())
+		int touchIndex = e.source.getIndex();
+		if (keysByMouseTouch[touchIndex] > 0)
 		{
-			allNotesOff();
+			Key* key = &keys->getUnchecked(keysByMouseTouch[touchIndex]);
+
+			if (!e.source.isDragging())
+			{
+				triggerKey(key->keyNumber, false);
+				keysByMouseTouch.set(touchIndex, -1);
+			}
 		}
 	}
 }
@@ -1036,6 +1045,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
 					// need to implement a velocity class
 					triggerKey(key->keyNumber);
 					lastKeyClicked = key->keyNumber;
+					keysByMouseTouch.set(e.source.getIndex(), key->keyNumber);
 
                     if (e.mods.isAltDown())
                     {
@@ -1106,40 +1116,16 @@ void Keyboard::mouseDrag(const MouseEvent& e)
         
         if (key)
         {
-			bool alreadyDown = false;
+			//bool alreadyDown = false;
+			int touchIndex = e.source.getIndex();
+			int keyIndex = keysByMouseTouch[touchIndex];
 
-			for (int i = 0; i < keysOn.size(); i++)
+			if (key->keyNumber != keyIndex)
 			{
-				Key& keyOn = keys->getReference(keysOn[i]);
-
-				if (!keyOn.isMouseOver() && !shiftHeld)
-				{
-					triggerKey(keyOn.keyNumber, false);
-				}
-
-				if (keyOn.keyNumber == key->keyNumber)
-				{
-					alreadyDown = true;
-				}
-			}
-
-			if (!alreadyDown)
-			{
+				triggerKey(keyIndex, false);
 				triggerKey(key->keyNumber);
-				lastKeyClicked = key->keyNumber;
+				keysByMouseTouch.set(touchIndex, key->keyNumber);
 			}
-
-			/*
-            if (key->keyNumber != lastKeyClicked)
-            {
-                Key* oldKey = getKey(lastKeyClicked);
-                if (oldKey && (!e.mods.isShiftDown() || e.mods.isAltDown()))
-                {
-					triggerKey(oldKey->keyNumber, false);
-                }
-                */
-
-            //}
         }
     }
      
@@ -1149,16 +1135,19 @@ void Keyboard::mouseUp(const MouseEvent& e)
 {
     if (uiModeSelected == UIMode::playMode)
     {
-        Key* key = getKeyFromPositionMouseEvent(e);
-        
-        if (key)
-        {
-            if (!e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
-            {
-                triggerKey(key->keyNumber, false);
-            }
+		int touchIndex = e.source.getIndex();
+		int keyIndex = keysByMouseTouch[touchIndex];
 
-        }
+		if (keyIndex > 0)
+		{
+			Key* key = &keys->getUnchecked(keyIndex);
+
+			if (key && !e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
+			{
+				triggerKey(key->keyNumber, false);
+				keysByMouseTouch.set(touchIndex, -1);
+			}
+		}
     }
 }
 
