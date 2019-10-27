@@ -29,7 +29,9 @@ SvkMidiProcessor::SvkMidiProcessor()
     
     // default sample rate
     reset(41000);
-    
+
+    midiOutput.reset(MidiOutput::openDevice(MidiOutput::getDefaultDeviceIndex()));
+
     setRootNote(60);
 }
 
@@ -115,7 +117,12 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 
 void SvkMidiProcessor::resetWithRate(double sampleRateIn)
 {
-	reset(sampleRateIn);
+    reset(sampleRateIn);
+    if (midiOutput.get())
+    {
+        midiOutput->stopBackgroundThread();
+        midiOutput->startBackgroundThread();
+    }
 }
 
 StringArray SvkMidiProcessor::getAvailableInputs()
@@ -135,7 +142,7 @@ MidiInput* SvkMidiProcessor::getInputDevice()
 
 MidiOutput*  SvkMidiProcessor::getOutputDevice()
 {
-    return midiOutput;
+    return midiOutput.get();
 }
 
 MidiKeyboardState* SvkMidiProcessor::getOriginalKeyboardState()
@@ -412,11 +419,15 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             midiMessages.addEvent(msg, smpl);
         }
     }
+
+    if (midiOutput)
+    {
+        midiOutput->sendBlockOfMessagesNow(midiMessages);
+    }
     
     midiBuffer.clear();
     msgCount = 0;
 }
-
 
 //==============================================================================
 

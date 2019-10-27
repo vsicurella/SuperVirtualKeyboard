@@ -450,10 +450,10 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 {
 	FileChooser chooser(message, File::getSpecialLocation(File::userDocumentsDirectory), "*.svk");
 
-	if (forSaving)
-		chooser.browseForFileToSave(true);
-	else
-		chooser.browseForFileToOpen();
+	//if (forSaving)
+	//	chooser.browseForFileToSave(true);
+	//else
+		//chooser.browseForFileToOpen();
 
 	return chooser.getResult();
 }

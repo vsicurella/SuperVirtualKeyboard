@@ -29,7 +29,7 @@ ReaperWriter::ReaperWriter(Mode* modeIn)
        filePath = File::getSpecialLocation(File::userDocumentsDirectory);
 
     FileChooser chooser("Save as", filePath, "*.txt");
-    chooser.browseForFileToSave(true);
+    //chooser.browseForFileToSave(true);
     fileOut = chooser.getResult();
 
 	setup_default_symbols();

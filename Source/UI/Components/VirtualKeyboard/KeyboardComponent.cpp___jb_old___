@@ -1140,7 +1140,7 @@ void Keyboard::mouseUp(const MouseEvent& e)
 
 		if (keyIndex > 0)
 		{
-			Key& key = keys->getReference(keyIndex);
+			Key& key = keys->getRefefence(keyIndex);
 
 			if (!e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
 			{
