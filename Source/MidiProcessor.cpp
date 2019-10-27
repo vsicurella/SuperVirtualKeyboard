@@ -30,7 +30,7 @@ SvkMidiProcessor::SvkMidiProcessor()
     // default sample rate
     reset(41000);
 
-    midiOutput.reset(MidiOutput::openDevice(MidiOutput::getDefaultDeviceIndex()));
+    //midiOutput.reset(MidiOutput::openDevice(MidiOutput::getDefaultDeviceIndex()));
 
     setRootNote(60);
 }
@@ -120,8 +120,8 @@ void SvkMidiProcessor::resetWithRate(double sampleRateIn)
     reset(sampleRateIn);
     if (midiOutput.get())
     {
-        midiOutput->stopBackgroundThread();
-        midiOutput->startBackgroundThread();
+        //midiOutput->stopBackgroundThread();
+        //midiOutput->startBackgroundThread();
     }
 }
 
@@ -422,7 +422,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
 
     if (midiOutput)
     {
-        midiOutput->sendBlockOfMessagesNow(midiMessages);
+        //midiOutput->sendBlockOfMessagesNow(midiMessages);
     }
     
     midiBuffer.clear();
