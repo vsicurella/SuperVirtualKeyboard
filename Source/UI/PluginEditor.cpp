@@ -176,6 +176,21 @@ bool SvkPluginEditor::exportAbletonMap()
 void SvkPluginEditor::showSettingsDialog()
 {
     pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
+	PopupMenu* outputs = pluginSettingsDialog->getMidiOutputBox()->getRootMenu();
+	outputs->clear();
+	Array<MidiDeviceInfo> devices = pluginState->getMidiProcessor()->getAvailableOutputs();
+	for (int i = 0; i < devices.size(); i++)
+	{
+		outputs->addItem(i + 1, devices[i].name);
+	}
+
+	if (pluginState->getPluginSettings()->getMidiIndexSelected() > -1)
+	{
+		pluginSettingsDialog->getMidiOutputBox()->setSelectedId(
+			pluginState->getPluginSettings()->getMidiIndexSelected(), dontSendNotification);
+	}
+
+	pluginSettingsDialog->addChangeListener(pluginState);
     CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
 }
 

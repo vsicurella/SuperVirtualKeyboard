@@ -68,11 +68,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     scaleEntryBtn->setButtonText (TRANS("OK"));
     scaleEntryBtn->addListener (this);
 
-    modeInfoButton.reset (new TextButton ("Mode Info Button"));
-    addAndMakeVisible (modeInfoButton.get());
-    modeInfoButton->setButtonText (TRANS("i"));
-    modeInfoButton->addListener (this);
-
     periodShiftSld.reset (new Slider ("Period Shift Slider"));
     addAndMakeVisible (periodShiftSld.get());
     periodShiftSld->setRange (-10, 10, 1);
@@ -244,6 +239,10 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     scaleTextBox->setPopupMenuEnabled (true);
     scaleTextBox->setText (String());
 
+    modeInfoButton.reset (new TextButton ("Mode Info Button"));
+    addAndMakeVisible (modeInfoButton.get());
+    modeInfoButton->setButtonText (TRANS("i"));
+    modeInfoButton->addListener (this);
     sizeToggleBtn.reset (new Component());
     addAndMakeVisible (sizeToggleBtn.get());
     sizeToggleBtn->setName ("SizeToggleButton");
