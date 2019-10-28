@@ -146,7 +146,6 @@ void Keyboard::applyMode(Mode* modeIn)
 		mode = &modeDefault;
 
 	grid.reset(new KeyboardGrid(mode));
-    removeAllChildren();
     
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
@@ -193,11 +192,11 @@ void Keyboard::applyMode(Mode* modeIn)
         for (int keyNum = 0; keyNum < orderArray.size(); keyNum++)
         {
             Key& key = keys->getReference((orderArray.getReference(keyNum)));
-            addAndMakeVisible(key);
+            //addAndMakeVisible(key);
+			key.toFront(false);
         }
     }
 	resized();
-	repaint();
 }
 
 void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
@@ -727,6 +726,9 @@ void Keyboard::retriggerNotes()
 
 void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 {
+	if (keyNumberIn < 0 || keyNumberIn > keys->size())
+		return;
+
 	Key& key = keys->getReference(keyNumberIn);
 
 	if (doNoteOn)
@@ -940,11 +942,13 @@ void Keyboard::resized()
 		// Calculate key sizes
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
-		pianoWidth = numOrder0Keys * keyWidth;
 
 		grid->setColumnGap(2);
 		grid->setRowGap(1);
-		grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() + numOrder0Keys, keyHeight);
+
+		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
+
+		grid->setBounds(getBounds());
 	//}
 
 	// Resize keys
@@ -964,11 +968,13 @@ void Keyboard::scaleToHeight(int heightIn)
 
 	keyHeight = heightIn;
 	keyWidth = keyHeight * keySizeRatio;
-	pianoWidth = keyWidth * numOrder0Keys;
 
 	grid->setColumnGap(1);
 	grid->setRowGap(1);
-	grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() * numOrder0Keys, keyHeight);
+
+	pianoWidth = (keyWidth + grid->getColumnGap()) * numOrder0Keys;
+
+	grid->setBounds(getBounds());
 
 	setSize(grid->getBounds().getWidth(), keyHeight);
 }
@@ -1006,6 +1012,9 @@ void Keyboard::mouseExit(const MouseEvent& e)
 				keysByMouseTouch.set(touchIndex, -1);
 			}
 		}
+
+		Key& key = keys->getReference(lastKeyOver);
+		key.repaint();
 	}
 }
 
@@ -1141,12 +1150,12 @@ void Keyboard::mouseUp(const MouseEvent& e)
 		if (keyIndex > 0)
 		{
 			Key& key = keys->getReference(keyIndex);
+			keysByMouseTouch.set(touchIndex, -1);
 
-			if (!e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
-			{
-				triggerKey(key.keyNumber, false);
-				keysByMouseTouch.set(touchIndex, -1);
-			}
+            if (!shiftHeld)
+            {
+                triggerKey(key.keyNumber, false);
+            }
 		}
     }
 }

@@ -63,16 +63,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     mode2RootSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
     mode2RootSld->addListener (this);
 
-    scaleTextBox.reset (new TextEditor ("Scale Text Box"));
-    addAndMakeVisible (scaleTextBox.get());
-    scaleTextBox->setMultiLine (false);
-    scaleTextBox->setReturnKeyStartsNewLine (false);
-    scaleTextBox->setReadOnly (false);
-    scaleTextBox->setScrollbarsShown (true);
-    scaleTextBox->setCaretVisible (true);
-    scaleTextBox->setPopupMenuEnabled (true);
-    scaleTextBox->setText (String());
-
     scaleEntryBtn.reset (new TextButton ("Scale Entry Button"));
     addAndMakeVisible (scaleEntryBtn.get());
     scaleEntryBtn->setButtonText (TRANS("OK"));
@@ -247,6 +237,16 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
     mapApplyBtn->setBounds (408, 48, 55, 24);
 
+    scaleTextBox.reset (new TextEditor ("Scale Text Box"));
+    addAndMakeVisible (scaleTextBox.get());
+    scaleTextBox->setMultiLine (false);
+    scaleTextBox->setReturnKeyStartsNewLine (false);
+    scaleTextBox->setReadOnly (false);
+    scaleTextBox->setScrollbarsShown (true);
+    scaleTextBox->setCaretVisible (true);
+    scaleTextBox->setPopupMenuEnabled (true);
+    scaleTextBox->setText (String());
+
 
     //[UserPreSize]
     mapOrderEditBtn->setVisible(false);
@@ -300,7 +300,6 @@ PluginControlComponent::~PluginControlComponent()
     mode2Box = nullptr;
     mode1RootSld = nullptr;
     mode2RootSld = nullptr;
-    scaleTextBox = nullptr;
     scaleEntryBtn = nullptr;
     modeInfoButton = nullptr;
     periodShiftSld = nullptr;
@@ -324,6 +323,7 @@ PluginControlComponent::~PluginControlComponent()
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
+    scaleTextBox = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -353,9 +353,8 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 51 - 150, 48, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 16, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 48, 79, 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (proportionOfWidth (0.1757f) / 2), 16, proportionOfWidth (0.1757f), 24);
-    scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 16, 31, 24);
-    modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 16, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) - -34 - 31, 16, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) / 2 + -116, 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 48, 31, 24);
@@ -374,10 +373,13 @@ void PluginControlComponent::resized()
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
     mapModeBox->setBounds (136, 16, proportionOfWidth (0.1590f), 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2), 16, proportionOfWidth (0.1927f), 24);
     //[UserResized] Add your own custom resize handling here..
     }
     else
     {
+		mapModeBox->setBounds(136, 16, proportionOfWidth(0.1638f), 24);
+
         scaleTextBox->setBounds ((getWidth() / 2) + -25 - (168 / 2), 16, 168, 24);
         scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 16, 31, 24);
         modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 16, 24, 24);
@@ -892,16 +894,12 @@ BEGIN_JUCER_METADATA
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25Cc 16 17.573% 24"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
   <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="82.5Cc 16 31 24" buttonText="OK"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="-34Rr 16 31 24" posRelativeX="39f9f4bff4e94802"
+              buttonText="OK" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="-129Cc 16 24 24" buttonText="i"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="-116C 16 24 24" posRelativeX="39f9f4bff4e94802"
+              buttonText="i" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
           virtualName="" explicitFocusOrder="0" pos="108 40R 86 24" min="-10.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
@@ -978,12 +976,16 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="400r 48 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 16 15.9% 24" editable="0"
-            layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map" textWhenNonSelected="Mapping Off"
-            textWhenNoItems="Mapping Off"/>
+            virtualName="" explicitFocusOrder="0" pos="136 16 15.87% 24"
+            editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
+            textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="408 48 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
+              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.239% 24"
+              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
+              scrollbars="1" caret="1" popupmenu="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
