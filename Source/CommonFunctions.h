@@ -432,6 +432,20 @@ static T sumUpToRingIndex(Array<T> arrayIn, int indexIn)
 }
 
 template <class T>
+Array<T> reverseArray(const Array<T>& arrayIn)
+{
+	Array<T> outArray;
+	outArray.resize(arrayIn.size());
+
+	for (int i = 0; i < arrayIn.size(); i++)
+	{
+		outArray.set(i, arrayIn.getUnchecked(arrayIn.size() - i - 1));
+	}
+
+	return outArray;
+}
+
+template <class T>
 String arrayToString(const Array<T>& arrayIn)
 {
     String arrayString = "";
