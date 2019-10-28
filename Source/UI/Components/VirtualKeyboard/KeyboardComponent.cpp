@@ -130,6 +130,7 @@ void Keyboard::initializeKeys(int size)
 	for (int i = 0; i < size; i++)
 	{
 		keys->getReference(i).keyNumber = i;
+		addAndMakeVisible(keys->getReference(i));
 	}
 
 	keysOn = Array<int>();
