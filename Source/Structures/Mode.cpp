@@ -19,7 +19,6 @@ Mode::Mode()
 
 	steps = parseIntStringToArray(stepsString);
 	ordersDefault = unfoldStepsToOrders(steps);
-	mosClass = intervalAmounts(steps);
     scaleSize = 1;
     modeSize = 1;
 	name = getDescription();
@@ -37,7 +36,6 @@ Mode::Mode(String stepsIn, String familyIn, int rootNoteIn, String nameIn, Strin
 
 	steps = parseIntStringToArray(stepsIn);
 	ordersDefault = unfoldStepsToOrders(steps);
-	mosClass = intervalAmounts(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	offset = getOffset() * -1;
@@ -60,7 +58,6 @@ Mode::Mode(Array<int> stepsIn, String familyIn, int rootNoteIn, String nameIn, S
 
 	steps = stepsIn;
 	ordersDefault = unfoldStepsToOrders(steps);
-	mosClass = intervalAmounts(steps);
 	scaleSize = ordersDefault.size();
 	modeSize = steps.size();
 	offset = getOffset() * -1;
@@ -86,7 +83,6 @@ Mode::Mode(ValueTree modeNodeIn, bool copyNode)
 
         stepsString = modeNode[IDs::stepString];
         steps = parseIntStringToArray(stepsString);
-        mosClass = intervalAmounts(steps);
         ordersDefault = unfoldStepsToOrders(steps);
         
         scaleSize = modeNode[IDs::scaleSize];
@@ -142,7 +138,6 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
         
         stepsString = modeNode[IDs::stepString];
         steps = parseIntStringToArray(stepsString);
-        mosClass = intervalAmounts(steps);
         ordersDefault = unfoldStepsToOrders(steps);
         
         scaleSize = modeNode[IDs::scaleSize];
@@ -250,6 +245,7 @@ void Mode::updateProperties()
     orders = repeatArray(ordersDefault, 128, offset);
     modeDegrees = ordersToModalDegrees(orders);
     scaleDegrees = generateScaleDegrees(scaleSize, offset);
+	mosClass = reverseArray(intervalAmounts(steps)).removeAllInstancesOf(0);
     keyboardOrdersSizes = intervalAmounts(orders);
 	stepsOfOrders = repeatIndicies(foldOrdersToSteps(orders));
 }
@@ -738,7 +734,6 @@ Array<int> Mode::generateScaleDegrees(int scaleSize, int offset)
 Array<int> Mode::intervalAmounts(Array<int> stepsIn)
 {
 	Array<int> intervals;
-	Array<int> intervalsOut;
 	int step;
 
 	for (int i = 0; i < stepsIn.size(); i++)
@@ -751,17 +746,7 @@ Array<int> Mode::intervalAmounts(Array<int> stepsIn)
 		intervals.set(step, intervals[step] + 1);
 	}
 
-	// reverse an array
-	for (int i = 0; i < intervals.size(); i++)
-	{
-		int val = intervals[intervals.size() - i - 1];
-		if (val != 0)
-			intervalsOut.add(val);
-	}
-
-	intervalsOut.minimiseStorageOverheads();
-
-	return intervalsOut;
+	return intervals;
 }
 
 Array<int> Mode::sumArray(Array<int> stepsIn, int offsetIn, bool includePeriod)
