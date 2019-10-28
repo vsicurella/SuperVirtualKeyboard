@@ -353,8 +353,8 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 51 - 150, 48, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 16, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 48, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) - -34 - 31, 16, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) / 2 + -116, 16, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1929f) / 2)) + proportionOfWidth (0.1929f) - -34 - 31, 16, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1929f) / 2)) + proportionOfWidth (0.1929f) / 2 + -116, 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 48, 31, 24);
@@ -366,14 +366,14 @@ void PluginControlComponent::resized()
     noteNumsBtn->setBounds (392, getHeight() - 40, 24, 24);
     periodShiftLbl->setBounds (24, getHeight() - 40, 88, 24);
     editColorsBtn->setBounds (696, getHeight() - 40, 79, 24);
-    keyStyleBox->setBounds (432, getHeight() - 40, proportionOfWidth (0.1423f), 24);
+    keyStyleBox->setBounds (432, getHeight() - 40, proportionOfWidth (0.1422f), 24);
     mapStyleLbl->setBounds (76 - (104 / 2), 48, 104, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
     keyboardViewport->setBounds (24, 80, getWidth() - 48, getHeight() - 132);
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
-    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1587f), 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2), 16, proportionOfWidth (0.1924f), 24);
+    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1584f), 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1929f) / 2), 16, proportionOfWidth (0.1929f), 24);
     //[UserResized] Add your own custom resize handling here..
     }
     else
