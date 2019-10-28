@@ -134,5 +134,12 @@ void Key::resized()
 
 void Key::mouseExit(const MouseEvent& e)
 {
-    repaint();
+	//// is mouse outside of parent?
+	//bool hold = getParentComponent()->reallyContains(e.getEventRelativeTo(getParentComponent()).getPosition(), true);
+	//if (!e.mods.isShiftDown())
+	//{
+	//	isPressed = false;
+	//	repaint();
+	//}
+
 }

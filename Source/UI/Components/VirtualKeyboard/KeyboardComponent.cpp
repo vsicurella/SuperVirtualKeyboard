@@ -131,6 +131,9 @@ void Keyboard::initializeKeys(int size)
 	{
 		keys->getReference(i).keyNumber = i;
 	}
+
+	keysOn = Array<int>();
+	keysByMouseTouch = Array<int>();
 }
 
 //===============================================================================================
@@ -143,7 +146,6 @@ void Keyboard::applyMode(Mode* modeIn)
 		mode = &modeDefault;
 
 	grid.reset(new KeyboardGrid(mode));
-    removeAllChildren();
     
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
@@ -190,11 +192,11 @@ void Keyboard::applyMode(Mode* modeIn)
         for (int keyNum = 0; keyNum < orderArray.size(); keyNum++)
         {
             Key& key = keys->getReference((orderArray.getReference(keyNum)));
-            addAndMakeVisible(key);
+            //addAndMakeVisible(key);
+			key.toFront(false);
         }
     }
 	resized();
-	repaint();
 }
 
 void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
@@ -285,6 +287,21 @@ Rectangle<int> Keyboard::getKeyAreaRelative(int midiNoteIn)
 {
     // TODO
     return Rectangle<int>();
+}
+
+int Keyboard::getKeyWidth()
+{
+	return keyWidth;
+}
+
+int Keyboard::getKeyHeight()
+{
+	return keyHeight;
+}
+
+int Keyboard::getPianoWidth(int heightIn)
+{
+	return numOrder0Keys * (keyWidth + grid->getColumnGap());
 }
 
 float Keyboard::getKeySizeRatio(int keyNumIn)
@@ -709,13 +726,16 @@ void Keyboard::retriggerNotes()
 
 void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 {
+	if (keyNumberIn < 0 || keyNumberIn > keys->size())
+		return;
+
 	Key& key = keys->getReference(keyNumberIn);
 
 	if (doNoteOn)
 	{
 		noteOn(midiChannelOut, keyNumberIn, velocity);
 		key.isPressed = true;
-		keysOn.add(keyNumberIn);
+		keysOn.addIfNotAlreadyThere(keyNumberIn);
 	}
 	else
 	{
@@ -922,11 +942,13 @@ void Keyboard::resized()
 		// Calculate key sizes
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
-		pianoWidth = numOrder0Keys * keyWidth;
 
 		grid->setColumnGap(2);
 		grid->setRowGap(1);
-		grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() + numOrder0Keys, keyHeight);
+
+		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
+
+		grid->setBounds(getBounds());
 	//}
 
 	// Resize keys
@@ -946,15 +968,16 @@ void Keyboard::scaleToHeight(int heightIn)
 
 	keyHeight = heightIn;
 	keyWidth = keyHeight * keySizeRatio;
-	pianoWidth = keyWidth * numOrder0Keys;
 
 	grid->setColumnGap(1);
 	grid->setRowGap(1);
-	grid->setBounds(0, 0, pianoWidth + grid->getColumnGap() * numOrder0Keys, keyHeight);
+
+	pianoWidth = (keyWidth + grid->getColumnGap()) * numOrder0Keys;
+
+	grid->setBounds(getBounds());
 
 	setSize(grid->getBounds().getWidth(), keyHeight);
 }
-
 
 //===============================================================================================
 
@@ -978,10 +1001,20 @@ void Keyboard::mouseExit(const MouseEvent& e)
 {
 	if (uiModeSelected == UIMode::playMode)
 	{
-		if (!shiftHeld && !isMouseButtonDownAnywhere())
+		int touchIndex = e.source.getIndex();
+		if (keysByMouseTouch[touchIndex] > 0)
 		{
-			allNotesOff();
+			Key& key = keys->getReference(keysByMouseTouch[touchIndex]);
+
+			if (!e.source.isDragging())
+			{
+				triggerKey(key.keyNumber, false);
+				keysByMouseTouch.set(touchIndex, -1);
+			}
 		}
+
+		Key& key = keys->getReference(lastKeyOver);
+		key.repaint();
 	}
 }
 
@@ -1021,6 +1054,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
 					// need to implement a velocity class
 					triggerKey(key->keyNumber);
 					lastKeyClicked = key->keyNumber;
+					keysByMouseTouch.set(e.source.getIndex(), key->keyNumber);
 
                     if (e.mods.isAltDown())
                     {
@@ -1091,17 +1125,16 @@ void Keyboard::mouseDrag(const MouseEvent& e)
         
         if (key)
         {
-            if (key->keyNumber != lastKeyClicked)
-            {
-                Key* oldKey = getKey(lastKeyClicked);
-                if (oldKey && (!e.mods.isShiftDown() || e.mods.isAltDown()))
-                {
-					triggerKey(oldKey->keyNumber, false);
-                }
-                
-                triggerKey(key->keyNumber);
-				lastKeyClicked = key->keyNumber;
-            }
+			//bool alreadyDown = false;
+			int touchIndex = e.source.getIndex();
+			int keyIndex = keysByMouseTouch[touchIndex];
+
+			if (key->keyNumber != keyIndex)
+			{
+				triggerKey(keyIndex, false);
+				triggerKey(key->keyNumber);
+				keysByMouseTouch.set(touchIndex, key->keyNumber);
+			}
         }
     }
      
@@ -1111,15 +1144,19 @@ void Keyboard::mouseUp(const MouseEvent& e)
 {
     if (uiModeSelected == UIMode::playMode)
     {
-        Key* key = getKeyFromPositionMouseEvent(e);
-        
-        if (key)
-        {
-            if (!e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
+		int touchIndex = e.source.getIndex();
+		int keyIndex = keysByMouseTouch[touchIndex];
+
+		if (keyIndex > 0)
+		{
+			Key& key = keys->getReference(keyIndex);
+			keysByMouseTouch.set(touchIndex, -1);
+
+            if (!shiftHeld)
             {
-                triggerKey(key->keyNumber, false);
+                triggerKey(key.keyNumber, false);
             }
-        }
+		}
     }
 }
 

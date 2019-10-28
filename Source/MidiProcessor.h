@@ -24,7 +24,7 @@ class SvkMidiProcessor : public MidiMessageCollector
     int outputSelected = 0;
     
     MidiInput* midiInput;
-    MidiOutput* midiOutput;
+    std::unique_ptr<MidiOutput> midiOutput;
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
@@ -125,6 +125,7 @@ public:
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
     
+	// Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;

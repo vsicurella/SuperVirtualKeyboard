@@ -322,7 +322,7 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
 		FileChooser chooser(saveMsg,
             fileOut, fileEnding);
 
-		chooser.browseForFileToSave(true);
+		//chooser.browseForFileToSave(true);
 		fileOut = chooser.getResult();
 	}
     else if (!fileOut.exists())
@@ -331,7 +331,7 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
             File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory),
             fileEnding);
         
-        chooser.browseForFileToSave(true);
+        //chooser.browseForFileToSave(true);
         fileOut = chooser.getResult();
     }
 
@@ -388,7 +388,7 @@ ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, Stri
 		else
 			chooser.reset(new FileChooser(openMsg, File::getSpecialLocation(File::userDocumentsDirectory), fileEnding));
 
-		chooser->browseForFileToOpen();
+		//chooser->browseForFileToOpen();
 		fileIn = chooser->getResult();
 	}
 

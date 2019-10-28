@@ -255,7 +255,7 @@ File PluginSettingsDialog::findDirectory(const String prompt)
 {
     File fileOut;
     FileChooser chooser(prompt, File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
-    chooser.browseForDirectory();
+    //chooser.browseForDirectory();
 
     if (chooser.getResult().exists())
     {
