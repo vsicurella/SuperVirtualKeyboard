@@ -727,6 +727,9 @@ void Keyboard::retriggerNotes()
 
 void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 {
+	if (keyNumberIn < 0 || keyNumberIn > keys->size())
+		return;
+
 	Key& key = keys->getReference(keyNumberIn);
 
 	if (doNoteOn)
@@ -1149,10 +1152,14 @@ void Keyboard::mouseUp(const MouseEvent& e)
 		{
 			Key* key = &keys->getUnchecked(keyIndex);
 
-			if (key && !e.mods.isShiftDown())// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
+			if (key)// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
 			{
-				triggerKey(key->keyNumber, false);
 				keysByMouseTouch.set(touchIndex, -1);
+
+				if (!shiftHeld)
+				{
+					triggerKey(key->keyNumber, false);
+				}
 			}
 		}
     }

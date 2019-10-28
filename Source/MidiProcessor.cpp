@@ -383,9 +383,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             
             if (isInputRemapped)
                 midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
-            
-			midiNote += periodShift * mode2->getScaleSize();
-            
+                        
             msg.setNoteNumber(midiNote);
             
 			if (midiNote >= 0 && midiNote < 128)
@@ -407,7 +405,10 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
         auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
         while (midiEventOut.getNextEvent(msg, smpl))
         {
-            msg.setNoteNumber(midiOutputFilter->getNoteRemapped(msg.getNoteNumber()));
+			int midiNote = msg.getNoteNumber();
+			midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
+			midiNote += periodShift * mode2->getScaleSize();
+            msg.setNoteNumber(midiNote);
             msg.setTimeStamp(++msgCount);
             midiMessages.addEvent(msg, smpl);
         }
