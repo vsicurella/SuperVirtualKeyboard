@@ -118,6 +118,12 @@ bool SvkPluginSettings::getSaveFactoryModes()
 	return saveFactoryModes;
 }
 
+int SvkPluginSettings::getMidiIndexSelected()
+
+{
+	return midiIndexSelected;
+}
+
 void SvkPluginSettings::setPresetDirectory(File presetDirectoryIn)
 {
     currentPresetLocation = presetDirectoryIn;
@@ -147,3 +153,9 @@ void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
 	saveFactoryModes = shouldSavePresets;
 	pluginSettingsNode.setProperty(IDs::saveFactoryModes, saveFactoryModes, nullptr);
 }
+
+void SvkPluginSettings::setMidiIndexSelected(int indexIn)
+{
+	midiIndexSelected = indexIn;
+}
+

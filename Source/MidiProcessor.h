@@ -17,8 +17,9 @@
 
 class SvkMidiProcessor : public MidiMessageCollector
 {
+
     Array<String> inputList;
-    Array<String> outputList;
+	Array<MidiDeviceInfo> outputList;
     
     int inputSelected = 0;
     int outputSelected = 0;
@@ -67,7 +68,7 @@ public:
 	void resetWithRate(double sampleRateIn);
     
     StringArray getAvailableInputs();
-    StringArray getAvailableOutputs();
+	Array<MidiDeviceInfo> getAvailableOutputs();
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
@@ -91,7 +92,7 @@ public:
     bool isAutoRemapping();
     
     String setMidiInput(int deviceIndex);
-    String setMidiOutput(int deviceIndex);
+    void setMidiOutput(int deviceIndex);
 
 	void setModeViewed(Mode* modeViewedIn);
 	void setMode1(Mode* mode1In);

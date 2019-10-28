@@ -144,7 +144,6 @@ private:
     std::unique_ptr<Slider> mode1RootSld;
     std::unique_ptr<Slider> mode2RootSld;
     std::unique_ptr<TextButton> scaleEntryBtn;
-    std::unique_ptr<TextButton> modeInfoButton;
     std::unique_ptr<Slider> periodShiftSld;
     std::unique_ptr<ToggleButton> mode1ViewBtn;
     std::unique_ptr<ToggleButton> mode2ViewBtn;
@@ -167,6 +166,7 @@ private:
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
     std::unique_ptr<TextEditor> scaleTextBox;
+    std::unique_ptr<TextButton> modeInfoButton;
 
 
     //==============================================================================

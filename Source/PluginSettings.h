@@ -33,6 +33,8 @@ class SvkPluginSettings
 	bool saveFactoryModes = false;
     
     bool resetDirectories = false;
+
+	int midiIndexSelected = -1;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 
@@ -52,12 +54,17 @@ public:
 
 	bool getCreatePresetFolder();
 	bool getSaveFactoryModes();
-    
+
+    int getMidiIndexSelected();
+
     void setPresetDirectory(File presetDirectoryIn);
     void setModeDirectory(File modeDirectoryIn);
     void setSettingsDirectory(File settingsDirectoryIn);
 
 	void setCreatePresetFolder(bool shouldCreateFolder);
 	void setSaveFactoryPresets(bool shouldSavePresets);
+
+	void setMidiIndexSelected(int indexIn);
+	
 
 };
