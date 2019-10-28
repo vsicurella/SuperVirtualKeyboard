@@ -353,8 +353,8 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 51 - 150, 48, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 16, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 48, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) - -34 - 31, 16, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) / 2 + -116, 16, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) - -34 - 31, 16, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) / 2 + -116, 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 48, 31, 24);
@@ -372,8 +372,8 @@ void PluginControlComponent::resized()
     keyboardViewport->setBounds (24, 80, getWidth() - 48, getHeight() - 132);
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
-    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1590f), 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2), 16, proportionOfWidth (0.1927f), 24);
+    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1587f), 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2), 16, proportionOfWidth (0.1924f), 24);
     //[UserResized] Add your own custom resize handling here..
     }
     else
@@ -947,7 +947,7 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="696 40R 79 24" buttonText="Edit Colors"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Key Style Box" id="292b32e0c6cd0b80" memberName="keyStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="432 40R 14.226% 24"
+            virtualName="" explicitFocusOrder="0" pos="432 40R 14.224% 24"
             editable="0" layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Save Button" id="b3d301956f9f6d50" memberName="saveBtn"
@@ -976,14 +976,14 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="400r 48 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 16 15.87% 24"
+            virtualName="" explicitFocusOrder="0" pos="136 16 15.841% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="408 48 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.239% 24"
+              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.289% 24"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
 </JUCER_COMPONENT>
