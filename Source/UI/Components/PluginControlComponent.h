@@ -167,6 +167,8 @@ private:
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
     std::unique_ptr<TextEditor> scaleTextBox;
+    std::unique_ptr<Component> sizeToggleBtn;
+    std::unique_ptr<Slider> transposeSld;
 
 
     //==============================================================================

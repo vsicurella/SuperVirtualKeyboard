@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -193,7 +193,7 @@ void PluginSettingsDialog::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    headerLbl->setBounds (proportionOfWidth (0.5000f) - (127 / 2), 0, 127, 24);
+    headerLbl->setBounds (proportionOfWidth (0.4994f) - (127 / 2), 0, 127, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -323,11 +323,11 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="24 153 184 24" buttonText="Create Local Directories"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
   <LABEL name="Header Label" id="6df6057198db7be1" memberName="headerLbl"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 127 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Global Preferences" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="1" italic="0" justification="33"
-         typefaceStyle="Bold"/>
+         virtualName="" explicitFocusOrder="0" pos="49.943%c 0 127 24"
+         edTextCol="ff000000" edBkgCol="0" labelText="Global Preferences"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="1"
+         italic="0" justification="33" typefaceStyle="Bold"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
