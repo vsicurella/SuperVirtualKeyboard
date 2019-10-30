@@ -25,7 +25,7 @@ class SvkMidiProcessor : public MidiMessageCollector
     int outputSelected = 0;
     
     MidiInput* midiInput;
-    MidiOutput* midiOutput;
+    std::unique_ptr<MidiOutput> midiOutput;
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
