@@ -511,7 +511,7 @@ namespace VirtualKeyboard
 		// Functionality
 		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
-		KeyboardViewport* viewport;
+		KeyboardViewport* viewport = nullptr;
 
         const MidiKeyboardState& keyboardInputState;
 		const MidiKeyboardState* keyboardInputFilteredState;
