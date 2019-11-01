@@ -946,8 +946,8 @@ void Keyboard::paint(Graphics& g)
 
 void Keyboard::resized()
 {
-	//if (keyHeight != getHeight())
-	//{
+	if (getHeight() > 0)
+	{
 		// Calculate key sizes
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
@@ -957,19 +957,22 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
-		//viewport->setStepSmall(keyWidth);
-		//viewport->setStepLarge(keyWidth * mode->getModeSize());
+		if (viewport)
+		{
+			viewport->setStepSmall(keyWidth);
+			viewport->setStepLarge(keyWidth * mode->getModeSize());
+		}
 
 		grid->setBounds(getBounds());
-	//}
+		
+		// Resize keys
+		for (int i = 0; i < keys->size(); i++)
+		{
+			Key& key = keys->getReference(i);
 
-	// Resize keys
-	for (int i = 0; i < keys->size(); i++)
-	{
-		Key& key = keys->getReference(i);
-            
-        grid->resizeKey(key);
-		grid->placeKey(key);
+			grid->resizeKey(key);
+			grid->placeKey(key);
+		}
 	}
 }
 
