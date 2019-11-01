@@ -64,6 +64,17 @@ public:
 
 	TextButton* getModeInfoButton();
 
+	/*
+		Returns thes X position of the viewport
+	*/
+	int getViewPosition();
+
+	/*
+		Sets the X position of the viewport
+	*/
+	void setViewPosition(int xIn);
+	void setViewPosition(float xRatioIn);
+
 	int getMode1BoxSelection();
 	int getMode2BoxSelection();
 

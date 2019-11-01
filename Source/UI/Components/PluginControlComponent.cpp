@@ -285,6 +285,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
+	keyboardViewport->setBounds(7, 40, proportionOfWidth(0.9830f), getHeight() - 83);
 
 	// DISABLED BECAUSE OF MOBILE
 	mapStyleBox->setVisible(false);
@@ -372,34 +373,34 @@ void PluginControlComponent::resized()
     //[/UserPreResize]
 
     mode1Box->setBounds (getWidth() - 218, -64, 150, 24);
-    mode2Box->setBounds (proportionOfWidth (0.8314f) - (proportionOfWidth (0.2362f) / 2), 8, proportionOfWidth (0.2362f), 24);
+    mode2Box->setBounds (proportionOfWidth (0.8317f) - (proportionOfWidth (0.2367f) / 2), 8, proportionOfWidth (0.2367f), 24);
     mode1RootSld->setBounds (getWidth() - 310, -64, 79, 24);
-    mode2RootSld->setBounds (proportionOfWidth (0.6583f), -40, proportionOfWidth (0.0929f), 24);
-    scaleEntryBtn->setBounds (proportionOfWidth (0.5872f) - proportionOfWidth (0.0505f), 8, proportionOfWidth (0.0505f), 24);
-    modeInfoButton->setBounds (proportionOfWidth (0.2316f), 8, 30, 24);
-    periodShiftSld->setBounds ((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f), getHeight() - 10 - 24, proportionOfWidth (0.1227f), 24);
+    mode2RootSld->setBounds (proportionOfWidth (0.6582f), -40, proportionOfWidth (0.0934f), 24);
+    scaleEntryBtn->setBounds (proportionOfWidth (0.5870f) - proportionOfWidth (0.0510f), 8, proportionOfWidth (0.0510f), 24);
+    modeInfoButton->setBounds (proportionOfWidth (0.2314f), 8, 30, 24);
+    periodShiftSld->setBounds ((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f), getHeight() - 10 - 24, proportionOfWidth (0.1231f), 24);
     mode1ViewBtn->setBounds (getWidth() - 66, -64, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 66, -32, 31, 24);
     mode1RootLbl->setBounds (getWidth() - 342, -64, 32, 24);
     mode2RootLbl->setBounds (getWidth() - 339, -32, 32, 24);
     mapStyleBox->setBounds (195 - (152 / 2), -40, 152, 24);
-    midiChannelSld->setBounds ((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f), getHeight() - 10 - 24, proportionOfWidth (0.1250f), 24);
-    midiChannelLbl->setBounds (((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f), getHeight() - 10 - 24, proportionOfWidth (0.1204f), 24);
-    noteNumsBtn->setBounds (((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f)) + roundToInt (proportionOfWidth (0.1250f) * 1.0917f), getHeight() - 10 - 24, proportionOfWidth (0.0275f), 24);
-    periodShiftLbl->setBounds (7 + 0, getHeight() - 10 - 24, proportionOfWidth (0.1101f), 24);
-    editColorsBtn->setBounds (proportionOfWidth (0.9782f) - proportionOfWidth (0.1078f), getHeight() - 10 - 24, proportionOfWidth (0.1078f), 24);
-    keyStyleBox->setBounds ((((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f)) + roundToInt (proportionOfWidth (0.1250f) * 1.0917f)) + roundToInt (proportionOfWidth (0.0275f) * 1.5417f), getHeight() - 10 - 24, proportionOfWidth (0.1697f), 24);
-    saveBtn->setBounds (7, 8, proportionOfWidth (0.0562f), 24);
-    loadBtn->setBounds (proportionOfWidth (0.0734f), 8, 48, 24);
+    midiChannelSld->setBounds ((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f), getHeight() - 10 - 24, proportionOfWidth (0.1253f), 24);
+    midiChannelLbl->setBounds (((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f), getHeight() - 10 - 24, proportionOfWidth (0.1200f), 24);
+    noteNumsBtn->setBounds (((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f), getHeight() - 10 - 24, proportionOfWidth (0.0276f), 24);
+    periodShiftLbl->setBounds (7 + 0, getHeight() - 10 - 24, proportionOfWidth (0.1104f), 24);
+    editColorsBtn->setBounds (proportionOfWidth (0.9777f) - proportionOfWidth (0.1083f), getHeight() - 10 - 24, proportionOfWidth (0.1083f), 24);
+    keyStyleBox->setBounds ((((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f)) + roundToInt (proportionOfWidth (0.0276f) * 1.5385f), getHeight() - 10 - 24, proportionOfWidth (0.1699f), 24);
+    saveBtn->setBounds (7, 8, proportionOfWidth (0.0563f), 24);
+    loadBtn->setBounds (proportionOfWidth (0.0732f), 8, 48, 24);
     mapStyleLbl->setBounds (59 - (104 / 2), -40, 104, 24);
-    highlightStyleBox->setBounds (((((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f)) + roundToInt (proportionOfWidth (0.1250f) * 1.0917f)) + roundToInt (proportionOfWidth (0.0275f) * 1.5417f)) + roundToInt (proportionOfWidth (0.1697f) * 1.0878f), getHeight() - 10 - 24, proportionOfWidth (0.1365f), 24);
-    keyboardViewport->setBounds (7, 40, proportionOfWidth (0.9828f), getHeight() - 83);
-    settingsButton->setBounds (proportionOfWidth (0.1376f), 8, proportionOfWidth (0.0860f), 24);
+    highlightStyleBox->setBounds (((((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f)) + roundToInt (proportionOfWidth (0.0276f) * 1.5385f)) + roundToInt (proportionOfWidth (0.1699f) * 1.0875f), getHeight() - 10 - 24, proportionOfWidth (0.1369f), 24);
+    keyboardViewport->setBounds (7, 40, proportionOfWidth (0.9830f), getHeight() - 83);
+    settingsButton->setBounds (proportionOfWidth (0.1380f), 8, proportionOfWidth (0.0860f), 24);
     mapOrderEditBtn->setBounds (383 - 96, -40, 96, 24);
-    mapModeBox->setBounds (119, -32, proportionOfWidth (0.1583f), 24);
-    scaleTextBox->setBounds (proportionOfWidth (0.5321f) - proportionOfWidth (0.2580f), 8, proportionOfWidth (0.2580f), 24);
-    sizeToggleBtn->setBounds (proportionOfWidth (0.9828f) - proportionOfWidth (0.0241f), 8, proportionOfWidth (0.0241f), 24);
-    transposeSld->setBounds (proportionOfWidth (0.7064f) - proportionOfWidth (0.1124f), 8, proportionOfWidth (0.1124f), 24);
+    mapModeBox->setBounds (119, -32, proportionOfWidth (0.1582f), 24);
+    scaleTextBox->setBounds (proportionOfWidth (0.5319f) - proportionOfWidth (0.2580f), 8, proportionOfWidth (0.2580f), 24);
+    sizeToggleBtn->setBounds (proportionOfWidth (0.9830f) - proportionOfWidth (0.0244f), 8, proportionOfWidth (0.0244f), 24);
+    transposeSld->setBounds (proportionOfWidth (0.7059f) - proportionOfWidth (0.1125f), 8, proportionOfWidth (0.1125f), 24);
     //[UserResized] Add your own custom resize handling here..
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
@@ -682,6 +683,22 @@ TextButton* PluginControlComponent::getModeInfoButton()
 {
 	return modeInfoButton.get();
 }
+
+int PluginControlComponent::getViewPosition()
+{
+	return keyboardViewport->getViewPositionX();
+}
+
+void PluginControlComponent::setViewPosition(int xIn)
+{
+	keyboardViewport->setViewPosition(Point<int>(xIn, 0));
+}
+
+void PluginControlComponent::setViewPosition(float xRatioIn)
+{
+	keyboardViewport->setViewPositionProportionately(xRatioIn, 1);
+}
+
 
 int PluginControlComponent::getMode1BoxSelection()
 {

@@ -24,16 +24,17 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     appCmdMgr->setFirstCommandTarget(this);
 
 	controlComponent.reset(new PluginControlComponent(pluginState));
-	controlComponent->setBounds(getBounds());
 	addAndMakeVisible(controlComponent.get());
+
+	viewport = controlComponent->getViewport();
+	Rectangle<int> viewportBounds = viewport->getBounds();
     
-	//view = controlComponent->getViewport();
 	virtualKeyboard = pluginState->getKeyboard();
 	virtualKeyboard->setViewport(controlComponent->getViewport());
-	//view->setViewedComponent(virtualKeyboard, false);
     
-    //keyboardScroll = &view->getHorizontalScrollBar();
-    //keyboardScroll->addListener(this);
+	viewport->setBounds(viewportBounds);
+	viewportScroll = &viewport->getHorizontalScrollBar();
+	viewportScroll->addListener(this);
     
     colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
     colorChooserWindow->setSize(450, 450);
@@ -56,6 +57,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
     
+	controlComponent->setBounds(getBounds());
     initNodeData();
 	//startTimerHz(30);
 }
@@ -75,7 +77,7 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        //view->setViewPosition((int)pluginEditorNode[IDs::viewportPosition], 0);
+        viewportX = (float)pluginEditorNode[IDs::viewportPosition];
 	}
     // Intialization
 	else
@@ -83,8 +85,7 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		pluginState->pluginEditorNode = pluginEditorNode;
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
-
-		//view->setViewPositionProportionately(0.52, 0);
+		viewportX = 0.51f;
 	}
     
     updateUI();
@@ -94,7 +95,7 @@ void SvkPluginEditor::updateNodeData()
 {
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	//pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
+	pluginEditorNode.setProperty(IDs::viewportPosition, viewport->getViewPositionX(), nullptr);
 }
 
 void SvkPluginEditor::updateUI()
@@ -112,8 +113,15 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
 	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
 	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
+	controlComponent->setViewPosition(viewportX);
 
 	DBG("Children Updated");
+}
+
+void SvkPluginEditor::updateScrollbarData()
+{
+	viewportX = viewport->getViewPositionX() / (float)viewport->getMaximumVisibleWidth();
+	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
 }
 
 //==============================================================================
@@ -358,15 +366,12 @@ void SvkPluginEditor::paint(Graphics& g)
 }
 
 void SvkPluginEditor::resized()
-{
-	//float viewXProportion = (float) view->getViewPositionX() / view->getMaximumVisibleWidth();
+{	
 	AudioProcessorEditor::resized();
-	controlComponent->setSize(getWidth(), getHeight());
 
-	//view->setBounds(0, keyboardEditorBar->getBottom(), getWidth(), getHeight() - keyboardEditorBar->getHeight());
-	//virtualKeyboard->setSize(getWidth(), getHeight());
+	controlComponent->setSize(getWidth(), getHeight());
 	
-	//view->setViewPosition((int)(viewXProportion * view->getMaximumVisibleWidth()), 0);
+	viewport->setViewPosition((int)(viewportX * viewport->getMaximumVisibleWidth() * 1.01f), 0);
     
     if (pluginEditorNode.isValid())
         updateNodeData();
@@ -386,6 +391,7 @@ void SvkPluginEditor::userTriedToCloseWindow()
 	if (colorChooserWindow->isVisible())
 		colorChooserWindow->closeButtonPressed();
 
+	updateScrollbarData();
     updateNodeData();
 	setVisible(false);
 }
@@ -410,6 +416,11 @@ void SvkPluginEditor::mouseUp(const MouseEvent& e)
 void SvkPluginEditor::mouseMove(const MouseEvent& e)
 {
 
+}
+
+void SvkPluginEditor::mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w)
+{
+	updateScrollbarData();
 }
 
 //==============================================================================
@@ -452,9 +463,9 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 
 void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
 {
-    if (scrollBarThatHasMoved == keyboardScroll)
+    if (scrollBarThatHasMoved == viewportScroll)
     {
-        //pluginEditorNode.setProperty(IDs::viewportPosition, view->getViewPositionX(), nullptr);
+		updateScrollbarData();
     }
 }
 
