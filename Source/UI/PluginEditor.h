@@ -58,6 +58,7 @@ public:
 	void updateNodeData();
 
 	void updateUI();
+	void updateScrollbarData();
 
 	//===============================================================================================
 
@@ -131,6 +132,8 @@ public:
 
 	void mouseMove(const MouseEvent& e) override;
 
+	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w) override;
+
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -166,7 +169,9 @@ private:
     std::unique_ptr<MappingHelper> mappingHelper;
 
 	Keyboard* virtualKeyboard;
-    ScrollBar* keyboardScroll;
+	Viewport* viewport;
+	float viewportX = 0.51f;
+	ScrollBar* viewportScroll;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;

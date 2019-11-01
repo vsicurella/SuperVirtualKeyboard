@@ -402,6 +402,7 @@ void Keyboard::setViewport(KeyboardViewport* viewportIn)
 	{
 		viewport->setViewedComponent(this, false);
 		setSize(getWidth(), viewport->getHeight());
+		viewport->setScrollOnDragEnabled(false);
 	}
 }
 
@@ -477,6 +478,13 @@ void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
 {
 	showNoteNumbers = shouldShowNumbers;
 	pianoNode.setProperty(IDs::pianoKeyShowNumber, showNoteNumbers, nullptr);
+
+	for (int i = 0; i < keys->size(); i++)
+	{
+		Key& key = keys->getReference(i);
+		key.showNoteNumber = shouldShowNumbers;
+		key.repaint();
+	}
 }
 
 void Keyboard::setShowFilteredNumbers(bool shouldShowNumbers)
