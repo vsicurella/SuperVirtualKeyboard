@@ -219,7 +219,7 @@ void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInpu
 }
 
 //===============================================================================================
-Viewport* Keyboard::getViewport()
+KeyboardViewport* Keyboard::getViewport()
 {
 	return viewport;
 }
@@ -394,7 +394,7 @@ int Keyboard::getScrollingStyle()
 
 //===============================================================================================
 
-void Keyboard::setViewport(Viewport* viewportIn)
+void Keyboard::setViewport(KeyboardViewport* viewportIn)
 {
 	viewport = viewportIn;
 
@@ -948,6 +948,9 @@ void Keyboard::resized()
 		grid->setRowGap(1);
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
+
+		//viewport->setStepSmall(keyWidth);
+		//viewport->setStepLarge(keyWidth * mode->getModeSize());
 
 		grid->setBounds(getBounds());
 	//}

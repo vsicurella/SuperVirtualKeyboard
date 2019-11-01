@@ -205,10 +205,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     highlightStyleBox->addItem (TRANS("Squares"), 5);
     highlightStyleBox->addListener (this);
 
-    keyboardViewport.reset (new Viewport ("Keyboard Viewport"));
-    addAndMakeVisible (keyboardViewport.get());
-    keyboardViewport->setScrollBarsShown (false, true);
-
     settingsButton.reset (new TextButton ("Settings Button"));
     addAndMakeVisible (settingsButton.get());
     settingsButton->setButtonText (TRANS("Settings"));
@@ -247,8 +243,14 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     scaleTextBox->setPopupMenuEnabled (true);
     scaleTextBox->setText (String());
 
+    keyboardViewport.reset (new KeyboardViewport ("Keyboard Viewport"));
+    addAndMakeVisible (keyboardViewport.get());
+    keyboardViewport->setName ("Keyboard Viewport");
+
 
     //[UserPreSize]
+	
+
     mapOrderEditBtn->setVisible(false);
 
 	scaleTextBox->addListener(this);
@@ -277,7 +279,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
-
 	// DISABLED BECAUSE NOT IMPLEMENTED
     editColorsBtn->setEnabled(false);
     mapModeBox->setItemEnabled(3, false);
@@ -318,12 +319,12 @@ PluginControlComponent::~PluginControlComponent()
     loadBtn = nullptr;
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
-    keyboardViewport = nullptr;
     settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
     scaleTextBox = nullptr;
+    keyboardViewport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -353,8 +354,8 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 51 - 150, 48, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 16, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 48, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) - -34 - 31, 16, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) / 2 + -116, 16, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) - -34 - 31, 16, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2)) + proportionOfWidth (0.1924f) / 2 + -116, 16, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 16, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 48, 31, 24);
@@ -369,11 +370,11 @@ void PluginControlComponent::resized()
     keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
     mapStyleLbl->setBounds (76 - (104 / 2), 48, 104, 24);
     highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    keyboardViewport->setBounds (24, 80, getWidth() - 48, getHeight() - 132);
     settingsButton->setBounds (792, getHeight() - 40, 88, 24);
     mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
-    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1590f), 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2), 16, proportionOfWidth (0.1927f), 24);
+    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1587f), 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1924f) / 2), 16, proportionOfWidth (0.1924f), 24);
+    keyboardViewport->setBounds (32, 80, getWidth() - 48, getHeight() - 132);
     //[UserResized] Add your own custom resize handling here..
     }
     else
@@ -630,7 +631,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	}
 }
 
-Viewport* PluginControlComponent::getViewport()
+KeyboardViewport* PluginControlComponent::getViewport()
 {
 	return keyboardViewport.get();
 }
@@ -965,10 +966,6 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="584 40R 96 24" editable="0"
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="24 80 48M 132M" vscroll="0"
-            hscroll="1" scrollbarThickness="8" contentType="0" jucerFile=""
-            contentClass="" constructorParams=""/>
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
               virtualName="" explicitFocusOrder="0" pos="792 40R 88 24" buttonText="Settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -976,16 +973,19 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="400r 48 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 16 15.87% 24"
+            virtualName="" explicitFocusOrder="0" pos="136 16 15.817% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="408 48 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.239% 24"
+              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.214% 24"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
+  <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
+                    virtualName="" explicitFocusOrder="0" pos="32 80 48M 132M" class="KeyboardViewport"
+                    params="&quot;Keyboard Viewport&quot;"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
