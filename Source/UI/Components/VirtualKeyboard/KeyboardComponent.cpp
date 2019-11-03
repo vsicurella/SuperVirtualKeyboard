@@ -957,13 +957,18 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
+		Rectangle<int> viewableBounds = getBounds();
+
 		if (viewport)
 		{
-			viewport->setStepSmall(keyWidth);
-			viewport->setStepLarge(keyWidth * mode->getModeSize());
+			viewport->setStepSmall(keyWidth + grid->getColumnGap());
+			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
+
+			if (viewport->isShowingButtons())
+				viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
 		}
 
-		grid->setBounds(getBounds());
+		grid->setBounds(viewableBounds);
 		
 		// Resize keys
 		for (int i = 0; i < keys->size(); i++)

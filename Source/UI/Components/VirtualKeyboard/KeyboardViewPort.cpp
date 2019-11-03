@@ -48,6 +48,10 @@ int KeyboardViewport::getButtonWidth()
 	return buttonWidth;
 }
 
+bool KeyboardViewport::isShowingButtons()
+{
+	return showStepButtons;	
+}
 
 void KeyboardViewport::setStepSmall(int smallSizeIn)
 {
@@ -82,6 +86,8 @@ void KeyboardViewport::setShowButtons(bool toShowButtons)
 		stepLeftLarge->setVisible(false);
 		stepLeftSmall->setVisible(false);
 	}
+
+//	resized();
 }
 
 void KeyboardViewport::stepSmallForward()
@@ -92,94 +98,111 @@ void KeyboardViewport::stepSmallForward()
 void KeyboardViewport::stepSmallBackward()
 {
     Viewport::setViewPosition(getViewPositionX() - stepSmall, getViewPositionY());
-
 }
 
 void KeyboardViewport::stepLargeForward()
 {
     Viewport::setViewPosition(getViewPositionX() + stepLarge, getViewPositionY());
-
 }
 
 void KeyboardViewport::stepLargeBackward()
 {
     Viewport::setViewPosition(getViewPositionX() - stepLarge, getViewPositionY());
-
 }
 
-int KeyboardViewport::drawAngleBracket(Graphics& g, bool isLeft, int sideLength, int xCenter, int yCenter, float thickness)
+int KeyboardViewport::drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness)
 {
+	float halfSide = sideLength / 2.0f;
+	float altitude = sqrtf(powf(sideLength, 2.0f) - powf(halfSide, 2.0f));
+	float halfAltitude = altitude / 2.0f;
 
-	float halfSide = sideLength / 2.0f + yCenter;
-	float altitude = sqrtf(powf(buttonWidth, 2) - powf(buttonWidth / 2.0f, 2));
+	int x1 = xCenter - halfAltitude;
+	int x2 = xCenter + halfAltitude;
+	int y1 = yCenter + halfSide;
+	int y2 = yCenter - halfSide;
 
-	int xc = (int)(xCenter - altitude / 2.0f);
-	int xa = altitude + xc;
-
-	if (isLeft)
+	if (isRightPointing)
 	{
-		g.drawLine(Line<float>(xc, halfSide, xa, yCenter), thickness);
-		g.drawLine(Line<float>(xc, -halfSide, xa, yCenter), thickness);
+		g.drawLine(Line<float>(x1, y1, x2, yCenter), thickness);
+		g.drawLine(Line<float>(x1, y2, x2, yCenter), thickness);
 	}
 	else
 	{
-		g.drawLine(Line<float>(xa, halfSide, xc, yCenter), thickness);
-		g.drawLine(Line<float>(xa, -halfSide, xc, yCenter), thickness);
+		g.drawLine(Line<float>(x2, y1, x1, yCenter), thickness);
+		g.drawLine(Line<float>(x2, y2, x1, yCenter), thickness);
 	}
 
 	return altitude;
 }
 
 
-void KeyboardViewport::redrawButtons()
+void KeyboardViewport::redrawButtons(int heightIn)
 {
-	singleBracketImage = Image(Image::PixelFormat::ARGB, buttonWidth, getHeight()/4, false);
-	doubleBracketImage = Image(Image::PixelFormat::ARGB, buttonWidth, getHeight()/4, false);
+	Image singleBracketImage = Image(Image::PixelFormat::ARGB, buttonWidth, heightIn, false);
+	Image doubleBracketImage = singleBracketImage.createCopy();
+	Image singleBracketFlipped = singleBracketImage.createCopy();
+	Image doubleBracketFlipped = singleBracketImage.createCopy();
+
+	Colour buttonColour = Colours::steelblue.darker().withSaturation(0.33f);
+	Colour bracketColour = Colours::black;
+	Colour mouseOverColor = Colours::lightgrey.withAlpha(0.33f);
+	Colour mouseClickColor = Colours::darkgrey.withAlpha(0.75f);
 	
-	Graphics g1(singleBracketImage);
-	int sideLength = round(buttonWidth * 0.8f);
+	int sideLength = round(buttonWidth * 0.33f);
 	int altitude;
 	int xCenter = buttonWidth / 2;
 	int yCenter = getHeight() / 4;
+	int doubleSeparation = 3;
 
-	altitude = drawAngleBracket(g1, true, sideLength, xCenter, yCenter, 2);
+	Graphics g1(singleBracketImage);
+	g1.setColour(buttonColour);
+	g1.fillAll();
+	g1.setColour(bracketColour);
+	altitude = drawAngleBracket(g1, true, sideLength, xCenter, yCenter, 1);
+
 
 	Graphics g2(doubleBracketImage);
-	int xc = (int)(xCenter - (altitude / 2.0f));
-	int yc = (int)(yCenter + (sideLength / 2.0f));
-	doubleBracketImage = singleBracketImage;
-	doubleBracketImage.moveImageSection(xc + 13, yc, xc, yc, altitude, sideLength);
+	g2.setColour(buttonColour);
+	g2.fillAll();
+	g2.setColour(bracketColour);
+	drawAngleBracket(g2, true, sideLength, xCenter - doubleSeparation, yCenter, 1);
+	drawAngleBracket(g2, true, sideLength, xCenter + doubleSeparation, yCenter, 1);
+
+	Graphics g3(singleBracketFlipped);
+	g3.setColour(buttonColour);
+	g3.fillAll();
+	g3.setColour(bracketColour);
+	altitude = drawAngleBracket(g3, false, sideLength, xCenter, yCenter, 1);
+
+
+	Graphics g4(doubleBracketFlipped);
+	g4.setColour(buttonColour);
+	g4.fillAll();
+	g4.setColour(bracketColour);
+	drawAngleBracket(g4, false, sideLength, xCenter - doubleSeparation, yCenter, 1);
+	drawAngleBracket(g4, false, sideLength, xCenter + doubleSeparation, yCenter, 1);
+
 
 	stepLeftSmall->setImages(false, false, false,
-		singleBracketImage, 0.01f, Colours::lightslategrey,
-		singleBracketImage, 0.68f, Colours::lightslategrey,
-		singleBracketImage, 1.0f, Colours::darkslategrey);
+		singleBracketImage, 1.0f, Colours::transparentBlack,
+		singleBracketImage, 1.0f, mouseOverColor,
+		singleBracketImage, 1.0f, mouseClickColor);
 
 	stepLeftLarge->setImages(false, false, false,
-		doubleBracketImage, 0.01f, Colours::lightslategrey,
-		doubleBracketImage, 0.68f, Colours::lightslategrey,
-		doubleBracketImage, 1.0f, Colours::darkslategrey);
-		
-	AffineTransform af = AffineTransform();
-	af.rotated(355.0f / 113.0f);
-	g1.drawImageTransformed(singleBracketImage, af);
-	g2.drawImageTransformed(doubleBracketImage, af);
+		doubleBracketImage, 1.0f, Colours::transparentBlack,
+		doubleBracketImage, 1.0f, mouseOverColor,
+		doubleBracketImage, 1.0f, mouseClickColor);
 	
 	stepRightSmall->setImages(false, false, false,
-		singleBracketImage, 0.01f, Colours::lightslategrey,
-		singleBracketImage, 0.68f, Colours::lightslategrey,
-		singleBracketImage, 1.0f, Colours::darkslategrey);
+		singleBracketFlipped, 1.0f, Colours::transparentBlack,
+		singleBracketFlipped, 1.0f, mouseOverColor,
+		singleBracketFlipped, 1.0f, mouseClickColor);
 
 	stepRightLarge->setImages(false, false, false,
-		doubleBracketImage, 0.01f, Colours::lightslategrey,
-		doubleBracketImage, 0.68f, Colours::lightslategrey,
-		doubleBracketImage, 1.0f, Colours::darkslategrey);
-
-	g1.drawImageTransformed(singleBracketImage, af);
-	g2.drawImageTransformed(doubleBracketImage, af);
+		doubleBracketFlipped, 1.0f, Colours::transparentBlack,
+		doubleBracketFlipped, 1.0f, mouseOverColor,
+		doubleBracketFlipped, 1.0f, mouseClickColor);
 }
-
-
 
 void KeyboardViewport::resized()
 {
@@ -187,13 +210,13 @@ void KeyboardViewport::resized()
 	
 	if (showStepButtons)
 	{
-		// resize the step sizes
-		redrawButtons();
+		int halfHeight = round(getMaximumVisibleHeight() / 2.0f);
+		redrawButtons(halfHeight);
 
-		stepRightLarge->setBounds(0, 0, buttonWidth, getHeight() / 2);
-		stepRightSmall->setBounds(0, getHeight() / 2, buttonWidth, getHeight() / 2);
-		stepLeftLarge->setBounds(getWidth() - buttonWidth, 0, buttonWidth, getHeight() / 2);
-		stepLeftSmall->setBounds(getWidth() - buttonWidth, getHeight() / 2, buttonWidth, getHeight() / 2);
+		stepRightLarge->setBounds(0, 0, buttonWidth, halfHeight);
+		stepRightSmall->setBounds(0, halfHeight, buttonWidth, halfHeight);
+		stepLeftLarge->setBounds(getWidth() - buttonWidth, 0, buttonWidth, halfHeight);
+		stepLeftSmall->setBounds(getWidth() - buttonWidth, halfHeight, buttonWidth, halfHeight);
 	}
 }
 
@@ -210,7 +233,6 @@ void KeyboardViewport::buttonClicked(Button* button)
 	else if (button == stepLeftLarge.get())
 	{
 		stepLargeForward();
-
 	}
 	else if (button == stepLeftSmall.get())
 	{
