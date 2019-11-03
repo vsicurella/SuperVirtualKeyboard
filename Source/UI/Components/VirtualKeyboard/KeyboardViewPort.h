@@ -18,12 +18,9 @@ class KeyboardViewport : public Viewport,
     int stepSmall = 0;
     int stepLarge = 0;
 
-	int buttonWidth = 75;
+	int buttonWidth = 16;
 	
 	bool showStepButtons = true;
-
-	Image singleBracketImage;
-	Image doubleBracketImage;
     
 	std::unique_ptr<ImageButton> stepLeftSmall;
 	std::unique_ptr<ImageButton> stepLeftLarge;
@@ -31,9 +28,9 @@ class KeyboardViewport : public Viewport,
 	std::unique_ptr<ImageButton> stepRightLarge;
 
 	// returns altitude
-	int drawAngleBracket(Graphics& g, bool isLeft, int sideLength, int xCenter, int yCenter, float thickness=1.0f);
+	int drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness=1.0f);
 
-	void redrawButtons();
+	void redrawButtons(int heightIn);
     
 public:
     
@@ -43,6 +40,7 @@ public:
     int getStepLarge();
 	
 	int getButtonWidth();
+	bool isShowingButtons();
     
     void setStepSmall(int smallSizeIn);
     void setStepLarge(int largeSizeIn);
