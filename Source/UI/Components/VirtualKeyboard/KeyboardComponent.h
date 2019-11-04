@@ -19,6 +19,7 @@
 #include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
+#include "KeyboardViewport.h"
 
 #include <iostream>     
 
@@ -112,7 +113,7 @@ namespace VirtualKeyboard
 		/*
 			Returns a pointer to the viewport
 		*/
-		Viewport* getViewport();
+		KeyboardViewport* getViewport();
 		/*
 			Returns a struct with the given key's data.
 		*/
@@ -251,7 +252,7 @@ namespace VirtualKeyboard
 		/*
 			Sets the viewport used
 		*/
-		void setViewport(Viewport* viewportIn);
+		void setViewport(KeyboardViewport* viewportIn);
 		/*
 			Sets the keyboards UI mode.
 		*/
@@ -510,7 +511,7 @@ namespace VirtualKeyboard
 		// Functionality
 		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
-		Viewport* viewport;
+		KeyboardViewport* viewport = nullptr;
 
         const MidiKeyboardState& keyboardInputState;
 		const MidiKeyboardState* keyboardInputFilteredState;

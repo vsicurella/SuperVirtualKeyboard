@@ -257,6 +257,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 
 
     //[UserPreSize]
+
+
     mapOrderEditBtn->setVisible(false);
 
 	scaleTextBox->addListener(this);
@@ -340,7 +342,6 @@ PluginControlComponent::~PluginControlComponent()
     loadBtn = nullptr;
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
-    keyboardViewport = nullptr;
     settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
@@ -638,7 +639,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	}
 }
 
-Viewport* PluginControlComponent::getViewport()
+KeyboardViewport* PluginControlComponent::getViewport()
 {
 	return keyboardViewport.get();
 }
@@ -993,10 +994,6 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="108.75% 10Rr 13.694% 24"
             posRelativeX="292b32e0c6cd0b80" editable="0" layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <VIEWPORT name="Keyboard Viewport" id="1f2717bdf6633c2" memberName="keyboardViewport"
-            virtualName="" explicitFocusOrder="0" pos="7 40 98.301% 83M"
-            vscroll="0" hscroll="1" scrollbarThickness="12" contentType="0"
-            jucerFile="" contentClass="" constructorParams=""/>
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
               virtualName="" explicitFocusOrder="0" pos="13.8% 8 8.599% 24"
               buttonText="Settings" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -1022,6 +1019,9 @@ BEGIN_JUCER_METADATA
           min="-128.0" max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
+                    virtualName="" explicitFocusOrder="0" pos="32 80 48M 132M" class="KeyboardViewport"
+                    params="&quot;Keyboard Viewport&quot;"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

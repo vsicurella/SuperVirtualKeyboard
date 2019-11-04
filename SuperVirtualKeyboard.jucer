@@ -47,6 +47,10 @@
                 file="Source/UI/Components/VirtualKeyboard/KeyboardController.cpp"/>
           <FILE id="EzMc1u" name="KeyboardController.h" compile="0" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/KeyboardController.h"/>
+          <FILE id="MLaBcA" name="KeyboardViewport.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.cpp"/>
+          <FILE id="tb4Bau" name="KeyboardViewport.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.h"/>
           <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
           <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"

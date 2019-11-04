@@ -219,7 +219,7 @@ void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInpu
 }
 
 //===============================================================================================
-Viewport* Keyboard::getViewport()
+KeyboardViewport* Keyboard::getViewport()
 {
 	return viewport;
 }
@@ -394,7 +394,7 @@ int Keyboard::getScrollingStyle()
 
 //===============================================================================================
 
-void Keyboard::setViewport(Viewport* viewportIn)
+void Keyboard::setViewport(KeyboardViewport* viewportIn)
 {
 	viewport = viewportIn;
 
@@ -946,8 +946,8 @@ void Keyboard::paint(Graphics& g)
 
 void Keyboard::resized()
 {
-	//if (keyHeight != getHeight())
-	//{
+	if (getHeight() > 0)
+	{
 		// Calculate key sizes
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
@@ -957,16 +957,27 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
-		grid->setBounds(getBounds());
-	//}
+		Rectangle<int> viewableBounds = getBounds();
 
-	// Resize keys
-	for (int i = 0; i < keys->size(); i++)
-	{
-		Key& key = keys->getReference(i);
-            
-        grid->resizeKey(key);
-		grid->placeKey(key);
+		if (viewport)
+		{
+			viewport->setStepSmall(keyWidth + grid->getColumnGap());
+			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
+
+			if (viewport->isShowingButtons())
+				viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
+		}
+
+		grid->setBounds(viewableBounds);
+		
+		// Resize keys
+		for (int i = 0; i < keys->size(); i++)
+		{
+			Key& key = keys->getReference(i);
+
+			grid->resizeKey(key);
+			grid->placeKey(key);
+		}
 	}
 }
 
