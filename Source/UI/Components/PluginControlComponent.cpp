@@ -201,11 +201,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     highlightStyleBox->addItem (TRANS("Squares"), 5);
     highlightStyleBox->addListener (this);
 
-    keyboardViewport.reset (new Viewport ("Keyboard Viewport"));
-    addAndMakeVisible (keyboardViewport.get());
-    keyboardViewport->setScrollBarsShown (false, true);
-    keyboardViewport->setScrollBarThickness (12);
-
     settingsButton.reset (new TextButton ("Settings Button"));
     addAndMakeVisible (settingsButton.get());
     settingsButton->setButtonText (TRANS("Settings"));
@@ -254,6 +249,10 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     transposeSld->setSliderStyle (Slider::IncDecButtons);
     transposeSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
     transposeSld->addListener (this);
+
+    keyboardViewport.reset (new KeyboardViewport ("Keyboard Viewport"));
+    addAndMakeVisible (keyboardViewport.get());
+    keyboardViewport->setName ("Keyboard Viewport");
 
 
     //[UserPreSize]
@@ -349,6 +348,7 @@ PluginControlComponent::~PluginControlComponent()
     scaleTextBox = nullptr;
     sizeToggleBtn = nullptr;
     transposeSld = nullptr;
+    keyboardViewport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -374,34 +374,34 @@ void PluginControlComponent::resized()
     //[/UserPreResize]
 
     mode1Box->setBounds (getWidth() - 218, -64, 150, 24);
-    mode2Box->setBounds (proportionOfWidth (0.8317f) - (proportionOfWidth (0.2367f) / 2), 8, proportionOfWidth (0.2367f), 24);
+    mode2Box->setBounds (proportionOfWidth (0.8320f) - (proportionOfWidth (0.2371f) / 2), 8, proportionOfWidth (0.2371f), 24);
     mode1RootSld->setBounds (getWidth() - 310, -64, 79, 24);
-    mode2RootSld->setBounds (proportionOfWidth (0.6582f), -40, proportionOfWidth (0.0934f), 24);
-    scaleEntryBtn->setBounds (proportionOfWidth (0.5870f) - proportionOfWidth (0.0510f), 8, proportionOfWidth (0.0510f), 24);
-    modeInfoButton->setBounds (proportionOfWidth (0.2314f), 8, 30, 24);
-    periodShiftSld->setBounds ((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f), getHeight() - 10 - 24, proportionOfWidth (0.1231f), 24);
+    mode2RootSld->setBounds (proportionOfWidth (0.6581f), -40, proportionOfWidth (0.0939f), 24);
+    scaleEntryBtn->setBounds (proportionOfWidth (0.5870f) - proportionOfWidth (0.0514f), 8, proportionOfWidth (0.0514f), 24);
+    modeInfoButton->setBounds (proportionOfWidth (0.2312f), 8, 30, 24);
+    periodShiftSld->setBounds (0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f), getHeight() - 10 - 24, proportionOfWidth (0.1235f), 24);
     mode1ViewBtn->setBounds (getWidth() - 66, -64, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 66, -32, 31, 24);
     mode1RootLbl->setBounds (getWidth() - 342, -64, 32, 24);
     mode2RootLbl->setBounds (getWidth() - 339, -32, 32, 24);
     mapStyleBox->setBounds (195 - (152 / 2), -40, 152, 24);
-    midiChannelSld->setBounds ((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f), getHeight() - 10 - 24, proportionOfWidth (0.1253f), 24);
-    midiChannelLbl->setBounds (((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f), getHeight() - 10 - 24, proportionOfWidth (0.1200f), 24);
-    noteNumsBtn->setBounds (((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f), getHeight() - 10 - 24, proportionOfWidth (0.0276f), 24);
-    periodShiftLbl->setBounds (7 + 0, getHeight() - 10 - 24, proportionOfWidth (0.1104f), 24);
-    editColorsBtn->setBounds (proportionOfWidth (0.9777f) - proportionOfWidth (0.1083f), getHeight() - 10 - 24, proportionOfWidth (0.1083f), 24);
-    keyStyleBox->setBounds ((((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f)) + roundToInt (proportionOfWidth (0.0276f) * 1.5385f), getHeight() - 10 - 24, proportionOfWidth (0.1699f), 24);
+    midiChannelSld->setBounds (((0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f)) + roundToInt (proportionOfWidth (0.1235f) * 1.0880f)) + roundToInt (proportionOfWidth (0.1196f) * 0.9091f), getHeight() - 10 - 24, proportionOfWidth (0.1255f), 24);
+    midiChannelLbl->setBounds ((0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f)) + roundToInt (proportionOfWidth (0.1235f) * 1.0880f), getHeight() - 10 - 24, proportionOfWidth (0.1196f), 24);
+    noteNumsBtn->setBounds ((((0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f)) + roundToInt (proportionOfWidth (0.1235f) * 1.0880f)) + roundToInt (proportionOfWidth (0.1196f) * 0.9091f)) + roundToInt (proportionOfWidth (0.1255f) * 1.0945f), getHeight() - 10 - 24, proportionOfWidth (0.0277f), 24);
+    periodShiftLbl->setBounds (0, getHeight() - 10 - 24, proportionOfWidth (0.1107f), 24);
+    editColorsBtn->setBounds (proportionOfWidth (0.9773f) - proportionOfWidth (0.1087f), getHeight() - 10 - 24, proportionOfWidth (0.1087f), 24);
+    keyStyleBox->setBounds (((((0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f)) + roundToInt (proportionOfWidth (0.1235f) * 1.0880f)) + roundToInt (proportionOfWidth (0.1196f) * 0.9091f)) + roundToInt (proportionOfWidth (0.1255f) * 1.0945f)) + roundToInt (proportionOfWidth (0.0277f) * 1.5357f), getHeight() - 10 - 24, proportionOfWidth (0.1700f), 24);
     saveBtn->setBounds (7, 8, proportionOfWidth (0.0563f), 24);
-    loadBtn->setBounds (proportionOfWidth (0.0732f), 8, 48, 24);
+    loadBtn->setBounds (proportionOfWidth (0.0731f), 8, 48, 24);
     mapStyleLbl->setBounds (59 - (104 / 2), -40, 104, 24);
-    highlightStyleBox->setBounds (((((((7 + 0) + roundToInt (proportionOfWidth (0.1104f) * 0.9808f)) + roundToInt (proportionOfWidth (0.1231f) * 1.0862f)) + roundToInt (proportionOfWidth (0.1200f) * 0.9115f)) + roundToInt (proportionOfWidth (0.1253f) * 1.0932f)) + roundToInt (proportionOfWidth (0.0276f) * 1.5385f)) + roundToInt (proportionOfWidth (0.1699f) * 1.0875f), getHeight() - 10 - 24, proportionOfWidth (0.1369f), 24);
-    keyboardViewport->setBounds (7, 40, proportionOfWidth (0.9830f), getHeight() - 83);
-    settingsButton->setBounds (proportionOfWidth (0.1380f), 8, proportionOfWidth (0.0860f), 24);
+    highlightStyleBox->setBounds ((((((0 + roundToInt (proportionOfWidth (0.1107f) * 0.9821f)) + roundToInt (proportionOfWidth (0.1235f) * 1.0880f)) + roundToInt (proportionOfWidth (0.1196f) * 0.9091f)) + roundToInt (proportionOfWidth (0.1255f) * 1.0945f)) + roundToInt (proportionOfWidth (0.0277f) * 1.5357f)) + roundToInt (proportionOfWidth (0.1700f) * 1.0872f), getHeight() - 10 - 24, proportionOfWidth (0.1373f), 24);
+    settingsButton->setBounds (proportionOfWidth (0.1383f), 8, proportionOfWidth (0.0860f), 24);
     mapOrderEditBtn->setBounds (383 - 96, -40, 96, 24);
-    mapModeBox->setBounds (119, -32, proportionOfWidth (0.1582f), 24);
-    scaleTextBox->setBounds (proportionOfWidth (0.5319f) - proportionOfWidth (0.2580f), 8, proportionOfWidth (0.2580f), 24);
-    sizeToggleBtn->setBounds (proportionOfWidth (0.9830f) - proportionOfWidth (0.0244f), 8, proportionOfWidth (0.0244f), 24);
-    transposeSld->setBounds (proportionOfWidth (0.7059f) - proportionOfWidth (0.1125f), 8, proportionOfWidth (0.1125f), 24);
+    mapModeBox->setBounds (119, -32, proportionOfWidth (0.1581f), 24);
+    scaleTextBox->setBounds (proportionOfWidth (0.5316f) - proportionOfWidth (0.2579f), 8, proportionOfWidth (0.2579f), 24);
+    sizeToggleBtn->setBounds (proportionOfWidth (0.9832f) - proportionOfWidth (0.0247f), 8, proportionOfWidth (0.0247f), 24);
+    transposeSld->setBounds (proportionOfWidth (0.7055f) - proportionOfWidth (0.1127f), 8, proportionOfWidth (0.1127f), 24);
+    keyboardViewport->setBounds (8, 40, getWidth() - 24, getHeight() - 92);
     //[UserResized] Add your own custom resize handling here..
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
@@ -907,7 +907,7 @@ BEGIN_JUCER_METADATA
             virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="218R -64 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <COMBOBOX name="Mode2 Box" id="e43718c6ce3f175" memberName="mode2Box" virtualName="ReferencedComboBox"
-            explicitFocusOrder="0" pos="83.174%c 8 23.673% 24" editable="0"
+            explicitFocusOrder="0" pos="83.202%c 8 23.715% 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="Mode1 Root Slider" id="e732568ad188d067" memberName="mode1RootSld"
           virtualName="" explicitFocusOrder="0" pos="310R -64 79 24" min="0.0"
@@ -915,18 +915,18 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="mode2RootSld" id="ae29d1ebf57b7bd7" memberName="mode2RootSld"
-          virtualName="" explicitFocusOrder="0" pos="65.817% -40 9.342% 24"
+          virtualName="" explicitFocusOrder="0" pos="65.81% -40 9.387% 24"
           posRelativeX="d5aac21b3b7762a8" min="0.0" max="127.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="40" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="58.705%r 8 5.096% 24"
+              virtualName="" explicitFocusOrder="0" pos="58.696%r 8 5.138% 24"
               buttonText="OK" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="23.142% 8 30 24" buttonText="i"
+              virtualName="" explicitFocusOrder="0" pos="23.123% 8 30 24" buttonText="i"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
-          virtualName="" explicitFocusOrder="0" pos="98.077% 10Rr 12.314% 24"
+          virtualName="" explicitFocusOrder="0" pos="98.214% 10Rr 12.352% 24"
           posRelativeX="140764aae2291735" min="-10.0" max="10.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="40" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
@@ -951,39 +951,39 @@ BEGIN_JUCER_METADATA
             layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
             textWhenNonSelected="Mode To Mode" textWhenNoItems="(no choices)"/>
   <SLIDER name="Midi Channel Slider" id="4f2d4d8b9051247f" memberName="midiChannelSld"
-          virtualName="" explicitFocusOrder="0" pos="91.15% 10Rr 12.527% 24"
+          virtualName="" explicitFocusOrder="0" pos="90.909% 10Rr 12.549% 24"
           posRelativeX="d2587185be475d9c" min="1.0" max="16.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="40" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <LABEL name="Midi Channel Label" id="d2587185be475d9c" memberName="midiChannelLbl"
-         virtualName="" explicitFocusOrder="0" pos="108.621% 10Rr 11.996% 24"
+         virtualName="" explicitFocusOrder="0" pos="108.8% 10Rr 11.957% 24"
          posRelativeX="89742a2afd3a3325" edTextCol="ff000000" edBkgCol="0"
          labelText="MIDI Channel:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Note Numbers Button" id="405a79d645f5f8ac" memberName="noteNumsBtn"
-              virtualName="" explicitFocusOrder="0" pos="109.322% 10Rr 2.76% 24"
+              virtualName="" explicitFocusOrder="0" pos="109.449% 10Rr 2.767% 24"
               posRelativeX="4f2d4d8b9051247f" buttonText="#" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="Period Shift Label" id="140764aae2291735" memberName="periodShiftLbl"
-         virtualName="" explicitFocusOrder="0" pos="0 10Rr 11.04% 24"
+         virtualName="" explicitFocusOrder="0" pos="0 10Rr 11.067% 24"
          posRelativeX="1f2717bdf6633c2" edTextCol="ff000000" edBkgCol="0"
          labelText="Period Shift:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Edit Colors Button" id="bc86137b1b6a5176" memberName="editColorsBtn"
-              virtualName="" explicitFocusOrder="0" pos="97.771%r 10Rr 10.828% 24"
+              virtualName="" explicitFocusOrder="0" pos="97.727%r 10Rr 10.87% 24"
               buttonText="Edit Colors" connectedEdges="0" needsCallback="1"
               radioGroupId="0"/>
   <COMBOBOX name="Key Style Box" id="292b32e0c6cd0b80" memberName="keyStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="153.846% 10Rr 16.985% 24"
+            virtualName="" explicitFocusOrder="0" pos="153.571% 10Rr 16.996% 24"
             posRelativeX="405a79d645f5f8ac" editable="0" layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Save Button" id="b3d301956f9f6d50" memberName="saveBtn"
-              virtualName="" explicitFocusOrder="0" pos="7 8 5.626% 24" buttonText="Save"
+              virtualName="" explicitFocusOrder="0" pos="7 8 5.632% 24" buttonText="Save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Load Button" id="7de794bf7f813f4c" memberName="loadBtn"
-              virtualName="" explicitFocusOrder="0" pos="7.325% 8 48 24" buttonText="Load"
+              virtualName="" explicitFocusOrder="0" pos="7.312% 8 48 24" buttonText="Load"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="Mapping Style Label" id="27d88f1ce2d645c1" memberName="mapStyleLbl"
          virtualName="" explicitFocusOrder="0" pos="59c -40 104 24" edTextCol="ff000000"
@@ -991,36 +991,36 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Highlight Style Box" id="ddae7c4ef2fca8a5" memberName="highlightStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="108.75% 10Rr 13.694% 24"
+            virtualName="" explicitFocusOrder="0" pos="108.721% 10Rr 13.735% 24"
             posRelativeX="292b32e0c6cd0b80" editable="0" layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
-              virtualName="" explicitFocusOrder="0" pos="13.8% 8 8.599% 24"
+              virtualName="" explicitFocusOrder="0" pos="13.834% 8 8.597% 24"
               buttonText="Settings" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
               virtualName="" explicitFocusOrder="0" pos="383r -40 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="119 -32 15.817% 24"
+            virtualName="" explicitFocusOrder="0" pos="119 -32 15.81% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="391 -40 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="53.185%r 8 25.796% 24"
+              virtualName="" explicitFocusOrder="0" pos="53.162%r 8 25.791% 24"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
   <GENERICCOMPONENT name="SizeToggleButton" id="7efc0bd141a0ba0d" memberName="sizeToggleBtn"
-                    virtualName="" explicitFocusOrder="0" pos="98.301%r 8 2.442% 24"
+                    virtualName="" explicitFocusOrder="0" pos="98.32%r 8 2.47% 24"
                     class="Component" params=""/>
   <SLIDER name="TransposeSlider" id="bca2f93853f7efd8" memberName="transposeSld"
-          virtualName="" explicitFocusOrder="0" pos="70.594%r 8 11.253% 24"
+          virtualName="" explicitFocusOrder="0" pos="70.553%r 8 11.265% 24"
           min="-128.0" max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
-                    virtualName="" explicitFocusOrder="0" pos="32 80 48M 132M" class="KeyboardViewport"
+                    virtualName="" explicitFocusOrder="0" pos="8 40 24M 92M" class="KeyboardViewport"
                     params="&quot;Keyboard Viewport&quot;"/>
 </JUCER_COMPONENT>
 

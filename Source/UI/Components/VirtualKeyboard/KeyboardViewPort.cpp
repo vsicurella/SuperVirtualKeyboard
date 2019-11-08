@@ -78,6 +78,7 @@ void KeyboardViewport::setShowButtons(bool toShowButtons)
 		stepRightSmall->setVisible(true);
 		stepLeftLarge->setVisible(true);
 		stepLeftSmall->setVisible(true);
+
 	}
 	else
 	{
@@ -86,8 +87,6 @@ void KeyboardViewport::setShowButtons(bool toShowButtons)
 		stepLeftLarge->setVisible(false);
 		stepLeftSmall->setVisible(false);
 	}
-
-//	resized();
 }
 
 void KeyboardViewport::stepSmallForward()
@@ -151,7 +150,7 @@ void KeyboardViewport::redrawButtons(int heightIn)
 	int sideLength = round(buttonWidth * 0.33f);
 	int altitude;
 	int xCenter = buttonWidth / 2;
-	int yCenter = getHeight() / 4;
+	int yCenter = heightIn / 2;
 	int doubleSeparation = 3;
 
 	Graphics g1(singleBracketImage);
@@ -159,21 +158,28 @@ void KeyboardViewport::redrawButtons(int heightIn)
 	g1.fillAll();
 	g1.setColour(bracketColour);
 	altitude = drawAngleBracket(g1, true, sideLength, xCenter, yCenter, 1);
+	g1.drawHorizontalLine(0, 0, buttonWidth);
+    g1.drawHorizontalLine(heightIn, 0, buttonWidth);
+    g1.drawVerticalLine(0, 0, heightIn);
 
-
-	Graphics g2(doubleBracketImage);
+    Graphics g2(doubleBracketImage);
 	g2.setColour(buttonColour);
 	g2.fillAll();
 	g2.setColour(bracketColour);
 	drawAngleBracket(g2, true, sideLength, xCenter - doubleSeparation, yCenter, 1);
 	drawAngleBracket(g2, true, sideLength, xCenter + doubleSeparation, yCenter, 1);
+    g2.drawHorizontalLine(0, 0, buttonWidth);
+    g2.drawHorizontalLine(heightIn, 0, buttonWidth);
+    g2.drawVerticalLine(0, 0, heightIn);
 
 	Graphics g3(singleBracketFlipped);
 	g3.setColour(buttonColour);
 	g3.fillAll();
 	g3.setColour(bracketColour);
 	altitude = drawAngleBracket(g3, false, sideLength, xCenter, yCenter, 1);
-
+    g3.drawHorizontalLine(0, 0, buttonWidth);
+    g3.drawHorizontalLine(heightIn, 0, buttonWidth);
+    g3.drawVerticalLine(buttonWidth, 0, heightIn);
 
 	Graphics g4(doubleBracketFlipped);
 	g4.setColour(buttonColour);
@@ -181,7 +187,9 @@ void KeyboardViewport::redrawButtons(int heightIn)
 	g4.setColour(bracketColour);
 	drawAngleBracket(g4, false, sideLength, xCenter - doubleSeparation, yCenter, 1);
 	drawAngleBracket(g4, false, sideLength, xCenter + doubleSeparation, yCenter, 1);
-
+    g4.drawHorizontalLine(0, 0, buttonWidth);
+    g4.drawHorizontalLine(heightIn, 0, buttonWidth);
+    g4.drawVerticalLine(buttonWidth, 0, heightIn);
 
 	stepLeftSmall->setImages(false, false, false,
 		singleBracketImage, 1.0f, Colours::transparentBlack,
@@ -210,6 +218,7 @@ void KeyboardViewport::resized()
 	
 	if (showStepButtons)
 	{
+		buttonWidth = round(getWidth() * 0.033f);
 		int halfHeight = round(getMaximumVisibleHeight() / 2.0f);
 		redrawButtons(halfHeight);
 
