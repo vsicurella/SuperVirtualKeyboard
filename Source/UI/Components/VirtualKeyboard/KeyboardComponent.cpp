@@ -219,7 +219,7 @@ void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInpu
 }
 
 //===============================================================================================
-Viewport* Keyboard::getViewport()
+KeyboardViewport* Keyboard::getViewport()
 {
 	return viewport;
 }
@@ -394,7 +394,7 @@ int Keyboard::getScrollingStyle()
 
 //===============================================================================================
 
-void Keyboard::setViewport(Viewport* viewportIn)
+void Keyboard::setViewport(KeyboardViewport* viewportIn)
 {
 	viewport = viewportIn;
 
@@ -402,6 +402,7 @@ void Keyboard::setViewport(Viewport* viewportIn)
 	{
 		viewport->setViewedComponent(this, false);
 		setSize(getWidth(), viewport->getHeight());
+		viewport->setScrollOnDragEnabled(false);
 	}
 }
 
@@ -477,6 +478,13 @@ void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
 {
 	showNoteNumbers = shouldShowNumbers;
 	pianoNode.setProperty(IDs::pianoKeyShowNumber, showNoteNumbers, nullptr);
+
+	for (int i = 0; i < keys->size(); i++)
+	{
+		Key& key = keys->getReference(i);
+		key.showNoteNumber = shouldShowNumbers;
+		key.repaint();
+	}
 }
 
 void Keyboard::setShowFilteredNumbers(bool shouldShowNumbers)
@@ -938,8 +946,8 @@ void Keyboard::paint(Graphics& g)
 
 void Keyboard::resized()
 {
-	//if (keyHeight != getHeight())
-	//{
+	if (getHeight() > 0)
+	{
 		// Calculate key sizes
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
@@ -949,16 +957,27 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
-		grid->setBounds(getBounds());
-	//}
+		Rectangle<int> viewableBounds = getBounds();
 
-	// Resize keys
-	for (int i = 0; i < keys->size(); i++)
-	{
-		Key& key = keys->getReference(i);
-            
-        grid->resizeKey(key);
-		grid->placeKey(key);
+		if (viewport)
+		{
+			viewport->setStepSmall(keyWidth + grid->getColumnGap());
+			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
+
+			if (viewport->isShowingButtons())
+				viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
+		}
+
+		grid->setBounds(viewableBounds);
+		
+		// Resize keys
+		for (int i = 0; i < keys->size(); i++)
+		{
+			Key& key = keys->getReference(i);
+
+			grid->resizeKey(key);
+			grid->placeKey(key);
+		}
 	}
 }
 
@@ -1005,11 +1024,11 @@ void Keyboard::mouseExit(const MouseEvent& e)
 		int touchIndex = e.source.getIndex();
 		if (keysByMouseTouch[touchIndex] > 0)
 		{
-			Key* key = &keys->getUnchecked(keysByMouseTouch[touchIndex]);
+			Key& key = keys->getReference(keysByMouseTouch[touchIndex]);
 
 			if (!e.source.isDragging())
 			{
-				triggerKey(key->keyNumber, false);
+				triggerKey(key.keyNumber, false);
 				keysByMouseTouch.set(touchIndex, -1);
 			}
 		}
@@ -1150,17 +1169,13 @@ void Keyboard::mouseUp(const MouseEvent& e)
 
 		if (keyIndex > 0)
 		{
-			Key* key = &keys->getUnchecked(keyIndex);
+			Key& key = keys->getReference(keyIndex);
+			keysByMouseTouch.set(touchIndex, -1);
 
-			if (key)// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
-			{
-				keysByMouseTouch.set(touchIndex, -1);
-
-				if (!shiftHeld)
-				{
-					triggerKey(key->keyNumber, false);
-				}
-			}
+            if (!shiftHeld)
+            {
+                triggerKey(key.keyNumber, false);
+            }
 		}
     }
 }

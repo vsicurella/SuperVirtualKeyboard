@@ -38,23 +38,17 @@ void KeyboardGrid::resizeKey(Key& key)
     {
         case(KeyPlacementType::nestedCenter):
         {
-            //if (key.order > 0)
-            //{
-                float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
-                height = stepHeight - stepHeight * (key.order - 1) / (key.step * 1.08f);
-                width = 0.75f - (key.order - 1) * 0.1f;
-            //}
+            float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
+            height = stepHeight - stepHeight * (key.order - 1) / (key.step * 1.08f);
+            width = 0.75f - (key.order - 1) * 0.1f;
             break;
         }
 
         case(KeyPlacementType::flat):
         {
-//            if (key.order > 0)
-//            {
-                float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
-                height = stepHeight - stepHeight * (key.order - 1) / key.step;
-                width = 0.8f;
-//            }
+            float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
+            height = stepHeight - stepHeight * (key.order - 1) / key.step;
+            width = 0.8f;
             break;
         }
 
@@ -110,7 +104,7 @@ void KeyboardGrid::placeKey(Key& key)
             int keyCol = (int) key.modeDegree;
             xPosition = keyCol * column + halfColumn;
             float stepOff = (key.order > 0 && key.step > 2) * (float)(key.order)/key.step;
-            DBG("KeyMD=" + String(key.modeDegree) + "\tStepOff=" + String(stepOff));
+//            DBG("KeyMD=" + String(key.modeDegree) + "\tStepOff=" + String(stepOff));
             xPosition += stepOff * (key.getWidth() * column);
             key.setTopLeftPosition(xPosition, 0);
 

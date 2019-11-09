@@ -25,6 +25,7 @@
 #include "../../PluginIDs.h"
 #include "../../PluginState.h"
 #include "ReferencedComboBox.h"
+#include "VirtualKeyboard/KeyboardViewport.h"
 //[/Headers]
 
 
@@ -55,7 +56,7 @@ public:
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
 
 	TextEditor* getScaleTextEditor();
-	Viewport* getViewport();
+	KeyboardViewport* getViewport();
     ComboBox* getMappingStyleBox();
 
 	ReferencedComboBox* getMode1Box();
@@ -63,6 +64,17 @@ public:
 	void updateModeBoxMenus();
 
 	TextButton* getModeInfoButton();
+
+	/*
+		Returns thes X position of the viewport
+	*/
+	int getViewPosition();
+
+	/*
+		Sets the X position of the viewport
+	*/
+	void setViewPosition(int xIn);
+	void setViewPosition(float xRatioIn);
 
 	int getMode1BoxSelection();
 	int getMode2BoxSelection();
@@ -161,7 +173,6 @@ private:
     std::unique_ptr<TextButton> loadBtn;
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<ComboBox> highlightStyleBox;
-    std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<TextButton> settingsButton;
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
@@ -169,6 +180,7 @@ private:
     std::unique_ptr<TextEditor> scaleTextBox;
     std::unique_ptr<Component> sizeToggleBtn;
     std::unique_ptr<Slider> transposeSld;
+    std::unique_ptr<KeyboardViewport> keyboardViewport;
 
 
     //==============================================================================
