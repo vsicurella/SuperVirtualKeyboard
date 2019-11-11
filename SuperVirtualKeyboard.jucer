@@ -90,6 +90,8 @@
       <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
       <FILE id="gGW61u" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
+      <FILE id="cry3qn" name="VectorResources.h" compile="0" resource="0"
+            file="Source/UI/VectorResources.h"/>
     </GROUP>
     <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
           file="Source/CommonFunctions.h"/>

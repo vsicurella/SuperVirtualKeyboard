@@ -1024,11 +1024,11 @@ void Keyboard::mouseExit(const MouseEvent& e)
 		int touchIndex = e.source.getIndex();
 		if (keysByMouseTouch[touchIndex] > 0)
 		{
-			Key* key = &keys->getUnchecked(keysByMouseTouch[touchIndex]);
+			Key& key = keys->getReference(keysByMouseTouch[touchIndex]);
 
 			if (!e.source.isDragging())
 			{
-				triggerKey(key->keyNumber, false);
+				triggerKey(key.keyNumber, false);
 				keysByMouseTouch.set(touchIndex, -1);
 			}
 		}
@@ -1169,7 +1169,7 @@ void Keyboard::mouseUp(const MouseEvent& e)
 
 		if (keyIndex > 0)
 		{
-			Key* key = &keys->getUnchecked(keyIndex);
+			Key* key = &keys->getReference(keyIndex);
 
 			if (key)// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
 			{

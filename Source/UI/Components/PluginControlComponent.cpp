@@ -169,20 +169,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     keyStyleBox->addItem (TRANS("Adjacent"), 4);
     keyStyleBox->addListener (this);
 
-    saveBtn.reset (new TextButton ("Save Button"));
-    addAndMakeVisible (saveBtn.get());
-    saveBtn->setButtonText (TRANS("Save"));
-    saveBtn->addListener (this);
-
-    saveBtn->setBounds (24, 16, 48, 24);
-
-    loadBtn.reset (new TextButton ("Load Button"));
-    addAndMakeVisible (loadBtn.get());
-    loadBtn->setButtonText (TRANS("Load"));
-    loadBtn->addListener (this);
-
-    loadBtn->setBounds (80, 16, 48, 24);
-
     mapStyleLbl.reset (new Label ("Mapping Style Label",
                                   TRANS("Mapping Style:")));
     addAndMakeVisible (mapStyleLbl.get());
@@ -205,11 +191,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     highlightStyleBox->addItem (TRANS("Squares"), 5);
     highlightStyleBox->addListener (this);
 
-    settingsButton.reset (new TextButton ("Settings Button"));
-    addAndMakeVisible (settingsButton.get());
-    settingsButton->setButtonText (TRANS("Settings"));
-    settingsButton->addListener (this);
-
     mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
     addAndMakeVisible (mapOrderEditBtn.get());
     mapOrderEditBtn->setButtonText (TRANS("Edit Mapping"));
@@ -231,7 +212,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
-    mapApplyBtn->setBounds (408, 48, 55, 24);
+    mapApplyBtn->setBounds (408, 40, 55, 24);
 
     scaleTextBox.reset (new TextEditor ("Scale Text Box"));
     addAndMakeVisible (scaleTextBox.get());
@@ -247,9 +228,46 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
 
+    saveButton.reset (new ImageButton ("Save Button"));
+    addAndMakeVisible (saveButton.get());
+    saveButton->setButtonText (TRANS("Save"));
+    saveButton->addListener (this);
+
+    saveButton->setImages (false, true, true,
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000));
+    saveButton->setBounds (24, 6, 28, 28);
+
+    openButton.reset (new ImageButton ("Open Button"));
+    addAndMakeVisible (openButton.get());
+    openButton->setButtonText (TRANS("Open"));
+    openButton->addListener (this);
+
+    openButton->setImages (false, true, true,
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000));
+    openButton->setBounds (62, 6, 28, 28);
+
+    settingsButton.reset (new ImageButton ("Settings Button"));
+    addAndMakeVisible (settingsButton.get());
+    settingsButton->setButtonText (TRANS("Settings"));
+    settingsButton->addListener (this);
+
+    settingsButton->setImages (false, true, true,
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+    settingsButton->setBounds (100, 6, 28, 28);
+
 
     //[UserPreSize]
+    saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
+    openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
 
+    saveButton->setImages(true, true, true, *saveIcon.get(), 1.0f, Colour(), *saveIcon.get(), 1.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 1.0f, Colours::white.withAlpha(0.5f));
+    openButton->setImages(true, true, true, *openIcon.get(), 1.0f, Colour(), *openIcon.get(), 1.0f, Colour(), *openIcon.get(), 1.0f, Colour());
 
     mapOrderEditBtn->setVisible(false);
 
@@ -263,6 +281,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	mode1Box->setInterceptsMouseClicks(false, false);
 	mode2Box->setInterceptsMouseClicks(false, false);
 
+
     saveMenu.reset(new PopupMenu());
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::saveMode);
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::savePresetToFile);
@@ -273,12 +292,18 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadMode);
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset);
 
+
+
     //[/UserPreSize]
 
     setSize (1000, 250);
 
 
     //[Constructor] You can add your own custom stuff here..
+
+    settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
+    settingsButton->setImages(true, true, true, *settingsIcon.get(), 1.0f, Colour(), *settingsIcon.get(), 0.66f, Colour(), *settingsIcon.get(), 1.0f, Colour());
+
 	// DISABLED BECAUSE NOT IMPLEMENTED
     editColorsBtn->setEnabled(false);
     mapModeBox->setItemEnabled(3, false);
@@ -315,16 +340,16 @@ PluginControlComponent::~PluginControlComponent()
     periodShiftLbl = nullptr;
     editColorsBtn = nullptr;
     keyStyleBox = nullptr;
-    saveBtn = nullptr;
-    loadBtn = nullptr;
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
-    settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
     scaleTextBox = nullptr;
     keyboardViewport = nullptr;
+    saveButton = nullptr;
+    openButton = nullptr;
+    settingsButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -340,6 +365,12 @@ void PluginControlComponent::paint (Graphics& g)
     g.fillAll (Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
+    Colour buttonFill = getLookAndFeel().findColour(TextButton::ColourIds::buttonColourId);
+    Colour buttonOutline = getLookAndFeel().findColour(TextEditor::ColourIds::outlineColourId);
+
+    drawSaveIcon(g, saveButton->getBoundsInParent(), buttonFill, buttonOutline);
+    drawLoadIcon(g, openButton->getBoundsInParent(), buttonFill, buttonOutline);
+    drawSettingsIcon(g, settingsButton->getBoundsInParent(), buttonFill, buttonOutline);
     //[/UserPaint]
 }
 
@@ -350,57 +381,57 @@ void PluginControlComponent::resized()
     {
     //[/UserPreResize]
 
-    mode1Box->setBounds (getWidth() - 201, 16, 150, 24);
-    mode2Box->setBounds (getWidth() - 51 - 150, 48, 150, 24);
-    mode1RootSld->setBounds (getWidth() - 293, 16, 79, 24);
-    mode2RootSld->setBounds (getWidth() - 293, 48, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1921f) / 2)) + proportionOfWidth (0.1921f) - -34 - 31, 16, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1921f) / 2)) + proportionOfWidth (0.1921f) / 2 + -116, 16, 24, 24);
-    periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
-    mode1ViewBtn->setBounds (getWidth() - 49, 16, 31, 24);
-    mode2ViewBtn->setBounds (getWidth() - 49, 48, 31, 24);
-    mode1RootLbl->setBounds (getWidth() - 325, 16, 32, 24);
-    mode2RootLbl->setBounds (getWidth() - 325, 48, 32, 24);
-    mapStyleBox->setBounds (212 - (152 / 2), 48, 152, 24);
-    midiChannelSld->setBounds (292, getHeight() - 40, 86, 24);
-    midiChannelLbl->setBounds (197, getHeight() - 40, 96, 24);
-    noteNumsBtn->setBounds (392, getHeight() - 40, 24, 24);
-    periodShiftLbl->setBounds (24, getHeight() - 40, 88, 24);
-    editColorsBtn->setBounds (696, getHeight() - 40, 79, 24);
-    keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
-    mapStyleLbl->setBounds (76 - (104 / 2), 48, 104, 24);
-    highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-    settingsButton->setBounds (792, getHeight() - 40, 88, 24);
-    mapOrderEditBtn->setBounds (400 - 96, 48, 96, 24);
-    mapModeBox->setBounds (136, 16, proportionOfWidth (0.1582f), 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1921f) / 2), 16, proportionOfWidth (0.1921f), 24);
-    keyboardViewport->setBounds (32, 80, getWidth() - 48, getHeight() - 132);
+    mode1Box->setBounds (getWidth() - 201, 8, 150, 24);
+    mode2Box->setBounds (getWidth() - 51 - 150, 40, 150, 24);
+    mode1RootSld->setBounds (getWidth() - 293, 8, 79, 24);
+    mode2RootSld->setBounds (getWidth() - 293, 40, 79, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) - -34 - 31, 8, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2)) + proportionOfWidth (0.1927f) / 2 + -116, 8, 24, 24);
+    periodShiftSld->setBounds (108, getHeight() - 48, 86, 24);
+    mode1ViewBtn->setBounds (getWidth() - 49, 8, 31, 24);
+    mode2ViewBtn->setBounds (getWidth() - 49, 40, 31, 24);
+    mode1RootLbl->setBounds (getWidth() - 325, 8, 32, 24);
+    mode2RootLbl->setBounds (getWidth() - 325, 40, 32, 24);
+    mapStyleBox->setBounds (212 - (152 / 2), 40, 152, 24);
+    midiChannelSld->setBounds (292, getHeight() - 48, 86, 24);
+    midiChannelLbl->setBounds (197, getHeight() - 48, 96, 24);
+    noteNumsBtn->setBounds (392, getHeight() - 48, 24, 24);
+    periodShiftLbl->setBounds (24, getHeight() - 48, 88, 24);
+    editColorsBtn->setBounds (696, getHeight() - 48, 79, 24);
+    keyStyleBox->setBounds (432, getHeight() - 48, 136, 24);
+    mapStyleLbl->setBounds (76 - (104 / 2), 40, 104, 24);
+    highlightStyleBox->setBounds (584, getHeight() - 48, 96, 24);
+    mapOrderEditBtn->setBounds (400 - 96, 40, 96, 24);
+    mapModeBox->setBounds (136, 8, proportionOfWidth (0.1586f), 24);
+    scaleTextBox->setBounds ((getWidth() / 2) + -25 - (proportionOfWidth (0.1927f) / 2), 8, proportionOfWidth (0.1927f), 24);
+    keyboardViewport->setBounds (32, 72, getWidth() - 48, getHeight() - 132);
     //[UserResized] Add your own custom resize handling here..
     }
     else
     {
-		mapModeBox->setBounds(136, 16, proportionOfWidth(0.1638f), 24);
+		mapModeBox->setBounds(136, 8, proportionOfWidth(0.1638f), 24);
 
-        scaleTextBox->setBounds ((getWidth() / 2) + -25 - (168 / 2), 16, 168, 24);
-        scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 16, 31, 24);
-        modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 16, 24, 24);
+        scaleTextBox->setBounds ((getWidth() / 2) + -25 - (168 / 2), 8, 168, 24);
+        scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 8, 31, 24);
+        modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 8, 24, 24);
 
-        mode2RootLbl->setBounds (getWidth() - 333, 16, 32, 24);
-        mode2RootSld->setBounds (getWidth() - 301, 16, 79, 24);
-        mode2Box->setBounds (getWidth() - 51 - 150, 16, 176, 24);
+        mode2RootLbl->setBounds (getWidth() - 333, 8, 32, 24);
+        mode2RootSld->setBounds (getWidth() - 301, 8, 79, 24);
+        mode2Box->setBounds (getWidth() - 51 - 150, 8, 176, 24);
 
-        keyboardViewport->setBounds (24, 48, getWidth() - 48, getHeight() - 100);
+        keyboardViewport->setBounds (24, 40, getWidth() - 40, getHeight() - 86);
 
-        periodShiftSld->setBounds (108, getHeight() - 40, 86, 24);
-        periodShiftLbl->setBounds (24, getHeight() - 40, 88, 24);
-        midiChannelSld->setBounds (292, getHeight() - 40, 86, 24);
-        midiChannelLbl->setBounds (197, getHeight() - 40, 96, 24);
-        noteNumsBtn->setBounds (392, getHeight() - 40, 24, 24);
-        keyStyleBox->setBounds (432, getHeight() - 40, 136, 24);
-        highlightStyleBox->setBounds (584, getHeight() - 40, 96, 24);
-        editColorsBtn->setBounds (696, getHeight() - 40, 79, 24);
-        settingsButton->setBounds (792, getHeight() - 40, 88, 24);
+        periodShiftSld->setBounds (108, getHeight() - 42, 86, 24);
+        periodShiftLbl->setBounds (24, getHeight() - 42, 88, 24);
+        midiChannelSld->setBounds (292, getHeight() - 42, 86, 24);
+        midiChannelLbl->setBounds (197, getHeight() - 42, 96, 24);
+        noteNumsBtn->setBounds (392, getHeight() - 42, 24, 24);
+        keyStyleBox->setBounds (432, getHeight() - 42, 136, 24);
+        highlightStyleBox->setBounds (584, getHeight() - 42, 96, 24);
+        editColorsBtn->setBounds (696, getHeight() - 42, 79, 24);
     }
+    
+    keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
 	if (svk)
@@ -551,26 +582,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::beginColorEditing, true);
         //[/UserButtonCode_editColorsBtn]
     }
-    else if (buttonThatWasClicked == saveBtn.get())
-    {
-        //[UserButtonCode_saveBtn] -- add your button handler code here..
-		//appCmdMgr->invokeDirectly(IDs::CommandIDs::savePresetToFile, true);
-        saveMenu->showAt(saveBtn.get());
-        //[/UserButtonCode_saveBtn]
-    }
-    else if (buttonThatWasClicked == loadBtn.get())
-    {
-        //[UserButtonCode_loadBtn] -- add your button handler code here..
-		//appCmdMgr->invokeDirectly(IDs::CommandIDs::loadPreset, true);
-        loadMenu->showAt(loadBtn.get());
-        //[/UserButtonCode_loadBtn]
-    }
-    else if (buttonThatWasClicked == settingsButton.get())
-    {
-        //[UserButtonCode_settingsButton] -- add your button handler code here..
-        appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
-        //[/UserButtonCode_settingsButton]
-    }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
         //[UserButtonCode_mapOrderEditBtn] -- add your button handler code here..
@@ -582,6 +593,24 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapApplyBtn] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::applyMapping, true);
         //[/UserButtonCode_mapApplyBtn]
+    }
+    else if (buttonThatWasClicked == saveButton.get())
+    {
+        //[UserButtonCode_saveButton] -- add your button handler code here..
+        saveMenu->showAt(saveButton.get());
+        //[/UserButtonCode_saveButton]
+    }
+    else if (buttonThatWasClicked == openButton.get())
+    {
+        //[UserButtonCode_openButton] -- add your button handler code here..
+        loadMenu->showAt(openButton.get());
+        //[/UserButtonCode_openButton]
+    }
+    else if (buttonThatWasClicked == settingsButton.get())
+    {
+        //[UserButtonCode_settingsButton] -- add your button handler code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
+        //[/UserButtonCode_settingsButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -896,112 +925,121 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="1000" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="Mode1 Box" id="197cbd0054b3ea6d" memberName="mode1Box"
-            virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="201R 16 150 24"
+            virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="201R 8 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <COMBOBOX name="Mode2 Box" id="e43718c6ce3f175" memberName="mode2Box" virtualName="ReferencedComboBox"
-            explicitFocusOrder="0" pos="51Rr 48 150 24" editable="0" layout="33"
+            explicitFocusOrder="0" pos="51Rr 40 150 24" editable="0" layout="33"
             items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="Mode1 Root Slider" id="e732568ad188d067" memberName="mode1RootSld"
-          virtualName="" explicitFocusOrder="0" pos="293R 16 79 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="293R 8 79 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="mode2RootSld" id="ae29d1ebf57b7bd7" memberName="mode2RootSld"
-          virtualName="" explicitFocusOrder="0" pos="293R 48 79 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="293R 40 79 24" min="0.0"
           max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="-34Rr 16 31 24" posRelativeX="39f9f4bff4e94802"
+              virtualName="" explicitFocusOrder="0" pos="-34Rr 8 31 24" posRelativeX="39f9f4bff4e94802"
               buttonText="OK" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="-116C 16 24 24" posRelativeX="39f9f4bff4e94802"
+              virtualName="" explicitFocusOrder="0" pos="-116C 8 24 24" posRelativeX="39f9f4bff4e94802"
               buttonText="i" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
-          virtualName="" explicitFocusOrder="0" pos="108 40R 86 24" min="-10.0"
+          virtualName="" explicitFocusOrder="0" pos="108 48R 86 24" min="-10.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TOGGLEBUTTON name="Mode1 View Button" id="bb818484022dae8c" memberName="mode1ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="49R 16 31 24" buttonText=""
+                virtualName="" explicitFocusOrder="0" pos="49R 8 31 24" buttonText=""
                 connectedEdges="0" needsCallback="1" radioGroupId="10" state="1"/>
   <TOGGLEBUTTON name="Mode2 View Button" id="a8183216fad07ec6" memberName="mode2ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="49R 48 31 24" buttonText=""
+                virtualName="" explicitFocusOrder="0" pos="49R 40 31 24" buttonText=""
                 connectedEdges="0" needsCallback="1" radioGroupId="10" state="0"/>
   <LABEL name="Mode1 Root Label" id="2df91047cc98faf4" memberName="mode1RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="325R 16 32 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="325R 8 32 24" edTextCol="ff000000"
          edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="Mode 2 Root Label" id="c21534178bfcff74" memberName="mode2RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="325R 48 32 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="325R 40 32 24" edTextCol="ff000000"
          edBkgCol="0" labelText="F5" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Mapping Style Box" id="217ff7f7b6934ebe" memberName="mapStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="212c 48 152 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="212c 40 152 24" editable="0"
             layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
             textWhenNonSelected="Mode To Mode" textWhenNoItems="(no choices)"/>
   <SLIDER name="Midi Channel Slider" id="4f2d4d8b9051247f" memberName="midiChannelSld"
-          virtualName="" explicitFocusOrder="0" pos="292 40R 86 24" min="1.0"
+          virtualName="" explicitFocusOrder="0" pos="292 48R 86 24" min="1.0"
           max="16.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="Midi Channel Label" id="d2587185be475d9c" memberName="midiChannelLbl"
-         virtualName="" explicitFocusOrder="0" pos="197 40R 96 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="197 48R 96 24" edTextCol="ff000000"
          edBkgCol="0" labelText="MIDI Channel" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Note Numbers Button" id="405a79d645f5f8ac" memberName="noteNumsBtn"
-              virtualName="" explicitFocusOrder="0" pos="392 40R 24 24" buttonText="#"
+              virtualName="" explicitFocusOrder="0" pos="392 48R 24 24" buttonText="#"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="Period Shift Label" id="140764aae2291735" memberName="periodShiftLbl"
-         virtualName="" explicitFocusOrder="0" pos="24 40R 88 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="24 48R 88 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Period Shift" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="Edit Colors Button" id="bc86137b1b6a5176" memberName="editColorsBtn"
-              virtualName="" explicitFocusOrder="0" pos="696 40R 79 24" buttonText="Edit Colors"
+              virtualName="" explicitFocusOrder="0" pos="696 48R 79 24" buttonText="Edit Colors"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Key Style Box" id="292b32e0c6cd0b80" memberName="keyStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="432 40R 136 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="432 48R 136 24" editable="0"
             layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <TEXTBUTTON name="Save Button" id="b3d301956f9f6d50" memberName="saveBtn"
-              virtualName="" explicitFocusOrder="0" pos="24 16 48 24" buttonText="Save"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="Load Button" id="7de794bf7f813f4c" memberName="loadBtn"
-              virtualName="" explicitFocusOrder="0" pos="80 16 48 24" buttonText="Load"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="Mapping Style Label" id="27d88f1ce2d645c1" memberName="mapStyleLbl"
-         virtualName="" explicitFocusOrder="0" pos="76c 48 104 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="76c 40 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Mapping Style:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="Highlight Style Box" id="ddae7c4ef2fca8a5" memberName="highlightStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="584 40R 96 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="584 48R 96 24" editable="0"
             layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
-              virtualName="" explicitFocusOrder="0" pos="792 40R 88 24" buttonText="Settings"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
-              virtualName="" explicitFocusOrder="0" pos="400r 48 96 24" buttonText="Edit Mapping"
+              virtualName="" explicitFocusOrder="0" pos="400r 40 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 16 15.817% 24"
+            virtualName="" explicitFocusOrder="0" pos="136 8 15.864% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
-              virtualName="" explicitFocusOrder="0" pos="408 48 55 24" buttonText="Apply"
+              virtualName="" explicitFocusOrder="0" pos="408 40 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 16 19.214% 24"
+              virtualName="" explicitFocusOrder="0" pos="-25Cc 8 19.271% 24"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
   <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
-                    virtualName="" explicitFocusOrder="0" pos="32 80 48M 132M" class="KeyboardViewport"
+                    virtualName="" explicitFocusOrder="0" pos="32 72 48M 132M" class="KeyboardViewport"
                     params="&quot;Keyboard Viewport&quot;"/>
+  <IMAGEBUTTON name="Save Button" id="ab59c4c9636981e7" memberName="saveButton"
+               virtualName="" explicitFocusOrder="0" pos="24 6 28 28" buttonText="Save"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
+  <IMAGEBUTTON name="Open Button" id="ab53896355f7aa6f" memberName="openButton"
+               virtualName="" explicitFocusOrder="0" pos="62 6 28 28" buttonText="Open"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
+  <IMAGEBUTTON name="Settings Button" id="7e06be94a5e201d9" memberName="settingsButton"
+               virtualName="" explicitFocusOrder="0" pos="100 6 28 28" buttonText="Settings"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
