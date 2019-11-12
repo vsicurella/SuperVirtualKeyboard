@@ -24,6 +24,7 @@
 
 #include "../../PluginIDs.h"
 #include "../../PluginState.h"
+#include "../VectorResources.h"
 #include "ReferencedComboBox.h"
 #include "VirtualKeyboard/KeyboardViewport.h"
 //[/Headers]
@@ -142,6 +143,10 @@ private:
 	SvkPluginState * pluginState;
 	ApplicationCommandManager* appCmdMgr;
 
+    std::unique_ptr<Image> saveIcon;
+    std::unique_ptr<Image> openIcon;
+    std::unique_ptr<Image> settingsIcon;
+
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
@@ -169,11 +174,8 @@ private:
     std::unique_ptr<Label> periodShiftLbl;
     std::unique_ptr<TextButton> editColorsBtn;
     std::unique_ptr<ComboBox> keyStyleBox;
-    std::unique_ptr<TextButton> saveBtn;
-    std::unique_ptr<TextButton> loadBtn;
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<ComboBox> highlightStyleBox;
-    std::unique_ptr<TextButton> settingsButton;
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
@@ -181,6 +183,9 @@ private:
     std::unique_ptr<Component> sizeToggleBtn;
     std::unique_ptr<Slider> transposeSld;
     std::unique_ptr<KeyboardViewport> keyboardViewport;
+    std::unique_ptr<ImageButton> saveButton;
+    std::unique_ptr<ImageButton> openButton;
+    std::unique_ptr<ImageButton> settingsButton;
 
 
     //==============================================================================

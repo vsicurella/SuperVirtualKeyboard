@@ -1169,13 +1169,17 @@ void Keyboard::mouseUp(const MouseEvent& e)
 
 		if (keyIndex > 0)
 		{
-			Key& key = keys->getReference(keyIndex);
-			keysByMouseTouch.set(touchIndex, -1);
+			Key* key = &keys->getReference(keyIndex);
 
-            if (!shiftHeld)
-            {
-                triggerKey(key.keyNumber, false);
-            }
+			if (key)// && mappingHelper->getVirtualKeyToMap() != key->keyNumber)
+			{
+				keysByMouseTouch.set(touchIndex, -1);
+
+				if (!shiftHeld)
+				{
+					triggerKey(key->keyNumber, false);
+				}
+			}
 		}
     }
 }

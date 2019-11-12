@@ -169,16 +169,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     keyStyleBox->addItem (TRANS("Adjacent"), 4);
     keyStyleBox->addListener (this);
 
-    saveBtn.reset (new TextButton ("Save Button"));
-    addAndMakeVisible (saveBtn.get());
-    saveBtn->setButtonText (TRANS("Save"));
-    saveBtn->addListener (this);
-
-    loadBtn.reset (new TextButton ("Load Button"));
-    addAndMakeVisible (loadBtn.get());
-    loadBtn->setButtonText (TRANS("Load"));
-    loadBtn->addListener (this);
-
     mapStyleLbl.reset (new Label ("Mapping Style Label",
                                   TRANS("Mapping Style:")));
     addAndMakeVisible (mapStyleLbl.get());
@@ -200,11 +190,6 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     highlightStyleBox->addItem (TRANS("Circles"), 4);
     highlightStyleBox->addItem (TRANS("Squares"), 5);
     highlightStyleBox->addListener (this);
-
-    settingsButton.reset (new TextButton ("Settings Button"));
-    addAndMakeVisible (settingsButton.get());
-    settingsButton->setButtonText (TRANS("Settings"));
-    settingsButton->addListener (this);
 
     mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
     addAndMakeVisible (mapOrderEditBtn.get());
@@ -254,9 +239,46 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
 
+    saveButton.reset (new ImageButton ("Save Button"));
+    addAndMakeVisible (saveButton.get());
+    saveButton->setButtonText (TRANS("Save"));
+    saveButton->addListener (this);
+
+    saveButton->setImages (false, true, true,
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000));
+    saveButton->setBounds (24, 6, 28, 28);
+
+    openButton.reset (new ImageButton ("Open Button"));
+    addAndMakeVisible (openButton.get());
+    openButton->setButtonText (TRANS("Open"));
+    openButton->addListener (this);
+
+    openButton->setImages (false, true, true,
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0x00000000));
+    openButton->setBounds (62, 6, 28, 28);
+
+    settingsButton.reset (new ImageButton ("Settings Button"));
+    addAndMakeVisible (settingsButton.get());
+    settingsButton->setButtonText (TRANS("Settings"));
+    settingsButton->addListener (this);
+
+    settingsButton->setImages (false, true, true,
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000),
+                               Image(), 1.000f, Colour (0x00000000));
+    settingsButton->setBounds (100, 6, 28, 28);
+
 
     //[UserPreSize]
+    saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
+    openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
 
+    saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
+    openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
     mapOrderEditBtn->setVisible(false);
 
@@ -270,6 +292,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	mode1Box->setInterceptsMouseClicks(false, false);
 	mode2Box->setInterceptsMouseClicks(false, false);
 
+
     saveMenu.reset(new PopupMenu());
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::saveMode);
     saveMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::savePresetToFile);
@@ -280,12 +303,18 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadMode);
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset);
 
+
+
     //[/UserPreSize]
 
     setSize (1000, 250);
 
 
     //[Constructor] You can add your own custom stuff here..
+
+    settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
+    settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
+
 	keyboardViewport->setBounds(7, 40, proportionOfWidth(0.9830f), getHeight() - 83);
 
 	// DISABLED BECAUSE OF MOBILE
@@ -337,11 +366,8 @@ PluginControlComponent::~PluginControlComponent()
     periodShiftLbl = nullptr;
     editColorsBtn = nullptr;
     keyStyleBox = nullptr;
-    saveBtn = nullptr;
-    loadBtn = nullptr;
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
-    settingsButton = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
@@ -349,6 +375,9 @@ PluginControlComponent::~PluginControlComponent()
     sizeToggleBtn = nullptr;
     transposeSld = nullptr;
     keyboardViewport = nullptr;
+    saveButton = nullptr;
+    openButton = nullptr;
+    settingsButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -364,6 +393,12 @@ void PluginControlComponent::paint (Graphics& g)
     g.fillAll (Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
+    Colour buttonFill = getLookAndFeel().findColour(TextButton::ColourIds::buttonColourId);
+    Colour buttonOutline = getLookAndFeel().findColour(TextEditor::ColourIds::outlineColourId);
+
+    drawSaveIcon(g, saveButton->getBoundsInParent(), buttonFill, buttonOutline);
+    drawLoadIcon(g, openButton->getBoundsInParent(), buttonFill, buttonOutline);
+    drawSettingsIcon(g, settingsButton->getBoundsInParent(), buttonFill, buttonOutline);
     //[/UserPaint]
 }
 
@@ -391,18 +426,18 @@ void PluginControlComponent::resized()
     periodShiftLbl->setBounds (7 + 0, getHeight() - 10 - 24, proportionOfWidth (0.1101f), 24);
     editColorsBtn->setBounds (proportionOfWidth (0.9782f) - proportionOfWidth (0.1078f), getHeight() - 10 - 24, proportionOfWidth (0.1078f), 24);
     keyStyleBox->setBounds ((((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f)) + roundToInt (proportionOfWidth (0.1250f) * 1.0917f)) + roundToInt (proportionOfWidth (0.0275f) * 1.5417f), getHeight() - 10 - 24, proportionOfWidth (0.1697f), 24);
-    saveBtn->setBounds (7, 8, proportionOfWidth (0.0562f), 24);
-    loadBtn->setBounds (proportionOfWidth (0.0734f), 8, 48, 24);
     mapStyleLbl->setBounds (59 - (104 / 2), -40, 104, 24);
     highlightStyleBox->setBounds (((((((7 + 0) + roundToInt (proportionOfWidth (0.1101f) * 0.9792f)) + roundToInt (proportionOfWidth (0.1227f) * 1.0841f)) + roundToInt (proportionOfWidth (0.1204f) * 0.9143f)) + roundToInt (proportionOfWidth (0.1250f) * 1.0917f)) + roundToInt (proportionOfWidth (0.0275f) * 1.5417f)) + roundToInt (proportionOfWidth (0.1697f) * 1.0878f), getHeight() - 10 - 24, proportionOfWidth (0.1365f), 24);
     keyboardViewport->setBounds (7, 40, proportionOfWidth (0.9828f), getHeight() - 83);
-    settingsButton->setBounds (proportionOfWidth (0.1376f), 8, proportionOfWidth (0.0860f), 24);
     mapOrderEditBtn->setBounds (383 - 96, -40, 96, 24);
     mapModeBox->setBounds (119, -32, proportionOfWidth (0.1583f), 24);
     scaleTextBox->setBounds (proportionOfWidth (0.5321f) - proportionOfWidth (0.2580f), 8, proportionOfWidth (0.2580f), 24);
     sizeToggleBtn->setBounds (proportionOfWidth (0.9828f) - proportionOfWidth (0.0241f), 8, proportionOfWidth (0.0241f), 24);
     transposeSld->setBounds (proportionOfWidth (0.7064f) - proportionOfWidth (0.1124f), 8, proportionOfWidth (0.1124f), 24);
     //[UserResized] Add your own custom resize handling here..
+
+
+	keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
 	if (svk)
@@ -559,26 +594,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::beginColorEditing, true);
         //[/UserButtonCode_editColorsBtn]
     }
-    else if (buttonThatWasClicked == saveBtn.get())
-    {
-        //[UserButtonCode_saveBtn] -- add your button handler code here..
-		//appCmdMgr->invokeDirectly(IDs::CommandIDs::savePresetToFile, true);
-        saveMenu->showAt(saveBtn.get());
-        //[/UserButtonCode_saveBtn]
-    }
-    else if (buttonThatWasClicked == loadBtn.get())
-    {
-        //[UserButtonCode_loadBtn] -- add your button handler code here..
-		//appCmdMgr->invokeDirectly(IDs::CommandIDs::loadPreset, true);
-        loadMenu->showAt(loadBtn.get());
-        //[/UserButtonCode_loadBtn]
-    }
-    else if (buttonThatWasClicked == settingsButton.get())
-    {
-        //[UserButtonCode_settingsButton] -- add your button handler code here..
-        appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
-        //[/UserButtonCode_settingsButton]
-    }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
         //[UserButtonCode_mapOrderEditBtn] -- add your button handler code here..
@@ -590,6 +605,24 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_mapApplyBtn] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::applyMapping, true);
         //[/UserButtonCode_mapApplyBtn]
+    }
+    else if (buttonThatWasClicked == saveButton.get())
+    {
+        //[UserButtonCode_saveButton] -- add your button handler code here..
+        saveMenu->showAt(saveButton.get());
+        //[/UserButtonCode_saveButton]
+    }
+    else if (buttonThatWasClicked == openButton.get())
+    {
+        //[UserButtonCode_openButton] -- add your button handler code here..
+        loadMenu->showAt(openButton.get());
+        //[/UserButtonCode_openButton]
+    }
+    else if (buttonThatWasClicked == settingsButton.get())
+    {
+        //[UserButtonCode_settingsButton] -- add your button handler code here..
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
+        //[/UserButtonCode_settingsButton]
     }
 
     //[UserbuttonClicked_Post]
@@ -979,12 +1012,6 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="153.846% 10Rr 16.985% 24"
             posRelativeX="405a79d645f5f8ac" editable="0" layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <TEXTBUTTON name="Save Button" id="b3d301956f9f6d50" memberName="saveBtn"
-              virtualName="" explicitFocusOrder="0" pos="7 8 5.626% 24" buttonText="Save"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="Load Button" id="7de794bf7f813f4c" memberName="loadBtn"
-              virtualName="" explicitFocusOrder="0" pos="7.325% 8 48 24" buttonText="Load"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="Mapping Style Label" id="27d88f1ce2d645c1" memberName="mapStyleLbl"
          virtualName="" explicitFocusOrder="0" pos="59c -40 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Mapping Style:" editableSingleClick="0"
@@ -994,9 +1021,6 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="108.75% 10Rr 13.694% 24"
             posRelativeX="292b32e0c6cd0b80" editable="0" layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <TEXTBUTTON name="Settings Button" id="70f30d2c8f0f81a0" memberName="settingsButton"
-              virtualName="" explicitFocusOrder="0" pos="13.8% 8 8.599% 24"
-              buttonText="Settings" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
               virtualName="" explicitFocusOrder="0" pos="383r -40 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -1022,6 +1046,24 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
                     virtualName="" explicitFocusOrder="0" pos="8 40 24M 92M" class="KeyboardViewport"
                     params="&quot;Keyboard Viewport&quot;"/>
+  <IMAGEBUTTON name="Save Button" id="ab59c4c9636981e7" memberName="saveButton"
+               virtualName="" explicitFocusOrder="0" pos="24 6 28 28" buttonText="Save"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
+  <IMAGEBUTTON name="Open Button" id="ab53896355f7aa6f" memberName="openButton"
+               virtualName="" explicitFocusOrder="0" pos="62 6 28 28" buttonText="Open"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
+  <IMAGEBUTTON name="Settings Button" id="7e06be94a5e201d9" memberName="settingsButton"
+               virtualName="" explicitFocusOrder="0" pos="100 6 28 28" buttonText="Settings"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
+               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
+               colourDown="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
