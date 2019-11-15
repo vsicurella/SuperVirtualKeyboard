@@ -183,13 +183,12 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-    pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
-    CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
-//    controlComponent->setVisible(false);
-//
-//    settingsContainer.reset(new SettingsContainer(pluginState));
-//    settingsContainer->setBounds(0, 0, getWidth(), getHeight());
-//    addAndMakeVisible(settingsContainer.get());
+    controlComponent->setVisible(false);
+    
+    settingsContainer.reset(new SettingsContainer(pluginState));
+    settingsContainer->setBounds(0, 0, getWidth(), getHeight());
+    addAndMakeVisible(settingsContainer.get());
+    settingsContainer->addChangeListener(this);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -449,6 +448,16 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		pluginState->commitModeInfo();
         updateUI();
 	}
+    
+    // Settings closed
+    if (source == settingsContainer.get())
+    {
+        settingsContainer->removeChangeListener(this);
+        settingsContainer->setVisible(false);
+        settingsContainer.reset();
+        
+        controlComponent->setVisible(true);
+    }
 }
 
 void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)

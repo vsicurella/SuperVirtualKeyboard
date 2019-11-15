@@ -22,25 +22,29 @@
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent
+class SettingsContainer : public TabbedComponent,
+                            public ChangeBroadcaster
+                            
 {
 public:
     SettingsContainer(SvkPluginState* pluginStateIn)
     : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop), pluginState(pluginStateIn)
     {
+        panels.add(new Component());
         panels.add(new GeneralSettingsPanel(pluginState));
         panels.add(new ViewSettingsPanel(pluginState));
         panels.add(new ControlSettingsPanel(pluginState));
         panels.add(new DeviceSettingsPanel(pluginState));
         
-        addTab("General", Colours::lightgrey, panels.getUnchecked(0), true);
-        addTab("View", Colours::lightgrey, panels.getUnchecked(0), true);
-        addTab("Device", Colours::lightgrey, panels.getUnchecked(0), true);
-        addTab("Control", Colours::lightgrey, panels.getUnchecked(0), true);
+        addTab("X", Colours::mediumblue, panels.getUnchecked(0), true);
+        addTab("General", Colours::lightgrey, panels.getUnchecked(1), true);
+        addTab("View", Colours::lightgrey, panels.getUnchecked(2), true);
+        addTab("Device", Colours::lightgrey, panels.getUnchecked(3), true);
+        addTab("Control", Colours::lightgrey, panels.getUnchecked(4), true);
 
-        setCurrentTabIndex(0);
+        setCurrentTabIndex(1);
         
-        componentViewed = panels.getUnchecked(0);
+        componentViewed = panels.getUnchecked(1);
     }
 
     ~SettingsContainer()
@@ -54,6 +58,12 @@ public:
     
     void currentTabChanged (int newCurrentTabIndex, const String &newCurrentTabName) override
     {
+        if (newCurrentTabIndex == 0)
+        {
+            sendChangeMessage();
+            return;
+        }
+        
         componentViewed = panels.getUnchecked(newCurrentTabIndex);
     }
 
