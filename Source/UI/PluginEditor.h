@@ -18,6 +18,7 @@
 
 #include "Components/PluginControlComponent.h"
 #include "Components/VirtualKeyboard/KeyboardComponent.h"
+#include "Components/Settings/SettingsContainer.h"
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
@@ -177,6 +178,7 @@ private:
     std::unique_ptr<ColourSelector> colorSelector;
     bool isColorEditing = false;
 
+    std::unique_ptr<SettingsContainer> settingsContainer;
     PluginSettingsDialog* pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;

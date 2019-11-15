@@ -430,7 +430,7 @@ void PluginControlComponent::resized()
         highlightStyleBox->setBounds (584, getHeight() - 42, 96, 24);
         editColorsBtn->setBounds (696, getHeight() - 42, 79, 24);
     }
-    
+
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());

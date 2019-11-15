@@ -185,6 +185,11 @@ void SvkPluginEditor::showSettingsDialog()
 {
     pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
     CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
+//    controlComponent->setVisible(false);
+//
+//    settingsContainer.reset(new SettingsContainer(pluginState));
+//    settingsContainer->setBounds(0, 0, getWidth(), getHeight());
+//    addAndMakeVisible(settingsContainer.get());
 }
 
 void SvkPluginEditor::commitCustomScale()
