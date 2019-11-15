@@ -37,6 +37,10 @@
     <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
       <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">
         <GROUP id="{27BD5BE9-AE8C-2637-CC5B-9D29EED4280E}" name="Settings">
+          <FILE id="Y2PWwq" name="DebugSettingsPanel.cpp" compile="1" resource="0"
+                file="Source/UI/Components/Settings/DebugSettingsPanel.cpp"/>
+          <FILE id="R0gghN" name="DebugSettingsPanel.h" compile="0" resource="0"
+                file="Source/UI/Components/Settings/DebugSettingsPanel.h"/>
           <FILE id="op2GYL" name="ControlSettingsPanel.cpp" compile="1" resource="0"
                 file="Source/UI/Components/Settings/ControlSettingsPanel.cpp"/>
           <FILE id="oSJZTa" name="ControlSettingsPanel.h" compile="0" resource="0"
