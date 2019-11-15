@@ -9,3 +9,23 @@
 */
 
 #include "DebugSettingsPanel.h"
+
+DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
+    : pluginState(pluginStateIn)
+{
+
+}
+
+DebugSettingsPanel::~DebugSettingsPanel()
+{
+}
+
+void DebugSettingsPanel::paint(Graphics& g)
+{
+    
+}
+
+void DebugSettingsPanel::resized()
+{
+    
+}
