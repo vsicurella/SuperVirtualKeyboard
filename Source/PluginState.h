@@ -18,6 +18,8 @@
 #include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
+#include "Structures/OwnedHashMap.h"
+
 #include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 
 struct SvkPluginState : public ChangeBroadcaster,
@@ -152,7 +154,7 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 
-    OwnedArray<RangedAudioParameter> svkParameters;
+    OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> svkParameters;
 
     bool presetEdited = false;
 
