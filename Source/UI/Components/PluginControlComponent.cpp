@@ -266,8 +266,8 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
     openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
 
-    saveButton->setImages(true, true, true, *saveIcon.get(), 1.0f, Colour(), *saveIcon.get(), 1.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 1.0f, Colours::white.withAlpha(0.5f));
-    openButton->setImages(true, true, true, *openIcon.get(), 1.0f, Colour(), *openIcon.get(), 1.0f, Colour(), *openIcon.get(), 1.0f, Colour());
+    saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
+    openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
     mapOrderEditBtn->setVisible(false);
 
@@ -302,7 +302,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     //[Constructor] You can add your own custom stuff here..
 
     settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
-    settingsButton->setImages(true, true, true, *settingsIcon.get(), 1.0f, Colour(), *settingsIcon.get(), 0.66f, Colour(), *settingsIcon.get(), 1.0f, Colour());
+    settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
 	// DISABLED BECAUSE NOT IMPLEMENTED
     editColorsBtn->setEnabled(false);
