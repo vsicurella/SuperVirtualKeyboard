@@ -116,6 +116,12 @@ namespace IDs
 	static Identifier pianoKeyShowName("ShowName");
 	static Identifier pianoKeyColor("KeyColor");
 
+    // Debug
+    static Identifier modeSlotDebug("ModeSlotToDebug");
+    static Identifier modeLibraryIndex("ModeLibraryIndex");
+    static Identifier modeRootNote("ModeRootNote");
+    static Identifier keyNumberDebug("KeyToDebug");
+
 
 	enum CommandIDs
 	{

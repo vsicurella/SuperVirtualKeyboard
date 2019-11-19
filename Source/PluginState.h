@@ -17,8 +17,8 @@
 #include "MidiProcessor.h"
 #include "PresetManager.h"
 #include "Structures/Preset.h"
-#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 #include "Structures/ModeMapper.h"
+#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
@@ -139,6 +139,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
+    
+    void initializeParameters();
 
 	std::unique_ptr<SvkPresetManager> presetManager;
 	std::unique_ptr<SvkMidiProcessor> midiProcessor;
@@ -149,6 +151,8 @@ private:
 
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
+
+    OwnedArray<RangedAudioParameter> svkParameters;
 
     bool presetEdited = false;
 

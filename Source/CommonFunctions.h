@@ -84,6 +84,7 @@ struct ModeSizeSorter
 		return 0;
 	}
 };
+
 struct FamilyNameSorter
 {
 	// Family first, then scale, then mode
@@ -118,6 +119,14 @@ struct FamilyNameSorter
 		}
 		return 0;
 	}
+};
+
+struct IDasStringHash
+{
+    static int generateHash (const Identifier& key, int upperLimit) noexcept
+    {
+        return DefaultHashFunctions::generateHash(key.toString(), upperLimit);
+    }
 };
 
 template <class T, class U>

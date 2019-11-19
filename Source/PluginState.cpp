@@ -39,6 +39,8 @@ SvkPluginState::SvkPluginState()
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
+    initializeParameters();
+    
 	setPresetViewed(0);
 	modeViewedNum = 1;
 	updateModeViewed(false);
@@ -103,6 +105,102 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
         setMapOrderOffset2(0);
+}
+
+void SvkPluginState::initializeParameters()
+{
+//    PresetViewed
+    svkParameters.add(new AudioParameterInt(IDs::presetSlotViewed.toString(),
+                                            "Preset Slot Viewed",
+                                             0, 0, 0));
+//    ModeViewed
+    svkParameters.add(new AudioParameterInt(IDs::modeSlotNumViewed.toString(),
+                                            "Mode Slot Viewed",
+                                             0, 1, 0));
+//    ModeSlot :
+    svkParameters.add(new AudioParameterInt(IDs::modeSlotDebug.toString(),
+                                            "Mode Slot Debug",
+                                             0, 1, 0));
+//        - mode lib id
+    svkParameters.add(new AudioParameterInt(IDs::modeLibraryIndex.toString(),
+                                            "Mode Debug Index",
+                                             0, 0, 0));
+//        - mode root
+    svkParameters.add(new AudioParameterInt(IDs::modeRootNote.toString(),
+                                            "Mode Debug Root",
+                                             0, 127, 60));
+//    PeriodShift
+    svkParameters.add(new AudioParameterInt(IDs::periodShift.toString(),
+                                            "Period Shift",
+                                             -10, 10, 0));
+//    MidiChannel
+    svkParameters.add(new AudioParameterInt(IDs::pianoMidiChannel.toString(),
+                                            "Midi Channel Out",
+                                             1, 16, 1));
+//    NoteNumbersShowing
+    svkParameters.add(new AudioParameterBool(IDs::pianoKeysShowNoteNumbers.toString(),
+                                            "Show Note Numbers",
+                                              false));
+//    FilteredNumsShowing
+    svkParameters.add(new AudioParameterBool(IDs::pianoKeysShowFilteredNotes.toString(),
+                                            "Show Filtered Numbers",
+                                              false));
+//    PitchShowing
+    svkParameters.add(new AudioParameterBool(IDs::pianoKeyShowName.toString(),
+                                            "Show Pitch Names",
+                                              false));
+//    KeyboardOrientation
+    svkParameters.add(new AudioParameterInt(IDs::pianoOrientation.toString(),
+                                            "Keyboard Orientation",
+                                             0, 3, 0));
+//    KeyStyle
+    svkParameters.add(new AudioParameterInt(IDs::pianoKeyPlacementType.toString(),
+                                            "Key Style",
+                                             0, 4, 0));
+//    HighlightStyle
+    svkParameters.add(new AudioParameterInt(IDs::pianoKeysHighlightStyle.toString(),
+                                            "Highlight Style",
+                                             0, 4, 0));
+//    MappingMode
+    svkParameters.add(new AudioParameterInt(IDs::mappingMode.toString(),
+                                            "Mapping Mode",
+                                             0, 2, 0));
+//    MappingStyle
+    svkParameters.add(new AudioParameterInt(IDs::modeMappingStyle.toString(),
+                                            "Mapping Style",
+                                             0, 2, 0));
+//    KeyboardVelocityMode
+    svkParameters.add(new AudioParameterInt(IDs::pianoVelocityBehavior.toString(),
+                                            "Keyboard Velocity Mode",
+                                             0, 2, 0));
+//    KeyboardFixedVelocity
+    svkParameters.add(new AudioParameterInt(IDs::pianoVelocityValue.toString(),
+                                            "Default Velocity",
+                                             0, 127, 100));
+//    KeySizeRatio
+    svkParameters.add(new AudioParameterFloat(IDs::pianoWHRatio.toString(),
+                                            "Key Size Ratio",
+                                             0.001f, 10.0f, 0.25f));
+//    PianoKeySelector :
+    svkParameters.add(new AudioParameterInt(IDs::keyNumberDebug.toString(),
+                                            "Key To Debug",
+                                             0, 127, 60));
+//        -WidthMod
+    svkParameters.add(new AudioParameterFloat(IDs::pianoKeyWidthMod.toString(),
+                                            "Key Debug Width Mod",
+                                             0.001f, 10.0f, 1.0f));
+//        -HeightMod
+    svkParameters.add(new AudioParameterFloat(IDs::pianoKeyHeightMod.toString(),
+                                            "Key Debug Height Mod",
+                                             0.001f, 10.0f, 1.0f));
+//        -XOff
+    svkParameters.add(new AudioParameterInt(IDs::pianoKeyXOffset.toString(),
+                                            "Key Debug X Offset",
+                                             -1000, 1000, 0));
+//        -YOff
+    svkParameters.add(new AudioParameterInt(IDs::pianoKeyYOffset.toString(),
+                                            "Key Debug Y Offset",
+                                             -1000, 1000, 0));
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
