@@ -30,6 +30,11 @@ public:
         : TheArray(), TheHash(numberOfSlots, hashFunction)
     {
     }
+    ~OwnedHashMap()
+    {
+        this->TheHash::clear();
+        this->TheArray::clear();
+    }
     
     TheArray& getOwnedArray()
     {

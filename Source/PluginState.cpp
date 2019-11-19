@@ -111,7 +111,7 @@ void SvkPluginState::initializeParameters()
 {
     svkParameters.stash(IDs::presetSlotViewed, new AudioParameterInt(IDs::presetSlotViewed.toString(),
                                             "Preset Slot Viewed",
-                                             0, 0, 0));
+                                             0, 1, 0));
     svkParameters.stash(IDs::modeSlotNumViewed, new AudioParameterInt(IDs::modeSlotNumViewed.toString(),
                                             "Mode Slot Viewed",
                                              0, 1, 0));
@@ -120,7 +120,7 @@ void SvkPluginState::initializeParameters()
                                              0, 1, 0));
     svkParameters.stash(IDs::modeLibraryIndex, new AudioParameterInt(IDs::modeLibraryIndex.toString(),
                                             "Mode Debug Index",
-                                             0, 0, 0));
+                                             0, 1, 0));
     svkParameters.stash(IDs::modeRootNote, new AudioParameterInt(IDs::modeRootNote.toString(),
                                             "Mode Debug Root",
                                              0, 127, 60));
