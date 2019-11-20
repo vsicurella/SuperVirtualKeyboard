@@ -172,7 +172,7 @@ namespace VirtualKeyboard
 		/*
 			Returns the current proportion of key width to height.
 		*/
-		float getKeySizeRatio(int keyNumIn);
+		float getKeySizeRatio();
 
 		/*
 			Returns the current size of the keys within the given order.
@@ -216,6 +216,11 @@ namespace VirtualKeyboard
 			Returns the UI mode of which the keyboard is in.
 		*/
 		int getUIMode();
+        
+        /*
+            Returns the orientation of which the keyboard is in.
+        */
+        int getOrientation();
 
 		/*
 			Returns the style of which the keys are nested.
@@ -225,7 +230,18 @@ namespace VirtualKeyboard
 		/*
 			Returns whether or not note numbers are showing
 		*/
-		int isShowingNoteNumbers();
+		bool isShowingNoteNumbers();
+        
+        /*
+            Returns whether or not filtered note numbers are showing
+        */
+        bool isShowingFilteredNumbers();
+        
+        /*
+            Returns whether or not note names are showing
+        */
+        
+        bool isShowingNoteNames();
 
 		/*
 			Returns the style of which the keys get highlighted.
@@ -236,6 +252,11 @@ namespace VirtualKeyboard
 			Returns the style of note velocity.
 		*/
 		int getVelocityStyle();
+        
+        /*
+            Returns the value of velocity if in fixed mode.
+        */
+        float getVelocityFixed();
 
 		/*
 			Returns whether or not Midi input is being scaled to the selected velocity style

@@ -362,6 +362,9 @@ void SvkPluginEditor::resized()
 	
 	viewport->setViewPosition((int)(viewportX * viewport->getMaximumVisibleWidth() * 1.01f), 0);
     
+    if (settingsContainer.get())
+         settingsContainer->setSize(getWidth(), getHeight());
+    
     if (pluginEditorNode.isValid())
         updateNodeData();
 }

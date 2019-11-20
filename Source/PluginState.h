@@ -22,8 +22,11 @@
 
 #include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 
+typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
+
 struct SvkPluginState : public ChangeBroadcaster,
-						public ChangeListener
+						public ChangeListener,
+                        public AudioProcessorParameter::Listener
 {
 	ValueTree pluginStateNode;
 	ValueTree pluginSettingsNode;
@@ -45,6 +48,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	SvkPresetManager* getPresetManager();
 	SvkMidiProcessor* getMidiProcessor();
 	SvkPluginSettings* getPluginSettings();
+    SvkParameters* getParameters();
     
     VirtualKeyboard::Keyboard* getKeyboard();
     ModeMapper* getModeMapper();
@@ -132,6 +136,12 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	bool saveModeViewedToFile();
 	bool loadModeFromFile();
+    
+    //==============================================================================
+
+    void parameterValueChanged(int parameterIndex, float newValue);
+     
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting);
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
@@ -154,7 +164,7 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 
-    OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> svkParameters;
+    SvkParameters svkParameters;
 
     bool presetEdited = false;
 
