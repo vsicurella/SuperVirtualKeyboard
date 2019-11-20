@@ -97,5 +97,10 @@ void DebugSettingsPanel::sliderValueChanged(Slider *slider)
 {
     RangedAudioParameter* param = svkParameters->grab(Identifier(slider->getName()));
     param->setValue(slider->getValue());
+    
+    if (slider->getName() == IDs::pianoWHRatio.toString())
+    {
+        pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
+    }
 }
 
