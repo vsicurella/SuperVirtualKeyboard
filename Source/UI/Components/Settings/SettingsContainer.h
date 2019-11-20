@@ -47,10 +47,9 @@ public:
         addTab("Control", Colours::lightgrey, panels.getUnchecked(4), true);
         addTab("Debug", Colours::palegreen, panels.getUnchecked(5), true);
 
-        setCurrentTabIndex(1);
+        setCurrentTabIndex(5);
         
-        componentViewed = panels.getUnchecked(1);
-        
+        componentViewed = panels.getUnchecked(5);
     }
 
     ~SettingsContainer()

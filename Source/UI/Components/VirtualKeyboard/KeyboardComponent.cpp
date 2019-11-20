@@ -707,6 +707,7 @@ void Keyboard::setKeySizeRatio(float keySizeRatioIn)
 {
 	keySizeRatio = keySizeRatioIn;
 	pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
+    resized();
 }
 
 void Keyboard::setKeyWidthSize(int widthSizeIn)
