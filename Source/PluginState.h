@@ -128,6 +128,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void updateModeViewed(bool sendChange=true);
     void updateToPreset(bool sendChange = true);
+    
+    void updateFromParameter(Identifier paramId);
 
 	void commitModeInfo();
     void commitPresetChanges();
