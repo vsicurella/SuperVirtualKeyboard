@@ -178,6 +178,11 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::pianoKeyYOffset, new AudioParameterInt(IDs::pianoKeyYOffset.toString(),
                                             "Key Debug Y Offset",
                                              -1000, 1000, 0));
+    
+    for (int i = 0; i < svkParameters.getSize(); i++)
+    {
+        svkParameters.getUnchecked(i)->addListener(this);
+    }
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
@@ -185,7 +190,7 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	presetEdited = false;
 
 	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
-
+    
 	modeViewedNum = (int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed];
 	mapModeSelected = (int) presetViewed->thePropertiesNode[IDs::mappingMode];
 	mapStyleSelected = (int) presetViewed->thePropertiesNode[IDs::modeMappingStyle];
@@ -207,6 +212,21 @@ void SvkPluginState::updateToPreset(bool sendChange)
     virtualKeyboard->applyMode(modeViewed);
 
 	doMapping();
+    
+    // update parameters
+    svkParameters.grab(IDs::presetSlotViewed)->setValue(presetSlotNumViewed);
+    svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleSelected);
+    svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleSelected);
+    svkParameters.grab(IDs::pianoMidiChannel)->setValue(midiProcessor->getMidiChannelOut());
+    svkParameters.grab(IDs::pianoKeysShowNoteNumbers)->setValue(virtualKeyboard->isShowingNoteNumbers());
+    svkParameters.grab(IDs::pianoKeysShowFilteredNotes)->setValue(virtualKeyboard->isShowingFilteredNumbers());
+    svkParameters.grab(IDs::pianoKeyShowName)->setValue(virtualKeyboard->isShowingNoteNames());
+    svkParameters.grab(IDs::pianoOrientation)->setValue(virtualKeyboard->getOrientation());
+    svkParameters.grab(IDs::pianoKeyPlacementType)->setValue(virtualKeyboard->getKeyPlacementStyle());
+    svkParameters.grab(IDs::pianoKeysHighlightStyle)->setValue(virtualKeyboard->getHighlightStyle());
+    svkParameters.grab(IDs::pianoVelocityBehavior)->setValue(virtualKeyboard->getVelocityStyle());
+    svkParameters.grab(IDs::pianoVelocityValue)->setValue((int) virtualKeyboard->getVelocityFixed() * 127);
+    svkParameters.grab(IDs::pianoWHRatio)->setValue(virtualKeyboard->getKeySizeRatio());
 
 	if (sendChange)
 		sendChangeMessage();
@@ -227,6 +247,11 @@ SvkMidiProcessor* SvkPluginState::getMidiProcessor()
 SvkPluginSettings* SvkPluginState::getPluginSettings()
 {
 	return pluginSettings.get();
+}
+
+SvkParameters* SvkPluginState::getParameters()
+{
+    return &svkParameters;
 }
 
 ApplicationCommandManager* SvkPluginState::getAppCmdMgr()
@@ -597,6 +622,8 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 	modePresetSlotNum = modeViewedNum ?
 		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
 
+    svkParameters.grab(IDs::modeSlotNumViewed)->setValue(modeViewedNum); // unnecessary call when the parameter triggers this function
+
 	modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modePresetSlotNum);
 
 	midiProcessor->setModeViewed(modeViewed);
@@ -688,6 +715,15 @@ bool SvkPluginState::loadModeFromFile()
 
 //==============================================================================
 
+void SvkPluginState::parameterValueChanged(int parameterIndex, float newValue)
+{
+    
+}
+ 
+void SvkPluginState::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
+{
+    
+}
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {

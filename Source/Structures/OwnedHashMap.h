@@ -46,6 +46,11 @@ public:
         return dynamic_cast<TheHash&>(this);
     }
     
+    int getSize()
+    {
+        return this->TheArray::size();
+    }
+    
     ValueType* stash(KeyType keyIn, ValueType* valueIn)
     {
         ValueType* valueOut = valueIn;

@@ -305,7 +305,7 @@ int Keyboard::getPianoWidth(int heightIn)
 	return numOrder0Keys * (keyWidth + grid->getColumnGap());
 }
 
-float Keyboard::getKeySizeRatio(int keyNumIn)
+float Keyboard::getKeySizeRatio()
 {
 	return keySizeRatio;
 }
@@ -361,14 +361,29 @@ int Keyboard::getUIMode()
 	return uiModeSelected;
 }
 
+int Keyboard::getOrientation()
+{
+    return orientationSelected;
+}
+
 int Keyboard::getKeyPlacementStyle()
 {
 	return keyPlacementSelected;
 }
 
-int Keyboard::isShowingNoteNumbers()
+bool Keyboard::isShowingNoteNumbers()
 {
 	return showNoteNumbers;
+}
+
+bool Keyboard::isShowingFilteredNumbers()
+{
+    return showFilteredNoteNums;
+}
+
+bool Keyboard::isShowingNoteNames()
+{
+    return showPitchNames;
 }
 
 int Keyboard::getHighlightStyle()
@@ -379,6 +394,11 @@ int Keyboard::getHighlightStyle()
 int Keyboard::getVelocityStyle()
 {
 	return velocitySelected;
+}
+
+float Keyboard::getVelocityFixed()
+{
+    return velocityFixed;
 }
 
 bool Keyboard::isInputVelocityScaled()
