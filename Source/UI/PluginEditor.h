@@ -37,6 +37,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
                         private ScrollBar::Listener,
+                        private AudioProcessorParameter::Listener,
 						private Timer
 {
 public:
@@ -136,6 +137,10 @@ public:
 	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w) override;
 
 	//==============================================================================
+    
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+     
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
@@ -164,6 +169,7 @@ private:
 	MidiKeyboardState externalMidi;
     ValueTree pluginEditorNode;
 
+    SvkParameters* svkParameters;
 	ApplicationCommandManager* appCmdMgr;
 	
 	std::unique_ptr<PluginControlComponent> controlComponent;

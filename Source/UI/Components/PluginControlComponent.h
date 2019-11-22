@@ -22,7 +22,6 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "../../PluginIDs.h"
 #include "../../PluginState.h"
 #include "../VectorResources.h"
 #include "ReferencedComboBox.h"
@@ -67,7 +66,7 @@ public:
 	TextButton* getModeInfoButton();
 
 	/*
-		Returns thes X position of the viewport
+		Returns the X position of the viewport
 	*/
 	int getViewPosition();
 
@@ -140,7 +139,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	SvkPluginState * pluginState;
+	SvkPluginState* pluginState;
+    SvkParameters* svkParameters;
 	ApplicationCommandManager* appCmdMgr;
 
     std::unique_ptr<Image> saveIcon;

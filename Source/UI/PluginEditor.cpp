@@ -54,12 +54,17 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
     
+    svkParameters = pluginState->getParameters();
+    for (int i = 0; i < svkParameters->getSize(); i++)
+    {
+        svkParameters->getUnchecked(i)->addListener(this);
+    }
+    
     setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
     
 	controlComponent->setBounds(getBounds());
     initNodeData();
-	//startTimerHz(30);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -100,19 +105,21 @@ void SvkPluginEditor::updateNodeData()
 
 void SvkPluginEditor::updateUI()
 {
-    controlComponent->setMappingMode(pluginState->getMappingMode());
+    DBG("param: " + String(svkParameters->grab(IDs::mappingMode)->getValue()));
+    DBG("state: " + String(pluginState->getMappingMode()));
+    controlComponent->setMappingMode(svkParameters->grab(IDs::mappingMode)->getValue());
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
-	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
+	controlComponent->setMappingStyleId(svkParameters->grab(IDs::modeMappingStyle)->getValue());
 	controlComponent->setMode1Root(pluginState->getMode1Root());
 	controlComponent->setMode2Root(pluginState->getMode2Root());
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
 	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
 	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
-	controlComponent->setPeriodShift(pluginState->getPeriodShift());
-	controlComponent->setMidiChannel(pluginState->getMidiChannelOut());
-	controlComponent->setNoteNumsView(pluginState->isShowingNoteNums());
-	controlComponent->setKeyStyleId(pluginState->getKeyStyle());
-	controlComponent->setHighlightStyleId(pluginState->getHighlightStyle());
+	controlComponent->setPeriodShift(svkParameters->grab(IDs::periodShift)->getValue());
+	controlComponent->setMidiChannel(svkParameters->grab(IDs::pianoMidiChannel)->getValue());
+	controlComponent->setNoteNumsView(svkParameters->grab(IDs::pianoKeysShowNoteNumbers)->getValue());
+	controlComponent->setKeyStyleId(svkParameters->grab(IDs::pianoKeyPlacementType)->getValue());
+	controlComponent->setHighlightStyleId(svkParameters->grab(IDs::pianoKeysHighlightStyle)->getValue());
 	controlComponent->setViewPosition(viewportX);
 
 	DBG("Children Updated");
@@ -241,7 +248,7 @@ void SvkPluginEditor::setMode2Root(int rootIn)
 
 void SvkPluginEditor::setModeView()
 {
-	setModeView(controlComponent->getModeViewed());
+	setModeView(svkParameters->grab(IDs::modeSlotNumViewed)->getValue());
 }
 
 void SvkPluginEditor::setModeView(int modeNumberIn)
@@ -260,7 +267,7 @@ void SvkPluginEditor::showModeInfo()
 
 void SvkPluginEditor::setMappingStyle()
 {
-	setMappingStyle(controlComponent->getMappingStyle());
+	setMappingStyle(svkParameters->grab(IDs::modeMappingStyle)->getValue());
 }
 
 void SvkPluginEditor::setMappingStyle(int mapStyleId)
@@ -281,7 +288,7 @@ void SvkPluginEditor::applyMap()
 
 void SvkPluginEditor::setMappingMode()
 {
-	setMappingMode(controlComponent->getMappingMode());
+	setMappingMode(svkParameters->grab(IDs::mappingMode)->getValue());
 }
 
 void SvkPluginEditor::setMappingMode(int mappingModeId)
@@ -291,7 +298,7 @@ void SvkPluginEditor::setMappingMode(int mappingModeId)
 
 void SvkPluginEditor::setPeriodShift()
 {
-	setPeriodShift(controlComponent->getPeriodShift());
+	setPeriodShift(svkParameters->grab(IDs::periodShift)->getValue());
 }
 
 void SvkPluginEditor::setPeriodShift(int periodsIn)
@@ -301,7 +308,7 @@ void SvkPluginEditor::setPeriodShift(int periodsIn)
 
 void SvkPluginEditor::setMidiChannel()
 {
-	setMidiChannel(controlComponent->getMidiChannel());
+	setMidiChannel(svkParameters->grab(IDs::pianoMidiChannel)->getValue());
 }
 
 void SvkPluginEditor::setMidiChannel(int midiChannelIn)
@@ -318,7 +325,7 @@ void SvkPluginEditor::beginColorEditing()
 
 void SvkPluginEditor::setNoteNumsVisible()
 {
-	setNoteNumsVisible(controlComponent->getNoteNumsView());
+	setNoteNumsVisible(svkParameters->grab(IDs::pianoKeysShowNoteNumbers)->getValue());
 }
 
 void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
@@ -328,7 +335,7 @@ void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
 
 void SvkPluginEditor::setKeyStyle()
 {
-	setKeyStyle(controlComponent->getKeyStyle());
+	setKeyStyle(svkParameters->grab(IDs::pianoKeyPlacementType)->getValue());
 }
 
 void SvkPluginEditor::setKeyStyle(int keyStyleId)
@@ -339,7 +346,7 @@ void SvkPluginEditor::setKeyStyle(int keyStyleId)
 
 void SvkPluginEditor::setHighlightStyle()
 {
-	setHighlightStyle(controlComponent->getHighlightStyle());
+	setHighlightStyle(svkParameters->grab(IDs::pianoKeysHighlightStyle)->getValue());
 }
 
 void SvkPluginEditor::setHighlightStyle(int highlightStyleId)
@@ -469,6 +476,18 @@ void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double ne
     {
 		updateScrollbarData();
     }
+}
+
+//==============================================================================
+
+void SvkPluginEditor::parameterValueChanged(int parameterIndex, float newValue)
+{
+    
+}
+ 
+void SvkPluginEditor::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
+{
+    
 }
 
 //==============================================================================

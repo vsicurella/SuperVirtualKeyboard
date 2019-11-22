@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "KeyboardViewPort.h"
+#include "KeyboardViewport.h"
 
 KeyboardViewport::KeyboardViewport(const String& nameIn, bool showStepButtonsIn)
 : Viewport(nameIn)

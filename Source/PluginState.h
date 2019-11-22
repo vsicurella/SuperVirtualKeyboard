@@ -25,8 +25,7 @@
 typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
 
 struct SvkPluginState : public ChangeBroadcaster,
-						public ChangeListener,
-                        public AudioProcessorParameter::Listener
+						public ChangeListener
 {
 	ValueTree pluginStateNode;
 	ValueTree pluginSettingsNode;
@@ -141,10 +140,6 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     //==============================================================================
 
-    void parameterValueChanged(int parameterIndex, float newValue);
-     
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting);
-
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
 	//==============================================================================
@@ -179,7 +174,7 @@ private:
     
 	// Mapping parameters
 
-    int mapModeSelected = 0;
+    int mapModeSelected = 1;
     int mapStyleSelected = 1;
     
     int mapOrder1 = 0;

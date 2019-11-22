@@ -112,7 +112,7 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::presetSlotViewed, new AudioParameterInt(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
     svkParameters.stash(IDs::modeSlotNumViewed, new AudioParameterInt(IDs::modeSlotNumViewed.toString(), "Mode Slot Viewed", 0, 1, 0));
     
-    svkParameters.stash(IDs::pianoKeysHighlightStyle, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 0, 2, 0));
+    svkParameters.stash(IDs::mappingMode, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 0, 2, 0));
     svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 0, 2, 0));
 
     svkParameters.stash(IDs::periodShift, new AudioParameterInt(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
@@ -138,11 +138,6 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::pianoKeyHeightMod, new AudioParameterFloat(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
     svkParameters.stash(IDs::pianoKeyXOffset, new AudioParameterInt(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
     svkParameters.stash(IDs::pianoKeyYOffset, new AudioParameterInt(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
-    
-    for (int i = 0; i < svkParameters.getSize(); i++)
-    {
-        svkParameters.getUnchecked(i)->addListener(this);
-    }
 }
 
 void SvkPluginState::updateToPreset(bool sendChange)
@@ -678,16 +673,6 @@ bool SvkPluginState::loadModeFromFile()
 }
 
 //==============================================================================
-
-void SvkPluginState::parameterValueChanged(int parameterIndex, float newValue)
-{
-    
-}
- 
-void SvkPluginState::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
-{
-    
-}
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {
