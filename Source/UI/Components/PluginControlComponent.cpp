@@ -451,7 +451,6 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == mode1Box.get())
     {
         //[UserComboBoxCode_mode1Box] -- add your combo box handling code here..
-        //DBG("MODE 1 SELECTED ID: " + String(mode1Box->getSelectedId()));
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
         //[/UserComboBoxCode_mode1Box]
     }
@@ -465,6 +464,7 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
         //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
+        svkParameters->grab(IDs::modeMappingStyle)->setValue(mapStyleBox->getSelectedId());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
 
         if (inMappingMode && (mapStyleBox->getSelectedId() == 3 || mapModeBox->getSelectedId() == 3))
@@ -483,18 +483,21 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
         //[UserComboBoxCode_keyStyleBox] -- add your combo box handling code here..
+        svkParameters->grab(IDs::pianoKeyPlacementType)->setValue(keyStyleBox->getSelectedId());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
         //[/UserComboBoxCode_keyStyleBox]
     }
     else if (comboBoxThatHasChanged == highlightStyleBox.get())
     {
         //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
+        svkParameters->grab(IDs::pianoKeysHighlightStyle)->setValue(highlightStyleBox->getSelectedId());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
         //[/UserComboBoxCode_highlightStyleBox]
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
+        svkParameters->grab(IDs::mappingMode)->setValue(mapModeBox->getSelectedId());
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
@@ -525,12 +528,14 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == periodShiftSld.get())
     {
         //[UserSliderCode_periodShiftSld] -- add your slider handling code here..
+        svkParameters->grab(IDs::periodShift)->setValue(periodShiftSld->getValue());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setPeriodShift, true);
         //[/UserSliderCode_periodShiftSld]
     }
     else if (sliderThatWasMoved == midiChannelSld.get())
     {
         //[UserSliderCode_midiChannelSld] -- add your slider handling code here..
+        svkParameters->grab(IDs::pianoMidiChannel)->setValue(midiChannelSld->getValue());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMidiChannelOut, true);
         //[/UserSliderCode_midiChannelSld]
     }
@@ -559,6 +564,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode1ViewBtn.get())
     {
         //[UserButtonCode_mode1ViewBtn] -- add your button handler code here..
+        svkParameters->grab(IDs::modeSlotNumViewed)->setValue(mode2ViewBtn->getToggleState());
 		if (mode1ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
         //[/UserButtonCode_mode1ViewBtn]
@@ -566,6 +572,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode2ViewBtn.get())
     {
         //[UserButtonCode_mode2ViewBtn] -- add your button handler code here..
+        svkParameters->grab(IDs::modeSlotNumViewed)->setValue(mode2ViewBtn->getToggleState());
 		if (mode2ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
         //[/UserButtonCode_mode2ViewBtn]
@@ -573,6 +580,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == noteNumsBtn.get())
     {
         //[UserButtonCode_noteNumsBtn] -- add your button handler code here..
+        svkParameters->grab(IDs::pianoKeysShowNoteNumbers)->setValue(noteNumsBtn->getToggleState());
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::showMidiNoteNumbers, true);
         //[/UserButtonCode_noteNumsBtn]
     }
