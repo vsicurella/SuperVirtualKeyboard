@@ -985,8 +985,8 @@ void Keyboard::resized()
 			viewport->setStepSmall(keyWidth + grid->getColumnGap());
 			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
 
-			if (viewport->isShowingButtons())
-				viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
+			//if (viewport->isShowingButtons())
+			//	viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
 		}
 
 		grid->setBounds(viewableBounds);
