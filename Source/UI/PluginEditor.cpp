@@ -467,6 +467,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
         settingsContainer.reset();
         
         controlComponent->setVisible(true);
+        controlComponent->resized();
     }
 }
 

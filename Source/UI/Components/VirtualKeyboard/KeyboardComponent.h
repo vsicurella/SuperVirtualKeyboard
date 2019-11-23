@@ -590,9 +590,8 @@ namespace VirtualKeyboard
 		int lastKeyClicked = 0;
 
 		int numOrder0Keys = 128;
-
-        float pianoWidth;
-        float minWindowHeight;
+        int pianoWidth;
+        int minWindowHeight;
 
 		Array<Array<int>> keysOrder;
 		Array<Array<int>> keysScaleDegree;
