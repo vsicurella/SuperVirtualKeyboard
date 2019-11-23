@@ -166,16 +166,10 @@ private:
     bool presetEdited = false;
 
     SvkPreset* presetViewed;
-	int presetSlotNumViewed = 0;
     
     Mode* modeViewed; // What is currently on screen
-    int modeViewedNum = 1; // The mode box view selection
-	int modePresetSlotNum = 0; // The slot number of the mode in the current preset
     
 	// Mapping parameters
-
-    int mapModeSelected = 1;
-    int mapStyleSelected = 1;
     
     int mapOrder1 = 0;
     int mapOrder2 = 0;

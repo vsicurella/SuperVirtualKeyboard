@@ -34,7 +34,7 @@ public:
         view.reset(new Viewport("SettingsViewport"));
         view->setScrollOnDragEnabled(true);
         view->setScrollBarsShown(true, false);
-        setSize(100, 100);
+        addAndMakeVisible(view.get());
 
         addChildComponent(panels.add(new Component()));
         addChildComponent(panels.add(new GeneralSettingsPanel(pluginState)));
@@ -49,10 +49,10 @@ public:
         addTab("Device", Colours::lightgrey, panels.getUnchecked(3), true);
         addTab("Control", Colours::lightgrey, panels.getUnchecked(4), true);
         addTab("Debug", Colours::palegreen, panels.getUnchecked(5), true);
-
+        
         setCurrentTabIndex(5);
         
-        componentViewed = panels.getUnchecked(5);
+        setSize(100, 100);
     }
 
     ~SettingsContainer()
@@ -87,7 +87,9 @@ public:
         
         getTabbedButtonBar().setBounds(0, 0, getWidth(), tabHeight);
         view->setBounds(0, tabHeight, getWidth(), getHeight() - tabHeight);
-        componentViewed->setSize(view->getMaximumVisibleWidth(), componentViewed->getNumChildComponents() * defaultControlHeight);
+        
+        if (componentViewed)
+            componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth(), componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom());
     }
     
 private:
