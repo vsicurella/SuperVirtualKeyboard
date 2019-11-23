@@ -18,6 +18,7 @@
 
 #include "Components/PluginControlComponent.h"
 #include "Components/VirtualKeyboard/KeyboardComponent.h"
+#include "Components/Settings/SettingsContainer.h"
 
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
@@ -36,6 +37,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
                         private ScrollBar::Listener,
+                        private AudioProcessorParameter::Listener,
 						private Timer
 {
 public:
@@ -135,6 +137,10 @@ public:
 	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w) override;
 
 	//==============================================================================
+    
+    void parameterValueChanged(int parameterIndex, float newValue) override;
+     
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
@@ -163,6 +169,7 @@ private:
 	MidiKeyboardState externalMidi;
     ValueTree pluginEditorNode;
 
+    SvkParameters* svkParameters;
 	ApplicationCommandManager* appCmdMgr;
 	
 	std::unique_ptr<PluginControlComponent> controlComponent;
@@ -177,6 +184,7 @@ private:
     std::unique_ptr<ColourSelector> colorSelector;
     bool isColorEditing = false;
 
+    std::unique_ptr<SettingsContainer> settingsContainer;
     PluginSettingsDialog* pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;

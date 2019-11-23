@@ -68,7 +68,7 @@ bool SvkPluginSettings::updateNode(bool writeSettings)
     {
         DBG("Writing settings to: " + currentSettingsLocation.getFullPathName());
         std::unique_ptr<XmlElement> xml(pluginSettingsNode.createXml());
-        return xml->writeToFile(currentSettingsLocation.getChildFile(settingsFileName), "");
+        return xml->writeTo(currentSettingsLocation.getChildFile(settingsFileName));
     }
     
     return true;

@@ -19,13 +19,15 @@ class SvkMidiProcessor : public MidiMessageCollector
 {
 
     Array<String> inputList;
-	Array<MidiDeviceInfo> outputList;
+    Array<String> outputList;
     
     int inputSelected = 0;
     int outputSelected = 0;
     
     MidiInput* midiInput;
-    std::unique_ptr<MidiOutput> midiOutput;
+    MidiOutput* midiOutput;
+    String midiInputName = "";
+    String midiOutputName = "";
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
@@ -67,18 +69,21 @@ public:
 
 	void resetWithRate(double sampleRateIn);
     
-    StringArray getAvailableInputs();
-	Array<MidiDeviceInfo> getAvailableOutputs();
+    StringArray getAvailableInputs() const;
+    StringArray getAvailableOutputs() const;
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
     
+    String getInputName() const;
+    String getOutputName() const;
+    
     MidiKeyboardState* getOriginalKeyboardState();
     MidiKeyboardState* getRemappedKeyboardState();
     
-    int getRootNote();
-    int getPeriodShift();
-    int getMidiChannelOut();
+    int getRootNote() const;
+    int getPeriodShift() const;
+    int getMidiChannelOut() const;
 
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();

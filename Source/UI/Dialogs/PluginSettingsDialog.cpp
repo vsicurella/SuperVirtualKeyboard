@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PluginSettingsDialog::PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn)
-    : pluginSettings(pluginSettingsIn)
+PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
+    : pluginState(pluginStateIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -164,9 +164,18 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn)
 
 
     //[UserPreSize]
-    presetDirectoryText->setText(pluginSettings->getPresetPath());
-    modeDirectoryText->setText(pluginSettings->getModePath());
-    settingsDirectoryText->setText(pluginSettings->getSettingsPath());
+    presetDirectoryText->setText(pluginState->getPluginSettings()->getPresetPath());
+    modeDirectoryText->setText(pluginState->getPluginSettings()->getModePath());
+    settingsDirectoryText->setText(pluginState->getPluginSettings()->getSettingsPath());
+
+    
+#if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
+    midiDeviceBox->addItemList(pluginState->getMidiProcessor()->getAvailableOutputs(), 1);
+    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
+#else
+    midiOutputLbl->setVisible(false);
+    midiDeviceBox->setVisible(false);
+#endif
     //[/UserPreSize]
 
     setSize (508, 250);
@@ -218,7 +227,7 @@ void PluginSettingsDialog::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    headerLbl->setBounds (proportionOfWidth (0.5000f) - (127 / 2), 0, 127, 24);
+    headerLbl->setBounds (proportionOfWidth (0.4994f) - (127 / 2), 0, 127, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -234,7 +243,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newPresetDirectory = findDirectory("Select Preset Directory");
         if (newPresetDirectory.exists())
         {
-            pluginSettings->setPresetDirectory(newPresetDirectory);
+            pluginState->getPluginSettings()->setPresetDirectory(newPresetDirectory);
             presetDirectoryText->setText(newPresetDirectory.getFullPathName());
         }
         //[/UserButtonCode_presetDirectoryBtn]
@@ -245,7 +254,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newModeDirectory = findDirectory("Select Mode Directory");
         if (newModeDirectory.exists())
         {
-            pluginSettings->setModeDirectory(newModeDirectory);
+            pluginState->getPluginSettings()->setModeDirectory(newModeDirectory);
             modeDirectoryText->setText(newModeDirectory.getFullPathName());
         }
         //[/UserButtonCode_modeDirectoryBtn]
@@ -256,7 +265,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newSettingsDirectory = findDirectory("Select Settings Directory");
         if (newSettingsDirectory.exists())
         {
-            pluginSettings->setSettingsDirectory(newSettingsDirectory);
+            pluginState->getPluginSettings()->setSettingsDirectory(newSettingsDirectory);
             settingsDirectoryText->setText(newSettingsDirectory.getFullPathName());
         }
         //[/UserButtonCode_settingsDirectoryBtn]
@@ -264,7 +273,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == localDirectoryBtn.get())
     {
         //[UserButtonCode_localDirectoryBtn] -- add your button handler code here..
-        pluginSettings->setCreatePresetFolder(localDirectoryBtn->getToggleState());
+        pluginState->getPluginSettings()->setCreatePresetFolder(localDirectoryBtn->getToggleState());
         //[/UserButtonCode_localDirectoryBtn]
     }
 
@@ -280,7 +289,7 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == midiDeviceBox.get())
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
-		pluginSettings->setMidiIndexSelected(midiDeviceBox->getSelectedId() - 1);
+		pluginState->getMidiProcessor()->setMidiOutput(midiDeviceBox->getSelectedId() - 1);
 		sendChangeMessage();
         //[/UserComboBoxCode_midiDeviceBox]
     }
@@ -325,8 +334,8 @@ File PluginSettingsDialog::findDirectory(const String prompt)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginSettingsDialog" componentName="PluginSettingsDialog"
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SvkPluginSettings* pluginSettingsIn"
-                 variableInitialisers="pluginSettings(pluginSettingsIn)" snapPixels="8"
+                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SvkPluginState* pluginStateIn"
+                 variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="508" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -375,6 +384,15 @@ BEGIN_JUCER_METADATA
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="15.0" kerning="0.0" bold="1"
          italic="0" justification="33" typefaceStyle="Bold"/>
+  <COMBOBOX name="Midi Outputs" id="8ece1efe3fd87d84" memberName="midiDeviceBox"
+            virtualName="" explicitFocusOrder="0" pos="128 200 320 24" editable="0"
+            layout="33" items="" textWhenNonSelected="No Midi Output" textWhenNoItems="(no choices)"/>
+  <LABEL name="Midi Output Label" id="e459f27b7dfb0123" memberName="midiOutputLbl"
+         virtualName="" explicitFocusOrder="0" pos="32 200 111 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Midi Outputs:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="1" italic="0" justification="33"
+         typefaceStyle="Bold"/>
   <COMBOBOX name="Midi Outputs" id="8ece1efe3fd87d84" memberName="midiDeviceBox"
             virtualName="" explicitFocusOrder="0" pos="128 200 320 24" editable="0"
             layout="33" items="" textWhenNonSelected="No Midi Output" textWhenNoItems="(no choices)"/>

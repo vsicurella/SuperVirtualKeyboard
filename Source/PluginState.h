@@ -17,8 +17,12 @@
 #include "MidiProcessor.h"
 #include "PresetManager.h"
 #include "Structures/Preset.h"
-#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 #include "Structures/ModeMapper.h"
+#include "Structures/OwnedHashMap.h"
+
+#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
+
+typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
 
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
@@ -43,6 +47,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	SvkPresetManager* getPresetManager();
 	SvkMidiProcessor* getMidiProcessor();
 	SvkPluginSettings* getPluginSettings();
+    SvkParameters* getParameters();
     
     VirtualKeyboard::Keyboard* getKeyboard();
     ModeMapper* getModeMapper();
@@ -122,6 +127,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void updateModeViewed(bool sendChange=true);
     void updateToPreset(bool sendChange = true);
+    
+    void updateFromParameter(Identifier paramId);
 
 	void commitModeInfo();
     void commitPresetChanges();
@@ -130,6 +137,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	bool saveModeViewedToFile();
 	bool loadModeFromFile();
+    
+    //==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
@@ -139,6 +148,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
+    
+    void initializeParameters();
 
 	std::unique_ptr<SvkPresetManager> presetManager;
 	std::unique_ptr<SvkMidiProcessor> midiProcessor;
@@ -150,19 +161,15 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 
+    SvkParameters svkParameters;
+
     bool presetEdited = false;
 
     SvkPreset* presetViewed;
-	int presetSlotNumViewed = 0;
     
     Mode* modeViewed; // What is currently on screen
-    int modeViewedNum = 1; // The mode box view selection
-	int modePresetSlotNum = 0; // The slot number of the mode in the current preset
     
 	// Mapping parameters
-
-    int mapModeSelected = 0;
-    int mapStyleSelected = 1;
     
     int mapOrder1 = 0;
     int mapOrder2 = 0;

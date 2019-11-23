@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../../../JuceLibraryCode/JuceHeader.h"
-#include "../../PluginSettings.h"
+#include "../../PluginState.h"
 //[/Headers]
 
 
@@ -41,7 +41,7 @@ class PluginSettingsDialog  : public Component,
 {
 public:
     //==============================================================================
-    PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn);
+    PluginSettingsDialog (SvkPluginState* pluginStateIn);
     ~PluginSettingsDialog();
 
     //==============================================================================
@@ -59,8 +59,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    SvkPluginSettings* pluginSettings;
-
+    SvkPluginState* pluginState;
+    
     //[/UserVariables]
 
     //==============================================================================

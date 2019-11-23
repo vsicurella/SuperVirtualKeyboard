@@ -305,7 +305,7 @@ int Keyboard::getPianoWidth(int heightIn)
 	return numOrder0Keys * (keyWidth + grid->getColumnGap());
 }
 
-float Keyboard::getKeySizeRatio(int keyNumIn)
+float Keyboard::getKeySizeRatio()
 {
 	return keySizeRatio;
 }
@@ -361,14 +361,29 @@ int Keyboard::getUIMode()
 	return uiModeSelected;
 }
 
+int Keyboard::getOrientation()
+{
+    return orientationSelected;
+}
+
 int Keyboard::getKeyPlacementStyle()
 {
 	return keyPlacementSelected;
 }
 
-int Keyboard::isShowingNoteNumbers()
+bool Keyboard::isShowingNoteNumbers()
 {
 	return showNoteNumbers;
+}
+
+bool Keyboard::isShowingFilteredNumbers()
+{
+    return showFilteredNoteNums;
+}
+
+bool Keyboard::isShowingNoteNames()
+{
+    return showPitchNames;
 }
 
 int Keyboard::getHighlightStyle()
@@ -379,6 +394,11 @@ int Keyboard::getHighlightStyle()
 int Keyboard::getVelocityStyle()
 {
 	return velocitySelected;
+}
+
+float Keyboard::getVelocityFixed()
+{
+    return velocityFixed;
 }
 
 bool Keyboard::isInputVelocityScaled()
@@ -430,7 +450,7 @@ void Keyboard::setKeyPlacementStyle(int placementIn)
 		grid->setKeyPlacement(keyPlacementSelected);
 	
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
-    //rresized();
+    resized();
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
@@ -687,6 +707,7 @@ void Keyboard::setKeySizeRatio(float keySizeRatioIn)
 {
 	keySizeRatio = keySizeRatioIn;
 	pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
+    resized();
 }
 
 void Keyboard::setKeyWidthSize(int widthSizeIn)
@@ -952,7 +973,7 @@ void Keyboard::resized()
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
 
-		grid->setColumnGap(2);
+		grid->setColumnGap(1);
 		grid->setRowGap(1);
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
@@ -964,8 +985,8 @@ void Keyboard::resized()
 			viewport->setStepSmall(keyWidth + grid->getColumnGap());
 			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
 
-			if (viewport->isShowingButtons())
-				viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
+			//if (viewport->isShowingButtons())
+			//	viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
 		}
 
 		grid->setBounds(viewableBounds);
