@@ -53,7 +53,7 @@ public:
         addTab("Control", Colours::lightgrey, panels.getUnchecked(4), true);
         addTab("Debug", Colours::palegreen, panels.getUnchecked(5), true);
         
-        setCurrentTabIndex(5);
+        setCurrentTabIndex(1);
         
         setSize(100, 100);
     }

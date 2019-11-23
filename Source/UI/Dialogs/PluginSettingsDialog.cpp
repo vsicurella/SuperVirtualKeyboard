@@ -170,7 +170,13 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
 
     
 #if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
-    midiDeviceBox->addItemList(pluginState->getMidiProcessor()->getAvailableOutputs(), 1);
+    availableOuts = pluginState->getMidiProcessor()->getAvailableOutputs();
+    
+    for (int i = 0; i < availableOuts.size(); i++)
+    {
+        midiDeviceBox->addItem(availableOuts[i].name, i+1);
+    }
+    
     midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
 #else
     midiOutputLbl->setVisible(false);
@@ -289,7 +295,7 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == midiDeviceBox.get())
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
-		pluginState->getMidiProcessor()->setMidiOutput(midiDeviceBox->getSelectedId() - 1);
+		pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(midiDeviceBox->getSelectedId() - 1).identifier);
 		sendChangeMessage();
         //[/UserComboBoxCode_midiDeviceBox]
     }
