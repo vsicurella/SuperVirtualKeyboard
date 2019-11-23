@@ -267,7 +267,8 @@ void SvkPluginEditor::showModeInfo()
 
 void SvkPluginEditor::setMappingStyle()
 {
-	setMappingStyle(svkParameters->grab(IDs::modeMappingStyle)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::modeMappingStyle));
+	setMappingStyle(api->get());
 }
 
 void SvkPluginEditor::setMappingStyle(int mapStyleId)
@@ -288,7 +289,8 @@ void SvkPluginEditor::applyMap()
 
 void SvkPluginEditor::setMappingMode()
 {
-	setMappingMode(svkParameters->grab(IDs::mappingMode)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::mappingMode));
+	setMappingMode(api->get());
 }
 
 void SvkPluginEditor::setMappingMode(int mappingModeId)
@@ -298,7 +300,8 @@ void SvkPluginEditor::setMappingMode(int mappingModeId)
 
 void SvkPluginEditor::setPeriodShift()
 {
-	setPeriodShift(svkParameters->grab(IDs::periodShift)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::periodShift));
+	setPeriodShift(api->get());
 }
 
 void SvkPluginEditor::setPeriodShift(int periodsIn)
@@ -308,7 +311,8 @@ void SvkPluginEditor::setPeriodShift(int periodsIn)
 
 void SvkPluginEditor::setMidiChannel()
 {
-	setMidiChannel(svkParameters->grab(IDs::pianoMidiChannel)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoMidiChannel));
+	setMidiChannel(api->get());
 }
 
 void SvkPluginEditor::setMidiChannel(int midiChannelIn)
@@ -335,18 +339,21 @@ void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
 
 void SvkPluginEditor::setKeyStyle()
 {
-	setKeyStyle(svkParameters->grab(IDs::pianoKeyPlacementType)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoKeyPlacementType));
+	setKeyStyle(api->get());
 }
 
 void SvkPluginEditor::setKeyStyle(int keyStyleId)
 {
 	pluginState->setKeyStyle(keyStyleId);
-    virtualKeyboard->resized(); // would like to move this to the VK class itself
+    
+    controlComponent->resized();
 }
 
 void SvkPluginEditor::setHighlightStyle()
 {
-	setHighlightStyle(svkParameters->grab(IDs::pianoKeysHighlightStyle)->getValue());
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoKeysHighlightStyle));
+    setHighlightStyle(api->get());
 }
 
 void SvkPluginEditor::setHighlightStyle(int highlightStyleId)

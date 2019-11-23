@@ -450,7 +450,7 @@ void Keyboard::setKeyPlacementStyle(int placementIn)
 		grid->setKeyPlacement(keyPlacementSelected);
 	
 	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
-    //rresized();
+    resized();
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
