@@ -85,7 +85,7 @@ void KeyboardGrid::placeKey(Key& key)
 {
 	int xPosition = 0;
     float column = getColumnWidth() + getColumnGap();
-    float halfColumn = column / 2.0f * (key.order > 0);
+    float halfColumn = column / 1.75f * (key.order > 0);
     int colToPlace = ceil(key.modeDegree);
     //DBG("halfcolumn="+String(halfColumn));
     
@@ -93,9 +93,9 @@ void KeyboardGrid::placeKey(Key& key)
 	{
 		case(KeyPlacementType::nestedCenter):
 		{
-            xPosition = colToPlace * column - halfColumn;
-            xPosition *= 1.0f + (0.001 * 10 * key.order > 1);
-            key.setCentrePosition(xPosition, key.getHeight()/2.0f);
+            xPosition = colToPlace * column - halfColumn + (column - key.getWidth() / 2);
+
+            key.setTopLeftPosition(xPosition, 0);
             break;
 		}
 
@@ -113,10 +113,7 @@ void KeyboardGrid::placeKey(Key& key)
 
 		default: // 0 & 1, key nested right & flat
 		{
-            xPosition = colToPlace * column - halfColumn;
-
-			//DBG("keyNumber=" + String(key.keyNumber) + " modeDegree=" + String(key.modeDegree) + " colToPlace=" + String(colToPlace) + " offset=" + String(offset) + " x=" + String(xPosition));
-
+            xPosition = colToPlace * column - halfColumn + (column - key.getWidth());
             key.setTopLeftPosition(xPosition, 0);
 			break;
 		}
