@@ -679,13 +679,13 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
         updateToPreset();
 	}
 
-	// Midi Output Selected
-	Component* c = dynamic_cast<Component*>(source);
-	if (c->getName() == "PluginSettingsDialog")
-	{
-		int index = pluginSettings->getMidiIndexSelected();
-
-		if (index >= 0)
-			midiProcessor->setMidiOutput(index);
-	}
+//	// Midi Output Selected
+//	Component* c = dynamic_cast<Component*>(source);
+//	if (c->getName() == "PluginSettingsDialog")
+//	{
+//		int index = pluginSettings->getMidiIndexSelected();
+//
+//		if (index >= 0)
+//			midiProcessor->setMidiOutput(index);
+//	}
 }

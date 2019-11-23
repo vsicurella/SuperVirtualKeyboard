@@ -190,25 +190,6 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-<<<<<<< HEAD
-    pluginSettingsDialog = new PluginSettingsDialog(pluginState->getPluginSettings());
-	PopupMenu* outputs = pluginSettingsDialog->getMidiOutputBox()->getRootMenu();
-	outputs->clear();
-	Array<MidiDeviceInfo> devices = pluginState->getMidiProcessor()->getAvailableOutputs();
-	for (int i = 0; i < devices.size(); i++)
-	{
-		outputs->addItem(i + 1, devices[i].name);
-	}
-
-	if (pluginState->getPluginSettings()->getMidiIndexSelected() > -1)
-	{
-		pluginSettingsDialog->getMidiOutputBox()->setSelectedId(
-			pluginState->getPluginSettings()->getMidiIndexSelected(), dontSendNotification);
-	}
-
-	pluginSettingsDialog->addChangeListener(pluginState);
-    CallOutBox::launchAsynchronously(pluginSettingsDialog, getScreenBounds(), nullptr);
-=======
     updateScrollbarData();
     controlComponent->setVisible(false);
     
@@ -216,7 +197,6 @@ void SvkPluginEditor::showSettingsDialog()
     settingsContainer->setBounds(0, 0, getWidth(), getHeight());
     addAndMakeVisible(settingsContainer.get());
     settingsContainer->addChangeListener(this);
->>>>>>> parameters-develop
 }
 
 void SvkPluginEditor::commitCustomScale()

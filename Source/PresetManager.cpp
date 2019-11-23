@@ -659,10 +659,10 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
     }
     
     // USERS
-//    for (int i = 0; i < loadedUserModes.size(); i++)
-//    {
-//        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
-//    }
+    for (int i = 0; i < loadedUserModes.size(); i++)
+    {
+        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
+    }
 
 	// FAVORITES
 	for (int i = 0; i < favoriteModes.size(); i++)

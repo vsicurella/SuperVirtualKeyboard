@@ -154,7 +154,7 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
     midiOutputLbl.reset (new Label ("Midi Output Label",
                                     TRANS("Midi Outputs:")));
     addAndMakeVisible (midiOutputLbl.get());
-    midiOutputLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    midiOutputLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Bold"));
     midiOutputLbl->setJustificationType (Justification::centredLeft);
     midiOutputLbl->setEditable (false, false, false);
     midiOutputLbl->setColour (TextEditor::textColourId, Colours::black);
@@ -162,22 +162,30 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
 
     midiOutputLbl->setBounds (32, 200, 111, 24);
 
+    bluetoothBtn.reset (new TextButton ("MIDIBluetoothDevices"));
+    addAndMakeVisible (bluetoothBtn.get());
+    bluetoothBtn->setButtonText (TRANS("MIDI Bluetooth Devices..."));
+    bluetoothBtn->addListener (this);
+
+    bluetoothBtn->setBounds (600, 200, 176, 24);
+
 
     //[UserPreSize]
     presetDirectoryText->setText(pluginState->getPluginSettings()->getPresetPath());
     modeDirectoryText->setText(pluginState->getPluginSettings()->getModePath());
     settingsDirectoryText->setText(pluginState->getPluginSettings()->getSettingsPath());
 
-    
+
 #if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
     availableOuts = pluginState->getMidiProcessor()->getAvailableOutputs();
-    
+
     for (int i = 0; i < availableOuts.size(); i++)
     {
         midiDeviceBox->addItem(availableOuts[i].name, i+1);
     }
-    
+
     midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
+    startTimer(1000);
 #else
     midiOutputLbl->setVisible(false);
     midiDeviceBox->setVisible(false);
@@ -188,6 +196,18 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
 
 
     //[Constructor] You can add your own custom stuff here..
+    if (!BluetoothMidiDevicePairingDialogue::isAvailable())
+        bluetoothBtn->setEnabled(false);
+
+    bluetoothBtn->onClick = []
+    {
+        RuntimePermissions::request (RuntimePermissions::bluetoothMidi, [] (bool wasGranted)
+        {
+            if (wasGranted)
+                BluetoothMidiDevicePairingDialogue::open();
+        });
+    };
+
     //[/Constructor]
 }
 
@@ -210,6 +230,7 @@ PluginSettingsDialog::~PluginSettingsDialog()
     headerLbl = nullptr;
     midiDeviceBox = nullptr;
     midiOutputLbl = nullptr;
+    bluetoothBtn = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -233,7 +254,7 @@ void PluginSettingsDialog::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    headerLbl->setBounds (proportionOfWidth (0.4994f) - (127 / 2), 0, 127, 24);
+    headerLbl->setBounds (proportionOfWidth (0.5000f) - (127 / 2), 0, 127, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -282,6 +303,12 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         pluginState->getPluginSettings()->setCreatePresetFolder(localDirectoryBtn->getToggleState());
         //[/UserButtonCode_localDirectoryBtn]
     }
+    else if (buttonThatWasClicked == bluetoothBtn.get())
+    {
+        //[UserButtonCode_bluetoothBtn] -- add your button handler code here..
+
+        //[/UserButtonCode_bluetoothBtn]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -295,6 +322,7 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == midiDeviceBox.get())
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
+        DBG("trijjered");
 		pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(midiDeviceBox->getSelectedId() - 1).identifier);
 		sendChangeMessage();
         //[/UserComboBoxCode_midiDeviceBox]
@@ -307,6 +335,19 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void PluginSettingsDialog::timerCallback()
+{
+    availableOuts = MidiOutput::getAvailableDevices();
+    midiDeviceBox->clear();
+
+    int i = 0;
+    for (auto device : availableOuts)
+    {
+        midiDeviceBox->addItem(device.name, ++i);
+    }
+
+    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
+}
 
 ComboBox* PluginSettingsDialog::getMidiOutputBox()
 {
@@ -340,10 +381,10 @@ File PluginSettingsDialog::findDirectory(const String prompt)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginSettingsDialog" componentName="PluginSettingsDialog"
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SvkPluginState* pluginStateIn"
-                 variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="508" initialHeight="250">
+                 parentClasses="public Component, public ChangeBroadcaster, private Timer"
+                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="508" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Preset Directory Text" id="a2079bd0bc4dc5c0" memberName="presetDirectoryText"
               virtualName="" explicitFocusOrder="0" pos="128 32 320 24" initialText=""
@@ -385,17 +426,8 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="24 153 184 24" buttonText="Create Local Directories"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
   <LABEL name="Header Label" id="6df6057198db7be1" memberName="headerLbl"
-         virtualName="" explicitFocusOrder="0" pos="49.943%c 0 127 24"
-         edTextCol="ff000000" edBkgCol="0" labelText="Global Preferences"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15.0" kerning="0.0" bold="1"
-         italic="0" justification="33" typefaceStyle="Bold"/>
-  <COMBOBOX name="Midi Outputs" id="8ece1efe3fd87d84" memberName="midiDeviceBox"
-            virtualName="" explicitFocusOrder="0" pos="128 200 320 24" editable="0"
-            layout="33" items="" textWhenNonSelected="No Midi Output" textWhenNoItems="(no choices)"/>
-  <LABEL name="Midi Output Label" id="e459f27b7dfb0123" memberName="midiOutputLbl"
-         virtualName="" explicitFocusOrder="0" pos="32 200 111 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Midi Outputs:" editableSingleClick="0"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 127 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Global Preferences" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="1" italic="0" justification="33"
          typefaceStyle="Bold"/>
@@ -406,7 +438,11 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="32 200 111 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Midi Outputs:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="1" italic="0" justification="33"
+         typefaceStyle="Bold"/>
+  <TEXTBUTTON name="MIDIBluetoothDevices" id="f5999cce512d75c9" memberName="bluetoothBtn"
+              virtualName="" explicitFocusOrder="0" pos="600 200 176 24" buttonText="MIDI Bluetooth Devices..."
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

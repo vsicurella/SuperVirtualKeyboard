@@ -174,7 +174,7 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 //==============================================================================
 
-String SvkMidiProcessor::setMidiInput(String deviceID)
+void SvkMidiProcessor::setMidiInput(String deviceID)
 {
     midiInput = MidiInput::openDevice(deviceID, this);
     midiInputName = midiInput->getName();
@@ -188,11 +188,9 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
         inputSelected = "";
         midiInput = nullptr;
     }
-    
-    return midiInputName;
-}
+ }
 
-String SvkMidiProcessor::setMidiOutput(String deviceID)
+void SvkMidiProcessor::setMidiOutput(String deviceID)
 {
     midiOutput = MidiOutput::openDevice(deviceID);
     midiOutputName = midiOutput->getName();
@@ -206,8 +204,6 @@ String SvkMidiProcessor::setMidiOutput(String deviceID)
         outputSelected = "";
         midiOutput = nullptr;
     }
-    
-    return midiOutput->getName();
 }
 
 void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
@@ -407,12 +403,12 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             msg.setTimeStamp(++msgCount);
             midiMessages.addEvent(msg, smpl);
             
-            if (midiOutput)
+            if (midiOutput.get())
                 midiOutput->sendMessageNow(msg);
         }
     }
 
-    if (midiOutput)
+    if (midiOutput.get())
     {
         midiOutput->sendBlockOfMessagesNow(midiMessages);
     }

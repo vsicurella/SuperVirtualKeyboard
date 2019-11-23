@@ -9,8 +9,8 @@
     <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
       <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
             file="Source/Resources/FactoryModes.txt"/>
-      <FILE id="CQnvMO" name="SVK-Mockup-Icon.png" compile="0" resource="1"
-            file="../SVK-Mockup-Icon.png"/>
+      <FILE id="hbdfkc" name="SVK-Mockup-Icon.png" compile="0" resource="1"
+            file="../../../Downloads/SVK-Mockup-Icon.png"/>
     </GROUP>
     <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
       <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
@@ -205,6 +205,29 @@
         <MODULEPATH id="juce_audio_basics"/>
       </MODULEPATHS>
     </ANDROIDSTUDIO>
+    <XCODE_IPHONE targetFolder="Builds/iOS" iosDevelopmentTeamID="94R5Q29Q3G" smallIcon="CQnvMO"
+                  bigIcon="CQnvMO" iosBackgroundBle="1" iosBackgroundAudio="1"
+                  iosBluetoothPermissionNeeded="1" iPadScreenOrientation="landscape"
+                  iosScreenOrientation="landscape">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" iosCompatibility="9.2"/>
+        <CONFIGURATION isDebug="0" name="Release" iosCompatibility="9.2"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_plugin_client"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+      </MODULEPATHS>
+    </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

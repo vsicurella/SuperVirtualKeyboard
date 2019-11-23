@@ -93,8 +93,8 @@ public:
     
     bool isAutoRemapping();
     
-    String setMidiInput(int deviceIndex);
-    void setMidiOutput(int deviceIndex);
+    void setMidiInput(String deviceIndex);
+    void setMidiOutput(String deviceIndex);
 
 	void setModeViewed(Mode* modeViewedIn);
 	void setMode1(Mode* mode1In);
