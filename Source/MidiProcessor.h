@@ -17,16 +17,14 @@
 
 class SvkMidiProcessor : public MidiMessageCollector
 {
-    Array<String> inputList;
-    Array<String> outputList;
+    std::unique_ptr<MidiInput> midiInput;
+    std::unique_ptr<MidiOutput> midiOutput;
     
-    int inputSelected = 0;
-    int outputSelected = 0;
-    
-    MidiInput* midiInput;
-    MidiOutput* midiOutput;
     String midiInputName = "";
     String midiOutputName = "";
+    
+    String inputSelected = "";
+    String outputSelected = "";
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
@@ -69,7 +67,7 @@ public:
 	void resetWithRate(double sampleRateIn);
     
     StringArray getAvailableInputs() const;
-    StringArray getAvailableOutputs() const;
+    Array<MidiDeviceInfo> getAvailableOutputs() const;
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
@@ -95,8 +93,8 @@ public:
     
     bool isAutoRemapping();
     
-    String setMidiInput(int deviceIndex);
-    String setMidiOutput(int deviceIndex);
+    String setMidiInput(String deviceID);
+    String setMidiOutput(String deviceID);
 
 	void setModeViewed(Mode* modeViewedIn);
 	void setMode1(Mode* mode1In);

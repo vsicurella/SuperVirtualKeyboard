@@ -20,7 +20,6 @@ SvkMidiProcessor::SvkMidiProcessor()
     midiInputFilter = std::make_unique<MidiFilter>();
     midiOutputFilter = std::make_unique<MidiFilter>();
 
-    //setMidiInput(MidiInput::getDefaultDeviceIndex());
     midiInput = nullptr;
     midiOutput = nullptr;
     
@@ -57,42 +56,6 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
     {
         midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
         
-        /*
-        // Open Input Device
-        int deviceIndex = MidiInput::getDefaultDeviceIndex();
-        String deviceName = midiSettingsNode.getProperty(IDs::midiInputName);
-        StringArray deviceList = MidiInput::getDevices();
-        
-        for (int i = 0; i < deviceList.size(); i++)
-        {
-            if (deviceList[i] == deviceName)
-            {
-                deviceIndex = i;
-                break;
-            }
-        }
-    
-        setMidiInput(deviceIndex);
-        
-        
-        // Open Output Device
-        deviceIndex = MidiOutput::getDefaultDeviceIndex();
-        deviceName = midiSettingsNode.getProperty(IDs::midiOutputName);
-        deviceList = MidiInput::getDevices();
-        
-        for (int i = 0; i < deviceList.size(); i++)
-        {
-            if (deviceList[i] == deviceName)
-            {
-                deviceIndex = i;
-                break;
-            }
-        }
-        
-        setMidiOutput(deviceIndex);
-         
-        */
-        
         // Root note
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
@@ -123,19 +86,19 @@ StringArray SvkMidiProcessor::getAvailableInputs() const
     return MidiInput::getDevices();
 }
 
-StringArray SvkMidiProcessor::getAvailableOutputs() const
+Array<MidiDeviceInfo> SvkMidiProcessor::getAvailableOutputs() const
 {
-    return MidiOutput::getDevices();
+    return MidiOutput::getAvailableDevices();
 }
 
 MidiInput* SvkMidiProcessor::getInputDevice()
 {
-    return midiInput;
+    return midiInput.get();
 }
 
 MidiOutput*  SvkMidiProcessor::getOutputDevice()
 {
-    return midiOutput;
+    return midiOutput.get();
 }
 
 String SvkMidiProcessor::getInputName() const
@@ -206,36 +169,36 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 //==============================================================================
 
-String SvkMidiProcessor::setMidiInput(int deviceIndex)
+String SvkMidiProcessor::setMidiInput(String deviceID)
 {
-    midiInput = MidiInput::openDevice(deviceIndex, this).get();
+    midiInput = MidiInput::openDevice(deviceID, this);
     midiInputName = midiInput->getName();
     if (midiInputName.isNotEmpty())
     {
-        inputSelected = deviceIndex;
-        midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
+        inputSelected = deviceID;
+        midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getIdentifier(), nullptr);
     }
     else
     {
-        inputSelected = -1;
+        inputSelected = "";
         midiInput = nullptr;
     }
     
     return midiInputName;
 }
 
-String SvkMidiProcessor::setMidiOutput(int deviceIndex)
+String SvkMidiProcessor::setMidiOutput(String deviceID)
 {
-    midiOutput = MidiOutput::openDevice(deviceIndex).get();
+    midiOutput = MidiOutput::openDevice(deviceID);
     midiOutputName = midiOutput->getName();
     if (midiOutputName.isNotEmpty())
     {
-        outputSelected = deviceIndex;
-        midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);
+        outputSelected = deviceID;
+        midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getIdentifier(), nullptr);
     }
     else
     {
-        outputSelected = -1;
+        outputSelected = "";
         midiOutput = nullptr;
     }
     
