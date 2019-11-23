@@ -31,6 +31,9 @@ public:
     SettingsContainer(SvkPluginState* pluginStateIn)
     : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop), pluginState(pluginStateIn)
     {
+        view.reset(new Viewport("SettingsViewport"));
+        view->setScrollOnDragEnabled(true);
+        view->setScrollBarsShown(true, false);
         setSize(100, 100);
 
         addChildComponent(panels.add(new Component()));
@@ -70,11 +73,21 @@ public:
         }
         
         componentViewed = panels.getUnchecked(newCurrentTabIndex);
+        view->setViewedComponent(componentViewed, false);
     }
 
     void popupMenuClickOnTab (int tabIndex, const String &tabName) override
     {
         
+    }
+    
+    void resized() override
+    {
+        int tabHeight = getTabBarDepth();
+        
+        getTabbedButtonBar().setBounds(0, 0, getWidth(), tabHeight);
+        view->setBounds(0, tabHeight, getWidth(), getHeight() - tabHeight);
+        componentViewed->setSize(view->getMaximumVisibleWidth(), componentViewed->getNumChildComponents() * defaultControlHeight);
     }
     
 private:
@@ -83,5 +96,9 @@ private:
     SvkPluginState* pluginState;
     
     OwnedArray<Component> panels;
+    std::unique_ptr<Viewport> view;
+    
     Component* componentViewed = nullptr;
+    
+    int defaultControlHeight = 50;
 };

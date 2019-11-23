@@ -73,22 +73,14 @@ void DebugSettingsPanel::resized()
     
     if (children.size() > 0)
     {
-        int rowHeight = 40;
-        int rows = getHeight() / rowHeight * 2 - 1;
-        int cols = ceil(children.size() / rows);
-        int colWidth = getWidth() / cols;
-
-        int r, c, x, y;
+        int rowHeight = 50;
+        int y;
         
         for (int i = 0; i < controls.size(); i++)
         {
-            r = i / cols;
-            c = i % cols;
-            x = c * colWidth;
-            y = r * rowHeight;
-            
-            labels.getUnchecked(i)->setBounds(x, y-10, colWidth, rowHeight);
-            controls.getUnchecked(i)->setBounds(x, y+rowHeight/2-10, colWidth, rowHeight);
+            y = rowHeight * i;
+            labels.getUnchecked(i)->setBounds(0, y-10, getWidth(), rowHeight);
+            controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth(), rowHeight);
         }
     }
 }
