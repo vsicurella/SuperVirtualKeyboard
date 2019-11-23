@@ -55,14 +55,13 @@ public:
     {
         ValueType* valueOut = valueIn;
         
-        
         this->add(valueIn);
         this->TheHash::set(keyIn, valueOut);
         
         return valueOut;
     }
     
-    ValueType* grab(KeyType keyIn)
+    ValueType* grab(const KeyType& keyIn) const
     {
         return this->TheHash::operator[](keyIn);
     }
