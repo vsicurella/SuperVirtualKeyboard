@@ -127,7 +127,7 @@ void SvkPluginEditor::updateUI()
 
 void SvkPluginEditor::updateScrollbarData()
 {
-	viewportX = viewport->getViewPositionX() / (float)viewport->getMaximumVisibleWidth();
+	viewportX = (float) viewport->getViewPositionX() / (float) viewport->getMaximumVisibleWidth();
 	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
 }
 
@@ -190,6 +190,7 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
+    updateScrollbarData();
     controlComponent->setVisible(false);
     
     settingsContainer.reset(new SettingsContainer(pluginState));
@@ -347,7 +348,7 @@ void SvkPluginEditor::setKeyStyle(int keyStyleId)
 {
 	pluginState->setKeyStyle(keyStyleId);
     
-    controlComponent->resized();
+    virtualKeyboard->resized();
 }
 
 void SvkPluginEditor::setHighlightStyle()
@@ -373,9 +374,9 @@ void SvkPluginEditor::resized()
 	AudioProcessorEditor::resized();
 
 	controlComponent->setSize(getWidth(), getHeight());
-	
-	viewport->setViewPosition((int)(viewportX * viewport->getMaximumVisibleWidth() * 1.01f), 0);
-    
+
+	viewport->setViewPosition(viewportX * viewport->getMaximumVisibleWidth() * 1.01f, 0);
+
     if (settingsContainer.get())
          settingsContainer->setSize(getWidth(), getHeight());
     
@@ -480,10 +481,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 
 void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
 {
-    if (scrollBarThatHasMoved == viewportScroll)
-    {
-		updateScrollbarData();
-    }
+    updateScrollbarData();
 }
 
 //==============================================================================
