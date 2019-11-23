@@ -20,6 +20,8 @@
 #include "DeviceSettingsPanel.h"
 #include "DebugSettingsPanel.h"
 
+#include "../../Dialogs/PluginSettingsDialog.h"
+
 //==============================================================================
 /*
 */
@@ -37,13 +39,14 @@ public:
         addAndMakeVisible(view.get());
 
         addChildComponent(panels.add(new Component()));
-        addChildComponent(panels.add(new GeneralSettingsPanel(pluginState)));
+        //addChildComponent(panels.add(new GeneralDialog(pluginState)));
+        addChildComponent(panels.add(new PluginSettingsDialog(pluginState)));
         addChildComponent(panels.add(new ViewSettingsPanel(pluginState)));
         addChildComponent(panels.add(new ControlSettingsPanel(pluginState)));
         addChildComponent(panels.add(new DeviceSettingsPanel(pluginState)));
         addChildComponent(panels.add(new DebugSettingsPanel(pluginState)));
         
-        addTab("X", Colours::mediumblue, panels.getUnchecked(0), true);
+        addTab("X", Colours::red, panels.getUnchecked(0), true);
         addTab("General", Colours::lightgrey, panels.getUnchecked(1), true);
         addTab("View", Colours::lightgrey, panels.getUnchecked(2), true);
         addTab("Device", Colours::lightgrey, panels.getUnchecked(3), true);
@@ -88,7 +91,7 @@ public:
         getTabbedButtonBar().setBounds(0, 0, getWidth(), tabHeight);
         view->setBounds(0, tabHeight, getWidth(), getHeight() - tabHeight);
         
-        if (componentViewed)
+        if (componentViewed && componentViewed->getNumChildComponents() > 0)
             componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth(), componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom());
     }
     

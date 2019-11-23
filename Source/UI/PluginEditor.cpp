@@ -466,7 +466,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		pluginState->commitModeInfo();
         updateUI();
 	}
-    
+        
     // Settings closed
     if (source == settingsContainer.get())
     {
