@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../../../JuceLibraryCode/JuceHeader.h"
-#include "../../PluginSettings.h"
+#include "../../PluginState.h"
 //[/Headers]
 
 
@@ -35,27 +35,32 @@
                                                                     //[/Comments]
 */
 class PluginSettingsDialog  : public Component,
-                              public Button::Listener
+                              public ChangeBroadcaster,
+                              public Button::Listener,
+                              public ComboBox::Listener
 {
 public:
     //==============================================================================
-    PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn);
+    PluginSettingsDialog (SvkPluginState* pluginStateIn);
     ~PluginSettingsDialog();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     File findDirectory(const String prompt);
+	ComboBox* getMidiOutputBox();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    SvkPluginSettings* pluginSettings;
+    SvkPluginState* pluginState;
+    
     //[/UserVariables]
 
     //==============================================================================
@@ -70,6 +75,8 @@ private:
     std::unique_ptr<TextButton> settingsDirectoryBtn;
     std::unique_ptr<ToggleButton> localDirectoryBtn;
     std::unique_ptr<Label> headerLbl;
+    std::unique_ptr<ComboBox> midiDeviceBox;
+    std::unique_ptr<Label> midiOutputLbl;
 
 
     //==============================================================================

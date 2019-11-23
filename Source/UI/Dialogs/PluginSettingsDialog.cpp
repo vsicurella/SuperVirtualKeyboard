@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -27,12 +27,13 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PluginSettingsDialog::PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn)
-    : pluginSettings(pluginSettingsIn)
+PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
+    : pluginState(pluginStateIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+    setName ("PluginSettingsDialog");
     presetDirectoryText.reset (new TextEditor ("Preset Directory Text"));
     addAndMakeVisible (presetDirectoryText.get());
     presetDirectoryText->setMultiLine (false);
@@ -140,14 +141,44 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn)
     headerLbl->setColour (TextEditor::textColourId, Colours::black);
     headerLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    midiDeviceBox.reset (new ComboBox ("Midi Outputs"));
+    addAndMakeVisible (midiDeviceBox.get());
+    midiDeviceBox->setEditableText (false);
+    midiDeviceBox->setJustificationType (Justification::centredLeft);
+    midiDeviceBox->setTextWhenNothingSelected (TRANS("No Midi Output"));
+    midiDeviceBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    midiDeviceBox->addListener (this);
+
+    midiDeviceBox->setBounds (128, 200, 320, 24);
+
+    midiOutputLbl.reset (new Label ("Midi Output Label",
+                                    TRANS("Midi Outputs:")));
+    addAndMakeVisible (midiOutputLbl.get());
+    midiOutputLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    midiOutputLbl->setJustificationType (Justification::centredLeft);
+    midiOutputLbl->setEditable (false, false, false);
+    midiOutputLbl->setColour (TextEditor::textColourId, Colours::black);
+    midiOutputLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    midiOutputLbl->setBounds (32, 200, 111, 24);
+
 
     //[UserPreSize]
-    presetDirectoryText->setText(pluginSettings->getPresetPath());
-    modeDirectoryText->setText(pluginSettings->getModePath());
-    settingsDirectoryText->setText(pluginSettings->getSettingsPath());
+    presetDirectoryText->setText(pluginState->getPluginSettings()->getPresetPath());
+    modeDirectoryText->setText(pluginState->getPluginSettings()->getModePath());
+    settingsDirectoryText->setText(pluginState->getPluginSettings()->getSettingsPath());
+
+    
+#if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
+    midiDeviceBox->addItemList(pluginState->getMidiProcessor()->getAvailableOutputs(), 1);
+    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
+#else
+    midiOutputLbl->setVisible(false);
+    midiDeviceBox->setVisible(false);
+#endif
     //[/UserPreSize]
 
-    setSize (508, 196);
+    setSize (508, 250);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -157,6 +188,7 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginSettings* pluginSettingsIn)
 PluginSettingsDialog::~PluginSettingsDialog()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	removeAllChangeListeners();
     //[/Destructor_pre]
 
     presetDirectoryText = nullptr;
@@ -170,6 +202,8 @@ PluginSettingsDialog::~PluginSettingsDialog()
     settingsDirectoryBtn = nullptr;
     localDirectoryBtn = nullptr;
     headerLbl = nullptr;
+    midiDeviceBox = nullptr;
+    midiOutputLbl = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -193,7 +227,7 @@ void PluginSettingsDialog::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    headerLbl->setBounds (proportionOfWidth (0.5000f) - (127 / 2), 0, 127, 24);
+    headerLbl->setBounds (proportionOfWidth (0.4994f) - (127 / 2), 0, 127, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -209,7 +243,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newPresetDirectory = findDirectory("Select Preset Directory");
         if (newPresetDirectory.exists())
         {
-            pluginSettings->setPresetDirectory(newPresetDirectory);
+            pluginState->getPluginSettings()->setPresetDirectory(newPresetDirectory);
             presetDirectoryText->setText(newPresetDirectory.getFullPathName());
         }
         //[/UserButtonCode_presetDirectoryBtn]
@@ -220,7 +254,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newModeDirectory = findDirectory("Select Mode Directory");
         if (newModeDirectory.exists())
         {
-            pluginSettings->setModeDirectory(newModeDirectory);
+            pluginState->getPluginSettings()->setModeDirectory(newModeDirectory);
             modeDirectoryText->setText(newModeDirectory.getFullPathName());
         }
         //[/UserButtonCode_modeDirectoryBtn]
@@ -231,7 +265,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
         File newSettingsDirectory = findDirectory("Select Settings Directory");
         if (newSettingsDirectory.exists())
         {
-            pluginSettings->setSettingsDirectory(newSettingsDirectory);
+            pluginState->getPluginSettings()->setSettingsDirectory(newSettingsDirectory);
             settingsDirectoryText->setText(newSettingsDirectory.getFullPathName());
         }
         //[/UserButtonCode_settingsDirectoryBtn]
@@ -239,7 +273,7 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == localDirectoryBtn.get())
     {
         //[UserButtonCode_localDirectoryBtn] -- add your button handler code here..
-        pluginSettings->setCreatePresetFolder(localDirectoryBtn->getToggleState());
+        pluginState->getPluginSettings()->setCreatePresetFolder(localDirectoryBtn->getToggleState());
         //[/UserButtonCode_localDirectoryBtn]
     }
 
@@ -247,15 +281,37 @@ void PluginSettingsDialog::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
+void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    //[UsercomboBoxChanged_Pre]
+    //[/UsercomboBoxChanged_Pre]
+
+    if (comboBoxThatHasChanged == midiDeviceBox.get())
+    {
+        //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
+		pluginState->getMidiProcessor()->setMidiOutput(midiDeviceBox->getSelectedId() - 1);
+		sendChangeMessage();
+        //[/UserComboBoxCode_midiDeviceBox]
+    }
+
+    //[UsercomboBoxChanged_Post]
+    //[/UsercomboBoxChanged_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+ComboBox* PluginSettingsDialog::getMidiOutputBox()
+{
+	return midiDeviceBox.get();
+}
 
 File PluginSettingsDialog::findDirectory(const String prompt)
 {
     File fileOut;
     FileChooser chooser(prompt, File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory));
-    chooser.browseForDirectory();
+    //chooser.browseForDirectory();
 
     if (chooser.getResult().exists())
     {
@@ -277,11 +333,11 @@ File PluginSettingsDialog::findDirectory(const String prompt)
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="PluginSettingsDialog" componentName=""
-                 parentClasses="public Component" constructorParams="SvkPluginSettings* pluginSettingsIn"
-                 variableInitialisers="pluginSettings(pluginSettingsIn)" snapPixels="8"
+<JUCER_COMPONENT documentType="Component" className="PluginSettingsDialog" componentName="PluginSettingsDialog"
+                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SvkPluginState* pluginStateIn"
+                 variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="508" initialHeight="196">
+                 initialWidth="508" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Preset Directory Text" id="a2079bd0bc4dc5c0" memberName="presetDirectoryText"
               virtualName="" explicitFocusOrder="0" pos="128 32 320 24" initialText=""
@@ -328,6 +384,14 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="1" italic="0" justification="33"
          typefaceStyle="Bold"/>
+  <COMBOBOX name="Midi Outputs" id="8ece1efe3fd87d84" memberName="midiDeviceBox"
+            virtualName="" explicitFocusOrder="0" pos="128 200 320 24" editable="0"
+            layout="33" items="" textWhenNonSelected="No Midi Output" textWhenNoItems="(no choices)"/>
+  <LABEL name="Midi Output Label" id="e459f27b7dfb0123" memberName="midiOutputLbl"
+         virtualName="" explicitFocusOrder="0" pos="32 200 111 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Midi Outputs:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

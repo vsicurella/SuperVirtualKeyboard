@@ -118,12 +118,12 @@ void SvkMidiProcessor::resetWithRate(double sampleRateIn)
 	reset(sampleRateIn);
 }
 
-StringArray SvkMidiProcessor::getAvailableInputs()
+StringArray SvkMidiProcessor::getAvailableInputs() const
 {
     return MidiInput::getDevices();
 }
 
-StringArray SvkMidiProcessor::getAvailableOutputs()
+StringArray SvkMidiProcessor::getAvailableOutputs() const
 {
     return MidiOutput::getDevices();
 }
@@ -138,6 +138,16 @@ MidiOutput*  SvkMidiProcessor::getOutputDevice()
     return midiOutput;
 }
 
+String SvkMidiProcessor::getInputName() const
+{
+    return midiInputName;
+}
+
+String SvkMidiProcessor::getOutputName() const
+{
+    return midiOutputName;
+}
+
 MidiKeyboardState* SvkMidiProcessor::getOriginalKeyboardState()
 {
     return originalKeyboardState.get();
@@ -149,17 +159,17 @@ MidiKeyboardState* SvkMidiProcessor::getRemappedKeyboardState()
     return remappedKeyboardState.get();
 }
 
-int SvkMidiProcessor::getRootNote()
+int SvkMidiProcessor::getRootNote() const
 {
     return rootMidiNote;
 }
 
-int SvkMidiProcessor::getPeriodShift()
+int SvkMidiProcessor::getPeriodShift() const
 {
     return periodShift;
 }
 
-int SvkMidiProcessor::getMidiChannelOut()
+int SvkMidiProcessor::getMidiChannelOut() const
 {
     return midiChannelOut;
 }
@@ -198,20 +208,37 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(int deviceIndex)
 {
-    //midiInput = MidiInput::openDevice(deviceIndex, this).get();
-    //midiInput->start();
-    //inputSelected = deviceIndex;
-    //midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
-    return midiInput->getName();
+    midiInput = MidiInput::openDevice(deviceIndex, this).get();
+    midiInputName = midiInput->getName();
+    if (midiInputName.isNotEmpty())
+    {
+        inputSelected = deviceIndex;
+        midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getName(), nullptr);
+    }
+    else
+    {
+        inputSelected = -1;
+        midiInput = nullptr;
+    }
+    
+    return midiInputName;
 }
 
 String SvkMidiProcessor::setMidiOutput(int deviceIndex)
 {
-    //midiOutput->stopBackgroundThread();
-    //midiOutput = MidiOutput::openDevice(deviceIndex).get();
-    //midiOutput->startBackgroundThread();
-    //outputSelected = deviceIndex;
-    //midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);
+    midiOutput = MidiOutput::openDevice(deviceIndex).get();
+    midiOutputName = midiOutput->getName();
+    if (midiOutputName.isNotEmpty())
+    {
+        outputSelected = deviceIndex;
+        midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getName(), nullptr);
+    }
+    else
+    {
+        outputSelected = -1;
+        midiOutput = nullptr;
+    }
+    
     return midiOutput->getName();
 }
 
@@ -411,6 +438,9 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
             msg.setNoteNumber(midiNote);
             msg.setTimeStamp(++msgCount);
             midiMessages.addEvent(msg, smpl);
+            
+            if (midiOutput)
+                midiOutput->sendMessageNow(msg);
         }
     }
     

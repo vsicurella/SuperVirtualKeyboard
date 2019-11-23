@@ -25,6 +25,8 @@ class SvkMidiProcessor : public MidiMessageCollector
     
     MidiInput* midiInput;
     MidiOutput* midiOutput;
+    String midiInputName = "";
+    String midiOutputName = "";
     
     MidiBuffer midiBuffer;
     int msgCount = 0;
@@ -66,18 +68,21 @@ public:
 
 	void resetWithRate(double sampleRateIn);
     
-    StringArray getAvailableInputs();
-    StringArray getAvailableOutputs();
+    StringArray getAvailableInputs() const;
+    StringArray getAvailableOutputs() const;
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
     
+    String getInputName() const;
+    String getOutputName() const;
+    
     MidiKeyboardState* getOriginalKeyboardState();
     MidiKeyboardState* getRemappedKeyboardState();
     
-    int getRootNote();
-    int getPeriodShift();
-    int getMidiChannelOut();
+    int getRootNote() const;
+    int getPeriodShift() const;
+    int getMidiChannelOut() const;
 
 	NoteMap* getInputNoteMap();
 	NoteMap* getOutputNoteMap();
