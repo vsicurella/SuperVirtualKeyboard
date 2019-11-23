@@ -28,7 +28,7 @@
 
 //==============================================================================
 PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn), appCmdMgr(pluginState->getAppCmdMgr())
+    : pluginState(pluginStateIn), svkParameters(pluginState->getParameters()), appCmdMgr(pluginState->getAppCmdMgr())
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -928,7 +928,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginControlComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener"
-                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), appCmdMgr(pluginState-&gt;getAppCmdMgr())"
+                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn), svkParameters(pluginState-&gt;getParameters()), appCmdMgr(pluginState-&gt;getAppCmdMgr())"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1000" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>

@@ -42,7 +42,7 @@ SvkPluginState::SvkPluginState()
     initializeParameters();
     
 	setPresetViewed(0);
-	modeViewedNum = 1;
+    setModeViewed(1);
 	updateModeViewed(false);
 }
 
@@ -112,8 +112,8 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::presetSlotViewed, new AudioParameterInt(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
     svkParameters.stash(IDs::modeSlotNumViewed, new AudioParameterInt(IDs::modeSlotNumViewed.toString(), "Mode Slot Viewed", 0, 1, 0));
     
-    svkParameters.stash(IDs::mappingMode, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 0, 2, 0));
-    svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 0, 2, 0));
+    svkParameters.stash(IDs::mappingMode, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
+    svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
 
     svkParameters.stash(IDs::periodShift, new AudioParameterInt(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
     svkParameters.stash(IDs::pianoMidiChannel, new AudioParameterInt(IDs::pianoMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
@@ -122,8 +122,8 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::pianoKeyShowName, new AudioParameterBool(IDs::pianoKeyShowName.toString(), "Show Pitch Names", false));
     
     svkParameters.stash(IDs::pianoOrientation, new AudioParameterInt(IDs::pianoOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
-    svkParameters.stash(IDs::pianoKeyPlacementType, new AudioParameterInt(IDs::pianoKeyPlacementType.toString(), "Key Style", 0, 4, 0));
-    svkParameters.stash(IDs::pianoKeysHighlightStyle, new AudioParameterInt(IDs::pianoKeysHighlightStyle.toString(), "Highlight Style", 0, 4, 0));
+    svkParameters.stash(IDs::pianoKeyPlacementType, new AudioParameterInt(IDs::pianoKeyPlacementType.toString(), "Key Style", 1, 4, 1));
+    svkParameters.stash(IDs::pianoKeysHighlightStyle, new AudioParameterInt(IDs::pianoKeysHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
     
     svkParameters.stash(IDs::pianoVelocityBehavior, new AudioParameterInt(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
     svkParameters.stash(IDs::pianoVelocityValue, new AudioParameterInt(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
@@ -144,11 +144,11 @@ void SvkPluginState::updateToPreset(bool sendChange)
 {
 	presetEdited = false;
 
-	presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
+	presetViewed = presetManager->getPresetLoaded(getPresetSlotNumViewed());
     
-	modeViewedNum = (int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed];
-	mapModeSelected = (int) presetViewed->thePropertiesNode[IDs::mappingMode];
-	mapStyleSelected = (int) presetViewed->thePropertiesNode[IDs::modeMappingStyle];
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue((int) presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
+	svkParameters.grab(IDs::mappingMode)->setValue((int) presetViewed->thePropertiesNode[IDs::mappingMode]);
+	svkParameters.grab(IDs::modeMappingStyle)->setValue((int) presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
     
     mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
     mapOrder2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderMapping];
@@ -169,9 +169,6 @@ void SvkPluginState::updateToPreset(bool sendChange)
 	doMapping();
     
     // update parameters
-    svkParameters.grab(IDs::presetSlotViewed)->setValue(presetSlotNumViewed);
-    svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleSelected);
-    svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleSelected);
     svkParameters.grab(IDs::pianoMidiChannel)->setValue(midiProcessor->getMidiChannelOut());
     svkParameters.grab(IDs::pianoKeysShowNoteNumbers)->setValue(virtualKeyboard->isShowingNoteNumbers());
     svkParameters.grab(IDs::pianoKeysShowFilteredNotes)->setValue(virtualKeyboard->isShowingFilteredNumbers());
@@ -240,17 +237,17 @@ NoteMap* SvkPluginState::getMidiOutputMap()
 
 int SvkPluginState::getMappingMode()
 {
-	return mapModeSelected;
+	return (int) svkParameters.grab(IDs::mappingMode)->getValue();
 }
 
 int SvkPluginState::getMappingStyle()
 {
-	return mapStyleSelected;
+	return (int) svkParameters.grab(IDs::modeMappingStyle)->getValue();
 }
 
 bool SvkPluginState::isAutoMapping()
 {
-    return mapModeSelected == 2;
+    return ((int) svkParameters.grab(IDs::mappingMode)->getValue()) == 2;
 }
 
 SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
@@ -265,7 +262,7 @@ SvkPreset* SvkPluginState::getPresetViewed()
 
 int SvkPluginState::getPresetSlotNumViewed()
 {
-	return presetSlotNumViewed;
+	return (int) svkParameters.grab(IDs::presetSlotViewed)->getValue();
 }
 
 int SvkPluginState::getNumModesInPresetViewed()
@@ -275,7 +272,7 @@ int SvkPluginState::getNumModesInPresetViewed()
 
 Mode* SvkPluginState::getModeInSlot(int slotNumIn)
 {
-    return presetManager->getModeInSlots(presetSlotNumViewed, slotNumIn);
+    return presetManager->getModeInSlots(getPresetSlotNumViewed(), slotNumIn);
 }
 
 Mode* SvkPluginState::getModeViewed()
@@ -285,17 +282,17 @@ Mode* SvkPluginState::getModeViewed()
 
 int SvkPluginState::getModeViewedNum()
 {
-	return modeViewedNum;
+	return (int) svkParameters.grab(IDs::modeSlotNumViewed)->getValue();
 }
 
 Mode* SvkPluginState::getMode1()
 {
-    return presetManager->getModeInSlots(presetSlotNumViewed, presetViewed->getMode1SlotNumber());
+    return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
 }
 
 Mode* SvkPluginState::getMode2()
 {
-    return presetManager->getModeInSlots(presetSlotNumViewed, presetViewed->getMode2SlotNumber());
+    return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
 }
 
 Mode* SvkPluginState::getModeCustom()
@@ -365,8 +362,8 @@ bool SvkPluginState::isPresetEdited()
 
 void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
-    presetSlotNumViewed = presetViewedIn;
-    presetViewed = presetManager->getPresetLoaded(presetSlotNumViewed);
+    svkParameters.grab(IDs::presetSlotViewed)->setValue(presetViewedIn);
+    presetViewed = presetManager->getPresetLoaded(presetViewedIn);
 
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
@@ -374,19 +371,19 @@ void SvkPluginState::setPresetViewed(int presetViewedIn)
 
 void SvkPluginState::setModeViewed(int modeViewedIn)
 {
-    modeViewedNum = modeViewedIn;
-	presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
+    svkParameters.grab(IDs::modeSlotNumViewed)->setValue(modeViewedIn);
+	presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedIn, nullptr);
 	updateModeViewed();
 }
 
 void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
-    presetManager->handleModeSelection(presetSlotNumViewed, modeBoxNum, idIn);
+    presetManager->handleModeSelection(getPresetSlotNumViewed(), modeBoxNum, idIn);
     
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
 
-	if (modeViewedNum == modeBoxNum)
+	if (getModeViewedNum() == modeBoxNum)
 		updateModeViewed();
 	
     sendChangeMessage();
@@ -401,7 +398,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 void SvkPluginState::setModeCustom(String stepsIn)
 {
     presetManager->setModeCustom(stepsIn);
-	handleModeSelection(modeViewedNum, 999);
+	handleModeSelection(getModeViewedNum(), 999);
 }
 
 void SvkPluginState::setMode1Root(int rootNoteIn)
@@ -481,15 +478,15 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    mapModeSelected = mapModeSelectionIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelected, nullptr);
+    svkParameters.grab(IDs::mappingMode)->setValue(mapModeSelectionIn);
+    presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
     
-    if (mapModeSelected == 2) // Auto Mapping
+    if (mapModeSelectionIn == 2) // Auto Mapping
     {
         doMapping();
     }
     
-    else if (mapModeSelected == 3) // Manual Mapping
+    else if (mapModeSelectionIn == 3) // Manual Mapping
     {
         ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
         midiProcessor->setMidiMaps(midiMaps);
@@ -507,7 +504,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-	mapStyleSelected = mapStyleIn;
+	svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleIn);
     presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
     
     if (isAutoMapping())
@@ -531,10 +528,10 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
 
 void SvkPluginState::doMapping()
 {
-	if (mapModeSelected > 1)
+	if (getMappingMode() > 1)
 	{
 		DBG("Mapping new settings");
-		doMapping(getMode1(), getMode2(), mapStyleSelected, mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+		doMapping(getMode1(), getMode2(), getMappingMode(), mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
 	}
 	else
 	{
@@ -573,12 +570,12 @@ void SvkPluginState::setHighlightStyle(int highlightStyleIn)
 
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
-	modePresetSlotNum = modeViewedNum ?
-		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue(getModeViewedNum() ?
+		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber());
 
-    svkParameters.grab(IDs::modeSlotNumViewed)->setValue(modeViewedNum); // unnecessary call when the parameter triggers this function
+    svkParameters.grab(IDs::modeSlotNumViewed)->setValue(getModeViewedNum()); // unnecessary call when the parameter triggers this function
 
-	modeViewed = presetManager->getModeInSlots(presetSlotNumViewed, modePresetSlotNum);
+	modeViewed = presetManager->getModeInSlots(getPresetSlotNumViewed(), getModeViewedNum());
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->applyMode(modeViewed);
@@ -594,7 +591,7 @@ void SvkPluginState::commitModeInfo()
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
-	presetManager->refreshModeSlot(presetSlotNumViewed);
+	presetManager->refreshModeSlot(getPresetSlotNumViewed());
 	updateModeViewed();
 	doMapping();
 }
@@ -615,7 +612,7 @@ void SvkPluginState::commitPresetChanges()
 		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiMapNode), nullptr);
 	}
 
-    presetManager->commitPreset(presetSlotNumViewed, presetViewed->parentNode);
+    presetManager->commitPreset(getPresetSlotNumViewed(), presetViewed->parentNode);
 
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
 	pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
@@ -631,13 +628,13 @@ void SvkPluginState::updateFromParameter(Identifier paramId)
 bool SvkPluginState::savePresetViewedToFile()
 {
     commitPresetChanges();
-    return presetManager->savePresetToFile(presetSlotNumViewed, pluginSettings->getPresetPath());
+    return presetManager->savePresetToFile(getPresetSlotNumViewed(), pluginSettings->getPresetPath());
 }
 
 bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
 {
     // multi preset loading not yet implemented
-	int slotNumber = presetSlotNumViewed;
+	int slotNumber = getPresetSlotNumViewed();
 
 	if (!replaceViewed)
 		slotNumber = presetManager->getNumPresetsLoaded();
@@ -654,7 +651,7 @@ bool SvkPluginState::saveModeViewedToFile()
 	int modeSlotNumber = modeViewed ? 
 		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
 
-	return presetManager->saveModeToFile(presetSlotNumViewed, modeSlotNumber, pluginSettings->getModePath());
+	return presetManager->saveModeToFile(getPresetSlotNumViewed(), modeSlotNumber, pluginSettings->getModePath());
 }
 
 bool SvkPluginState::loadModeFromFile()
@@ -663,7 +660,7 @@ bool SvkPluginState::loadModeFromFile()
 
 	if (Mode::isValidMode(modeNode))
 	{
-		presetManager->addSlotAndSetSelection(presetSlotNumViewed, modeViewedNum, modeNode);
+		presetManager->addSlotAndSetSelection(getPresetSlotNumViewed(), getModeViewedNum(), modeNode);
 		updateModeViewed();
 		doMapping();
 		return true;

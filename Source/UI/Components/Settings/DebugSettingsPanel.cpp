@@ -14,9 +14,7 @@ DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
     : pluginState(pluginStateIn)
 {
     svkParameters = pluginState->getParameters();
-    
-    setSize(100, 100);
-    
+        
     Label* lbl;
     Component* c;
     Slider* s;
@@ -48,6 +46,7 @@ DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
         addAndMakeVisible(s);
     }
     
+    setSize(100, 100);
 }
 
 DebugSettingsPanel::~DebugSettingsPanel()
@@ -69,19 +68,14 @@ void DebugSettingsPanel::paint(Graphics& g)
 
 void DebugSettingsPanel::resized()
 {
-    Array<Component*> children = getChildren();
+    int rowHeight = 50;
+    int y;
     
-    if (children.size() > 0)
+    for (int i = 0; i < controls.size(); i++)
     {
-        int rowHeight = 50;
-        int y;
-        
-        for (int i = 0; i < controls.size(); i++)
-        {
-            y = rowHeight * i;
-            labels.getUnchecked(i)->setBounds(0, y-10, getWidth(), rowHeight);
-            controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth(), rowHeight);
-        }
+        y = rowHeight * i;
+        labels.getUnchecked(i)->setBounds(0, y-10, getWidth(), rowHeight);
+        controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth(), rowHeight);
     }
 }
 
