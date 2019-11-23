@@ -18,30 +18,39 @@ DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
     Label* lbl;
     Component* c;
     Slider* s;
-    Identifier paramID;
+    String paramName;
     RangedAudioParameter* param;
+    AudioParameterInt* api;
     
-    SvkParameters::Iterator i = SvkParameters::Iterator(*svkParameters);
-    
-    while (i.next())
+    for (int i = 0; i < svkParameters->getSize(); i++)
     {
-        paramID = i.getKey();
-        param = i.getValue();
+        param = svkParameters->getUnchecked(i);
+        paramName = param->paramID;
         
-        lbl = labels.add(new Label(paramID.toString(), paramID.toString()));
+        lbl = labels.add(new Label("Lbl" + paramName, param->name));
         lbl->setColour(Label::textColourId, Colours::black);
         addAndMakeVisible(lbl);
         
         const NormalisableRange<float>& range = param->getNormalisableRange();
-        s = new Slider(paramID.toString());
+        s = new Slider("Sld" + paramName);
         c = controls.add(s);
         
         s->setSliderStyle(Slider::LinearHorizontal);
-        //s->setRange(range.convertFrom0to1(0), range.convertFrom0to1(1));
-        s->setNormalisableRange(NormalisableRange<double>(range.start, range.end));
+        
+        api = dynamic_cast<AudioParameterInt*>(param);
+        if (api)
+        {
+            s->setNormalisableRange(NormalisableRange<double>(range.start, range.end, 1));
+        }
+        else
+        {
+            s->setNormalisableRange(NormalisableRange<double>(range.start, range.end, 0.01f));
+        }
+        
+        s->setScrollWheelEnabled(false);
         s->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
         s->setColour(Slider::textBoxTextColourId, Colours::black);
-        s->setValue(param->getValue());
+        s->setValue(param->getValue(), dontSendNotification);
         s->addListener (this);
         addAndMakeVisible(s);
     }
@@ -81,10 +90,11 @@ void DebugSettingsPanel::resized()
 
 void DebugSettingsPanel::sliderValueChanged(Slider *slider)
 {
-    RangedAudioParameter* param = svkParameters->grab(Identifier(slider->getName()));
+    String paramName = slider->getName().substring(3);
+    RangedAudioParameter* param = svkParameters->grab(Identifier(paramName));
     param->setValue(slider->getValue());
     
-    if (slider->getName() == IDs::pianoWHRatio.toString())
+    if (paramName == IDs::pianoWHRatio.toString())
     {
         pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
     }

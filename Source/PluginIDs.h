@@ -109,7 +109,7 @@ namespace IDs
 	static Identifier pianoKeyNumber("KeyNumber");
 	static Identifier pianoKeyPitchName("PitchName");
 	static Identifier pianoKeyWidthMod("WidthMod");
-	static Identifier pianoKeyHeightMod("HeighMod");
+	static Identifier pianoKeyHeightMod("HeightMod");
 	static Identifier pianoKeyXOffset("XOffset");
 	static Identifier pianoKeyYOffset("YOffset");
 	static Identifier pianoKeyShowNumber("ShowNumber");

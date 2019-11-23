@@ -973,7 +973,7 @@ void Keyboard::resized()
 		keyHeight = getHeight();
 		keyWidth = keyHeight * keySizeRatio;
 
-		grid->setColumnGap(2);
+		grid->setColumnGap(1);
 		grid->setRowGap(1);
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
