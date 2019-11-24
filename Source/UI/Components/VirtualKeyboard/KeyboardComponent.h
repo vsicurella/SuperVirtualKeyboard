@@ -284,6 +284,11 @@ namespace VirtualKeyboard
 		*/
 		void setOrientation(int orientationIn);
         
+        /*
+            Sets the amount of rows to split the keyboard into
+         */
+        void setNumRows(int numRowsIn);
+        
 		/*
 			Sets the style of which the keys are nested in.
 		*/
@@ -549,6 +554,8 @@ namespace VirtualKeyboard
 		int highlightSelected = 1;
 		int velocitySelected = 1;
 		int scrollingSelected = 1;
+        
+        int numRows = 1;
 
 		bool showPitchNames = false;
 		bool showNoteNumbers = false;

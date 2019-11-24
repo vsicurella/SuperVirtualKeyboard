@@ -14,6 +14,8 @@
 
 class FractionalGrid
 {
+protected:
+
 	// Parameters
 	float columns;
 	float rows;
@@ -32,7 +34,7 @@ class FractionalGrid
 
     // Methods
     void updateGrid();
-
+    
 public:
 
     FractionalGrid(float columsIn, float rowsIn);

@@ -12,8 +12,8 @@
 
 using namespace VirtualKeyboard;
 
-KeyboardGrid::KeyboardGrid(Mode* modeIn, int keyPlacementType)
-: FractionalGrid(modeIn->getKeyboardOrdersSize(0), 1), mode(modeIn), keyPlacement(keyPlacementType)
+KeyboardGrid::KeyboardGrid(Mode* modeIn, int numRows, int keyPlacementType)
+: FractionalGrid(modeIn->getKeyboardOrdersSize(0), numRows), mode(modeIn), keyPlacement(keyPlacementType)
 {
 }
 
@@ -78,43 +78,62 @@ void KeyboardGrid::resizeKey(Key& key)
             }
         }
     }
-    key.setSize(width*getColumnWidth(), height*getRowHeight());
+    
+    key.setSize(width * colSize, height * rowSize);
 }
 
 void KeyboardGrid::placeKey(Key& key)
 {
-	int xPosition = 0;
-    float column = getColumnWidth() + getColumnGap();
+    int row = rowSize + rowGap;
+    int rowKeyLimit = round(columns / (mode->getModeSize() * rows)) * mode->getModeSize();
+    
+    float column = colSize + columnGap;
     float halfColumn = column / 1.75f * (key.order > 0);
-    int colToPlace = ceil(key.modeDegree);
+    int colToPlace = (int) ceil(key.modeDegree);
+    int rowToPlace = 0;
+    
+    if (colToPlace >= rowKeyLimit)
+    {
+        rowToPlace = colToPlace / rowKeyLimit;
+
+        // let last row be longer to preserve period
+        if (128 - key.keyNumber - 1 <= mode->getModeSize())
+            rowToPlace -= 1;
+        
+        colToPlace -= rowKeyLimit * rowToPlace;
+    }
+            
+    int x;
+    int y = rowToPlace * row;
+
     //DBG("halfcolumn="+String(halfColumn));
     
 	switch (keyPlacement)
 	{
 		case(KeyPlacementType::nestedCenter):
 		{
-            xPosition = colToPlace * column - halfColumn + (column - key.getWidth() / 2);
-
-            key.setTopLeftPosition(xPosition, 0);
+            x = colToPlace * column - halfColumn + (column - key.getWidth() / 2);
+            
+            key.setTopLeftPosition(x, y);
             break;
 		}
 
 		case(KeyPlacementType::adjacent):
 		{
             int keyCol = (int) key.modeDegree;
-            xPosition = keyCol * column + halfColumn;
+            x = keyCol * column + halfColumn;
             float stepOff = (key.order > 0 && key.step > 2) * (float)(key.order)/key.step;
 //            DBG("KeyMD=" + String(key.modeDegree) + "\tStepOff=" + String(stepOff));
-            xPosition += stepOff * (key.getWidth() * column);
-            key.setTopLeftPosition(xPosition, 0);
+            x += stepOff * (key.getWidth() * column);
+            key.setTopLeftPosition(x, y);
 
 			break;
 		}
 
 		default: // 0 & 1, key nested right & flat
 		{
-            xPosition = colToPlace * column - halfColumn + (column - key.getWidth());
-            key.setTopLeftPosition(xPosition, 0);
+            x = colToPlace * column - halfColumn + (column - key.getWidth());
+            key.setTopLeftPosition(x, y);
 			break;
 		}
 	}

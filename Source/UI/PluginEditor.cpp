@@ -194,8 +194,8 @@ void SvkPluginEditor::showSettingsDialog()
     controlComponent->setVisible(false);
     
     settingsContainer.reset(new SettingsContainer(pluginState));
-    settingsContainer->setBounds(0, 0, getWidth(), getHeight());
     addAndMakeVisible(settingsContainer.get());
+    settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
     settingsContainer->addChangeListener(this);
 }
 
@@ -297,6 +297,17 @@ void SvkPluginEditor::setMappingMode()
 void SvkPluginEditor::setMappingMode(int mappingModeId)
 {
     pluginState->setMapMode(mappingModeId);
+}
+
+void SvkPluginEditor::setKeyboardRows()
+{
+    auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoNumRows));
+    setKeyboardRows(api->get());
+}
+
+void SvkPluginEditor::setKeyboardRows(int numRows)
+{
+    virtualKeyboard->setNumRows(numRows);
 }
 
 void SvkPluginEditor::setPeriodShift()

@@ -177,15 +177,8 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
 
 
 #if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
-    availableOuts = pluginState->getMidiProcessor()->getAvailableOutputs();
-
-    for (int i = 0; i < availableOuts.size(); i++)
-    {
-        midiDeviceBox->addItem(availableOuts[i].name, i+1);
-    }
-
-    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
-    startTimer(1000);
+    timerCallback();
+    startTimer(750);
 #else
     midiOutputLbl->setVisible(false);
     midiDeviceBox->setVisible(false);
@@ -322,9 +315,10 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == midiDeviceBox.get())
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
-        DBG("trijjered");
-		pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(midiDeviceBox->getSelectedId() - 1).identifier);
-		sendChangeMessage();
+        int deviceNum = comboBoxThatHasChanged->getSelectedId() - 1;
+ 
+        if (deviceNum >= 0)
+            pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(deviceNum).identifier);
         //[/UserComboBoxCode_midiDeviceBox]
     }
 
@@ -335,18 +329,23 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
 void PluginSettingsDialog::timerCallback()
 {
-    availableOuts = MidiOutput::getAvailableDevices();
-    midiDeviceBox->clear();
+    Array<MidiDeviceInfo> devices = pluginState->getMidiProcessor()->getAvailableOutputs();
+    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
 
-    int i = 0;
-    for (auto device : availableOuts)
+    if (availableOuts != devices && !midiDeviceBox->isPopupActive())
     {
-        midiDeviceBox->addItem(device.name, ++i);
+        availableOuts = devices;
+        midiDeviceBox->clear();
+        
+        int i = 0;
+        for (auto device : availableOuts)
+        {
+            midiDeviceBox->addItem(device.name, ++i);
+        }
     }
-
-    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
 }
 
 ComboBox* PluginSettingsDialog::getMidiOutputBox()
