@@ -79,6 +79,7 @@ namespace IDs
 	static Identifier pianoNode("PianoNode");
 	static Identifier pianoUIMode("PianoUIMode");
 	static Identifier pianoOrientation("PianoOrientation");
+    static Identifier pianoNumRows("PianoNumRows");
 	static Identifier pianoKeyboardState("PianoKeyboardState");
 	static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
 	static Identifier pianoMidiChannel("SelectedMidiChannel");
@@ -161,6 +162,7 @@ namespace IDs
 		setPianoHorizontal,
 		setPianoVerticalL,
 		setPianoVerticalR,
+        setKeyboardRows,
 		setKeyStyle,
 		setKeysNestedRight,
 		setKeysFlat,

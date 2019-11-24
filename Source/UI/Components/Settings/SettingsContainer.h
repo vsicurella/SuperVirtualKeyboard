@@ -77,6 +77,9 @@ public:
         
         componentViewed = panels.getUnchecked(newCurrentTabIndex);
         view->setViewedComponent(componentViewed, false);
+        
+        if (getParentComponent())
+            resized();
     }
 
     void popupMenuClickOnTab (int tabIndex, const String &tabName) override
@@ -92,7 +95,7 @@ public:
         view->setBounds(0, tabHeight, getWidth(), getHeight() - tabHeight);
         
         if (componentViewed && componentViewed->getNumChildComponents() > 0)
-            componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth(), componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom());
+            componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth()*0.9, componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom() * 1.2);
     }
     
 private:

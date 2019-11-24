@@ -146,7 +146,7 @@ void Keyboard::applyMode(Mode* modeIn)
 	if (mode == nullptr)
 		mode = &modeDefault;
 
-	grid.reset(new KeyboardGrid(mode));
+	grid.reset(new KeyboardGrid(mode, numRows));
     
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
@@ -440,6 +440,13 @@ void Keyboard::setOrientation(int orientationIn)
 	pianoNode.setProperty(IDs::pianoOrientation, orientationSelected, nullptr);
 
 	// do stuff
+}
+
+void Keyboard::setNumRows(int numRowsIn)
+{
+    numRows = jlimit(1, 4, numRowsIn);
+    pianoNode.setProperty(IDs::pianoNumRows, numRows, nullptr);
+    applyMode(mode);
 }
 
 void Keyboard::setKeyPlacementStyle(int placementIn)
@@ -978,7 +985,7 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
-		Rectangle<int> viewableBounds = getBounds();
+		Rectangle<int> viewableBounds = getBounds().withWidth(pianoWidth);
 
 		if (viewport)
 		{

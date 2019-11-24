@@ -117,6 +117,9 @@ public:
 
 	void setNoteNumsVisible();
 	void setNoteNumsVisible(bool noteNumsVisible);
+    
+    void setKeyboardRows();
+    void setKeyboardRows(int numRows);
 	
 	void setKeyStyle();
 	void setKeyStyle(int keyStyleId);
