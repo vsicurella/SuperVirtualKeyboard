@@ -339,7 +339,8 @@ Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
 
 Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
 {
-	Point<int> ep = Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY());
+	MouseEvent er = e.getEventRelativeTo(viewport);
+	Point<int> ep = Point<int>(er.getScreenX() - getScreenX(), er.getPosition().getY());
 	return getKeyFromPosition(ep);
 }
 
