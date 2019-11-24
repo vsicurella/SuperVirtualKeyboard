@@ -168,15 +168,15 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
     modeDirectoryText->setText(pluginState->getPluginSettings()->getModePath());
     settingsDirectoryText->setText(pluginState->getPluginSettings()->getSettingsPath());
 
-    
+
 #if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
     availableOuts = pluginState->getMidiProcessor()->getAvailableOutputs();
-    
+
     for (int i = 0; i < availableOuts.size(); i++)
     {
         midiDeviceBox->addItem(availableOuts[i].name, i+1);
     }
-    
+
     midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
 #else
     midiOutputLbl->setVisible(false);
@@ -233,7 +233,7 @@ void PluginSettingsDialog::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    headerLbl->setBounds (proportionOfWidth (0.4994f) - (127 / 2), 0, 127, 24);
+    headerLbl->setBounds (proportionOfWidth (0.5000f) - (127 / 2), 0, 127, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }

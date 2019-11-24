@@ -41,16 +41,18 @@ DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
         if (api)
         {
             s->setNormalisableRange(NormalisableRange<double>(range.start, range.end, 1));
+            s->setSliderStyle(Slider::IncDecButtons);
+            s->setValue(api->get(), dontSendNotification);
         }
         else
         {
             s->setNormalisableRange(NormalisableRange<double>(range.start, range.end, 0.01f));
+            s->setValue(param->getValue(), dontSendNotification);
         }
         
         s->setScrollWheelEnabled(false);
         s->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
         s->setColour(Slider::textBoxTextColourId, Colours::black);
-        s->setValue(param->getValue(), dontSendNotification);
         s->addListener (this);
         addAndMakeVisible(s);
     }
@@ -79,12 +81,19 @@ void DebugSettingsPanel::resized()
 {
     int rowHeight = 50;
     int y;
+    Slider* s;
     
     for (int i = 0; i < controls.size(); i++)
     {
         y = rowHeight * i;
         labels.getUnchecked(i)->setBounds(0, y-10, getWidth(), rowHeight);
-        controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth(), rowHeight);
+        
+        s = dynamic_cast<Slider*>(controls.getUnchecked(i));
+        
+        if (s && s->getSliderStyle() == Slider::IncDecButtons)
+            controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth() * 0.2, rowHeight);
+        else
+            controls.getUnchecked(i)->setBounds(0, y+rowHeight/2-10, getWidth(), rowHeight);
     }
 }
 
@@ -92,11 +101,20 @@ void DebugSettingsPanel::sliderValueChanged(Slider *slider)
 {
     String paramName = slider->getName().substring(3);
     RangedAudioParameter* param = svkParameters->grab(Identifier(paramName));
-    param->setValue(slider->getValue());
+    AudioParameterInt* api;
     
     if (paramName == IDs::pianoWHRatio.toString())
     {
+        param->setValue(slider->getValue());
         pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
     }
+    
+    else if (paramName == IDs::pianoNumRows.toString())
+    {
+        api = dynamic_cast<AudioParameterInt*>(param);
+        *api = slider->getValue();
+        pluginState->getKeyboard()->setNumRows(api->get());
+    }
+    
 }
 

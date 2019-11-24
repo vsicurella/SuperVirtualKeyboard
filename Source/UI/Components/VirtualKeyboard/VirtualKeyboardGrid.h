@@ -33,7 +33,7 @@ namespace VirtualKeyboard
         
     public:
                 
-		KeyboardGrid(Mode* modeIn, int keyPlacementType=1);
+		KeyboardGrid(Mode* modeIn, int numRows=1, int keyPlacementType=1);
         ~KeyboardGrid() {};
                 
 		void setKeyPlacement(int keyPlacementTypeIn);
