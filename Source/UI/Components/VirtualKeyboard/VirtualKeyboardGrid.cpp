@@ -102,9 +102,7 @@ void KeyboardGrid::placeKey(Key& key)
         
         colToPlace -= rowKeyLimit * rowToPlace;
     }
-    
-    DBG("Key " + String(key.keyNumber) + "\tRow " + String(rowToPlace) + "\tCol " + String(colToPlace));
-        
+            
     int x;
     int y = rowToPlace * row;
 

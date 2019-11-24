@@ -190,19 +190,21 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
 String SvkMidiProcessor::setMidiOutput(String deviceID)
 {
     midiOutput = MidiOutput::openDevice(deviceID);
-    midiOutputName = midiOutput->getName();
-    if (midiOutputName.isNotEmpty())
+    
+    if (midiOutput.get())
     {
+        midiOutputName = midiOutput->getName();
         outputSelected = deviceID;
         midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getIdentifier(), nullptr);
     }
     else
     {
+        midiOutputName = "";
         outputSelected = "";
         midiOutput = nullptr;
     }
     
-    return midiOutput->getName();
+    return midiOutputName;
 }
 
 void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
