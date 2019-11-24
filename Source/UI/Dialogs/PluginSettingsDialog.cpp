@@ -170,14 +170,8 @@ PluginSettingsDialog::PluginSettingsDialog (SvkPluginState* pluginStateIn)
 
 
 #if JUCE_IOS || JUCE_ANDROID || JUCE_LINUX || JUCE_DEBUG
-    availableOuts = pluginState->getMidiProcessor()->getAvailableOutputs();
-
-    for (int i = 0; i < availableOuts.size(); i++)
-    {
-        midiDeviceBox->addItem(availableOuts[i].name, i+1);
-    }
-
-    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName());
+    timerCallback();
+    startTimer(750);
 #else
     midiOutputLbl->setVisible(false);
     midiDeviceBox->setVisible(false);
@@ -295,8 +289,10 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == midiDeviceBox.get())
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
-		pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(midiDeviceBox->getSelectedId() - 1).identifier);
-		sendChangeMessage();
+        int deviceNum = comboBoxThatHasChanged->getSelectedId() - 1;
+ 
+        if (deviceNum >= 0)
+            pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(deviceNum).identifier);
         //[/UserComboBoxCode_midiDeviceBox]
     }
 
@@ -307,6 +303,24 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void PluginSettingsDialog::timerCallback()
+{
+    Array<MidiDeviceInfo> devices = pluginState->getMidiProcessor()->getAvailableOutputs();
+    midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
+
+    if (availableOuts != devices && !midiDeviceBox->isPopupActive())
+    {
+        availableOuts = devices;
+        midiDeviceBox->clear();
+        
+        int i = 0;
+        for (auto device : availableOuts)
+        {
+            midiDeviceBox->addItem(device.name, ++i);
+        }
+    }
+}
 
 ComboBox* PluginSettingsDialog::getMidiOutputBox()
 {
@@ -340,10 +354,10 @@ File PluginSettingsDialog::findDirectory(const String prompt)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginSettingsDialog" componentName="PluginSettingsDialog"
-                 parentClasses="public Component, public ChangeBroadcaster" constructorParams="SvkPluginState* pluginStateIn"
-                 variableInitialisers="pluginState(pluginStateIn)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="508" initialHeight="250">
+                 parentClasses="public Component, public ChangeBroadcaster, private Timer"
+                 constructorParams="SvkPluginState* pluginStateIn" variableInitialisers="pluginState(pluginStateIn)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="508" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TEXTEDITOR name="Preset Directory Text" id="a2079bd0bc4dc5c0" memberName="presetDirectoryText"
               virtualName="" explicitFocusOrder="0" pos="128 32 320 24" initialText=""

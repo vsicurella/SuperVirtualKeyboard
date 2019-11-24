@@ -36,6 +36,7 @@
 */
 class PluginSettingsDialog  : public Component,
                               public ChangeBroadcaster,
+                              private Timer,
                               public Button::Listener,
                               public ComboBox::Listener
 {
@@ -48,6 +49,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     File findDirectory(const String prompt);
 	ComboBox* getMidiOutputBox();
+
+    void timerCallback() override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
