@@ -20,7 +20,8 @@ class KeyboardViewport : public Viewport,
 
 	int buttonWidth = 16;
 	
-	bool showStepButtons = true;
+    int scrollingModeSelected = 1;
+    int scrollingStyleSelected = 1;
     
 	std::unique_ptr<ImageButton> stepLeftSmall;
 	std::unique_ptr<ImageButton> stepLeftLarge;
@@ -34,7 +35,7 @@ class KeyboardViewport : public Viewport,
     
 public:
     
-    KeyboardViewport(const String &nameIn=String(), bool showStepButtonsIn=true);
+    KeyboardViewport(const String &nameIn=String(), int scrollingModeIn=1, int scrollingStyleIn=1);
     
     int getStepSmall();
     int getStepLarge();
@@ -47,7 +48,8 @@ public:
 
 	void setButtonWidth(int widthIn);
 	
-	void setShowButtons(bool toShowButtons);
+	void setScrollingMode(int modeIdIn);
+    void setScrollingStyle(int styleIdIn);
     
     void stepSmallForward();
     void stepSmallBackward();
@@ -57,4 +59,20 @@ public:
     void resized() override;
 
 	void buttonClicked(Button* button) override;
+    
+    enum ScrollingMode
+    {
+        NoScrolling = 0,
+        Smooth,
+        Stepped,
+        SmoothWithButtons
+    };
+    
+    enum ScrollingStyle
+    {
+        Hidden = 0,
+        Bar,
+        KeyboardView,
+        Dots
+    };
 };
