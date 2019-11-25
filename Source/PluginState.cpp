@@ -120,7 +120,10 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::pianoKeysShowNoteNumbers, new AudioParameterBool(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
     svkParameters.stash(IDs::pianoKeysShowFilteredNotes, new AudioParameterBool(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
     svkParameters.stash(IDs::pianoKeyShowName, new AudioParameterBool(IDs::pianoKeyShowName.toString(), "Show Pitch Names", false));
-    svkParameters.stash(IDs::pianoNumRows, new AudioParameterInt(IDs::pianoNumRows.toString(), "Keyboard Rows", 1, 4, 1));
+    svkParameters.stash(IDs::scrollingMode, new AudioParameterInt(IDs::scrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
+    svkParameters.stash(IDs::pianoScrollingStyle, new AudioParameterInt(IDs::pianoScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
+    svkParameters.stash(IDs::numKeysInWidth, new AudioParameterInt(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
+    svkParameters.stash(IDs::pianoNumRows, new AudioParameterInt(IDs::pianoNumRows.toString(), "Keyboard Rows", 1, 16, 1));
     svkParameters.stash(IDs::pianoOrientation, new AudioParameterInt(IDs::pianoOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
     svkParameters.stash(IDs::pianoKeyPlacementType, new AudioParameterInt(IDs::pianoKeyPlacementType.toString(), "Key Style", 1, 4, 1));
     svkParameters.stash(IDs::pianoKeysHighlightStyle, new AudioParameterInt(IDs::pianoKeysHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
