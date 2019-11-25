@@ -999,7 +999,7 @@ void Keyboard::resized()
             //viewport->getHorizontalScrollBar().setRangeLimits(0, pianoWidth + viewport->getButtonWidth());
 		}
         
-        Rectangle<int> viewableBounds = getLocalBounds().withWidth(pianoWidth);
+        Rectangle<int> viewableBounds = getBounds().withWidth(pianoWidth);
 		grid->setBounds(viewableBounds);
         grid->setYOffset(0);
 		
