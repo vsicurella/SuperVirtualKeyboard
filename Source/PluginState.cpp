@@ -130,7 +130,11 @@ void SvkPluginState::initializeParameters()
     
     svkParameters.stash(IDs::pianoVelocityBehavior, new AudioParameterInt(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
     svkParameters.stash(IDs::pianoVelocityValue, new AudioParameterInt(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
-    svkParameters.stash(IDs::pianoWHRatio, new AudioParameterFloat(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
+    float defaultWH = 0.24;
+#if JUCE_IOS
+    defaultWH = 0.12f;
+#endif
+    svkParameters.stash(IDs::pianoWHRatio, new AudioParameterFloat(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, defaultWH));
     
     svkParameters.stash(IDs::modeSlotDebug, new AudioParameterInt(IDs::modeSlotDebug.toString(), "Mode Slot Debug", 0, 1, 0));
     svkParameters.stash(IDs::modeLibraryIndex, new AudioParameterInt(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));

@@ -318,7 +318,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
 	keyboardViewport->setBounds(7, 40, proportionOfWidth(0.9830f), getHeight() - 83);
-
+    
 	// DISABLED BECAUSE OF MOBILE
 	mapStyleBox->setVisible(false);
 	mapApplyBtn->setVisible(false);
@@ -342,6 +342,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn)
 	highlightStyleBox->setItemEnabled(4, false);
 	highlightStyleBox->setItemEnabled(5, false);
 
+    
     //[/Constructor]
 }
 

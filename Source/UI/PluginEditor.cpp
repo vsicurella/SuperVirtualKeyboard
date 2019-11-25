@@ -65,6 +65,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
     
 	controlComponent->setBounds(getBounds());
     initNodeData();
+    pluginState->handleModeSelection(pluginState->getModeViewedNum(), 72);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -93,6 +94,8 @@ void SvkPluginEditor::initNodeData()
 		viewportX = 0.51f;
 	}
     
+    pluginEditorNode.setProperty(IDs::viewportPosition, 0.48f, nullptr);
+    virtualKeyboard->setKeySizeRatio(0.12f);
     updateUI();
 }
 
