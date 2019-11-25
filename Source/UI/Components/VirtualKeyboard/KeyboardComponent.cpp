@@ -999,6 +999,7 @@ void Keyboard::resized()
 		}
         
         Rectangle<int> viewableBounds = getBounds().withWidth(pianoWidth);
+
 		grid->setBounds(viewableBounds);
         grid->setYOffset(0);
 		
