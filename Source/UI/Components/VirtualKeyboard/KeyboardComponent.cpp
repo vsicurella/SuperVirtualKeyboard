@@ -147,7 +147,7 @@ void Keyboard::applyMode(Mode* modeIn)
 		mode = &modeDefault;
 
 	grid.reset(new KeyboardGrid(mode, numRows));
-    
+
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
 	numOrder0Keys = mode->getKeyboardOrdersSize(0);
@@ -339,8 +339,9 @@ Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
 
 Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
 {
-    MouseEvent er = e.getEventRelativeTo(viewport);
-	Point<int> ep = Point<int>(er.getScreenX() - getScreenX(), er.getPosition().getY());
+	MouseEvent er = e.getEventRelativeTo(viewport);
+
+    Point<int> ep = Point<int>(er.getScreenX() - getScreenX(), er.getPosition().getY());
 	return getKeyFromPosition(ep);
 }
 
@@ -445,7 +446,7 @@ void Keyboard::setOrientation(int orientationIn)
 
 void Keyboard::setNumRows(int numRowsIn)
 {
-    numRows = jlimit(1, 4, numRowsIn);
+    numRows = jlimit(1, 16, numRowsIn);
     pianoNode.setProperty(IDs::pianoNumRows, numRows, nullptr);
     applyMode(mode);
 }
@@ -986,18 +987,21 @@ void Keyboard::resized()
 
 		pianoWidth = numOrder0Keys * (keyWidth + grid->getColumnGap());
 
-		Rectangle<int> viewableBounds = getBounds().withWidth(pianoWidth);
-
 		if (viewport)
 		{
-			viewport->setStepSmall(keyWidth + grid->getColumnGap());
-			viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
-
-			//if (viewport->isShowingButtons())
-			//	viewableBounds = viewableBounds.withTrimmedLeft(viewport->getButtonWidth()).withTrimmedRight(viewport->getButtonWidth());
+            if (viewport->isShowingButtons())
+            {
+                viewport->setStepSmall(keyWidth + grid->getColumnGap());
+                viewport->setStepLarge((keyWidth + grid->getColumnGap()) * mode->getModeSize());
+                grid->setXOffset(viewport->getButtonWidth());
+            }
+            
+            //viewport->getHorizontalScrollBar().setRangeLimits(0, pianoWidth + viewport->getButtonWidth());
 		}
-
+        
+        Rectangle<int> viewableBounds = getLocalBounds().withWidth(pianoWidth);
 		grid->setBounds(viewableBounds);
+        grid->setYOffset(0);
 		
 		// Resize keys
 		for (int i = 0; i < keys->size(); i++)

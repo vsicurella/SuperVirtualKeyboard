@@ -25,7 +25,7 @@
 #include "../../PluginState.h"
 #include "../VectorResources.h"
 #include "ReferencedComboBox.h"
-#include "VirtualKeyboard/KeyboardViewport.h"
+#include "VirtualKeyboard/KeyboardViewPort.h"
 //[/Headers]
 
 

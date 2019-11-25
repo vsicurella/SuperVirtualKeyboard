@@ -19,7 +19,7 @@
 #include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
-#include "KeyboardViewport.h"
+#include "KeyboardViewPort.h"
 
 #include <iostream>     
 

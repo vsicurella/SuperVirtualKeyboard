@@ -8,9 +8,9 @@
   ==============================================================================
 */
 
-#include "KeyboardViewport.h"
+#include "KeyboardViewPort.h"
 
-KeyboardViewport::KeyboardViewport(const String& nameIn, bool showStepButtonsIn)
+KeyboardViewport::KeyboardViewport(const String& nameIn, int scrollingModeIn, int scrollingStyleIn)
 : Viewport(nameIn)
 {
 	stepRightLarge.reset(new ImageButton());
@@ -30,7 +30,8 @@ KeyboardViewport::KeyboardViewport(const String& nameIn, bool showStepButtonsIn)
 	stepLeftSmall->addListener(this);
 	addChildComponent(stepLeftSmall.get());
 
-	setShowButtons(showStepButtonsIn);
+	setScrollingMode(scrollingModeIn);
+    setScrollingStyle(scrollingStyleIn);
 }
 
 int KeyboardViewport::getStepSmall()
@@ -45,12 +46,15 @@ int KeyboardViewport::getStepLarge()
 
 int KeyboardViewport::getButtonWidth()
 {
-	return buttonWidth;
+    if (isShowingButtons())
+        return buttonWidth;
+    
+    return 0;
 }
 
 bool KeyboardViewport::isShowingButtons()
 {
-	return showStepButtons;	
+	return scrollingModeSelected > 1;
 }
 
 void KeyboardViewport::setStepSmall(int smallSizeIn)
@@ -68,11 +72,11 @@ void KeyboardViewport::setButtonWidth(int widthIn)
 	buttonWidth = widthIn;
 }
 
-void KeyboardViewport::setShowButtons(bool toShowButtons)
+void KeyboardViewport::setScrollingMode(int modeIdIn)
 {
-	showStepButtons = toShowButtons;
+	scrollingModeSelected = modeIdIn;
 
-	if (showStepButtons)
+	if (scrollingModeSelected > 1)
 	{
 		stepRightLarge->setVisible(true);
 		stepRightSmall->setVisible(true);
@@ -87,7 +91,11 @@ void KeyboardViewport::setShowButtons(bool toShowButtons)
 		stepLeftSmall->setVisible(false);
 	}
 
-//	resized();
+}
+void KeyboardViewport::setScrollingStyle(int styleIdIn)
+{
+    scrollingStyleSelected = styleIdIn;
+    // do stuff
 }
 
 void KeyboardViewport::stepSmallForward()
@@ -208,7 +216,8 @@ void KeyboardViewport::resized()
 {
     Viewport::resized();
 	
-	if (showStepButtons)
+    // draw step buttons
+	if (scrollingModeSelected > 1)
 	{
 		int halfHeight = round(getMaximumVisibleHeight() / 2.0f);
 		redrawButtons(halfHeight);
