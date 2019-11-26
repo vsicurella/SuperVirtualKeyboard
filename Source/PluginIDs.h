@@ -43,6 +43,9 @@ static Identifier midiSettingsNode("MidiSettings");
 static Identifier midiMapNode("MidiMappings");
 static Identifier rootMidiNote("RootNote");
 static Identifier periodShift("PeriodShift");
+static Identifier transposeAmt("TransposeAmt");
+static Identifier sustainPedalOn("SustainPedalOn");
+static Identifier maxVoices("MaxVoices");
 static Identifier midiInputMap("InputMapping");
 static Identifier midiOutputMap("OutputMappint");
 static Identifier midiInputName("InputDevice");
@@ -57,6 +60,16 @@ static Identifier mode1OrderMapping("Mode1OrderMapping");
 static Identifier mode2OrderMapping("Mode2OrderMapping");
 static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
 static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
+
+// MPE Settings
+static Identifier mpeOn("MPEOn");
+static Identifier pitchBendGlobalMax("PitchBendGlobalMax");
+static Identifier pitchBendNoteMax("PitchBendNoteMax");
+static Identifier mpePitchTrackingMode("MPEPitchTrackingMode");
+static Identifier mpePressueTrackingMode("MPEPitchTrackingMode");
+static Identifier mpeTimbreTrackingMode("MPEPitchTrackingMode");
+static Identifier mpeThru("MPEThru");
+static Identifier mpeZone("MPEZone");
 
 // Mode
 static Identifier scaleSize("ScaleSize");
@@ -85,7 +98,6 @@ static Identifier pianoOrientation("PianoOrientation");
 static Identifier pianoKeyboardState("PianoKeyboardState");
 static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
 static Identifier pianoMidiChannel("SelectedMidiChannel");
-static Identifier pianoMPEToggle("MpeToggle");
 static Identifier pianoWHRatio("WidthToHeightRatio");
 static Identifier pianoNumRows("PianoNumRows");
 static Identifier pianoHasCustomColor("PresetHasCustomColor");
