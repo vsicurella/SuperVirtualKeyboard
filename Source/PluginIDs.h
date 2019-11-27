@@ -43,6 +43,7 @@ static Identifier midiSettingsNode("MidiSettings");
 static Identifier midiMapNode("MidiMappings");
 static Identifier rootMidiNote("RootNote");
 static Identifier periodShift("PeriodShift");
+static Identifier periodShiftModeSize("PeriodShiftModeSize");
 static Identifier transposeAmt("TransposeAmt");
 static Identifier sustainPedalOn("SustainPedalOn");
 static Identifier maxVoices("MaxVoices");
@@ -63,13 +64,14 @@ static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
 
 // MPE Settings
 static Identifier mpeOn("MPEOn");
+static Identifier mpeThru("MPEThru");
+static Identifier mpeZone("MPEZone");
+static Identifier mpeLegacyOn("MPELegacyOn");
 static Identifier pitchBendGlobalMax("PitchBendGlobalMax");
 static Identifier pitchBendNoteMax("PitchBendNoteMax");
 static Identifier mpePitchTrackingMode("MPEPitchTrackingMode");
-static Identifier mpePressueTrackingMode("MPEPitchTrackingMode");
+static Identifier mpePressureTrackingMode("MPEPitchTrackingMode");
 static Identifier mpeTimbreTrackingMode("MPEPitchTrackingMode");
-static Identifier mpeThru("MPEThru");
-static Identifier mpeZone("MPEZone");
 
 // Mode
 static Identifier scaleSize("ScaleSize");
