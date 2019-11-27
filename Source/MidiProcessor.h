@@ -34,14 +34,26 @@ class SvkMidiProcessor : public MidiMessageCollector
 	Mode* mode2;
     
     int rootMidiNote = 60;
-
+    int midiChannelOut = 1;
     int periodShift = 0;
-	bool useModeSize = false;
-    
-	int midiChannelOut = 1;
+    int transposeAmt = 0;
+    bool useModePeriod = false;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;
+    
+    std::unique_ptr<MPEInstrument> mpeInst;
+    
+    bool mpeOn = false;
+    bool mpeThru = false;
+    bool mpeLegacyOn = false;
+    MPEZoneLayout mpeZone;
+    
+    int pitchBendGlobalMax = 2;
+    int pitchBendNoteMax = 48;
+    int mpePitchTrackingMode = 0;
+    int mpePressureTrackingMode = 0;
+    int mpeTimbreTrackingMode = 0;
     
     bool midiInputPaused = false;
     bool isInputRemapped = true;
@@ -80,6 +92,7 @@ public:
     
     int getRootNote() const;
     int getPeriodShift() const;
+    int getTransposeAmt() const;
     int getMidiChannelOut() const;
 
 	NoteMap* getInputNoteMap();
@@ -91,6 +104,17 @@ public:
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
     
+    bool isMPEOn() const;
+    bool isMPELegacyMode() const;
+    bool isMPEThru() const;
+    MPEZoneLayout getMPEZone() const;
+
+    int getPitchBendNoteMax() const;
+    int getPitchBendGlobalMax() const;
+    int getPitchTrackingMode() const;
+    int getPressureTrackingMode() const;
+    int getTimbreTrackingMode() const;
+    
     bool isAutoRemapping();
     
     String setMidiInput(String deviceID);
@@ -101,11 +125,21 @@ public:
 	void setMode2(Mode* mode2In);
     
     void setRootNote(int rootNoteIn);
-    
-	void setPeriodShift(int shiftIn);
-	void periodUsesModeSize(bool useMode);
-
     void setMidiChannelOut(int channelOut);
+	void setPeriodShift(int shiftIn);
+    void setTransposeAmt(int notesToTranspose);
+	void periodUsesModeSize(bool useMode);
+    
+    void setMPEOn(bool turnOnMPE);
+    void setMPEThru(bool mpeOnThru);
+    void setMPELegacy(bool turnOnLegacy);
+    void setMPEZone(MPEZoneLayout zoneIn);
+    
+    void setPitchBendNoteMax(int bendAmtIn);
+    void setPitchBendGlobalMax(int bendAmtIn);
+    void setPitchTrackingMode(int modeIn);
+    void setPressureTrackingMode(int modeIn);
+    void setTimbreTrackingMode(int modeIn);
     
     void setInputToRemap(bool doRemap=true);
     void setOutputToRemap(bool doRemap=true);
@@ -124,6 +158,7 @@ public:
     void resetOutputMap(bool updateNode=true);
     
     void processMidi(MidiBuffer& midiMessages);
+    void sendMsgToOutputs(const MidiMessage& bufferToSend);
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
