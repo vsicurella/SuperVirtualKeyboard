@@ -23,6 +23,8 @@ SvkMidiProcessor::SvkMidiProcessor()
     midiInput = nullptr;
     midiOutput = nullptr;
     
+    mpeInst.reset(new MPEInstrument());
+    
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
     
@@ -40,6 +42,19 @@ SvkMidiProcessor::~SvkMidiProcessor()
 void SvkMidiProcessor::updateNode()
 {
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
+    midiSettingsNode.setProperty(IDs::pianoMidiChannel, midiChannelOut, nullptr);
+    midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
+    midiSettingsNode.setProperty(IDs::periodShiftModeSize, useModePeriod, nullptr);
+    midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
+    midiSettingsNode.setProperty(IDs::mpeOn, mpeOn, nullptr);
+    midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
+    midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
+    midiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeLegacyOn, nullptr);
+    midiSettingsNode.setProperty(IDs::pitchBendNoteMax, pitchBendNoteMax, nullptr);
+    midiSettingsNode.setProperty(IDs::pitchBendGlobalMax, pitchBendGlobalMax, nullptr);
+    midiSettingsNode.setProperty(IDs::mpePitchTrackingMode, mpePitchTrackingMode, nullptr);
+    midiSettingsNode.setProperty(IDs::mpePressureTrackingMode, mpePressureTrackingMode, nullptr);
+    midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
 
     Array<int> inputMap = midiInputFilter->getRemappedNotes();
     midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
@@ -135,6 +150,56 @@ int SvkMidiProcessor::getPeriodShift() const
 int SvkMidiProcessor::getMidiChannelOut() const
 {
     return midiChannelOut;
+}
+
+int SvkMidiProcessor::getTransposeAmt() const
+{
+    return transposeAmt;
+}
+
+bool SvkMidiProcessor::isMPEOn() const
+{
+    return mpeOn;
+}
+
+bool SvkMidiProcessor::isMPELegacyMode() const
+{
+    return mpeLegacyOn;
+}
+
+bool SvkMidiProcessor::isMPEThru() const
+{
+    return mpeThru;
+}
+
+MPEZoneLayout SvkMidiProcessor::getMPEZone() const
+{
+    return mpeZone;
+}
+
+int SvkMidiProcessor::getPitchBendNoteMax() const
+{
+    return pitchBendNoteMax;
+}
+
+int SvkMidiProcessor::getPitchBendGlobalMax() const
+{
+    return pitchBendGlobalMax;
+}
+
+int SvkMidiProcessor::getPitchTrackingMode() const
+{
+    return mpePitchTrackingMode;
+}
+
+int SvkMidiProcessor::getPressureTrackingMode() const
+{
+    return mpePressureTrackingMode;
+}
+
+int SvkMidiProcessor::getTimbreTrackingMode() const
+{
+    return mpeTimbreTrackingMode;
 }
 
 NoteMap* SvkMidiProcessor::getInputNoteMap()
@@ -236,7 +301,7 @@ void SvkMidiProcessor::setPeriodShift(int shiftIn)
 
 void SvkMidiProcessor::periodUsesModeSize(bool useModeSizeIn)
 {
-	useModeSize = useModeSizeIn;
+	useModePeriod = useModeSizeIn;
 }
 
 void SvkMidiProcessor::setMidiChannelOut(int channelOut)
@@ -248,6 +313,56 @@ void SvkMidiProcessor::setMidiChannelOut(int channelOut)
     
     midiSettingsNode.setProperty(IDs::pianoMidiChannel, channelOut, nullptr);
     midiChannelOut = channelOut;
+}
+
+void SvkMidiProcessor::setTransposeAmt(int notesToTranspose)
+{
+    transposeAmt = notesToTranspose;
+}
+
+void SvkMidiProcessor::setMPEOn(bool turnOnMPE)
+{
+    mpeOn = turnOnMPE;
+}
+
+void SvkMidiProcessor::setMPEThru(bool mpeOnThru)
+{
+    mpeThru = mpeOnThru;
+}
+
+void SvkMidiProcessor::setMPELegacy(bool turnOnLegacy)
+{
+    mpeLegacyOn = turnOnLegacy;
+}
+
+void SvkMidiProcessor::setMPEZone(MPEZoneLayout zoneIn)
+{
+    mpeZone = zoneIn;
+}
+
+void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
+{
+    pitchBendNoteMax = bendAmtIn;
+}
+
+void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
+{
+    pitchBendGlobalMax = bendAmtIn;
+}
+
+void SvkMidiProcessor::setPitchTrackingMode(int modeIn)
+{
+    mpePitchTrackingMode = modeIn;
+}
+
+void SvkMidiProcessor::setPressureTrackingMode(int modeIn)
+{
+    mpePressureTrackingMode = modeIn;
+}
+
+void SvkMidiProcessor::setTimbreTrackingMode(int modeIn)
+{
+    mpeTimbreTrackingMode = modeIn;
 }
 
 void SvkMidiProcessor::setInputToRemap(bool doRemap)
@@ -387,6 +502,8 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
         }
     }
     
+    
+    
     // Midi Output filtering
     msgCount = 0;
     midiMessages.clear();
@@ -402,16 +519,24 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
 			midiNote += periodShift * mode2->getScaleSize();
             msg.setNoteNumber(midiNote);
             msg.setTimeStamp(++msgCount);
-            midiMessages.addEvent(msg, smpl);
             
-            if (midiOutput)
-                midiOutput->sendMessageNow(msg);
+            
+            
+            midiMessages.addEvent(msg, smpl);
+            sendMsgToOutputs(msg);
         }
     }
     
     midiBuffer.clear();
     msgCount = 0;
 }
+
+void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
+{
+    if (midiOutput)
+        midiOutput->sendMessageNow(msg);
+}
+
 
 
 //==============================================================================
