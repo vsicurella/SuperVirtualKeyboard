@@ -21,17 +21,19 @@ Tuning::Tuning()
 
 Tuning::Tuning(double period, double divisions, int rootNote, int noteMin, int noteMax)
 {
-    int note = rootNote - noteMin;
+    int note = noteMin - rootNote;
     int noteIndex = noteMin;
-    double interval = ratioToCents(period) / divisions;
-    double cents;
+    double interval = ratioToSemitones(period) / divisions;
+    double semitone;
     
     while(noteIndex <= noteMax)
     {
-        cents = interval * note++;
-        semitonesFromUnison.add(cents);
-        pitchBendTable.add(semitonesToPitchBend(cents));
+        semitone = interval * note++;
+        semitonesFromUnison.add(semitone);
+    
+        pitchBendTable.add(semitonesToPitchBend(semitone));
         noteIndex++;
+        //DBG(String(noteIndex-1) + ": " + String(semitone) + "\tPB: " + String(semitonesToPitchBend(semitone)));
     }
     
     intervalsFromRoot.add(interval);
@@ -84,6 +86,11 @@ Tuning::Tuning(double period, double generator, int scaleSize, int stepsDown, in
         cents = 0;
         semitonesFromUnison.add(cents);
     }
+}
+
+Tuning::~Tuning()
+{
+    
 }
 
 Array<double> Tuning::getSemitoneTable() const
@@ -152,7 +159,7 @@ int Tuning::getClosestNoteForSemitone(double semitoneIn, int& pitchBendReturn)
 int Tuning::getPitchBendAtMidiNote(int midiNoteIn)
 {
     // TODO: implement root / destination frequency
-    int destinationSemitone = midiNoteIn - destinationSemitone;
+    int destinationSemitone = midiNoteIn - destinationRootMidi;
     int semitoneDifference = destinationSemitone - getNoteInSemitones(midiNoteIn);
     int pitchBend = semitonesToPitchBend(semitoneDifference);
     
@@ -175,7 +182,7 @@ void Tuning::setPitchBendMax(int pitchBendMaxIn)
 int Tuning::semitonesToPitchBend(double semitonesIn)
 {
     semitonesIn = jlimit((double) -semitoneMax, (double) semitoneMax, semitonesIn);
-    int pitchBend = 8192 + (16834.0 / 48.0) * semitonesIn; // accuracy handling?
+    int pitchBend = 8192 + (16384.0 / 48.0) * semitonesIn; // accuracy handling?
     
     return pitchBend;
 }
