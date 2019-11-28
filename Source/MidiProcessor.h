@@ -14,8 +14,10 @@
 #include "Structures/MidiFilter.h"
 #include "CommonFunctions.h"
 #include "Structures/Mode.h"
+#include "Structures/Tuning.h"
 
 class SvkMidiProcessor : public MidiMessageCollector
+                   // private MPEInstrument::Listener
 {
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;
@@ -38,11 +40,13 @@ class SvkMidiProcessor : public MidiMessageCollector
     int periodShift = 0;
     int transposeAmt = 0;
     bool useModePeriod = false;
+    int maxNumVoices = 128;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;
     
     std::unique_ptr<MPEInstrument> mpeInst;
+    std::unique_ptr<Tuning> tuning;
     
     bool mpeOn = false;
     bool mpeThru = false;
@@ -167,4 +171,11 @@ public:
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
+    
+//    void noteAdded(MPENote newNote) override;
+//    void notePressureChanged (MPENote changedNote) override;
+//    void notePitchbendChanged (MPENote changedNote) override;
+//    void noteTimbreChanged (MPENote changedNote) override;
+//    void noteKeyStateChanged (MPENote changedNote) override;
+//    void noteReleased (MPENote finishedNote) override;
 };

@@ -31,7 +31,11 @@ SvkMidiProcessor::SvkMidiProcessor()
     // default sample rate
     reset(41000);
     
+    tuning.reset(new Tuning(2, 22));
     setRootNote(60);
+    setMPEOn(true);
+    mpeZone.setLowerZone();
+    setMPEZone(mpeZone);
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -323,6 +327,7 @@ void SvkMidiProcessor::setTransposeAmt(int notesToTranspose)
 void SvkMidiProcessor::setMPEOn(bool turnOnMPE)
 {
     mpeOn = turnOnMPE;
+    mpeInst->setZoneLayout(mpeZone);
 }
 
 void SvkMidiProcessor::setMPEThru(bool mpeOnThru)
@@ -333,11 +338,20 @@ void SvkMidiProcessor::setMPEThru(bool mpeOnThru)
 void SvkMidiProcessor::setMPELegacy(bool turnOnLegacy)
 {
     mpeLegacyOn = turnOnLegacy;
+    
+    if (mpeLegacyOn)
+    {
+        mpeInst->enableLegacyMode();
+    }
+    else {
+        mpeInst->setZoneLayout(mpeZone);
+    }
 }
 
 void SvkMidiProcessor::setMPEZone(MPEZoneLayout zoneIn)
 {
     mpeZone = zoneIn;
+    mpeInst->setZoneLayout(mpeZone);
 }
 
 void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
@@ -348,21 +362,25 @@ void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
 void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
 {
     pitchBendGlobalMax = bendAmtIn;
+    mpeInst->setLegacyModePitchbendRange(pitchBendGlobalMax);
 }
 
 void SvkMidiProcessor::setPitchTrackingMode(int modeIn)
 {
     mpePitchTrackingMode = modeIn;
+    mpeInst->setPitchbendTrackingMode(MPEInstrument::TrackingMode(mpePitchTrackingMode));
 }
 
 void SvkMidiProcessor::setPressureTrackingMode(int modeIn)
 {
     mpePressureTrackingMode = modeIn;
+    mpeInst->setPressureTrackingMode(MPEInstrument::TrackingMode(mpePitchTrackingMode));
 }
 
 void SvkMidiProcessor::setTimbreTrackingMode(int modeIn)
 {
     mpeTimbreTrackingMode = modeIn;
+    mpeInst->setTimbreTrackingMode(MPEInstrument::TrackingMode(mpePitchTrackingMode));
 }
 
 void SvkMidiProcessor::setInputToRemap(bool doRemap)
@@ -516,14 +534,50 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
         {
 			int midiNote = msg.getNoteNumber();
 			midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
-			midiNote += periodShift * mode2->getScaleSize();
-            msg.setNoteNumber(midiNote);
-            msg.setTimeStamp(++msgCount);
+			midiNote += periodShift * mode2->getScaleSize() + transposeAmt;
             
+            if (true)
+            {
+                mpeInst->processNextMidiEvent(msg);
+                
+                MidiMessage mpeMsg;
+                
+                if (msg.isNoteOn())
+                {
+                    MPENote note = mpeInst->getNote(mpeInst->getNumPlayingNotes() - 1);
+                    int pitchbend = tuning->getPitchBendAtMidiNote(note.initialNote);
+                                      
+                    mpeMsg.pitchWheel(note.midiChannel, pitchbend);
+                    mpeMsg.noteOn(note.midiChannel, note.initialNote, (uint8) note.noteOnVelocity.as7BitInt());
+                }
+                else if (msg.isNoteOff())
+                {
+                    MPENote note = mpeInst->getNote(mpeInst->getNumPlayingNotes() - 1);
+                    mpeMsg.noteOff(note.midiChannel, note.initialNote, (uint8) note.noteOffVelocity.as7BitInt());
+                }
+                
+                if (msg.isNoteOnOrOff())
+                {
+                    midiMessages.addEvent(mpeMsg, ++msgCount);
+                    sendMsgToOutputs(mpeMsg);
+                }
+                
+            }
             
-            
-            midiMessages.addEvent(msg, smpl);
-            sendMsgToOutputs(msg);
+            else
+            {
+                if (midiNote <= 0 && midiNote < 128)
+                {
+                    msg.setNoteNumber(midiNote);
+                    msg.setTimeStamp(++msgCount);
+                    midiMessages.addEvent(msg, smpl);
+                    sendMsgToOutputs(msg);
+                }
+                else
+                {
+                    msg.setTimeStamp(++msgCount);
+                }
+            }
         }
     }
     
@@ -536,8 +590,6 @@ void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
     if (midiOutput)
         midiOutput->sendMessageNow(msg);
 }
-
-
 
 //==============================================================================
 
