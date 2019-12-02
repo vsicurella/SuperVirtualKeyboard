@@ -47,12 +47,13 @@ static Identifier periodShiftModeSize("PeriodShiftModeSize");
 static Identifier transposeAmt("TransposeAmt");
 static Identifier sustainPedalOn("SustainPedalOn");
 static Identifier maxVoices("MaxVoices");
-static Identifier midiInputMap("InputMapping");
-static Identifier midiOutputMap("OutputMappint");
+static Identifier midiInputFilter("InputFilter");
+static Identifier midiInputRemap("InputMapping");
+static Identifier midiOutputFilter("OutputFilter");
 static Identifier midiInputName("InputDevice");
 static Identifier midiOutputName("OutputDevice");
-static Identifier midiMapInputCustom("Custom Midi Input Map");
-static Identifier midiMapOutputCustom("Custom Midi Output Map");
+static Identifier midiMapInputCustom("CustomMidiInputMap");
+static Identifier midiMapOutputCustom("CustomMidiOutputMap");
 static Identifier modeMapFromRootNote("ModeMapFromRootNote");
 static Identifier modeMapFromPreset("ModeMapFromPreset");
 static Identifier mappingMode("MappingMode");
@@ -72,6 +73,7 @@ static Identifier pitchBendNoteMax("PitchBendNoteMax");
 static Identifier mpePitchTrackingMode("MPEPitchTrackingMode");
 static Identifier mpePressureTrackingMode("MPEPitchTrackingMode");
 static Identifier mpeTimbreTrackingMode("MPEPitchTrackingMode");
+static Identifier mpeTuningPreserveMidiNote("MPETunePreserveMidiNote");
 
 // Mode
 static Identifier scaleSize("ScaleSize");

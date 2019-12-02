@@ -15,7 +15,7 @@
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../CommonFunctions.h"
 #include "../../../PluginIDs.h"
-#include "../../../MidiProcessor.h"
+#include "../../../Midi/MidiProcessor.h"
 #include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
@@ -76,9 +76,8 @@ namespace VirtualKeyboard
     public:
         //===============================================================================================
         
-        Keyboard(MidiKeyboardState& keyboardStateIn);
-		Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn,
-            Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
+        Keyboard();
+		Keyboard(ValueTree keyboardNodeIn, Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
 		~Keyboard() {};
         
         //===============================================================================================
@@ -106,7 +105,7 @@ namespace VirtualKeyboard
 		/*
 		Allows the keyboard to listen the filtered midi input
 		*/
-		void setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn);
+		void displayKeyboardState(MidiKeyboardState* keyboardStateIn);
         
         //===============================================================================================
 
@@ -539,9 +538,9 @@ namespace VirtualKeyboard
         std::unique_ptr<KeyboardGrid> grid;
 		KeyboardViewport* viewport = nullptr;
 
-        const MidiKeyboardState& keyboardInputState;
-		const MidiKeyboardState* keyboardInputFilteredState;
-		NoteMap* inputNoteMap;
+		MidiKeyboardState* externalKeyboardToDisplay;
+        
+		NoteMap* noteMapOnDisplay;
         
 		MidiBuffer buffer;
 		Array<Key*> keysPause;

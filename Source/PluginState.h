@@ -14,7 +14,7 @@
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
 #include "PluginSettings.h"
-#include "MidiProcessor.h"
+#include "Midi/MidiProcessor.h"
 #include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
