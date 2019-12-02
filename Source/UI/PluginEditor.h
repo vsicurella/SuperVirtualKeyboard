@@ -37,7 +37,6 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
                         private ScrollBar::Listener,
-                        private AudioProcessorParameter::Listener,
 						private Timer
 {
 public:
@@ -141,10 +140,6 @@ public:
 
 	//==============================================================================
     
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-     
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
     void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart) override;

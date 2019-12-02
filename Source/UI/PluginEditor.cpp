@@ -45,7 +45,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorSelector->setSize(450, 450);
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
-	pluginState->getMidiProcessor()->resetWithRate(processor.getSampleRate());
     pluginState->addChangeListener(this);
     
     mappingHelper.reset(new MappingHelper(pluginState));
@@ -55,11 +54,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	addMouseListener(this, true);
     
     svkParameters = pluginState->getParameters();
-    for (int i = 0; i < svkParameters->getSize(); i++)
-    {
-        svkParameters->getUnchecked(i)->addListener(this);
-    }
-    
+//    for (int i = 0; i < svkParameters->getSize(); i++)
+//    {
+//        svkParameters->getUnchecked(i)->addListener(this);
+//    }
+//
     setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
     
@@ -496,16 +495,6 @@ void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double ne
 }
 
 //==============================================================================
-
-void SvkPluginEditor::parameterValueChanged(int parameterIndex, float newValue)
-{
-    
-}
- 
-void SvkPluginEditor::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
-{
-    
-}
 
 //==============================================================================
 

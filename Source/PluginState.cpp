@@ -30,11 +30,9 @@ SvkPluginState::SvkPluginState()
 	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
-	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(*midiProcessor->getOriginalKeyboardState(), pianoNode));
-	virtualKeyboard->addListener(midiProcessor.get());
+	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(pianoNode));
 	pianoNode = virtualKeyboard->getNode();
-    
-    midiProcessor->getRemappedKeyboardState()->addListener(virtualKeyboard.get());
+    virtualKeyboard->addListener(midiProcessor.get());
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
@@ -231,11 +229,11 @@ ModeMapper* SvkPluginState::getModeMapper()
 
 NoteMap* SvkPluginState::getMidiInputMap()
 {
-    return midiProcessor->getMidiInputFilter()->getNoteMap();
+    return midiProcessor->getInputRemapMidiFilter()->getNoteMap();
 }
 NoteMap* SvkPluginState::getMidiOutputMap()
 {
-    return midiProcessor->getMidiOutputFilter()->getNoteMap();
+    return midiProcessor->getOutputMidiFilter()->getNoteMap();
 }
 
 int SvkPluginState::getMappingMode()
@@ -471,12 +469,12 @@ void SvkPluginState::setMidiChannel(int midiChannelIn)
 
 void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
 {
-	midiProcessor->setMidiInputMap(noteMapIn);
+	midiProcessor->setInputRemap(noteMapIn);
 }
 
 void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 {
-	midiProcessor->setMidiOutputMap(noteMapIn);
+	midiProcessor->setOutputFilter(noteMapIn);
 }
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
@@ -497,8 +495,8 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
     
     else // Mapping Off
     {
-        midiProcessor->setMidiInputMap(NoteMap());
-        midiProcessor->setMidiOutputMap(NoteMap());
+        midiProcessor->setInputRemap(NoteMap());
+        midiProcessor->setOutputFilter(NoteMap());
         setModeViewed(1);
     }
 
@@ -523,7 +521,7 @@ void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mapping
 
     NoteMap noteMap = modeMapper->map(*mode1, *mode2, mappingType,
                                       mode1OrderIn, mode2OrderIn, mode1OrderOffsetIn, mode2OrderOffsetIn,
-                                      *midiProcessor->getInputNoteMap());
+                                      *midiProcessor->getInputNoteRemap());
 
     setMidiInputMap(noteMap);
     sendMappingToKeyboard();
@@ -538,14 +536,14 @@ void SvkPluginState::doMapping()
 	}
 	else
 	{
-		midiProcessor->setMidiInputMap(NoteMap());
+		midiProcessor->setInputRemap(NoteMap());
 		sendMappingToKeyboard();
 	}
 }
 
 void SvkPluginState::sendMappingToKeyboard()
 {
-	virtualKeyboard->setInputNoteMap(midiProcessor->getInputNoteMap());
+	virtualKeyboard->setInputNoteMap(midiProcessor->getInputNoteRemap());
 }
 
 void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
@@ -582,6 +580,16 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->applyMode(modeViewed);
+    
+//    if (getModeViewedNum())
+//    {
+//        virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState());
+//    }
+//    else
+//    {
+//        virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
+//    }
+    midiProcessor->getRemappedKeyboardState()->addListener(virtualKeyboard.get());
 }
 
 void SvkPluginState::commitModeInfo()

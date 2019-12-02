@@ -12,7 +12,7 @@
 
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "../PluginState.h"
-#include "../MidiProcessor.h"
+#include "../Midi/MidiProcessor.h"
 #include "NoteMap.h"
 
 class MappingHelper : public MidiKeyboardStateListener
