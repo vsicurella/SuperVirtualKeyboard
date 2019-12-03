@@ -290,7 +290,7 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_midiDeviceBox] -- add your combo box handling code here..
         int deviceNum = comboBoxThatHasChanged->getSelectedId() - 1;
- 
+
         if (deviceNum >= 0)
             pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(deviceNum).identifier);
         //[/UserComboBoxCode_midiDeviceBox]
@@ -313,7 +313,7 @@ void PluginSettingsDialog::timerCallback()
     {
         availableOuts = devices;
         midiDeviceBox->clear();
-        
+
         int i = 0;
         for (auto device : availableOuts)
         {

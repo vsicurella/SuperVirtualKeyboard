@@ -79,6 +79,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     int getMapOrderOffset1();
     int getMapOrderOffset2();
 
+	Tuning* getTuning();
+
 	int getPeriodShift();
 	int getMidiChannelOut();
 
@@ -115,6 +117,9 @@ struct SvkPluginState : public ChangeBroadcaster,
     void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
     void doMapping();
+
+	void setTuning(const Tuning* tuningToCopy);
+	void setTuningToET(double period, double divisions);
 
 	void sendMappingToKeyboard();
 	void sendMappingToKeyboard(ValueTree mapNodeIn);
@@ -160,6 +165,7 @@ private:
 
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
+	std::unique_ptr<Tuning> tuning;
 
     SvkParameters svkParameters;
 

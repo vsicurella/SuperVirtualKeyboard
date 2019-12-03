@@ -27,15 +27,8 @@ SvkMidiProcessor::SvkMidiProcessor()
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
     
-    tuning.reset(new Tuning(2, 22));
-    retuner.reset(new TunedNoteInterpreter(tuning.get()));
+	retuner.reset(new TunedNoteInterpreter());
     retuner->setPitchBendMax(48);
-    
-    Array<double> smt = tuning->getSemitoneTable();
-    for (int i = 0; i < smt.size(); i++)
-    {
-        DBG(String(i) + ": " + String(tuning->getNoteInSemitones(i)) +"\t"+  String(retuner->calculateDifferenceInSemitonesFromStd(i)) + "\t" + String(retuner->calculatePitchbendFromStdMidiNote(i)));
-    }
     
     mpeInst.reset(new MPEInstrument());
     channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
@@ -326,6 +319,12 @@ void SvkMidiProcessor::setTransposeAmt(int notesToTranspose)
     transposeAmt = notesToTranspose;
 }
 
+void SvkMidiProcessor::setTuning(Tuning* tuningIn)
+{
+	tuning = tuningIn;
+	retuner->resetTuning(tuning);
+}
+
 void SvkMidiProcessor::setMPEOn(bool turnOnMPE)
 {
     mpeOn = turnOnMPE;
@@ -595,7 +594,7 @@ MidiBuffer SvkMidiProcessor::convertToMPE(const MidiBuffer& bufferIn)
     {
         if (msgIn.isNoteOff())
         {
-            if (mpeTuningPreserveMidiNote)
+            if (mpeTuningPreserveMidiNote || tuning == nullptr)
             {
                 midiPitch = MidiPitch(msgIn.getNoteNumber(), 8192);
             }
@@ -615,6 +614,11 @@ MidiBuffer SvkMidiProcessor::convertToMPE(const MidiBuffer& bufferIn)
         else if (msgIn.isNoteOn())
         {
             
+			if (tuning == nullptr)
+			{
+				pitchBend = 8192;
+				midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
+			}
             if (mpeTuningPreserveMidiNote)
             {
                 pitchBend = retuner->calculatePitchbendFromStdMidiNote(msgIn.getNoteNumber());

@@ -1190,6 +1190,7 @@ void Keyboard::mouseDrag(const MouseEvent& e)
 			{
 				triggerKey(keyIndex, false);
 				triggerKey(key->keyNumber);
+				lastKeyClicked = key->keyNumber;
 				keysByMouseTouch.set(touchIndex, key->keyNumber);
 			}
         }
