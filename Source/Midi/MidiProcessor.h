@@ -54,8 +54,8 @@ class SvkMidiProcessor : public MPEInstrument,
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiInputRemap;
     std::unique_ptr<MidiFilter> midiOutputFilter;
+	Tuning* tuning = nullptr;
 
-    std::unique_ptr<Tuning> tuning;
     std::unique_ptr<MPEInstrument> mpeInst;
     std::unique_ptr<TunedNoteInterpreter> retuner;
     std::unique_ptr<SvkMpeChannelAssigner> channelAssigner;
@@ -155,6 +155,8 @@ public:
 	void setInputRemap(NoteMap mapIn, bool updateNode = true);
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
+
+	void setTuning(Tuning* tuningIn);
     
     void setMPEOn(bool turnOnMPE);
     void setPitchBendNoteMax(int bendAmtIn);

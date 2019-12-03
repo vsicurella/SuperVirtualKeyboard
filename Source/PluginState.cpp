@@ -392,6 +392,11 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 	if (isAutoMapping())
 		doMapping();
 
+	if (midiProcessor->isMPEOn())
+	{
+		setTuningToET(2, getMode2()->getScaleSize());
+	}
+
     presetEdited = true;
 }
 
@@ -539,6 +544,18 @@ void SvkPluginState::doMapping()
 		midiProcessor->setInputRemap(NoteMap());
 		sendMappingToKeyboard();
 	}
+}
+
+void SvkPluginState::setTuning(const Tuning* tuningToCopy)
+{
+	tuning.reset(new Tuning(*tuningToCopy));
+	midiProcessor->setTuning(tuning.get());
+}
+
+void SvkPluginState::setTuningToET(double period, double divisions)
+{
+	tuning.reset(new Tuning(period, divisions));
+	midiProcessor->setTuning(tuning.get());
 }
 
 void SvkPluginState::sendMappingToKeyboard()
