@@ -66,10 +66,27 @@ public:
         return this->TheHash::operator[](keyIn);
     }
     
-    void toss(KeyType keyIn)
-    {
-        this->TheHash::remove(keyIn);
-        this->TheArray::remove(keyIn);
-    }
+	void toss(KeyType keyIn)
+	{
+		this->TheArray::removeObject(grab(keyIn));
+		this->TheHash::remove(keyIn);
+	}
+
+	static void test()
+	{
+		// keep the "fun" in "function"
+
+		OwnedHashMap<String, RangedAudioParameter> parameters;
+
+		Identifier normal("NormalcyAmount");
+		parameters->stash(normal.toString(), new AudioParameterFloat(normal.toString(), "Sounds good", 0.0f, 100.0f, 50.0f));
+
+		Identifier weird("WeirdnessAmount");
+		parameters->stash(weird.toString(), new AudioParameterFloat(weird.toString(), "What??", 0.0f, 100.0f, 50.0f));
+
+		parameters->grab(weird.toString())->setValue(100.0f);
+		parameters->grab(normal.toString())->setValue(0.0f);
+		parameters->toss(normal.toString());
+	}
 };
 
