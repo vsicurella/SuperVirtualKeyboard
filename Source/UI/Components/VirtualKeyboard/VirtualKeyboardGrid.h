@@ -31,11 +31,20 @@ namespace VirtualKeyboard
 
 		int keyPlacement = 1;
         
+        int xOffset = 0;
+        int yOffset = 0;
+        
     public:
                 
 		KeyboardGrid(Mode* modeIn, int numRows=1, int keyPlacementType=1);
         ~KeyboardGrid() {};
-                
+        
+        int getXOffset();
+        int getYOffset();
+        
+        void setXOffset(int xOffsetIn);
+        void setYOffset(int yOffsetIn);
+        
 		void setKeyPlacement(int keyPlacementTypeIn);
 
         void resizeKey(Key& key);

@@ -17,6 +17,26 @@ KeyboardGrid::KeyboardGrid(Mode* modeIn, int numRows, int keyPlacementType)
 {
 }
 
+int KeyboardGrid::getXOffset()
+{
+    return xOffset;
+}
+
+int KeyboardGrid::getYOffset()
+{
+    return yOffset;
+}
+
+void KeyboardGrid::setXOffset(int xOffsetIn)
+{
+    xOffset = xOffsetIn;
+}
+
+void KeyboardGrid::setYOffset(int yOffsetIn)
+{
+    yOffset = yOffsetIn;
+}
+
 void KeyboardGrid::setKeyPlacement(int keyPlacementTypeIn)
 {
 	keyPlacement = keyPlacementTypeIn;
@@ -104,15 +124,13 @@ void KeyboardGrid::placeKey(Key& key)
     }
             
     int x;
-    int y = rowToPlace * row;
-
-    //DBG("halfcolumn="+String(halfColumn));
+    int y = rowToPlace * row + yOffset;
     
 	switch (keyPlacement)
 	{
 		case(KeyPlacementType::nestedCenter):
 		{
-            x = colToPlace * column - halfColumn + (column - key.getWidth() / 2);
+            x = colToPlace * column - halfColumn + (column - key.getWidth() / 2) + xOffset;
             
             key.setTopLeftPosition(x, y);
             break;
@@ -121,7 +139,7 @@ void KeyboardGrid::placeKey(Key& key)
 		case(KeyPlacementType::adjacent):
 		{
             int keyCol = (int) key.modeDegree;
-            x = keyCol * column + halfColumn;
+            x = keyCol * column + halfColumn + xOffset;
             float stepOff = (key.order > 0 && key.step > 2) * (float)(key.order)/key.step;
 //            DBG("KeyMD=" + String(key.modeDegree) + "\tStepOff=" + String(stepOff));
             x += stepOff * (key.getWidth() * column);
@@ -132,7 +150,7 @@ void KeyboardGrid::placeKey(Key& key)
 
 		default: // 0 & 1, key nested right & flat
 		{
-            x = colToPlace * column - halfColumn + (column - key.getWidth());
+            x = colToPlace * column - halfColumn + (column - key.getWidth()) + xOffset;
             key.setTopLeftPosition(x, y);
 			break;
 		}
