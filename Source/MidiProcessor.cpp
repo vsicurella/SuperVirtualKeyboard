@@ -27,10 +27,7 @@ SvkMidiProcessor::SvkMidiProcessor()
     
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
-    
-    // default sample rate
-    reset(41000);
-    
+
     setRootNote(60);
 }
 
@@ -90,11 +87,6 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 }
 
 //==============================================================================
-
-void SvkMidiProcessor::resetWithRate(double sampleRateIn)
-{
-	reset(sampleRateIn);
-}
 
 StringArray SvkMidiProcessor::getAvailableInputs() const
 {

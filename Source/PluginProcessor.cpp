@@ -22,11 +22,10 @@ SvkAudioProcessor::SvkAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        ),
-	pluginState(new SvkPluginState())
 #endif
+	
 {
-    //midiStateInput = pluginState->midiStateIn.get();
-    
+	pluginState.reset(new SvkPluginState());
 }
 
 SvkAudioProcessor::~SvkAudioProcessor()
@@ -102,7 +101,6 @@ void SvkAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 	pluginState->getMidiProcessor()->reset(sampleRate);
-    //midiStateInput = pluginState->midiStateIn.get();
     sendChangeMessage();
 }
 
