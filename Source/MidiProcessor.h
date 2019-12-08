@@ -76,8 +76,6 @@ public:
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
 
-	void resetWithRate(double sampleRateIn);
-    
     StringArray getAvailableInputs() const;
     Array<MidiDeviceInfo> getAvailableOutputs() const;
     
