@@ -162,9 +162,9 @@ void SvkPluginState::updateToPreset(bool sendChange)
 
 	presetViewed = presetManager->getPresetLoaded(getPresetSlotNumViewed());
     
-	svkParameters.grab(IDs::modeSlotNumViewed)->setValue(presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
-	svkParameters.grab(IDs::mappingMode)->setValue(presetViewed->thePropertiesNode[IDs::mappingMode]);
-	svkParameters.grab(IDs::modeMappingStyle)->setValue(presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue((int)presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
+	svkParameters.grab(IDs::mappingMode)->setValue((int)presetViewed->thePropertiesNode[IDs::mappingMode]);
+	svkParameters.grab(IDs::modeMappingStyle)->setValue((int)presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
     
     mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
     mapOrder2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderMapping];
@@ -878,7 +878,6 @@ void SvkPluginState::commitPresetChanges()
 
     presetEdited = false;
 }
-
 
 bool SvkPluginState::savePresetViewedToFile()
 {
