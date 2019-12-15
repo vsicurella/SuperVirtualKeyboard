@@ -13,9 +13,9 @@
 
 using namespace VirtualKeyboard;
 
-Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
-	: keyboardInputState(keyboardStateIn)
+Keyboard::Keyboard()
 {
+    setName("VirtualKeyboard");
 	reset();
 	initializeKeys();
 	pianoNode = ValueTree(IDs::pianoNode);
@@ -30,8 +30,7 @@ Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn)
     setOpaque(true);
 }
 
-Keyboard::Keyboard(MidiKeyboardState& keyboardStateIn, ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterMapIn)
-	: keyboardInputState(keyboardStateIn)
+Keyboard::Keyboard(ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterMapIn)
 {
 	initializeKeys(); // todo: load keyboard size
 	restoreNode(keyboardNodeIn, true);
@@ -213,9 +212,15 @@ void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
 	}
 }
 
-void Keyboard::setAndListenToFilteredInput(const MidiKeyboardState& filteredInputStateIn)
+void Keyboard::displayKeyboardState(MidiKeyboardState* keyboardStateIn)
 {
-	keyboardInputFilteredState = &filteredInputStateIn;
+    //if (externalKeyboardToDisplay != nullptr)
+    //    externalKeyboardToDisplay->removeListener(this);
+    
+    //externalKeyboardToDisplay = keyboardStateIn;
+    
+   // if (externalKeyboardToDisplay != nullptr)
+    //    externalKeyboardToDisplay->addListener(this);
 }
 
 //===============================================================================================
@@ -577,7 +582,7 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
 
 void Keyboard::setInputNoteMap(NoteMap* noteMapIn)
 {
-    inputNoteMap = noteMapIn;
+    noteMapOnDisplay = noteMapIn;
 }
 
 //===============================================================================================
@@ -998,8 +1003,7 @@ void Keyboard::resized()
             //viewport->getHorizontalScrollBar().setRangeLimits(0, pianoWidth + viewport->getButtonWidth());
 		}
         
-        Rectangle<int> viewableBounds = getBounds().withWidth(pianoWidth);
-
+        Rectangle<int> viewableBounds = getLocalBounds().withWidth(pianoWidth);
 		grid->setBounds(viewableBounds);
         grid->setYOffset(0);
 		
@@ -1186,6 +1190,7 @@ void Keyboard::mouseDrag(const MouseEvent& e)
 			{
 				triggerKey(keyIndex, false);
 				triggerKey(key->keyNumber);
+				lastKeyClicked = key->keyNumber;
 				keysByMouseTouch.set(touchIndex, key->keyNumber);
 			}
         }

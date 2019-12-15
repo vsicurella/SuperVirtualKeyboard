@@ -14,24 +14,22 @@ Tuning::Tuning()
 {
     semitonesFromUnison.resize(128);
     semitonesFromUnison.fill(0);
-    
-    pitchBendTable.resize(128);
-    pitchBendTable.fill(0);
+
 }
 
 Tuning::Tuning(double period, double divisions, int rootNote, int noteMin, int noteMax)
 {
-    int note = rootNote - noteMin;
+    int note = noteMin - rootNote;
     int noteIndex = noteMin;
-    double interval = ratioToCents(period) / divisions;
-    double cents;
+    double interval = ratioToSemitones(period) / divisions;
+    double semitone;
     
     while(noteIndex <= noteMax)
     {
-        cents = interval * note++;
-        semitonesFromUnison.add(cents);
-        pitchBendTable.add(semitonesToPitchBend(cents));
+        semitone = interval * note++;
+        semitonesFromUnison.add(semitone);
         noteIndex++;
+        //DBG(String(noteIndex-1) + ": " + String(semitone) + "\tPB: " + String(semitonesToPitchBend(semitone)));
     }
     
     intervalsFromRoot.add(interval);
@@ -86,14 +84,14 @@ Tuning::Tuning(double period, double generator, int scaleSize, int stepsDown, in
     }
 }
 
+Tuning::~Tuning()
+{
+    
+}
+
 Array<double> Tuning::getSemitoneTable() const
 {
     return semitonesFromUnison;
-}
-
-Array<int> Tuning::getPitchBendTable() const
-{
-    return pitchBendTable;
 }
 
 int Tuning::getNoteMin() const
@@ -101,95 +99,34 @@ int Tuning::getNoteMin() const
     return noteMin;
 }
 
-int Tuning::getPitchBendMax() const
+int Tuning::getTuningBankSize() const
 {
-    return pitchBendMax;
+    return semitonesFromUnison.size();
 }
 
-int Tuning::getNoteInSemitones(int midiNoteIn) const
+int Tuning::getRootNote() const
+{
+    return rootMidiNote;
+}
+
+double Tuning::getRootFrequency() const
+{
+    return rootFrequency;
+}
+
+double Tuning::getNoteInSemitones(int midiNoteIn) const
 {
     int noteIndex = midiNoteIn + noteMin;
     
     if (noteIndex >= noteMin && noteIndex < semitonesFromUnison.size())
-        return semitonesFromUnison[noteIndex] * 100;
+        return semitonesFromUnison[noteIndex];
     
     return 0;
 }
 
-int Tuning::getNoteInCents(int midiNoteIn) const
+double Tuning::getNoteInCents(int midiNoteIn) const
 {
     return getNoteInSemitones(midiNoteIn) * 100;
-}
-
-int Tuning::getNoteInPitchBend(int midiNoteIn) const
-{
-    int noteIndex = midiNoteIn + noteMin;
-
-    if (noteIndex >= noteMin && noteIndex < semitonesFromUnison.size())
-        return pitchBendTable[midiNoteIn];
-    
-    return 0;
-}
-
-int Tuning::getClosestNoteForSemitone(double semitoneIn, int& pitchBendReturn)
-{
-    int midiNoteOut = (int) (semitoneIn + rootMidiNote);
-    double microtone = semitoneIn - floor(semitoneIn);
-    
-    if (microtone < 0.5)
-    {
-        pitchBendReturn = semitonesToPitchBend(microtone);
-    }
-    else
-    {
-        midiNoteOut++;
-        pitchBendReturn = semitonesToPitchBend(1 - microtone);
-    }
-    
-    return midiNoteOut;
-}
-
-int Tuning::getPitchBendAtMidiNote(int midiNoteIn)
-{
-    // TODO: implement root / destination frequency
-    int destinationSemitone = midiNoteIn - destinationSemitone;
-    int semitoneDifference = destinationSemitone - getNoteInSemitones(midiNoteIn);
-    int pitchBend = semitonesToPitchBend(semitoneDifference);
-    
-    pitchBend = jlimit(0, 16834, pitchBend);
-    
-    return pitchBend;
-}
-
-MPEValue Tuning::getMPEValueOfNote(int midiNoteIn) const
-{
-    return MPEValue::from14BitInt(getNoteInPitchBend(midiNoteIn));
-}
-
-void Tuning::setPitchBendMax(int pitchBendMaxIn)
-{
-    pitchBendMax = pitchBendMaxIn;
-    semitoneMax = pitchBendMax / 2;
-}
-
-int Tuning::semitonesToPitchBend(double semitonesIn)
-{
-    semitonesIn = jlimit((double) -semitoneMax, (double) semitoneMax, semitonesIn);
-    int pitchBend = 8192 + (16834.0 / 48.0) * semitonesIn; // accuracy handling?
-    
-    return pitchBend;
-}
-
-double Tuning::pitchBendToSemitones(int pitchBendIn)
-{
-    pitchBendIn = jlimit(0, 16384, pitchBendIn);
-    double semitones = (pitchBendIn - 8192) * 48 / 16834.0;
-    return semitones;
-}
-
-int Tuning::ratioToPitchBend(double ratioIn)
-{
-    return semitonesToPitchBend(ratioToSemitones(ratioIn));
 }
 
 double Tuning::ratioToSemitones(double ratioIn)

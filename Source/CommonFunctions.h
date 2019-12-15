@@ -142,6 +142,12 @@ struct Pair
 	}
 };
 
+struct MidiPitch : Pair<int, int>
+{
+    MidiPitch(int midiNoteIn=-1, int pitchbendIn=0)
+    : Pair<int, int>(midiNoteIn, pitchbendIn) {}
+};
+
 class TextFilterIntOrSpace : public TextEditor::InputFilter
 {
 	String filterNewText(TextEditor&, const String& newInput) override
