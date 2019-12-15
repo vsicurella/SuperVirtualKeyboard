@@ -40,7 +40,7 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 	xOffset = xOff;
 	yOffset = yOff;
 	showNoteNumber = showNoteNumIn;
-	showNoteName = showNoteNameIn;
+	showNoteLabel = showNoteNameIn;
 	color = colorIn;
 }
 
@@ -57,7 +57,7 @@ Key::Key(ValueTree keyNodeIn)
 Key::Key(const Key& keyToCopy)
 : Key(keyToCopy.keyNumber, keyToCopy.order, keyToCopy.scaleDegree, keyToCopy.modeDegree, keyToCopy.step,
       keyToCopy.pitchName, keyToCopy.widthMod, keyToCopy.heightMod, keyToCopy.xOffset, keyToCopy.yOffset,
-      keyToCopy.showNoteNumber, keyToCopy.showNoteName, keyToCopy.color)
+      keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.color)
 {
     node = keyToCopy.node.createCopy();
 }
@@ -83,8 +83,8 @@ void Key::applyParameters(ValueTree nodeIn)
 			yOffset = nodeIn.getProperty(id);
 		else if (id == IDs::pianoKeyShowNumber)
 			showNoteNumber = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyShowName)
-			showNoteName = nodeIn.getProperty(id);
+		else if (id == IDs::keyboardShowsNoteLabels)
+			showNoteLabel = nodeIn.getProperty(id);
 		else if (id == IDs::pianoKeyColor)
 			color = Colour::fromString(nodeIn.getProperty(id).toString());
 	}

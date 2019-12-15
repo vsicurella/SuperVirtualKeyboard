@@ -54,8 +54,8 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 	{
 		pianoNode = pianoNodeIn;
 
-		orientationSelected = pianoNode[IDs::pianoOrientation];
-		keyPlacementSelected = pianoNode[IDs::pianoKeyPlacementType];
+		orientationSelected = pianoNode[IDs::keyboardOrientation];
+		keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
 		keySizeRatio = (float) pianoNode[IDs::pianoWHRatio];
         
@@ -101,12 +101,12 @@ void Keyboard::reset()
 
 	setUIMode(UIMode::playMode);
 	setOrientation(Orientation::horizontal);
-	setKeyPlacementStyle(KeyPlacementType::nestedRight);
+	setKeyStyle(KeyPlacementType::nestedRight);
 	setHighlightStyle(HighlightStyle::full);
 	setVelocityBehavior(VelocityStyle::linear);
 	setScrollingStyle(ScrollingStyle::smooth);
 
-	setShowPitchNames(false);
+	setShowNoteLabels(false);
 	setShowNoteNumbers(false);
 	setShowFilteredNumbers(false);
 	
@@ -389,7 +389,7 @@ bool Keyboard::isShowingFilteredNumbers()
 
 bool Keyboard::isShowingNoteNames()
 {
-    return showPitchNames;
+    return showNoteLabels;
 }
 
 int Keyboard::getHighlightStyle()
@@ -443,7 +443,7 @@ void Keyboard::setUIMode(int uiModeIn)
 void Keyboard::setOrientation(int orientationIn)
 {
 	orientationSelected = orientationIn;
-	pianoNode.setProperty(IDs::pianoOrientation, orientationSelected, nullptr);
+	pianoNode.setProperty(IDs::keyboardOrientation, orientationSelected, nullptr);
 
 	// do stuff
 }
@@ -451,25 +451,25 @@ void Keyboard::setOrientation(int orientationIn)
 void Keyboard::setNumRows(int numRowsIn)
 {
     numRows = jlimit(1, 16, numRowsIn);
-    pianoNode.setProperty(IDs::pianoNumRows, numRows, nullptr);
+    pianoNode.setProperty(IDs::keyboardNumRows, numRows, nullptr);
     applyMode(mode);
 }
 
-void Keyboard::setKeyPlacementStyle(int placementIn)
+void Keyboard::setKeyStyle(int placementIn)
 {
 	keyPlacementSelected = placementIn;
 	
 	if (grid)
 		grid->setKeyPlacement(keyPlacementSelected);
 	
-	pianoNode.setProperty(IDs::pianoKeyPlacementType, keyPlacementSelected, nullptr);
+	pianoNode.setProperty(IDs::keyboardKeysStyle, keyPlacementSelected, nullptr);
     resized();
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
 {
 	highlightSelected = styleIn;
-	pianoNode.setProperty(IDs::pianoKeysHighlightStyle, highlightSelected, nullptr);
+	pianoNode.setProperty(IDs::keyboardHighlightStyle, highlightSelected, nullptr);
 }
 
 void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
@@ -484,7 +484,7 @@ void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
 void Keyboard::setScrollingStyle(int scrollingStyleIn)
 {
 	scrollingSelected = scrollingStyleIn;
-	pianoNode.setProperty(IDs::pianoScrollingStyle, scrollingSelected, nullptr);
+	pianoNode.setProperty(IDs::keyboardScrollingStyle, scrollingSelected, nullptr);
 
 	// do stuff?
 }
@@ -492,7 +492,7 @@ void Keyboard::setScrollingStyle(int scrollingStyleIn)
 void Keyboard::setMidiChannelOut(int midiChannelOutIn)
 {
 	midiChannelOut = jlimit(1, 16, midiChannelOutIn);
-	pianoNode.setProperty(IDs::pianoMidiChannel, midiChannelOut, nullptr);
+	pianoNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
 }
 
 void Keyboard::setVelocityFixed(float velocityIn)
@@ -526,10 +526,10 @@ void Keyboard::setShowFilteredNumbers(bool shouldShowNumbers)
 	pianoNode.setProperty(IDs::pianoKeysShowFilteredNotes, showFilteredNoteNums, nullptr);
 }
 
-void Keyboard::setShowPitchNames(bool shouldShowPitchNames)
+void Keyboard::setShowNoteLabels(bool shouldShowPitchNames)
 {
-	showPitchNames = shouldShowPitchNames;
-	pianoNode.setProperty(IDs::pianoKeyShowName, showPitchNames, nullptr);
+	showNoteLabels = shouldShowPitchNames;
+	pianoNode.setProperty(IDs::keyboardShowsNoteLabels, showNoteLabels, nullptr);
 }
 
 // should be replaced, but keeping here just in case

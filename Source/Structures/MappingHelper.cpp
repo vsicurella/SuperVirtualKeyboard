@@ -59,10 +59,10 @@ void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods)
         
         else
         {
-            pluginState->getMidiInputMap()->setValue(midiNoteTriggered, virtualKeyToMap);
+            pluginState->getMidiInputFilterMap()->setValue(midiNoteTriggered, virtualKeyToMap);
         }
         
-        DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(pluginState->getMidiInputMap()->getValue(midiNoteTriggered)));
+        DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(pluginState->getMidiInputFilterMap()->getValue(midiNoteTriggered)));
         waitingForKeyInput = false;
     }
 }

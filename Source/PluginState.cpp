@@ -83,10 +83,10 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeMappingStyle))
 		setMapStyle(1);
     
-    if (!presetViewed->theKeyboardNode.hasProperty(IDs::pianoKeyPlacementType))
+    if (!presetViewed->theKeyboardNode.hasProperty(IDs::keyboardKeysStyle))
 		setKeyStyle(1);
     
-    if (!presetViewed->theKeyboardNode.hasProperty(IDs::pianoKeysHighlightStyle))
+    if (!presetViewed->theKeyboardNode.hasProperty(IDs::keyboardHighlightStyle))
 		setHighlightStyle(1);
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeSlotNumViewed))
@@ -114,27 +114,27 @@ void SvkPluginState::initializeParameters()
     svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
 
     svkParameters.stash(IDs::periodShift, new AudioParameterInt(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
-    svkParameters.stash(IDs::pianoMidiChannel, new AudioParameterInt(IDs::pianoMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
+    svkParameters.stash(IDs::keyboardMidiChannel, new AudioParameterInt(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
     svkParameters.stash(IDs::pianoKeysShowNoteNumbers, new AudioParameterBool(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
     svkParameters.stash(IDs::pianoKeysShowFilteredNotes, new AudioParameterBool(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
-    svkParameters.stash(IDs::pianoKeyShowName, new AudioParameterBool(IDs::pianoKeyShowName.toString(), "Show Pitch Names", false));
-    svkParameters.stash(IDs::scrollingMode, new AudioParameterInt(IDs::scrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
-    svkParameters.stash(IDs::pianoScrollingStyle, new AudioParameterInt(IDs::pianoScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
+    svkParameters.stash(IDs::pianoKeyShowNoteLabel, new AudioParameterBool(IDs::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
+    svkParameters.stash(IDs::keyboardScrollingMode, new AudioParameterInt(IDs::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
+    svkParameters.stash(IDs::keyboardScrollingStyle, new AudioParameterInt(IDs::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
     svkParameters.stash(IDs::numKeysInWidth, new AudioParameterInt(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
-    svkParameters.stash(IDs::pianoNumRows, new AudioParameterInt(IDs::pianoNumRows.toString(), "Keyboard Rows", 1, 16, 1));
-    svkParameters.stash(IDs::pianoOrientation, new AudioParameterInt(IDs::pianoOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
-    svkParameters.stash(IDs::pianoKeyPlacementType, new AudioParameterInt(IDs::pianoKeyPlacementType.toString(), "Key Style", 1, 4, 1));
-    svkParameters.stash(IDs::pianoKeysHighlightStyle, new AudioParameterInt(IDs::pianoKeysHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
+    svkParameters.stash(IDs::keyboardNumRows, new AudioParameterInt(IDs::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
+    svkParameters.stash(IDs::keyboardOrientation, new AudioParameterInt(IDs::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
+    svkParameters.stash(IDs::keyboardKeysStyle, new AudioParameterInt(IDs::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
+    svkParameters.stash(IDs::keyboardHighlightStyle, new AudioParameterInt(IDs::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
     
     svkParameters.stash(IDs::pianoVelocityBehavior, new AudioParameterInt(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
     svkParameters.stash(IDs::pianoVelocityValue, new AudioParameterInt(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
     svkParameters.stash(IDs::pianoWHRatio, new AudioParameterFloat(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
     
-    svkParameters.stash(IDs::modeSlotDebug, new AudioParameterInt(IDs::modeSlotDebug.toString(), "Mode Slot Debug", 0, 1, 0));
+    svkParameters.stash(IDs::modeSlotToEdit, new AudioParameterInt(IDs::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
     svkParameters.stash(IDs::modeLibraryIndex, new AudioParameterInt(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
     svkParameters.stash(IDs::modeRootNote, new AudioParameterInt(IDs::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
     
-    svkParameters.stash(IDs::keyNumberDebug, new AudioParameterInt(IDs::keyNumberDebug.toString(), "Key To Debug", 0, 127, 60));
+    svkParameters.stash(IDs::keyNumberToEdit, new AudioParameterInt(IDs::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
     svkParameters.stash(IDs::pianoKeyWidthMod, new AudioParameterFloat(IDs::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
     svkParameters.stash(IDs::pianoKeyHeightMod, new AudioParameterFloat(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
     svkParameters.stash(IDs::pianoKeyXOffset, new AudioParameterInt(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
@@ -147,9 +147,9 @@ void SvkPluginState::updateToPreset(bool sendChange)
 
 	presetViewed = presetManager->getPresetLoaded(getPresetSlotNumViewed());
     
-	setParameterInt(IDs::modeSlotNumViewed, (int)presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
-	setParameterInt(IDs::mappingMode, (int)presetViewed->thePropertiesNode[IDs::mappingMode]);
-	setParameterInt(IDs::modeMappingStyle, (int)presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue(presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
+	svkParameters.grab(IDs::mappingMode)->setValue(presetViewed->thePropertiesNode[IDs::mappingMode]);
+	svkParameters.grab(IDs::modeMappingStyle)->setValue(presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
     
     mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
     mapOrder2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderMapping];
@@ -177,41 +177,41 @@ void SvkPluginState::updateToPreset(bool sendChange)
 
 void SvkPluginState::updateParameter(Identifier paramId)
 {
-	if (paramId == IDs::pianoMidiChannel)
+	if (paramId == IDs::keyboardMidiChannel)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoMidiChannel)) = midiProcessor->getMidiChannelOut();
+		svkParameters.grab(IDs::keyboardMidiChannel)->setValue(midiProcessor->getMidiChannelOut());
 	}
 	else if (paramId == IDs::pianoKeysShowNoteNumbers)
 	{
-		*dynamic_cast<AudioParameterBool*>(svkParameters.grab(IDs::pianoKeysShowNoteNumbers)) = virtualKeyboard->isShowingNoteNumbers();
+		svkParameters.grab(IDs::pianoKeysShowNoteNumbers)->setValue(virtualKeyboard->isShowingNoteNumbers());
 	}
 	else if (paramId == IDs::pianoKeysShowFilteredNotes)
 	{
-		*dynamic_cast<AudioParameterBool*>(svkParameters.grab(IDs::pianoKeysShowFilteredNotes)) = virtualKeyboard->isShowingFilteredNumbers();
+		svkParameters.grab(IDs::pianoKeysShowFilteredNotes)->setValue(virtualKeyboard->isShowingFilteredNumbers());
 	}
-	else if (paramId == IDs::pianoKeyShowName)
+	else if (paramId == IDs::pianoKeyShowNoteLabel)
 	{
-		*dynamic_cast<AudioParameterBool*>(svkParameters.grab(IDs::pianoKeyShowName)) = virtualKeyboard->isShowingNoteNames();
+		svkParameters.grab(IDs::pianoKeyShowNoteLabel)->setValue(virtualKeyboard->isShowingNoteNames());
 	}
-	else if (paramId == IDs::pianoOrientation)
+	else if (paramId == IDs::keyboardOrientation)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoOrientation)) = virtualKeyboard->getOrientation();
+		svkParameters.grab(IDs::keyboardOrientation)->setValue(virtualKeyboard->getOrientation());
 	}
-	else if (paramId == IDs::pianoKeyPlacementType)
+	else if (paramId == IDs::keyboardKeysStyle)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoKeyPlacementType)) = virtualKeyboard->getKeyPlacementStyle();
+		svkParameters.grab(IDs::keyboardKeysStyle)->setValue(virtualKeyboard->getKeyPlacementStyle());
 	}
-	else if (paramId == IDs::pianoKeysHighlightStyle)
+	else if (paramId == IDs::keyboardHighlightStyle)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoKeysHighlightStyle)) = virtualKeyboard->getHighlightStyle();
+		svkParameters.grab(IDs::keyboardHighlightStyle)->setValue(virtualKeyboard->getHighlightStyle());
 	}
 	else if (paramId == IDs::pianoVelocityBehavior)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoVelocityBehavior)) = virtualKeyboard->getVelocityStyle();
+		svkParameters.grab(IDs::pianoVelocityBehavior)->setValue(virtualKeyboard->getVelocityStyle());
 	}
 	else if (paramId == IDs::pianoVelocityValue)
 	{
-		*dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::pianoVelocityValue)) = (int)(virtualKeyboard->getVelocityFixed() * 127);
+		svkParameters.grab(IDs::pianoVelocityValue)->setValue((int)(virtualKeyboard->getVelocityFixed() * 127));
 	}
 	else if (paramId == IDs::pianoWHRatio)
 	{
@@ -231,74 +231,18 @@ void SvkPluginState::updateFromParameter(Identifier paramId)
 {
     
 }
-void SvkPluginState::setParameterInt(Identifier paramId, int valueIn)
-{
-	auto param = svkParameters.grab(paramId);
-	AudioParameterInt* api = dynamic_cast<AudioParameterInt*>(param);
-	bool inRange = true;
-	
-	//if (api->getNormalisableRange().snapToLegalValue(valueIn))
-		//inRange = false;
-
-	if (api)
-	{
-		if (!inRange)
-		{
-			//valueIn = api->getDefaultValue();
-			DBG("VALUE FOR PARAM " + paramId.toString() + " NOT IN RANGE: DEFAULT = " + String(valueIn));
-		}
-
-		*api = valueIn;
-	}
-	else
-	{
-		DBG("COULD NOT SET " + paramId.toString() + ": NOT AN INT PARAMETER");
-	}
-}
-
-void SvkPluginState::setParameterBool(Identifier paramId, bool boolIn)
-{
-	auto param = svkParameters.grab(paramId);
-	AudioParameterBool* apb = dynamic_cast<AudioParameterBool*>(param);
-
-	if (apb)
-	{
-		*apb = boolIn;
-	}
-	else
-	{
-		DBG("COULD NOT SET " + paramId.toString() + ": PARAM NOT FOUND");
-	}
-}
-
-void SvkPluginState::setParameterChoice(Identifier paramId, int choiceNum)
-{
-	auto param = svkParameters.grab(paramId);
-	AudioParameterChoice* apc = dynamic_cast<AudioParameterChoice*>(param);
-	bool inRange = true;
-
-	StringArray choices = apc->getAllValueStrings();
-
-	if (choiceNum < 0 || choiceNum >= choices.size())
-		inRange = false;
-
-	if (apc)
-	{
-		if (!inRange)
-		{
-			choiceNum = param->getDefaultValue();
-			DBG("VALUE FOR PARAM " + paramId.toString() + " NOT IN RANGE: DEFAULT = " + choices[choiceNum]);
-		}
-
-		*apc = choiceNum;
-	}
-	else
-	{
-		DBG("COULD NOT SET " + paramId.toString() + ": NOT AN CHOICE PARAMETER");
-	}
-}
 
 //==============================================================================
+
+ApplicationCommandManager* SvkPluginState::getAppCmdMgr()
+{
+	return appCmdMgr.get();
+}
+
+UndoManager* SvkPluginState::getUndoManager()
+{
+	return undoManager.get();
+}
 
 SvkPresetManager* SvkPluginState::getPresetManager()
 {
@@ -320,16 +264,6 @@ SvkParameters* SvkPluginState::getParameters()
     return &svkParameters;
 }
 
-ApplicationCommandManager* SvkPluginState::getAppCmdMgr()
-{
-	return appCmdMgr.get();
-}
-
-UndoManager* SvkPluginState::getUndoManager()
-{
-	return undoManager.get();
-}
-
 VirtualKeyboard::Keyboard* SvkPluginState::getKeyboard()
 {
 	return virtualKeyboard.get();
@@ -340,28 +274,14 @@ ModeMapper* SvkPluginState::getModeMapper()
 	return modeMapper.get();
 }
 
-NoteMap* SvkPluginState::getMidiInputMap()
+NoteMap* SvkPluginState::getMidiInputFilterMap()
 {
     return midiProcessor->getInputRemapMidiFilter()->getNoteMap();
 }
-NoteMap* SvkPluginState::getMidiOutputMap()
+
+NoteMap* SvkPluginState::getMidiOutputFilterMap()
 {
     return midiProcessor->getOutputMidiFilter()->getNoteMap();
-}
-
-int SvkPluginState::getMappingMode()
-{
-	return presetViewed->thePropertiesNode[IDs::mappingMode];
-}
-
-int SvkPluginState::getMappingStyle()
-{
-	return presetViewed->thePropertiesNode[IDs::modeMappingStyle];
-}
-
-bool SvkPluginState::isAutoMapping()
-{
-	return getMappingMode() == 2;
 }
 
 SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
@@ -374,9 +294,81 @@ SvkPreset* SvkPluginState::getPresetViewed()
     return presetViewed;
 }
 
+Mode* SvkPluginState::getModeInSlot(int slotNumIn)
+{
+	return presetManager->getModeInSlots(getPresetSlotNumViewed(), slotNumIn);
+}
+
+Mode* SvkPluginState::getModeViewed()
+{
+	return modeViewed;
+}
+
+Mode* SvkPluginState::getMode1()
+{
+	return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
+}
+
+Mode* SvkPluginState::getMode2()
+{
+	return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
+}
+
+Mode* SvkPluginState::getModeCustom()
+{
+	return presetManager->getModeCustom();
+}
+
+Tuning* SvkPluginState::getTuning()
+{
+	return nullptr;
+}
+
+//==============================================================================
+
+float SvkPluginState::getParameterValue(Identifier paramId)
+{
+	RangedAudioParameter* param = svkParameters.grab(paramId);
+	
+	if (param)
+		return param->convertFrom0to1(param->getValue());
+	
+	return 0.0f;
+}
+
+float SvkPluginState::getParameterMin(Identifier paramId)
+{
+	RangedAudioParameter* param = svkParameters.grab(paramId);
+
+	if (param)
+		return param->convertFrom0to1(0.0f);
+
+	return 0.0f;
+}
+
+float SvkPluginState::getParameterMax(Identifier paramId)
+{
+	RangedAudioParameter* param = svkParameters.grab(paramId);
+
+	if (param)
+		return param->convertFrom0to1(1.0f);
+
+	return 0.0f;
+}
+
+float SvkPluginState::getParameterDefaultValue(Identifier paramId)
+{
+	RangedAudioParameter* param = svkParameters.grab(paramId);
+
+	if (param)
+		return param->convertFrom0to1(param->getDefaultValue());
+
+	return 0.0f;
+}
+
 int SvkPluginState::getPresetSlotNumViewed()
 {
-	return dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::presetSlotViewed))->get();
+	return getParameterValue(IDs::presetSlotViewed);
 }
 
 int SvkPluginState::getNumModesInPresetViewed()
@@ -384,44 +376,39 @@ int SvkPluginState::getNumModesInPresetViewed()
 	return presetViewed->getModeSlotsSize();
 }
 
-Mode* SvkPluginState::getModeInSlot(int slotNumIn)
-{
-    return presetManager->getModeInSlots(getPresetSlotNumViewed(), slotNumIn);
-}
-
-Mode* SvkPluginState::getModeViewed()
-{
-    return modeViewed;
-}
-
 int SvkPluginState::getModeViewedNum()
 {
-	return dynamic_cast<AudioParameterInt*>(svkParameters.grab(IDs::modeSlotNumViewed))->get();
+	return getParameterValue(IDs::modeSlotNumViewed);
 }
 
-Mode* SvkPluginState::getMode1()
+int SvkPluginState::getMappingMode()
 {
-    return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
+	return getParameterValue(IDs::mappingMode);
 }
 
-Mode* SvkPluginState::getMode2()
+int SvkPluginState::getMappingStyle()
 {
-    return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
+	return getParameterValue(IDs::modeMappingStyle);
 }
 
-Mode* SvkPluginState::getModeCustom()
+bool SvkPluginState::isAutoMapping()
 {
-    return presetManager->getModeCustom();
+	return getMappingMode() == 2.0f;
+}
+
+int SvkPluginState::getModeSlotRoot(int slotNum)
+{
+	return getModeInSlot(slotNum)->getRootNote();
 }
 
 int SvkPluginState::getMode1Root()
 {
-	return getMode1()->getRootNote();
+	return getModeSlotRoot(0);
 }
 
 int SvkPluginState::getMode2Root()
 {
-	return getMode2()->getRootNote();
+	return getModeSlotRoot(1);
 }
 
 int SvkPluginState::getMapOrder1()
@@ -444,39 +431,26 @@ int SvkPluginState::getMapOrderOffset2()
     return mapOrderOffset2;
 }
 
-int SvkPluginState::getPeriodShift()
+bool SvkPluginState::isPresetEdited()
 {
-	return midiProcessor->getPeriodShift();
-}
-
-int SvkPluginState::getMidiChannelOut()
-{
-	return midiProcessor->getMidiChannelOut();
-}
-
-bool SvkPluginState::isShowingNoteNums()
-{
-	return virtualKeyboard->isShowingNoteNumbers();
-}
-int SvkPluginState::getKeyStyle()
-{
-	return virtualKeyboard->getKeyPlacementStyle();
-}
-int SvkPluginState::getHighlightStyle()
-{
-	return virtualKeyboard->getHighlightStyle();
+	return presetEdited;
 }
 
 //==============================================================================
 
-bool SvkPluginState::isPresetEdited()
+void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 {
-    return presetEdited;
+	RangedAudioParameter* param = svkParameters.grab(paramIdIn);
+
+	if (param)
+	{
+		param->setValue(valueIn);
+	}
 }
 
 void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
-	setParameterInt(IDs::presetSlotViewed, presetViewedIn);
+	svkParameters.grab(IDs::presetSlotViewed)->setValue(presetViewedIn);
     presetViewed = presetManager->getPresetLoaded(presetViewedIn);
 
 	midiProcessor->setMode1(getMode1());
@@ -485,7 +459,7 @@ void SvkPluginState::setPresetViewed(int presetViewedIn)
 
 void SvkPluginState::setModeViewed(int modeViewedIn)
 {
-	setParameterInt(IDs::modeSlotNumViewed, modeViewedIn);
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue(modeViewedIn);
 	presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedIn, nullptr);
 	updateModeViewed();
 }
@@ -513,41 +487,178 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
     presetEdited = true;
 }
 
-
-void SvkPluginState::setModeCustom(String stepsIn)
+void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    presetManager->setModeCustom(stepsIn);
-	handleModeSelection(getModeViewedNum(), 999);
+	svkParameters.grab(IDs::mappingMode)->setValue(mapModeSelectionIn);
+	presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
+
+	if (mapModeSelectionIn == 2) // Auto Mapping
+	{
+		doMapping();
+	}
+
+	else if (mapModeSelectionIn == 3) // Manual Mapping
+	{
+		ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
+		midiProcessor->setMidiMaps(midiMaps);
+	}
+
+	else // Mapping Off
+	{
+		midiProcessor->setInputRemap(NoteMap());
+		midiProcessor->setOutputFilter(NoteMap());
+		setModeViewed(1);
+	}
+
+	sendChangeMessage();
+}
+
+void SvkPluginState::setMapStyle(int mapStyleIn)
+{
+	svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleIn);
+	presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
+
+	if (isAutoMapping())
+	{
+		doMapping();
+	}
+}
+
+void SvkPluginState::setPeriodShift(int shiftIn)
+{
+	svkParameters.grab(IDs::periodShift)->setValue(shiftIn);
+	midiProcessor->setPeriodShift(shiftIn);
+}
+
+void SvkPluginState::setMidiChannel(int midiChannelIn)
+{
+	svkParameters.grab(IDs::keyboardMidiChannel)->setValue(midiChannelIn);
+	// Can be improved, don't think this needs to be set in both objects
+	midiProcessor->setMidiChannelOut(midiChannelIn);
+	virtualKeyboard->setMidiChannelOut(midiChannelIn);
+}
+
+void SvkPluginState::setShowNoteNums(bool showNoteNumsIn)
+{
+	svkParameters.grab(IDs::pianoKeysShowNoteNumbers)->setValue(showNoteNumsIn);
+	virtualKeyboard->setShowNoteNumbers(showNoteNumsIn);
+}
+
+void SvkPluginState::setShowFilteredNoteNums(bool showFilteredNoteNumsIn)
+{
+	svkParameters.grab(IDs::pianoKeysShowFilteredNotes)->setValue(showFilteredNoteNumsIn);
+	virtualKeyboard->setShowFilteredNumbers(showFilteredNoteNumsIn);
+}
+
+void SvkPluginState::setShowNoteLabels(bool showNoteLabelsIn)
+{
+	svkParameters.grab(IDs::keyboardShowsNoteLabels)->setValue(showNoteLabelsIn);
+	virtualKeyboard->setShowNoteLabels(showNoteLabelsIn);
+}
+
+void SvkPluginState::setScrollingMode(int modeIn)
+{
+	svkParameters.grab(IDs::keyboardScrollingMode)->setValue(modeIn);
+	//TODO: add to virtualKeyboard
+}
+
+void SvkPluginState::setScrollingStyle(int styleIn)
+{
+	svkParameters.grab(IDs::keyboardScrollingStyle)->setValue(styleIn);
+	virtualKeyboard->setScrollingStyle(styleIn);
+}
+
+void SvkPluginState::setNumKeysInWidth(int numKeysIn)
+{
+	svkParameters.grab(IDs::numKeysInWidth)->setValue(numKeysIn);
+	//TODO: add to virtualKeyboard
+}
+
+void SvkPluginState::setNumKeyboardRows(int rowsIn)
+{
+	svkParameters.grab(IDs::keyboardNumRows)->setValue(rowsIn);
+	virtualKeyboard->setNumRows(rowsIn);
+}
+
+void SvkPluginState::setKeyboardOrientation(int orientationIn)
+{
+	svkParameters.grab(IDs::keyboardOrientation)->setValue(orientationIn);
+	virtualKeyboard->setShowNoteLabels(orientationIn);
+}
+
+void SvkPluginState::setKeyStyle(int keyStyleIn)
+{
+	svkParameters.grab(IDs::keyboardKeysStyle)->setValue(keyStyleIn);
+	virtualKeyboard->setKeyStyle(keyStyleIn);
+}
+
+void SvkPluginState::setHighlightStyle(int highlightStyleIn)
+{
+	svkParameters.grab(IDs::keyboardHighlightStyle)->setValue(highlightStyleIn);
+	virtualKeyboard->setHighlightStyle(highlightStyleIn);
+}
+
+void SvkPluginState::setVelocityBehavior(int velocityIdIn)
+{
+	svkParameters.grab(IDs::pianoVelocityBehavior)->setValue(velocityIdIn);
+	virtualKeyboard->setVelocityBehavior(velocityIdIn);
+}
+
+void SvkPluginState::setVelocityScalar(int velocityScalar)
+{
+	//TODO
+	//svkParameters.grab(IDs::keyboardHighlightStyle)->setValue(highlightStyleIn);
+	//virtualKeyboard->setHighlightStyle(highlightStyleIn);
+}
+
+void SvkPluginState::setVelocityFixed(int velocityFixed)
+{
+	svkParameters.grab(IDs::pianoVelocityValue)->setValue(velocityFixed);
+	virtualKeyboard->setHighlightStyle(velocityFixed);
+}
+
+void SvkPluginState::setModeSlotRoot(int modeSlotIn, int rootNoteIn)
+{
+	Mode* mode = getModeInSlot(modeSlotIn);
+	rootNoteIn = totalModulus(rootNoteIn, 128);
+	mode->setRootNote(rootNoteIn);
+
+	presetEdited = true;
+
+	// May need some tweaking
+	if (getModeViewedNum() == modeSlotIn)
+		updateModeViewed();
+
+	if (isAutoMapping())
+		doMapping();
 }
 
 void SvkPluginState::setMode1Root(int rootNoteIn)
 {
-    Mode* mode = getMode1();
-    
-    rootNoteIn = totalModulus(rootNoteIn, 128);
-    mode->setRootNote(rootNoteIn);
-    
-    presetEdited = true;
-    
-	updateModeViewed();
-    
-    if (isAutoMapping())
-        doMapping();
+	setModeSlotRoot(0, rootNoteIn);
 }
 
 void SvkPluginState::setMode2Root(int rootNoteIn)
 {
-    Mode* mode = getMode2();
+	setModeSlotRoot(1, rootNoteIn);
+}
 
-    rootNoteIn = totalModulus(rootNoteIn, 128);
-    mode->setRootNote(rootNoteIn);
-    
-    presetEdited = true;
-    
-	updateModeViewed();
+//==============================================================================
 
-    if (isAutoMapping())
-        doMapping();
+void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
+{
+	midiProcessor->setInputRemap(noteMapIn);
+}
+
+void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
+{
+	midiProcessor->setOutputFilter(noteMapIn);
+}
+
+void SvkPluginState::setModeCustom(String stepsIn)
+{
+	presetManager->setModeCustom(stepsIn);
+	handleModeSelection(getModeViewedNum(), 999);
 }
 
 void SvkPluginState::setMapOrder1(int orderIn)
@@ -572,64 +683,6 @@ void SvkPluginState::setMapOrderOffset2(int offsetIn)
 {
     mapOrderOffset2 = offsetIn;
     presetViewed->thePropertiesNode.setProperty(IDs::mode2OrderOffsetMapping, mapOrderOffset2, nullptr);
-}
-
-void SvkPluginState::setPeriodShift(int shiftIn)
-{
-    midiProcessor->setPeriodShift(shiftIn);
-}
-
-void SvkPluginState::setMidiChannel(int midiChannelIn)
-{
-    midiProcessor->setMidiChannelOut(midiChannelIn);
-	virtualKeyboard->setMidiChannelOut(midiChannelIn);
-}
-
-void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
-{
-	midiProcessor->setInputRemap(noteMapIn);
-}
-
-void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
-{
-	midiProcessor->setOutputFilter(noteMapIn);
-}
-
-void SvkPluginState::setMapMode(int mapModeSelectionIn)
-{
-	setParameterInt(IDs::mappingMode, mapModeSelectionIn);
-    presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
-    
-    if (mapModeSelectionIn == 2) // Auto Mapping
-    {
-        doMapping();
-    }
-    
-    else if (mapModeSelectionIn == 3) // Manual Mapping
-    {
-        ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
-        midiProcessor->setMidiMaps(midiMaps);
-    }
-    
-    else // Mapping Off
-    {
-        midiProcessor->setInputRemap(NoteMap());
-        midiProcessor->setOutputFilter(NoteMap());
-        setModeViewed(1);
-    }
-
-    sendChangeMessage();
-}
-
-void SvkPluginState::setMapStyle(int mapStyleIn)
-{
-	svkParameters.grab(IDs::modeMappingStyle)->setValue(mapStyleIn);
-    presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
-    
-    if (isAutoMapping())
-    {
-        doMapping();
-    }
 }
 
 void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mappingType,
@@ -671,6 +724,8 @@ void SvkPluginState::setTuningToET(double period, double divisions)
 	midiProcessor->setTuning(tuning.get());
 }
 
+//==============================================================================
+
 void SvkPluginState::sendMappingToKeyboard()
 {
 	virtualKeyboard->setInputNoteMap(midiProcessor->getInputNoteRemap());
@@ -682,41 +737,16 @@ void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
 	sendMappingToKeyboard();
 }
 
-void SvkPluginState::setNoteNumsShowing(bool showNoteNumsIn)
-{
-	virtualKeyboard->setShowNoteNumbers(showNoteNumsIn);
-}
-
-void SvkPluginState::setKeyStyle(int keyStyleIn)
-{
-    virtualKeyboard->setKeyPlacementStyle(keyStyleIn);
-}
-
-void SvkPluginState::setHighlightStyle(int highlightStyleIn)
-{
-	virtualKeyboard->setHighlightStyle(highlightStyleIn);
-}
-
-//==============================================================================
-
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
-	setParameterInt(IDs::modeSlotNumViewed, getModeViewedNum());
+	svkParameters.grab(IDs::modeSlotNumViewed)->setValue(getModeViewedNum());
 
 	modeViewed = presetManager->getModeInSlots(getPresetSlotNumViewed(), getModeViewedNum());
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->applyMode(modeViewed);
-    
-//    if (getModeViewedNum())
-//    {
-//        virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState());
-//    }
-//    else
-//    {
-//        virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
-//    }
-    midiProcessor->getRemappedKeyboardState()->addListener(virtualKeyboard.get());
+
+	//TODO: Change VirtualKeyboard displayed keyboard state
 }
 
 void SvkPluginState::commitModeInfo()

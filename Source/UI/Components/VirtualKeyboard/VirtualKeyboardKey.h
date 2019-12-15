@@ -56,7 +56,7 @@ namespace VirtualKeyboard
         float xOffset = 0;
         float yOffset = 0;
         bool showNoteNumber = false;
-        bool showNoteName = false;
+        bool showNoteLabel = false;
 		float velocityFixed = 1;
 		Colour color = Colours::transparentBlack;
     };

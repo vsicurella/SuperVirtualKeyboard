@@ -40,7 +40,8 @@ struct SvkPluginState : public ChangeBroadcaster,
     void recallState(ValueTree nodeIn);
 
 	//==============================================================================
-    
+    // Object getters
+
     ApplicationCommandManager* getAppCmdMgr();
     UndoManager* getUndoManager();
     
@@ -52,25 +53,37 @@ struct SvkPluginState : public ChangeBroadcaster,
     VirtualKeyboard::Keyboard* getKeyboard();
     ModeMapper* getModeMapper();
     
-    NoteMap* getMidiInputMap();
-    NoteMap* getMidiOutputMap();
+    NoteMap* getMidiInputFilterMap();
+    NoteMap* getMidiOutputFilterMap();
+
+	SvkPreset* getPresetinSlot(int slotNumIn = 0);
+	SvkPreset* getPresetViewed();
+
+	Mode* getModeInSlot(int slotNumIn);
+	Mode* getModeViewed();
+	Mode* getMode1();
+	Mode* getMode2();
+	Mode* getModeCustom();
+
+	Tuning* getTuning();
+
+	//==============================================================================
+	// Parameter Getters
+
+	float getParameterValue(Identifier paramId);
+	float getParameterMin(Identifier paramId);
+	float getParameterMax(Identifier paramId);
+	float getParameterDefaultValue(Identifier paramId);
+
+	int getPresetSlotNumViewed();
+	int getNumModesInPresetViewed();
+	int getModeViewedNum();
+
 	int getMappingMode();
 	int getMappingStyle();
     bool isAutoMapping();
-    
-    SvkPreset* getPresetinSlot(int slotNumIn=0);
-    SvkPreset* getPresetViewed();
-	int getPresetSlotNumViewed();
-	int getNumModesInPresetViewed();
-    
-    Mode* getModeInSlot(int slotNumIn);
-    Mode* getModeViewed();
-	int getModeViewedNum();
 
-    Mode* getMode1();
-    Mode* getMode2();
-    Mode* getModeCustom();
-
+	int getModeSlotRoot(int slotNum);
 	int getMode1Root();
 	int getMode2Root();
     
@@ -79,41 +92,61 @@ struct SvkPluginState : public ChangeBroadcaster,
     int getMapOrderOffset1();
     int getMapOrderOffset2();
 
-	Tuning* getTuning();
-
-	int getPeriodShift();
-	int getMidiChannelOut();
-
-	bool isShowingNoteNums();
-	int getKeyStyle();
-	int getHighlightStyle();
+	bool isPresetEdited();
 
     //==============================================================================
-    
-    bool isPresetEdited();
+    // Parameter setters
 
+	void setParameterValue(Identifier paramIdIn, float valueIn);
+
+	// Should either add arg "bool updateParm=false" to all of these, or implement updateFromParameter()
     void setPresetViewed(int presetViewedIn);
 	void setModeViewed(int modeViewedIn);
+	void handleModeSelection(int modeBoxNum, int idIn);
 
-    void handleModeSelection(int modeBoxNum, int idIn);
-    void setModeCustom(String stepsIn);
+	void setMapMode(int mapModeSelectionIn);
+	void setMapStyle(int mapStyleIn);
 
+	void setPeriodShift(int shiftIn);
+	void setMidiChannel(int midiChannelIn);
+	void setShowNoteNums(bool showNoteNumsIn);
+	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);
+	void setShowNoteLabels(bool showNoteLabelsIn);
+	void setScrollingMode(int modeIn);
+	void setScrollingStyle(int styleIn);
+	void setNumKeysInWidth(int numKeysIn);
+	void setNumKeyboardRows(int rowsIn);
+	void setKeyboardOrientation(int orientationIn);
+	void setKeyStyle(int keyStyleIn);
+	void setHighlightStyle(int highlightStyleIn);
+
+	void setVelocityBehavior(int velocityIdIn);
+	void setVelocityScalar(int velocityScalar);
+	void setVelocityFixed(int velocityFixed);
+
+	void setModeSlotRoot(int modeSlotIn, int rootNoteIn);
 	void setMode1Root(int rootNoteIn);
     void setMode2Root(int rootNoteIn);
     
-    void setMapOrder1(int orderIn);
-    void setMapOrder2(int orderIn);
-    void setMapOrderOffset1(int offsetIn);
-    void setMapOrderOffset2(int offsetIn);
-    
-    void setPeriodShift(int shiftIn);
-    void setMidiChannel(int midiChannelIn);
-    
+	// Move these to VirtualKeyboard?
+/*	void setKeyWidthMod(int keyNumIn, float widthMod);
+	void setKeyHeightMod(int keyNumIn, float heightMod);
+	void setKeyXOffset(int keyNumIn, int xOffset);
+	void setKeyYOffset(int keyNumIn, int yOffset); */   
+
+	//==============================================================================
+	// User Functionality
+
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);
     
-    void setMapMode(int mapModeSelectionIn);
-    void setMapStyle(int mapStyleIn);
+	void setModeCustom(String stepsIn);
+
+	void setMapOrder1(int orderIn);
+	void setMapOrder2(int orderIn);
+	void setMapOrderOffset1(int offsetIn);
+	void setMapOrderOffset2(int offsetIn);
+
     void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
     void doMapping();
@@ -121,14 +154,11 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setTuning(const Tuning* tuningToCopy);
 	void setTuningToET(double period, double divisions);
 
+	//==============================================================================
+	// Internal Functionality
+
 	void sendMappingToKeyboard();
 	void sendMappingToKeyboard(ValueTree mapNodeIn);
-    
-	void setNoteNumsShowing(bool showNoteNumsIn);
-    void setKeyStyle(int keyStyleIn);
-    void setHighlightStyle(int highlightStyleIn);
-    
-	//==============================================================================
 
 	void updateModeViewed(bool sendChange=true);
     void updateToPreset(bool sendChange = true);
@@ -136,10 +166,6 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void updateParameter(Identifier paramId);
 	void updateParameters();
     void updateFromParameter(Identifier paramId);
-
-	void setParameterInt(Identifier paramId, int valueIn);
-	void setParameterBool(Identifier paramId, bool boolIn);
-	void setParameterChoice(Identifier paramId, int choiceNum);
 
 	void commitModeInfo();
     void commitPresetChanges();
@@ -175,12 +201,11 @@ private:
 
     SvkParameters svkParameters;
 
-    bool presetEdited = false;
-
     SvkPreset* presetViewed;
-    
     Mode* modeViewed; // What is currently on screen
     
+	bool presetEdited = false;
+
 	// Mapping parameters
     
     int mapOrder1 = 0;
