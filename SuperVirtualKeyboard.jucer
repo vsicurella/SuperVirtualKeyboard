@@ -2,10 +2,23 @@
 
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
               jucerVersion="5.4.5" companyName="Everytone" companyEmail="sicurella12@gmail.com"
-              pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginIsMidiEffectPlugin,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Analyzer" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
-              pluginAUMainType="'aumi'" pluginChannelConfigs="{0, 0}">
+              pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginVST3Category="Instrument,Tools" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
+              pluginAUMainType="'aumi'" version="0.03">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
+    <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
+      <FILE id="ytvF67" name="ChannelAssigner.cpp" compile="1" resource="0"
+            file="Source/Midi/ChannelAssigner.cpp"/>
+      <FILE id="hzQIcx" name="ChannelAssigner.h" compile="0" resource="0"
+            file="Source/Midi/ChannelAssigner.h"/>
+      <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
+      <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"
+            file="Source/Midi/MidiProcessor.cpp"/>
+      <FILE id="K9KkLT" name="TunedNoteInterpreter.h" compile="0" resource="0"
+            file="Source/Midi/TunedNoteInterpreter.h"/>
+      <FILE id="xgxwGW" name="TunedNoteInterpreter.cpp" compile="1" resource="0"
+            file="Source/Midi/TunedNoteInterpreter.cpp"/>
+    </GROUP>
     <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
       <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
             file="Source/Resources/FactoryModes.txt"/>
@@ -129,9 +142,6 @@
           file="Source/PluginProcessor.cpp"/>
     <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
           file="Source/PluginProcessor.h"/>
-    <FILE id="VI9lFR" name="MidiProcessor.cpp" compile="1" resource="0"
-          file="Source/MidiProcessor.cpp"/>
-    <FILE id="DPYCxv" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
     <FILE id="RXVf6v" name="PluginSettings.cpp" compile="1" resource="0"
           file="Source/PluginSettings.cpp"/>
     <FILE id="a1oozu" name="PluginSettings.h" compile="0" resource="0"
