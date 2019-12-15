@@ -280,7 +280,7 @@ void SvkPluginEditor::applyMap()
 
 void SvkPluginEditor::setMappingMode()
 {
-	setMappingMode(controlComponent->getMappingMode());
+	setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
 }
 
 void SvkPluginEditor::setMappingMode(int mappingModeId)
