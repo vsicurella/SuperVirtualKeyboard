@@ -75,6 +75,13 @@ static Identifier mpePressureTrackingMode("MPEPitchTrackingMode");
 static Identifier mpeTimbreTrackingMode("MPEPitchTrackingMode");
 static Identifier mpeTuningPreserveMidiNote("MPETunePreserveMidiNote");
 
+// Tuning
+static Identifier tuningName("TuningName");
+static Identifier retuneOn("RetuneOn");
+static Identifier retuneAuto("RetuneAuto");
+static Identifier tuningRootNote("TuningRootNote");
+static Identifier tuningRootFreq("TuningRootFreq");
+
 // Mode
 static Identifier scaleSize("ScaleSize");
 static Identifier modeSize("ModeSize");

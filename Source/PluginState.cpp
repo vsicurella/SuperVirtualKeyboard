@@ -33,6 +33,8 @@ SvkPluginState::SvkPluginState()
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(pianoNode));
 	pianoNode = virtualKeyboard->getNode();
     virtualKeyboard->addListener(midiProcessor.get());
+    
+    setTuningToET(2, 12);
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
@@ -112,8 +114,21 @@ void SvkPluginState::initializeParameters()
     
     svkParameters.stash(IDs::mappingMode, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
     svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
+    
+    svkParameters.stash(IDs::mpeOn, new AudioParameterBool(IDs::mpeOn.toString(), "MPE On", false));
+    svkParameters.stash(IDs::mpeLegacyOn, new AudioParameterBool(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
+    svkParameters.stash(IDs::mpeTuningPreserveMidiNote, new AudioParameterBool(IDs::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
+    svkParameters.stash(IDs::pitchBendGlobalMax, new AudioParameterInt(IDs::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
+    svkParameters.stash(IDs::pitchBendNoteMax, new AudioParameterInt(IDs::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
+    svkParameters.stash(IDs::maxVoices, new AudioParameterInt(IDs::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
+
+    svkParameters.stash(IDs::retuneOn, new AudioParameterBool(IDs::retuneOn.toString(), "Retune On", false));
+    svkParameters.stash(IDs::retuneAuto, new AudioParameterBool(IDs::retuneAuto.toString(), "Retune Auto", false));
+    svkParameters.stash(IDs::tuningRootNote, new AudioParameterInt(IDs::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
+    svkParameters.stash(IDs::tuningRootFreq, new AudioParameterFloat(IDs::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
 
     svkParameters.stash(IDs::periodShift, new AudioParameterInt(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
+    svkParameters.stash(IDs::transposeAmt, new AudioParameterInt(IDs::transposeAmt.toString(), "Transpose", -127, 127, 0));
     svkParameters.stash(IDs::keyboardMidiChannel, new AudioParameterInt(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
     svkParameters.stash(IDs::pianoKeysShowNoteNumbers, new AudioParameterBool(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
     svkParameters.stash(IDs::pianoKeysShowFilteredNotes, new AudioParameterBool(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
@@ -524,10 +539,79 @@ void SvkPluginState::setMapStyle(int mapStyleIn)
 	}
 }
 
+void SvkPluginState::setMPEOn(bool mpeOnIn)
+{
+    setParameterValue(IDs::mpeOn, mpeOnIn);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeOn, mpeOnIn, nullptr);
+    
+    midiProcessor->setMPEOn(mpeOnIn);
+}
+
+void SvkPluginState::setMPELegacy(bool mpeLegacyIn)
+{
+    setParameterValue(IDs::mpeLegacyOn, mpeLegacyIn);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeLegacyIn, nullptr);
+    
+    if (mpeLegacyIn)
+        midiProcessor->getMPEInstrument()->enableLegacyMode();
+    else
+        midiProcessor->setMPEOn(true); // bad if called when MPE is actually off
+    
+}
+
+void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax)
+{
+    setParameterValue(IDs::pitchBendGlobalMax, globalPitchBendMax);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendGlobalMax, globalPitchBendMax, nullptr);
+    midiProcessor->setPitchBendGlobalMax(globalPitchBendMax);
+}
+
+void SvkPluginState::setNotePitchBendMax(int notePitchBendMax)
+{
+    setParameterValue(IDs::pitchBendNoteMax, notePitchBendMax);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendNoteMax, notePitchBendMax, nullptr);
+    midiProcessor->setPitchBendGlobalMax(notePitchBendMax);
+}
+
+void SvkPluginState::setMaxPolyphony(int maxVoicesIn)
+{
+    setParameterValue(IDs::maxVoices, maxVoicesIn);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::maxVoices, maxVoicesIn, nullptr);
+    midiProcessor->setVoiceLimit(maxVoicesIn);
+}
+
+void SvkPluginState::setRetuneOn(bool toRetuneIn)
+{
+    setParameterValue(IDs::retuneOn, toRetuneIn);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneOn, toRetuneIn, nullptr);
+    midiProcessor->setRetuneOn(toRetuneIn);
+}
+
+void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn)
+{
+    autoRetuneOn = toRetuneAutoIn;
+    
+    if (midiProcessor->isRetuning() && autoRetuneOn)
+        setTuningToModeET(2);
+}
+
+void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune)
+{
+    setParameterValue(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune);
+    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune, nullptr);
+    midiProcessor->setTuningPreservesMidiNote(preseveMidiNoteRetune);
+}
+
 void SvkPluginState::setPeriodShift(int shiftIn)
 {
 	svkParameters.grab(IDs::periodShift)->setValue(shiftIn);
 	midiProcessor->setPeriodShift(shiftIn);
+}
+
+void SvkPluginState::setTransposeAmt(int stepsIn)
+{
+    setParameterValue(IDs::transposeAmt, stepsIn);
+    midiProcessor->setTransposeAmt(stepsIn);
 }
 
 void SvkPluginState::setMidiChannel(int midiChannelIn)
@@ -723,6 +807,13 @@ void SvkPluginState::setTuningToET(double period, double divisions)
 	tuning.reset(new Tuning(period, divisions));
 	midiProcessor->setTuning(tuning.get());
 }
+
+void SvkPluginState::setTuningToModeET(double period)
+{
+    tuning.reset(new Tuning(period, getMode2()->getScaleSize()));
+    midiProcessor->setTuning(tuning.get());
+}
+
 
 //==============================================================================
 

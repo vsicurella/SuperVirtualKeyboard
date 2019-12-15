@@ -58,9 +58,9 @@ void SvkMidiProcessor::updateNode()
     midiSettingsNode.setProperty(IDs::mpeOn, mpeOn, nullptr);
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
     midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeLegacyOn, isLegacyModeEnabled(), nullptr);
+    midiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeInst->isLegacyModeEnabled(), nullptr);
     midiSettingsNode.setProperty(IDs::pitchBendNoteMax, pitchBendNoteMax, nullptr);
-    midiSettingsNode.setProperty(IDs::pitchBendGlobalMax, getLegacyModePitchbendRange(), nullptr);
+    midiSettingsNode.setProperty(IDs::pitchBendGlobalMax, mpeInst->getLegacyModePitchbendRange(), nullptr);
     midiSettingsNode.setProperty(IDs::mpePitchTrackingMode, mpePitchbendTrackingMode, nullptr);
     midiSettingsNode.setProperty(IDs::mpePressureTrackingMode, mpePressureTrackingMode, nullptr);
     midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
@@ -196,6 +196,11 @@ int SvkMidiProcessor::getVoiceLimit() const
     return maxNumVoices;
 }
 
+bool SvkMidiProcessor::isRetuning() const
+{
+    return doRetuning;
+}
+
 int SvkMidiProcessor::isTuningPreservesMidiNote() const
 {
     return mpeTuningPreserveMidiNote;
@@ -219,6 +224,11 @@ MidiFilter* SvkMidiProcessor::getInputRemapMidiFilter()
 MidiFilter* SvkMidiProcessor::getOutputMidiFilter()
 {
 	return midiOutputFilter.get();
+}
+
+MPEInstrument* SvkMidiProcessor::getMPEInstrument()
+{
+    return mpeInst.get();
 }
 
 int SvkMidiProcessor::getInputNote(int midiNoteIn)
@@ -348,9 +358,19 @@ void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
     retuner->setPitchBendMax(pitchBendNoteMax);
 }
 
+void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
+{
+    pitchBendGlobalMax = bendAmtIn;
+    //mpeInst->setLegacyModePitchbendRange(bendAmtIn);
+}
+
+void SvkMidiProcessor::setTuningPreservesMidiNote(bool preserveMidiNote)
+{
+    mpeTuningPreserveMidiNote = preserveMidiNote;
+}
+
 void SvkMidiProcessor::setPitchbendTrackingMode(int modeIn)
 {
-    
     mpePitchbendTrackingMode = modeIn;
     mpeInst->setPitchbendTrackingMode(MPEInstrument::TrackingMode(mpePitchbendTrackingMode));
 }
@@ -371,7 +391,12 @@ void SvkMidiProcessor::setVoiceLimit(int maxVoicesIn)
 {
     maxNumVoices = maxVoicesIn;
     mpeZone.setLowerZone(maxVoicesIn, pitchBendNoteMax, pitchBendGlobalMax);
-    setZoneLayout(mpeZone);
+    mpeInst->setZoneLayout(mpeZone);
+}
+
+void SvkMidiProcessor::setRetuneOn(bool retuneOn)
+{
+    doRetuning = retuneOn;
 }
 
 void SvkMidiProcessor::setInputToFilter(bool doRemap)
