@@ -291,7 +291,7 @@ namespace VirtualKeyboard
 		/*
 			Sets the style of which the keys are nested in.
 		*/
-        void setKeyPlacementStyle(int placementIn);
+        void setKeyStyle(int placementIn);
         
 		/*
 			Set the way the keys are highlighted
@@ -336,7 +336,7 @@ namespace VirtualKeyboard
 		/*
 			Set whether pitch names are shown
 		*/
-		void setShowPitchNames(bool shouldShowPitchNames);
+		void setShowNoteLabels(bool shouldShowPitchNames);
 
 		// might want to restructure these so this is not necessary
 		void setKeyProportions(Key* keyIn);
@@ -556,7 +556,7 @@ namespace VirtualKeyboard
         
         int numRows = 1;
 
-		bool showPitchNames = false;
+		bool showNoteLabels = false;
 		bool showNoteNumbers = false;
 		bool showFilteredNoteNums = false;
 

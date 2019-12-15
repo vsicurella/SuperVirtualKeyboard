@@ -91,24 +91,25 @@ static Identifier pluginEditorNode("PluginWindow");
 static Identifier windowBoundsW("WindowW");
 static Identifier windowBoundsH("WindowH");
 static Identifier viewportPosition("ViewportPosition");
-static Identifier pianoScrollingStyle("PianoScrollingStyle");
-static Identifier scrollingMode("ScrollingMode");
-static Identifier numKeysInWidth("NumKeysInWidth");
 
-// Piano Component
+// TODO: Refactor piano -> keyboard
+// Keyboard Component
 static Identifier pianoNode("PianoNode");
 static Identifier pianoUIMode("PianoUIMode");
-static Identifier pianoOrientation("PianoOrientation");
-static Identifier pianoKeyboardState("PianoKeyboardState");
+static Identifier keyboardOrientation("KeyboardOrientation");
 static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
-static Identifier pianoMidiChannel("SelectedMidiChannel");
+static Identifier keyboardMidiChannel("SelectedMidiChannel");
 static Identifier pianoWHRatio("WidthToHeightRatio");
-static Identifier pianoNumRows("PianoNumRows");
+static Identifier keyboardNumRows("KeyboardNumRows");
 static Identifier pianoHasCustomColor("PresetHasCustomColor");
-static Identifier pianoKeyPlacementType("KeyPlacementType");
+static Identifier keyboardKeysStyle("KeyPlacementType");
 static Identifier pianoKeysShowNoteNumbers("PianoShowNoteNumbers");
 static Identifier pianoKeysShowFilteredNotes("PianoShowFilteredNotes");
-static Identifier pianoKeysHighlightStyle("PianoHighlightStyle");
+static Identifier keyboardShowsNoteLabels("KeyboardShowsNoteLabels");
+static Identifier keyboardHighlightStyle("PianoHighlightStyle");
+static Identifier keyboardScrollingStyle("KeyboardScrollingStyle");
+static Identifier keyboardScrollingMode("KeyboardScrollingMode");
+static Identifier numKeysInWidth("NumKeysInWidth");
 static Identifier pianoVelocityBehavior("PianoVelocityBehavior");
 static Identifier pianoVelocityScaleInput("PianoVelocityScaleInput");
 static Identifier pianoVelocityValue("PianoVelocityValue");
@@ -127,20 +128,20 @@ static Identifier pianoKeyRatioSingle("KeySingleRatios");
 static Identifier pianoKeyTreeNode("PianoKeyTree");
 static Identifier pianoKeyNode("PianoKeyNode");
 static Identifier pianoKeyNumber("KeyNumber");
-static Identifier pianoKeyPitchName("PitchName");
+static Identifier pianoKeyNoteLabel("NoteLabel");
 static Identifier pianoKeyWidthMod("WidthMod");
 static Identifier pianoKeyHeightMod("HeightMod");
 static Identifier pianoKeyXOffset("XOffset");
 static Identifier pianoKeyYOffset("YOffset");
 static Identifier pianoKeyShowNumber("ShowNumber");
-static Identifier pianoKeyShowName("ShowName");
+static Identifier pianoKeyShowNoteLabel("ShowKeyNoteLabel");
 static Identifier pianoKeyColor("KeyColor");
 
 // Debug
-static Identifier modeSlotDebug("ModeSlotToDebug");
+static Identifier modeSlotToEdit("ModeSlotToDebug");
 static Identifier modeLibraryIndex("ModeLibraryIndex");
 static Identifier modeRootNote("ModeRootNote");
-static Identifier keyNumberDebug("KeyToDebug");
+static Identifier keyNumberToEdit("KeyToDebug");
 
 
 enum CommandIDs

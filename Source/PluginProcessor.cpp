@@ -21,7 +21,7 @@ SvkAudioProcessor::SvkAudioProcessor()
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       ),
+                       )
 #endif
 	
 {

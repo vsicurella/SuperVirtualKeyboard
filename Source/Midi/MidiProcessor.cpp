@@ -51,7 +51,7 @@ SvkMidiProcessor::~SvkMidiProcessor()
 void SvkMidiProcessor::updateNode()
 {
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
-    midiSettingsNode.setProperty(IDs::pianoMidiChannel, midiChannelOut, nullptr);
+    midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
     midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
     midiSettingsNode.setProperty(IDs::periodShiftModeSize, useModePeriod, nullptr);
     midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
@@ -310,7 +310,7 @@ void SvkMidiProcessor::setMidiChannelOut(int channelOut)
     
     channelOut = channelOut % 16;
     
-    midiSettingsNode.setProperty(IDs::pianoMidiChannel, channelOut, nullptr);
+    midiSettingsNode.setProperty(IDs::keyboardMidiChannel, channelOut, nullptr);
     midiChannelOut = channelOut;
 }
 

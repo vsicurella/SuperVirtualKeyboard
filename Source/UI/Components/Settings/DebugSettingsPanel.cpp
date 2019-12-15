@@ -109,7 +109,7 @@ void DebugSettingsPanel::sliderValueChanged(Slider *slider)
         pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
     }
     
-    else if (paramName == IDs::pianoNumRows.toString())
+    else if (paramName == IDs::keyboardNumRows.toString())
     {
         api = dynamic_cast<AudioParameterInt*>(param);
         *api = slider->getValue();

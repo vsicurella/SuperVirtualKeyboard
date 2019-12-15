@@ -486,7 +486,7 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
         //[UserComboBoxCode_keyStyleBox] -- add your combo box handling code here..
-        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoKeyPlacementType));
+        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::keyboardKeysStyle));
         *api = keyStyleBox->getSelectedId();
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
         //[/UserComboBoxCode_keyStyleBox]
@@ -494,7 +494,7 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == highlightStyleBox.get())
     {
         //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
-        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoKeysHighlightStyle));
+        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::keyboardHighlightStyle));
         *api = highlightStyleBox->getSelectedId();
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
         //[/UserComboBoxCode_highlightStyleBox]
@@ -542,7 +542,7 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == midiChannelSld.get())
     {
         //[UserSliderCode_midiChannelSld] -- add your slider handling code here..
-        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::pianoMidiChannel));
+        auto api = dynamic_cast<AudioParameterInt*>(svkParameters->grab(IDs::keyboardMidiChannel));
         *api = midiChannelSld->getValue();
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMidiChannelOut, true);
         //[/UserSliderCode_midiChannelSld]
