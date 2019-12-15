@@ -20,8 +20,7 @@
 #include "../Structures/Mode.h"
 #include "../Structures/Tuning.h"
 
-class SvkMidiProcessor : public MPEInstrument,
-                            public MidiMessageCollector
+class SvkMidiProcessor : public MidiMessageCollector
 {
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;
@@ -65,8 +64,8 @@ class SvkMidiProcessor : public MPEInstrument,
     int mpePressureTrackingMode = 0;
     int mpeTimbreTrackingMode = 0;
     
-    bool mpeOn = false;
-    bool isRetuning = true;
+    bool mpeOn = false; 	
+    bool doRetuning = false;
     
     bool midiInputPaused = false;
     bool isInputFiltered = false;
@@ -115,6 +114,8 @@ public:
     MidiFilter* getInputMidiFilter();
 	MidiFilter* getInputRemapMidiFilter();
 	MidiFilter* getOutputMidiFilter();
+    
+    MPEInstrument* getMPEInstrument();
 
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
@@ -129,6 +130,8 @@ public:
     int getTimbreTrackingMode() const;
     
     int getVoiceLimit() const;
+    
+    bool isRetuning() const;
     
     String setMidiInput(String deviceID);
     String setMidiOutput(String deviceID);
@@ -156,10 +159,10 @@ public:
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
-	void setTuning(Tuning* tuningIn);
     
     void setMPEOn(bool turnOnMPE);
     void setPitchBendNoteMax(int bendAmtIn);
+    void setPitchBendGlobalMax(int bendAmtIn);
     void setTuningPreservesMidiNote(bool preserveMidiNote);
     
     void setPitchbendTrackingMode(int modeIn);
@@ -167,6 +170,9 @@ public:
     void setTimbreTrackingMode(int modeIn);
     
     void setVoiceLimit(int maxVoicesIn);
+    
+    void setTuning(Tuning* tuningIn);
+    void setRetuneOn(bool retuneOn);
 
     void mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode = true);
     void mapNoteForInputRemap(int noteIn, int noteOut, bool updateNode = true);

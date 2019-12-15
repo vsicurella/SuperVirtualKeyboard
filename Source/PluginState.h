@@ -83,6 +83,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	int getMappingStyle();
     bool isAutoMapping();
 
+    bool isAutoRetuning();
+
 	int getModeSlotRoot(int slotNum);
 	int getMode1Root();
 	int getMode2Root();
@@ -106,8 +108,19 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void setMapMode(int mapModeSelectionIn);
 	void setMapStyle(int mapStyleIn);
+    
+    void setMPEOn(bool mpeOnIn);
+    void setMPELegacy(bool mpeLegacyIn);
+    void setGlobalPitchBendMax(int globalPitchBendMax);
+    void setNotePitchBendMax(int notePitchBendMax);
+    void setMaxPolyphony(int maxVoicesIn);
+    
+    void setRetuneOn(bool toRetuneIn);
+    void setRetuneAuto(bool toRetuneAutoIn);
+    void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune);
 
 	void setPeriodShift(int shiftIn);
+    void setTransposeAmt(int stepsIn);
 	void setMidiChannel(int midiChannelIn);
 	void setShowNoteNums(bool showNoteNumsIn);
 	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);
@@ -153,6 +166,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void setTuning(const Tuning* tuningToCopy);
 	void setTuningToET(double period, double divisions);
+    void setTuningToModeET(double period);
 
 	//==============================================================================
 	// Internal Functionality
@@ -212,4 +226,6 @@ private:
     int mapOrder2 = 0;
     int mapOrderOffset1 = 0;
     int mapOrderOffset2 = 0;
+    
+    bool autoRetuneOn = false;
 };
