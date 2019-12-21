@@ -46,6 +46,12 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
     pluginState->addChangeListener(this);
+    svkParameters = pluginState->getParameters();
+    
+    for (int i = 0; i < svkParameters->getSize(); i++)
+    {
+        svkParameters->getUnchecked(i)->addListener(this);
+    }
     
     mappingHelper.reset(new MappingHelper(pluginState));
     //pluginState->getMidiProcessor()->getOriginalKeyboardState()->addListener(mappingHelper.get());
@@ -492,6 +498,17 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 		chooser.browseForFileToOpen();
 
 	return chooser.getResult();
+}
+
+void SvkPluginEditor::parameterValueChanged (int parameterIndex, float newValue)
+{
+    pluginState->updateFromParameter(parameterIndex);
+    DBG("PARAMETER EDITED: " + String(parameterIndex));
+}
+
+void SvkPluginEditor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
+{
+
 }
 
 //==============================================================================

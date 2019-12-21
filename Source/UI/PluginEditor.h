@@ -37,6 +37,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
                         private ScrollBar::Listener,
+                        private AudioProcessorParameter::Listener,
 						private Timer
 {
 public:
@@ -147,6 +148,12 @@ public:
 	 //==============================================================================
 
 	 File fileDialog(String message, bool forSaving);
+    
+    //==============================================================================
+    
+    void parameterValueChanged (int parameterIndex, float newValue);
+
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting);
 
 	 //==============================================================================
 
