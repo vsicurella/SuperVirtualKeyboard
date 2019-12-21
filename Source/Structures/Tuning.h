@@ -11,8 +11,7 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
-#include "../CommonFunctions.h"
-#include "Mode.h"
+//#include "../CommonFunctions.h"
 
 class Tuning
 {

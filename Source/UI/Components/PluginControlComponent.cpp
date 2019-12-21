@@ -499,8 +499,12 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
-        svkParameters->grab(IDs::mappingMode)->setValue(mapModeBox->getSelectedId());
-        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
+        svkParameters->grab(IDs::mappingMode)->setValue(svkParameters->grab(IDs::mappingMode)->convertTo0to1(mapModeBox->getSelectedId()));
+        DBG("Real ID: " + String(mapModeBox->getSelectedId()));
+        DBG("Param Val: " + String(svkParameters->grab(IDs::mappingMode)->convertFrom0to1(svkParameters->grab(IDs::mappingMode)->getValue())));
+        DBG("Direct PVal: " + String(svkParameters->grab(IDs::mappingMode)->getValue()));
+        DBG("Expected PVal: " + String(svkParameters->grab(IDs::mappingMode)->convertTo0to1(mapModeBox->getSelectedId())));
+        //appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
 
