@@ -21,6 +21,11 @@ ControlSettingsPanel::~ControlSettingsPanel()
 {
 }
 
+void ControlSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+{
+    
+}
+
 void ControlSettingsPanel::paint(Graphics& g)
 {
     

@@ -20,6 +20,11 @@ GeneralSettingsPanel::~GeneralSettingsPanel()
 {
 }
 
+void GeneralSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+{
+    
+}
+
 void GeneralSettingsPanel::paint(Graphics& g)
 {
     

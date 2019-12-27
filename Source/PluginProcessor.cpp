@@ -12,20 +12,22 @@
 #include "PluginProcessor.h"
 
 //==============================================================================
-SvkAudioProcessor::SvkAudioProcessor()
+SvkAudioProcessor::SvkAudioProcessor() :
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
+     AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  AudioChannelSet::stereo(), true)
                       #endif
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
 #endif
-	
+    svkUndo(new UndoManager()),
+    svkCmdMgr(new ApplicationCommandManager()),
+    svkValueTree(*this, svkUndo.get(), IDs::svkParentNode, createParameters())
 {
-	pluginState.reset(new SvkPluginState());
+	pluginState.reset(new SvkPluginState(svkValueTree.state, &svkParameters, &svkParameterIDs));
 }
 
 SvkAudioProcessor::~SvkAudioProcessor()
@@ -152,7 +154,7 @@ bool SvkAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* SvkAudioProcessor::createEditor()
 {
-    return new SvkPluginEditor(*this, pluginState->getAppCmdMgr());
+    return new SvkPluginEditor(*this);
 }
 
 //==============================================================================
@@ -184,9 +186,34 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 
 //==============================================================================
 
+UndoManager* SvkAudioProcessor::getUndoManager()
+{
+    return svkUndo.get();
+}
+
+ApplicationCommandManager* SvkAudioProcessor::getAppCmdMgr()
+{
+    return svkCmdMgr.get();
+}
+
 SvkPluginState* SvkAudioProcessor::getPluginState()
 {
 	return pluginState.get();
+}
+
+SvkParameters* SvkAudioProcessor::getSvkParameters()
+{
+    return &svkParameters;
+}
+
+Array<Identifier>* SvkAudioProcessor::getParameterIDs()
+{
+    return &svkParameterIDs;
+}
+
+Identifier SvkAudioProcessor::getParameterID(int paramIndex) const
+{
+    return svkParameterIDs[paramIndex];
 }
 
 //==============================================================================
@@ -197,3 +224,61 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 }
 
 //==============================================================================
+
+AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
+{
+    svkParameters.stash(IDs::presetSlotViewed, new AudioParameterInt(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
+    svkParameters.stash(IDs::modeSlotNumViewed, new AudioParameterInt(IDs::modeSlotNumViewed.toString(), "Mode Slot Viewed", 0, 1, 0));
+    
+    svkParameters.stash(IDs::mappingMode, new AudioParameterInt(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
+    svkParameters.stash(IDs::modeMappingStyle, new AudioParameterInt(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
+    
+    svkParameters.stash(IDs::mpeOn, new AudioParameterBool(IDs::mpeOn.toString(), "MPE On", false));
+    svkParameters.stash(IDs::mpeLegacyOn, new AudioParameterBool(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
+    svkParameters.stash(IDs::mpeTuningPreserveMidiNote, new AudioParameterBool(IDs::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
+    svkParameters.stash(IDs::pitchBendGlobalMax, new AudioParameterInt(IDs::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
+    svkParameters.stash(IDs::pitchBendNoteMax, new AudioParameterInt(IDs::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
+    svkParameters.stash(IDs::maxVoices, new AudioParameterInt(IDs::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
+
+    svkParameters.stash(IDs::retuneOn, new AudioParameterBool(IDs::retuneOn.toString(), "Retune On", false));
+    svkParameters.stash(IDs::retuneAuto, new AudioParameterBool(IDs::retuneAuto.toString(), "Retune Auto", false));
+    svkParameters.stash(IDs::tuningRootNote, new AudioParameterInt(IDs::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
+    svkParameters.stash(IDs::tuningRootFreq, new AudioParameterFloat(IDs::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
+
+    svkParameters.stash(IDs::periodShift, new AudioParameterInt(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
+    svkParameters.stash(IDs::transposeAmt, new AudioParameterInt(IDs::transposeAmt.toString(), "Transpose", -127, 127, 0));
+    svkParameters.stash(IDs::keyboardMidiChannel, new AudioParameterInt(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
+    svkParameters.stash(IDs::pianoKeysShowNoteNumbers, new AudioParameterBool(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
+    svkParameters.stash(IDs::pianoKeysShowFilteredNotes, new AudioParameterBool(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
+    svkParameters.stash(IDs::pianoKeyShowNoteLabel, new AudioParameterBool(IDs::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
+    svkParameters.stash(IDs::keyboardScrollingMode, new AudioParameterInt(IDs::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
+    svkParameters.stash(IDs::keyboardScrollingStyle, new AudioParameterInt(IDs::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
+    svkParameters.stash(IDs::numKeysInWidth, new AudioParameterInt(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
+    svkParameters.stash(IDs::keyboardNumRows, new AudioParameterInt(IDs::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
+    svkParameters.stash(IDs::keyboardOrientation, new AudioParameterInt(IDs::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
+    svkParameters.stash(IDs::keyboardKeysStyle, new AudioParameterInt(IDs::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
+    svkParameters.stash(IDs::keyboardHighlightStyle, new AudioParameterInt(IDs::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
+    
+    svkParameters.stash(IDs::pianoVelocityBehavior, new AudioParameterInt(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
+    svkParameters.stash(IDs::pianoVelocityValue, new AudioParameterInt(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
+    svkParameters.stash(IDs::pianoWHRatio, new AudioParameterFloat(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
+    
+    svkParameters.stash(IDs::modeSlotToEdit, new AudioParameterInt(IDs::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
+    svkParameters.stash(IDs::modeLibraryIndex, new AudioParameterInt(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
+    svkParameters.stash(IDs::modeRootNote, new AudioParameterInt(IDs::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
+    
+    svkParameters.stash(IDs::keyNumberToEdit, new AudioParameterInt(IDs::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
+    svkParameters.stash(IDs::pianoKeyWidthMod, new AudioParameterFloat(IDs::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
+    svkParameters.stash(IDs::pianoKeyHeightMod, new AudioParameterFloat(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
+    svkParameters.stash(IDs::pianoKeyXOffset, new AudioParameterInt(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
+    svkParameters.stash(IDs::pianoKeyYOffset, new AudioParameterInt(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
+    
+    for (SvkParameters::TheHash::Iterator param(svkParameters); param.next();)
+    {
+        svkParameterIDs.add(param.getKey());
+    }
+    
+    SvkParameters::TheArray& paramArray = svkParameters.getOwnedArray();
+        
+    return { paramArray.begin(), paramArray.end() };
+}

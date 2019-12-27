@@ -18,11 +18,8 @@
 #include "PresetManager.h"
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
-#include "Structures/OwnedHashMap.h"
 
 #include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
-
-typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
 
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
@@ -34,7 +31,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
     
-    SvkPluginState();
+    SvkPluginState(ValueTree svkValueTreeIn, SvkParameters* svkParametersIn, const Array<Identifier>* paramIDsIn);
 	~SvkPluginState() {}
     
     void recallState(ValueTree nodeIn);
@@ -43,14 +40,10 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	//==============================================================================
     // Object getters
-
-    ApplicationCommandManager* getAppCmdMgr();
-    UndoManager* getUndoManager();
     
 	SvkPresetManager* getPresetManager();
 	SvkMidiProcessor* getMidiProcessor();
 	SvkPluginSettings* getPluginSettings();
-    SvkParameters* getParameters();
     
     VirtualKeyboard::Keyboard* getKeyboard();
     ModeMapper* getModeMapper();
@@ -202,23 +195,18 @@ struct SvkPluginState : public ChangeBroadcaster,
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
-    
-    void initializeParameters();
 
 	std::unique_ptr<SvkPresetManager> presetManager;
 	std::unique_ptr<SvkMidiProcessor> midiProcessor;
 	std::unique_ptr<SvkPluginSettings> pluginSettings;
 
-	std::unique_ptr<ApplicationCommandManager> appCmdMgr;
-	std::unique_ptr<UndoManager> undoManager;
-
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 	std::unique_ptr<Tuning> tuning;
 
-    SvkParameters svkParameters;
-    Array<Identifier> svkParameterIDs;
-
+    SvkParameters* svkParameters;
+    const Array<Identifier>* svkParameterIDs;
+    
     SvkPreset* presetViewed;
     Mode* modeViewed; // What is currently on screen
     

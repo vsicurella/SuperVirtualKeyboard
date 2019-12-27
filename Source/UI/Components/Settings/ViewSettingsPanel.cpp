@@ -20,6 +20,11 @@ ViewSettingsPanel::~ViewSettingsPanel()
 {
 }
 
+void ViewSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+{
+    
+}
+
 void ViewSettingsPanel::paint(Graphics& g)
 {
     
