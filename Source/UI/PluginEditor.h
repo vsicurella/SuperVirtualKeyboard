@@ -41,7 +41,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						private Timer
 {
 public:
-    SvkPluginEditor (SvkAudioProcessor&, ApplicationCommandManager*);
+    SvkPluginEditor (SvkAudioProcessor&);
     ~SvkPluginEditor();
 
     //==============================================================================
@@ -151,9 +151,9 @@ public:
     
     //==============================================================================
     
-    void parameterValueChanged (int parameterIndex, float newValue);
+    void parameterValueChanged (int parameterIndex, float newValue) override;
 
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting);
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
 	 //==============================================================================
 
@@ -167,15 +167,15 @@ public:
 
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     SvkAudioProcessor& processor;
 	SvkPluginState* pluginState;
 	MidiKeyboardState externalMidi;
     ValueTree pluginEditorNode;
 
+    ApplicationCommandManager* appCmdMgr;
+
     SvkParameters* svkParameters;
-	ApplicationCommandManager* appCmdMgr;
+    const Array<Identifier>* svkParameterIDs;
 	
 	std::unique_ptr<PluginControlComponent> controlComponent;
     std::unique_ptr<MappingHelper> mappingHelper;

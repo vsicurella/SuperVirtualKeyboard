@@ -16,6 +16,7 @@
 namespace IDs
 {
 // Plugin State & Presets
+static Identifier svkParentNode("SVKValueTreeParent");
 static Identifier pluginStateNode("PluginState");
 static Identifier modeLibraryNode("ModeLibrary");
 static Identifier presetNode("Preset");

@@ -14,16 +14,22 @@
 using namespace VirtualKeyboard;
 
 //==============================================================================
-SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager* cmdMgr)
-	: AudioProcessorEditor(&p), processor(p), appCmdMgr(cmdMgr), pluginState(processor.getPluginState())
+SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
+	: AudioProcessorEditor(&p), processor(p),
+      pluginState(processor.getPluginState()),
+      appCmdMgr(processor.getAppCmdMgr()),
+      svkParameters(processor.getSvkParameters()),
+      svkParameterIDs(processor.getParameterIDs())
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
+    
     appCmdMgr->registerAllCommandsForTarget(this);
     appCmdMgr->setFirstCommandTarget(this);
 
-	controlComponent.reset(new PluginControlComponent(pluginState));
+	controlComponent.reset(new PluginControlComponent(pluginState, appCmdMgr));
+    controlComponent->connectToProcessor(processor.svkValueTree);
 	addAndMakeVisible(controlComponent.get());
 
 	viewport = controlComponent->getViewport();
@@ -46,7 +52,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p, ApplicationCommandManager
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
     
     pluginState->addChangeListener(this);
-    svkParameters = pluginState->getParameters();
     
     for (int i = 0; i < svkParameters->getSize(); i++)
     {
@@ -190,7 +195,7 @@ void SvkPluginEditor::showSettingsDialog()
     updateScrollbarData();
     controlComponent->setVisible(false);
     
-    settingsContainer.reset(new SettingsContainer(pluginState));
+    settingsContainer.reset(new SettingsContainer(processor.svkValueTree, svkParameters, svkParameterIDs));
     addAndMakeVisible(settingsContainer.get());
     settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
     settingsContainer->addChangeListener(this);

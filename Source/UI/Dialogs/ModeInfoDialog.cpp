@@ -436,7 +436,7 @@ void ModeInfoDialog::commitMode()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster, TextEditor::Listener"
+                 parentClasses="public Component, public ChangeBroadcaster, public TextEditor::Listener"
                  constructorParams="Mode* modeIn" variableInitialisers="modeOriginal(modeIn), modeWorking(Mode(modeIn-&gt;modeNode)), modeNode(modeWorking.modeNode)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="340" initialHeight="525">

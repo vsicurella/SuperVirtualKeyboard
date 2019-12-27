@@ -10,11 +10,18 @@
 
 #include "DebugSettingsPanel.h"
 
-DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+DebugSettingsPanel::DebugSettingsPanel(SvkParameters* parametersIn, const Array<Identifier>* paramIDsIn)
+    : svkParameters(parametersIn), svkParamIDs(paramIDsIn)
 {
-    svkParameters = pluginState->getParameters();
-        
+    setSize(100, 100);
+}
+
+DebugSettingsPanel::~DebugSettingsPanel()
+{
+}
+
+void DebugSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+{
     Label* lbl;
     Component* c;
     Slider* s;
@@ -54,14 +61,10 @@ DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
         s->setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
         s->setColour(Slider::textBoxTextColourId, Colours::black);
         s->addListener (this);
+        
+        sliderAttachments.add(new AudioProcessorValueTreeState::SliderAttachment(processorTree, paramName, *s));
         addAndMakeVisible(s);
     }
-    
-    setSize(100, 100);
-}
-
-DebugSettingsPanel::~DebugSettingsPanel()
-{
 }
 
 void DebugSettingsPanel::paint(Graphics& g)
@@ -105,15 +108,15 @@ void DebugSettingsPanel::sliderValueChanged(Slider *slider)
     
     if (paramName == IDs::pianoWHRatio.toString())
     {
-        param->setValue(slider->getValue());
-        pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
+        //param->setValue(slider->getValue());
+        //pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
     }
     
     else if (paramName == IDs::keyboardNumRows.toString())
     {
-        api = dynamic_cast<AudioParameterInt*>(param);
-        *api = slider->getValue();
-        pluginState->getKeyboard()->setNumRows(api->get());
+        //api = dynamic_cast<AudioParameterInt*>(param);
+        //*api = slider->getValue();
+        //pluginState->getKeyboard()->setNumRows(api->get());
     }
     
 }

@@ -18,12 +18,17 @@
 /**
 */
 class SvkAudioProcessor  : public AudioProcessor,
-                                            public ChangeBroadcaster
+                            public ChangeBroadcaster
 {
 public:
     //==============================================================================
     SvkAudioProcessor();
     ~SvkAudioProcessor();
+    
+    std::unique_ptr<UndoManager> svkUndo;
+    std::unique_ptr<ApplicationCommandManager> svkCmdMgr;
+    AudioProcessorValueTreeState svkValueTree;
+    
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -35,7 +40,6 @@ public:
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
-	
 	AudioProcessorEditor* createEditor() override;
 	bool hasEditor() const override;
 
@@ -55,20 +59,28 @@ public:
     void changeProgramName (int index, const String& newName) override;
 
     //==============================================================================
-
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	//==============================================================================
-
+    UndoManager* getUndoManager();
+    ApplicationCommandManager* getAppCmdMgr();
 	SvkPluginState* getPluginState();
+    
+    SvkParameters* getSvkParameters();
+    Array<Identifier>* getParameterIDs();
+    Identifier getParameterID(int paramIndex) const;
 
 	//==============================================================================
 
 private:
+    
+    AudioProcessorValueTreeState::ParameterLayout createParameters();
+    
+    SvkParameters svkParameters;
+    Array<Identifier> svkParameterIDs;
 
 	std::unique_ptr<SvkPluginState> pluginState;
-	//MidiKeyboardState* midiStateInput;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkAudioProcessor)
 };

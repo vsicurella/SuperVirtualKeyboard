@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "PluginIDs.h"
+#include "Structures/OwnedHashMap.h"
 
 struct ScaleSizeSorter
 {
@@ -128,6 +129,8 @@ struct IDasStringHash
         return DefaultHashFunctions::generateHash(key.toString(), upperLimit);
     }
 };
+
+typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
 
 template <class T, class U>
 struct Pair

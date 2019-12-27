@@ -29,9 +29,24 @@ class SettingsContainer : public TabbedComponent,
                             public ChangeBroadcaster
                             
 {
+    AudioProcessorValueTreeState& svkTree;
+    SvkParameters* svkParameters;
+    const Array<Identifier>* svkParamIDs;
+    
+    OwnedArray<Component> panels;
+    std::unique_ptr<Viewport> view;
+
+    Component* componentViewed = nullptr;
+
+    int defaultControlHeight = 50;
+    
 public:
-    SettingsContainer(SvkPluginState* pluginStateIn)
-    : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop), pluginState(pluginStateIn)
+    
+    SettingsContainer(AudioProcessorValueTreeState& processorTreeIn, SvkParameters* paramsIn, const Array<Identifier>* paramIDsIn)
+    : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
+      svkTree(processorTreeIn),
+      svkParameters(paramsIn),
+      svkParamIDs(paramIDsIn)
     {
         view.reset(new Viewport("SettingsViewport"));
         view->setScrollOnDragEnabled(true);
@@ -40,11 +55,19 @@ public:
 
         addChildComponent(panels.add(new Component()));
         //addChildComponent(panels.add(new GeneralDialog(pluginState)));
-        addChildComponent(panels.add(new PluginSettingsDialog(pluginState)));
-        addChildComponent(panels.add(new ViewSettingsPanel(pluginState)));
-        addChildComponent(panels.add(new ControlSettingsPanel(pluginState)));
-        addChildComponent(panels.add(new DeviceSettingsPanel(pluginState)));
-        addChildComponent(panels.add(new DebugSettingsPanel(pluginState)));
+        addChildComponent(panels.add(new PluginSettingsDialog(nullptr)));
+        addChildComponent(panels.add(new ViewSettingsPanel(nullptr)));
+        addChildComponent(panels.add(new ControlSettingsPanel(nullptr)));
+        addChildComponent(panels.add(new DeviceSettingsPanel(nullptr)));
+        addChildComponent(panels.add(new DebugSettingsPanel(svkParameters, svkParamIDs)));
+        
+        for (auto panel : panels)
+        {
+            SvkUiPanel* svkPanel = dynamic_cast<SvkUiPanel*>(panel);
+            
+            if (svkPanel)
+                svkPanel->connectToProcessor(svkTree);
+        }
         
         addTab("X", Colours::red, panels.getUnchecked(0), true);
         addTab("General", Colours::lightgrey, panels.getUnchecked(1), true);
@@ -97,16 +120,7 @@ public:
         if (componentViewed && componentViewed->getNumChildComponents() > 0)
             componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth()*0.9, componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom() * 1.2);
     }
+
     
-private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContainer)
-    
-    SvkPluginState* pluginState;
-    
-    OwnedArray<Component> panels;
-    std::unique_ptr<Viewport> view;
-    
-    Component* componentViewed = nullptr;
-    
-    int defaultControlHeight = 50;
 };

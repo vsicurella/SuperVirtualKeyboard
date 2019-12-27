@@ -10,9 +10,10 @@
 
 #pragma once
 
+#include "../../SvkUiPanel.h"
 #include "../../../PluginState.h"
 
-class ViewSettingsPanel : public Component
+class ViewSettingsPanel : public SvkUiPanel
 {
     
 public:
@@ -20,6 +21,8 @@ public:
     ViewSettingsPanel(SvkPluginState* pluginStateIn);
     
     ~ViewSettingsPanel();
+    
+    void connectToProcessor(AudioProcessorValueTreeState& processorTree) override;
     
     void paint(Graphics& g) override;
     void resized() override;

@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "../SvkUiPanel.h"
 #include "../../PluginState.h"
 #include "../VectorResources.h"
 #include "ReferencedComboBox.h"
@@ -38,7 +39,7 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class PluginControlComponent  : public Component,
+class PluginControlComponent  : public SvkUiPanel,
                                 public TextEditor::Listener,
                                 public ComboBox::Listener,
                                 public Slider::Listener,
@@ -46,11 +47,13 @@ class PluginControlComponent  : public Component,
 {
 public:
     //==============================================================================
-    PluginControlComponent (SvkPluginState* pluginStateIn);
+    PluginControlComponent (SvkPluginState* pluginStateIn, ApplicationCommandManager* appCmdMgrIn);
     ~PluginControlComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+
+    void connectToProcessor(AudioProcessorValueTreeState& processorTree) override;
 
 	String getScaleEntryText();
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
@@ -150,6 +153,10 @@ private:
     std::unique_ptr<PopupMenu> saveMenu;
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
+
+    OwnedArray<AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
+    OwnedArray<AudioProcessorValueTreeState::ComboBoxAttachment> comboBoxAttachments;
+    OwnedArray<AudioProcessorValueTreeState::SliderAttachment> sliderAttachments;
 
     bool inMappingMode = false;
 

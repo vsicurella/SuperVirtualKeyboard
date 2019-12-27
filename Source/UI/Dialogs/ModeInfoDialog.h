@@ -37,7 +37,7 @@
 */
 class ModeInfoDialog  : public Component,
                         public ChangeBroadcaster,
-                        TextEditor::Listener,
+                        public TextEditor::Listener,
                         public Button::Listener,
                         public Slider::Listener
 {
@@ -67,8 +67,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    Mode modeWorking;
     Mode* modeOriginal;
+    Mode modeWorking;
     ValueTree modeNode;
     //[/UserVariables]
 

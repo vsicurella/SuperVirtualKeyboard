@@ -38,12 +38,12 @@ public:
     
     TheArray& getOwnedArray()
     {
-        return dynamic_cast<TheArray&>(this);
+        return dynamic_cast<TheArray&>(*this);
     }
     
     TheHash& getHashMap()
     {
-        return dynamic_cast<TheHash&>(this);
+        return dynamic_cast<TheHash&>(*this);
     }
     
     int getSize()

@@ -20,6 +20,11 @@ DeviceSettingsPanel::~DeviceSettingsPanel()
 {
 }
 
+void DeviceSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+{
+    
+}
+
 void DeviceSettingsPanel::paint(Graphics& g)
 {
     
