@@ -10,8 +10,8 @@
 
 #include "GeneralSettingsPanel.h"
 
-GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+GeneralSettingsPanel::GeneralSettingsPanel(AudioProcessorValueTreeState& processorTree)
+    : SvkUiPanel(processorTree)
 {
 
 }
@@ -20,7 +20,7 @@ GeneralSettingsPanel::~GeneralSettingsPanel()
 {
 }
 
-void GeneralSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void GeneralSettingsPanel::connectToProcessor()
 {
     
 }

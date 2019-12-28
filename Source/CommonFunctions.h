@@ -130,7 +130,7 @@ struct IDasStringHash
     }
 };
 
-typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
+//typedef OwnedHashMap<Identifier, RangedAudioParameter, IDasStringHash> SvkParameters;
 
 template <class T, class U>
 struct Pair

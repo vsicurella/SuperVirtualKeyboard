@@ -24,6 +24,7 @@
 struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener
 {
+    AudioProcessorValueTreeState& svkValueTree;
 	ValueTree pluginStateNode;
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;
@@ -31,7 +32,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
     
-    SvkPluginState(ValueTree svkValueTreeIn, SvkParameters* svkParametersIn, const Array<Identifier>* paramIDsIn);
+    SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn);
 	~SvkPluginState() {}
     
     void recallState(ValueTree nodeIn);
@@ -65,7 +66,6 @@ struct SvkPluginState : public ChangeBroadcaster,
 	//==============================================================================
 	// Parameter Getters
 
-    float getParameterValue(int paramInd);
 	float getParameterValue(Identifier paramId);
 	float getParameterMin(Identifier paramId);
 	float getParameterMax(Identifier paramId);
@@ -171,14 +171,12 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void sendMappingToKeyboard(ValueTree mapNodeIn);
 
 	void updateModeViewed(bool sendChange=true);
-    void updateToPreset(bool sendChange = true);
+    void resetToPreset(bool sendChange = true);
     
-	void updateParameter(Identifier paramId);
-	void updateParameters();
-    void updateFromParameter(int paramInd);
+	void resetParameterToPresetValue(Identifier paramId);
 
 	void commitModeInfo();
-    void commitPresetChanges();
+    void commitParametersToPreset();
 	bool savePresetViewedToFile();
 	bool loadPresetFromFile(bool replaceViewed);
 
@@ -203,9 +201,6 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 	std::unique_ptr<Tuning> tuning;
-
-    SvkParameters* svkParameters;
-    const Array<Identifier>* svkParameterIDs;
     
     SvkPreset* presetViewed;
     Mode* modeViewed; // What is currently on screen

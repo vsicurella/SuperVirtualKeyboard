@@ -10,8 +10,8 @@
 
 #include "DebugSettingsPanel.h"
 
-DebugSettingsPanel::DebugSettingsPanel(SvkParameters* parametersIn, const Array<Identifier>* paramIDsIn)
-    : svkParameters(parametersIn), svkParamIDs(paramIDsIn)
+DebugSettingsPanel::DebugSettingsPanel(AudioProcessorValueTreeState& processorTreeIn, Array<String>* paramIDsIn)
+    : SvkUiPanel(processorTreeIn), paramIDs(paramIDsIn)
 {
     setSize(100, 100);
 }
@@ -20,7 +20,7 @@ DebugSettingsPanel::~DebugSettingsPanel()
 {
 }
 
-void DebugSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void DebugSettingsPanel::connectToProcessor()
 {
     Label* lbl;
     Component* c;
@@ -28,11 +28,11 @@ void DebugSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& proces
     String paramName;
     RangedAudioParameter* param;
     AudioParameterInt* api;
-    
-    for (int i = 0; i < svkParameters->getSize(); i++)
+        
+    for (int i = 0; i < paramIDs->size(); i++)
     {
-        param = svkParameters->getUnchecked(i);
-        paramName = param->paramID;
+        paramName = paramIDs->getUnchecked(i);
+        param = processorTree.getParameter(paramName);
         
         lbl = labels.add(new Label("Lbl" + paramName, param->name));
         lbl->setColour(Label::textColourId, Colours::black);
@@ -62,7 +62,7 @@ void DebugSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& proces
         s->setColour(Slider::textBoxTextColourId, Colours::black);
         s->addListener (this);
         
-        sliderAttachments.add(new AudioProcessorValueTreeState::SliderAttachment(processorTree, paramName, *s));
+        sliderAttachments.add(new SliderAttachment(processorTree, paramName, *s));
         addAndMakeVisible(s);
     }
 }
@@ -103,7 +103,7 @@ void DebugSettingsPanel::resized()
 void DebugSettingsPanel::sliderValueChanged(Slider *slider)
 {
     String paramName = slider->getName().substring(3);
-    RangedAudioParameter* param = svkParameters->grab(Identifier(paramName));
+    RangedAudioParameter* param = processorTree.getParameter(paramName);
     AudioParameterInt* api;
     
     if (paramName == IDs::pianoWHRatio.toString())

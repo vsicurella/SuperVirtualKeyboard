@@ -18,11 +18,11 @@ class ControlSettingsPanel : public SvkUiPanel
     
 public:
     
-    ControlSettingsPanel(SvkPluginState* pluginStateIn);
+    ControlSettingsPanel(AudioProcessorValueTreeState& processorTreeIn);
     
     ~ControlSettingsPanel();
     
-    void connectToProcessor(AudioProcessorValueTreeState& processorTree) override;
+    void connectToProcessor() override;
     
     void paint(Graphics& g) override;
     void resized() override;
@@ -30,6 +30,10 @@ public:
 private:
     
     SvkPluginState* pluginState;
+    
+    OwnedArray<ButtonAttachment> buttonAttachments;
+    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
+    OwnedArray<SliderAttachment> sliderAttachments;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ControlSettingsPanel)

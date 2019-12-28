@@ -66,19 +66,15 @@ public:
     UndoManager* getUndoManager();
     ApplicationCommandManager* getAppCmdMgr();
 	SvkPluginState* getPluginState();
+    Array<String>* getParamIDs();
     
-    SvkParameters* getSvkParameters();
-    Array<Identifier>* getParameterIDs();
-    Identifier getParameterID(int paramIndex) const;
-
 	//==============================================================================
 
 private:
     
     AudioProcessorValueTreeState::ParameterLayout createParameters();
-    
-    SvkParameters svkParameters;
-    Array<Identifier> svkParameterIDs;
+    Array<std::unique_ptr<RangedAudioParameter>> paramsInit;
+    Array<String> paramIDs;
 
 	std::unique_ptr<SvkPluginState> pluginState;
     

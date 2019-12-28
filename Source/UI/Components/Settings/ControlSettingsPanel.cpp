@@ -11,8 +11,8 @@
 #include "ControlSettingsPanel.h"
 
 
-ControlSettingsPanel::ControlSettingsPanel(SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+ControlSettingsPanel::ControlSettingsPanel(AudioProcessorValueTreeState& processorTreeIn)
+    : SvkUiPanel(processorTreeIn)
 {
 
 }
@@ -21,7 +21,7 @@ ControlSettingsPanel::~ControlSettingsPanel()
 {
 }
 
-void ControlSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void ControlSettingsPanel::connectToProcessor()
 {
     
 }

@@ -22,11 +22,16 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 
-#include "../SvkUiPanel.h"
-#include "../../PluginState.h"
+//#include "../SvkUiPanel.h"
+#include "../../PresetManager.h"
 #include "../VectorResources.h"
 #include "ReferencedComboBox.h"
+#include "VirtualKeyboard/KeyboardComponent.h"
 #include "VirtualKeyboard/KeyboardViewport.h"
+
+typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
+typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 //[/Headers]
 
 
@@ -39,7 +44,7 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class PluginControlComponent  : public SvkUiPanel,
+class PluginControlComponent  : public Component,
                                 public TextEditor::Listener,
                                 public ComboBox::Listener,
                                 public Slider::Listener,
@@ -47,13 +52,13 @@ class PluginControlComponent  : public SvkUiPanel,
 {
 public:
     //==============================================================================
-    PluginControlComponent (SvkPluginState* pluginStateIn, ApplicationCommandManager* appCmdMgrIn);
+    PluginControlComponent (AudioProcessorValueTreeState& processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn);
     ~PluginControlComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 
-    void connectToProcessor(AudioProcessorValueTreeState& processorTree) override;
+    void connectToProcessor();
 
 	String getScaleEntryText();
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
@@ -142,9 +147,9 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	SvkPluginState* pluginState;
-    SvkParameters* svkParameters;
+    AudioProcessorValueTreeState& processorTree;
 	ApplicationCommandManager* appCmdMgr;
+    SvkPresetManager* presetManager;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;
@@ -154,9 +159,11 @@ private:
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
 
-    OwnedArray<AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
-    OwnedArray<AudioProcessorValueTreeState::ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<AudioProcessorValueTreeState::SliderAttachment> sliderAttachments;
+    OwnedArray<ButtonAttachment> buttonAttachments;
+    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
+    OwnedArray<SliderAttachment> sliderAttachments;
+
+    TextFilterIntOrSpace txtFilter;
 
     bool inMappingMode = false;
 

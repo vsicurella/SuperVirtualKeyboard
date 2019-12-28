@@ -21,11 +21,10 @@ class DebugSettingsPanel : public SvkUiPanel, public Slider::Listener
     
 public:
     
-    DebugSettingsPanel(SvkParameters* parametersIn, const Array<Identifier>* paramIDsIn);
-    
+    DebugSettingsPanel(AudioProcessorValueTreeState& processorTreeIn, Array<String>* paramIDsIn);
     ~DebugSettingsPanel();
     
-    void connectToProcessor(AudioProcessorValueTreeState& processorTree) override;
+    void connectToProcessor() override;
     
     void paint(Graphics& g) override;
     void resized() override;
@@ -33,16 +32,15 @@ public:
     void sliderValueChanged(Slider *slider) override;
     
 private:
-    
-    SvkParameters* svkParameters;
-    const Array<Identifier>* svkParamIDs;
-    
+
     OwnedArray<Component> controls;
     OwnedArray<Label> labels;
     
-    OwnedArray<AudioProcessorValueTreeState::ButtonAttachment> buttonAttachments;
-    OwnedArray<AudioProcessorValueTreeState::ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<AudioProcessorValueTreeState::SliderAttachment> sliderAttachments;
+    Array<String>* paramIDs;
+    
+    OwnedArray<ButtonAttachment> buttonAttachments;
+    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
+    OwnedArray<SliderAttachment> sliderAttachments;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DebugSettingsPanel)
 };

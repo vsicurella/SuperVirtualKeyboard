@@ -30,10 +30,9 @@ class SettingsContainer : public TabbedComponent,
                             
 {
     AudioProcessorValueTreeState& svkTree;
-    SvkParameters* svkParameters;
-    const Array<Identifier>* svkParamIDs;
+    SvkPluginState* pluginState;
     
-    OwnedArray<Component> panels;
+    OwnedArray<SvkUiPanel> panels;
     std::unique_ptr<Viewport> view;
 
     Component* componentViewed = nullptr;
@@ -42,39 +41,34 @@ class SettingsContainer : public TabbedComponent,
     
 public:
     
-    SettingsContainer(AudioProcessorValueTreeState& processorTreeIn, SvkParameters* paramsIn, const Array<Identifier>* paramIDsIn)
+    SettingsContainer(AudioProcessorValueTreeState& processorTreeIn, SvkPluginState* pluginStateIn)
     : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
-      svkTree(processorTreeIn),
-      svkParameters(paramsIn),
-      svkParamIDs(paramIDsIn)
+      svkTree(processorTreeIn)
     {
         view.reset(new Viewport("SettingsViewport"));
         view->setScrollOnDragEnabled(true);
         view->setScrollBarsShown(true, false);
         addAndMakeVisible(view.get());
 
-        addChildComponent(panels.add(new Component()));
+        addChildComponent(new Component());
         //addChildComponent(panels.add(new GeneralDialog(pluginState)));
-        addChildComponent(panels.add(new PluginSettingsDialog(nullptr)));
-        addChildComponent(panels.add(new ViewSettingsPanel(nullptr)));
-        addChildComponent(panels.add(new ControlSettingsPanel(nullptr)));
-        addChildComponent(panels.add(new DeviceSettingsPanel(nullptr)));
-        addChildComponent(panels.add(new DebugSettingsPanel(svkParameters, svkParamIDs)));
+        addChildComponent(panels.add(new PluginSettingsDialog(svkTree, pluginState)));
+        addChildComponent(panels.add(new ViewSettingsPanel(svkTree)));
+        addChildComponent(panels.add(new ControlSettingsPanel(svkTree)));
+        addChildComponent(panels.add(new DeviceSettingsPanel(svkTree)));
+        addChildComponent(panels.add(new DebugSettingsPanel(svkTree, pluginState)));
         
         for (auto panel : panels)
         {
-            SvkUiPanel* svkPanel = dynamic_cast<SvkUiPanel*>(panel);
-            
-            if (svkPanel)
-                svkPanel->connectToProcessor(svkTree);
+            panel->connectToProcessor();
         }
         
-        addTab("X", Colours::red, panels.getUnchecked(0), true);
-        addTab("General", Colours::lightgrey, panels.getUnchecked(1), true);
-        addTab("View", Colours::lightgrey, panels.getUnchecked(2), true);
-        addTab("Device", Colours::lightgrey, panels.getUnchecked(3), true);
-        addTab("Control", Colours::lightgrey, panels.getUnchecked(4), true);
-        addTab("Debug", Colours::palegreen, panels.getUnchecked(5), true);
+        addTab("X", Colours::red, getChild(0), true);
+        addTab("General", Colours::lightgrey, panels.getUnchecked(0), true);
+        addTab("View", Colours::lightgrey, panels.getUnchecked(1), true);
+        addTab("Device", Colours::lightgrey, panels.getUnchecked(2), true);
+        addTab("Control", Colours::lightgrey, panels.getUnchecked(3), true);
+        addTab("Debug", Colours::palegreen, panels.getUnchecked(4), true);
         
         setCurrentTabIndex(1);
         
