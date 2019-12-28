@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn, ApplicationCommandManager* appCmdMgrIn)
-    : pluginState(pluginStateIn), appCmdMgr(appCmdMgrIn)
+PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn)
+    : processorTree(processorTreeIn), appCmdMgr(appCmdMgrIn), presetManager(presetManagerIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -275,7 +275,7 @@ PluginControlComponent::PluginControlComponent (SvkPluginState* pluginStateIn, A
 
 	noteNumsBtn->setClickingTogglesState(true);
 
-    scaleTextBox->setInputFilter(pluginState->textFilterIntOrSpace.get(), false);
+    scaleTextBox->setInputFilter(&txtFilter, false);
 
     keyboardViewport->setScrollingMode(3);
 
@@ -390,8 +390,8 @@ void PluginControlComponent::resized()
     mode2Box->setBounds (getWidth() - 51 - 150, 40, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 8, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 40, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) - -34 - 31, 8, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) / 2 + -116, 8, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) - -641 - 31, 8, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) / 2 + -90, 8, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 48, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 8, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 40, 31, 24);
@@ -503,10 +503,6 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
 //        svkParameters->grab(IDs::mappingMode)->setValue(svkParameters->grab(IDs::mappingMode)->convertTo0to1(mapModeBox->getSelectedId()));
-        DBG("Real ID: " + String(mapModeBox->getSelectedId()));
-        DBG("Param Val: " + String(svkParameters->grab(IDs::mappingMode)->convertFrom0to1(svkParameters->grab(IDs::mappingMode)->getValue())));
-        DBG("Direct PVal: " + String(svkParameters->grab(IDs::mappingMode)->getValue()));
-        DBG("Expected PVal: " + String(svkParameters->grab(IDs::mappingMode)->convertTo0to1(mapModeBox->getSelectedId())));
         //appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
@@ -638,15 +634,15 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void PluginControlComponent::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void PluginControlComponent::connectToProcessor()
 {
-    comboBoxAttachments.add(new AudioProcessorValueTreeState::ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
-    comboBoxAttachments.add(new AudioProcessorValueTreeState::ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
-    sliderAttachments.add(new AudioProcessorValueTreeState::SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
-    sliderAttachments.add(new AudioProcessorValueTreeState::SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
-    buttonAttachments.add(new AudioProcessorValueTreeState::ButtonAttachment(processorTree, IDs::pianoKeysShowNoteNumbers.toString(), *noteNumsBtn.get()));
-    comboBoxAttachments.add(new AudioProcessorValueTreeState::ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
-    comboBoxAttachments.add(new AudioProcessorValueTreeState::ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
+    sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
+    sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
+    buttonAttachments.add(new ButtonAttachment(processorTree, IDs::pianoKeysShowNoteNumbers.toString(), *noteNumsBtn.get()));
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
 }
 
 void PluginControlComponent::textEditorTextChanged(TextEditor& textEditor)
@@ -674,7 +670,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	if (mode1Box->getBounds().contains(e.getPosition()))
 	{
 		String display = mode1Box->getText();
-		pluginState->getPresetManager()->requestModeMenu(mode1Box->getRootMenu());
+		presetManager->requestModeMenu(mode1Box->getRootMenu());
 		mode1Box->setText(display, dontSendNotification);
 		mode1Box->showPopup();
 	}
@@ -682,7 +678,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	if (mode2Box->getBounds().contains(e.getPosition()))
 	{
 		String display = mode2Box->getText();
-		pluginState->getPresetManager()->requestModeMenu(mode2Box->getRootMenu());
+		presetManager->requestModeMenu(mode2Box->getRootMenu());
 		mode2Box->setText(display, dontSendNotification);
 		mode2Box->showPopup();
 	}
@@ -947,9 +943,9 @@ void PluginControlComponent::setHighlightStyleId(int idIn, NotificationType noti
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PluginControlComponent" componentName=""
-                 parentClasses="public SvkUiPanel, public TextEditor::Listener"
-                 constructorParams="SvkPluginState* pluginStateIn, ApplicationCommandManager* appCmdMgrIn"
-                 variableInitialisers="pluginState(pluginStateIn), appCmdMgr(appCmdMgrIn)"
+                 parentClasses="public Component, public TextEditor::Listener"
+                 constructorParams="AudioProcessorValueTreeState&amp; processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn"
+                 variableInitialisers="processorTree(processorTreeIn), appCmdMgr(appCmdMgrIn), presetManager(presetManagerIn)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1000" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -1038,14 +1034,14 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="400r 40 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 8 15.833% 24"
+            virtualName="" explicitFocusOrder="0" pos="136 8 15.829% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="408 40 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 8 19.236% 24"
+              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 8 19.221% 24"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
   <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"

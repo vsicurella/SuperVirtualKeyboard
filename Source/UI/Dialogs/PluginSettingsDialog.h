@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../../../JuceLibraryCode/JuceHeader.h"
 #include "../../PluginState.h"
+#include "../SvkUiPanel.h"
 //[/Headers]
 
 
@@ -34,7 +35,7 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class PluginSettingsDialog  : public Component,
+class PluginSettingsDialog  : public SvkUiPanel,
                               public ChangeBroadcaster,
                               private Timer,
                               public Button::Listener,
@@ -42,7 +43,7 @@ class PluginSettingsDialog  : public Component,
 {
 public:
     //==============================================================================
-    PluginSettingsDialog (SvkPluginState* pluginStateIn);
+    PluginSettingsDialog (AudioProcessorValueTreeState& apvtsIn, SvkPluginState* pluginStateIn);
     ~PluginSettingsDialog();
 
     //==============================================================================

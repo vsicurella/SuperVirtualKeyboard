@@ -10,8 +10,8 @@
 
 #include "DeviceSettingsPanel.h"
 
-DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+DeviceSettingsPanel::DeviceSettingsPanel(AudioProcessorValueTreeState& processorTreeIn)
+    : SvkUiPanel(processorTreeIn)
 {
 
 }
@@ -20,7 +20,7 @@ DeviceSettingsPanel::~DeviceSettingsPanel()
 {
 }
 
-void DeviceSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void DeviceSettingsPanel::connectToProcessor()
 {
     
 }

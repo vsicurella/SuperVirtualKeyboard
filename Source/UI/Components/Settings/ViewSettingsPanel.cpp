@@ -10,8 +10,8 @@
 
 #include "ViewSettingsPanel.h"
 
-ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+ViewSettingsPanel::ViewSettingsPanel(AudioProcessorValueTreeState& processorTreeIn)
+    : SvkUiPanel(processorTreeIn)
 {
 
 }
@@ -20,7 +20,7 @@ ViewSettingsPanel::~ViewSettingsPanel()
 {
 }
 
-void ViewSettingsPanel::connectToProcessor(AudioProcessorValueTreeState& processorTree)
+void ViewSettingsPanel::connectToProcessor()
 {
     
 }

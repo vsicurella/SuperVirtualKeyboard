@@ -17,9 +17,7 @@ using namespace VirtualKeyboard;
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
       pluginState(processor.getPluginState()),
-      appCmdMgr(processor.getAppCmdMgr()),
-      svkParameters(processor.getSvkParameters()),
-      svkParameterIDs(processor.getParameterIDs())
+      appCmdMgr(processor.getAppCmdMgr())
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
@@ -28,8 +26,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     appCmdMgr->registerAllCommandsForTarget(this);
     appCmdMgr->setFirstCommandTarget(this);
 
-	controlComponent.reset(new PluginControlComponent(pluginState, appCmdMgr));
-    controlComponent->connectToProcessor(processor.svkValueTree);
+	controlComponent.reset(new PluginControlComponent(processor.svkValueTree, appCmdMgr, pluginState->getPresetManager()));
+    controlComponent->connectToProcessor();
 	addAndMakeVisible(controlComponent.get());
 
 	viewport = controlComponent->getViewport();
@@ -53,9 +51,10 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     
     pluginState->addChangeListener(this);
     
-    for (int i = 0; i < svkParameters->getSize(); i++)
+    for (int i = 0; i < processor.getParamIDs()->size(); i++)
     {
-        svkParameters->getUnchecked(i)->addListener(this);
+        String paramName = processor.getParamIDs()->getUnchecked(i);
+        processor.svkValueTree.getParameter(paramName)->addListener(this);
     }
     
     mappingHelper.reset(new MappingHelper(pluginState));
@@ -192,13 +191,13 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-    updateScrollbarData();
-    controlComponent->setVisible(false);
-    
-    settingsContainer.reset(new SettingsContainer(processor.svkValueTree, svkParameters, svkParameterIDs));
-    addAndMakeVisible(settingsContainer.get());
-    settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
-    settingsContainer->addChangeListener(this);
+//    updateScrollbarData();
+//    controlComponent->setVisible(false);
+//
+//    settingsContainer.reset(new SettingsContainer(processor.svkValueTree, pluginState));
+//    addAndMakeVisible(settingsContainer.get());
+//    settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
+//    settingsContainer->addChangeListener(this);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -383,8 +382,8 @@ void SvkPluginEditor::resized()
 
 	viewport->setViewPosition(viewportX * viewport->getMaximumVisibleWidth() * 1.01f, 0);
 
-    if (settingsContainer.get())
-         settingsContainer->setSize(getWidth(), getHeight());
+//    if (settingsContainer.get())
+//         settingsContainer->setSize(getWidth(), getHeight());
     
     if (pluginEditorNode.isValid())
         updateNodeData();
@@ -474,15 +473,15 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	}
         
     // Settings closed
-    if (source == settingsContainer.get())
-    {
-        settingsContainer->removeChangeListener(this);
-        settingsContainer->setVisible(false);
-        settingsContainer.reset();
-        
-        controlComponent->setVisible(true);
-        controlComponent->resized();
-    }
+//    if (source == settingsContainer.get())
+//    {
+//        settingsContainer->removeChangeListener(this);
+//        settingsContainer->setVisible(false);
+//        settingsContainer.reset();
+//
+//        controlComponent->setVisible(true);
+//        controlComponent->resized();
+//    }
 }
 
 void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
@@ -507,7 +506,6 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 
 void SvkPluginEditor::parameterValueChanged (int parameterIndex, float newValue)
 {
-    pluginState->updateFromParameter(parameterIndex);
     DBG("PARAMETER EDITED: " + String(parameterIndex));
 }
 

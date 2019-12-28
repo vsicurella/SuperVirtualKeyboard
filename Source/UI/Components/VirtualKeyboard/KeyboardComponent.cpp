@@ -53,7 +53,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 	if (pianoNodeIn.hasType(IDs::pianoNode))
 	{
 		pianoNode = pianoNodeIn;
-
+        
 		orientationSelected = pianoNode[IDs::keyboardOrientation];
 		keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
