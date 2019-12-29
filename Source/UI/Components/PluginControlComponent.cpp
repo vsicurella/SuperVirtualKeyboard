@@ -487,19 +487,18 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
         //[UserComboBoxCode_keyStyleBox] -- add your combo box handling code here..
-//		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
         //[/UserComboBoxCode_keyStyleBox]
     }
     else if (comboBoxThatHasChanged == highlightStyleBox.get())
     {
         //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
-//		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
         //[/UserComboBoxCode_highlightStyleBox]
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
-        //appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
 
@@ -529,15 +528,11 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == periodShiftSld.get())
     {
         //[UserSliderCode_periodShiftSld] -- add your slider handling code here..
-//        svkParameters->grab(IDs::periodShift)->setValue(periodShiftSld->getValue());
-//        appCmdMgr->invokeDirectly(IDs::CommandIDs::setPeriodShift, true);
         //[/UserSliderCode_periodShiftSld]
     }
     else if (sliderThatWasMoved == midiChannelSld.get())
     {
         //[UserSliderCode_midiChannelSld] -- add your slider handling code here..
-//        svkParameters->grab(IDs::keyboardMidiChannel)->setValue(midiChannelSld->getValue());
-//        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMidiChannelOut, true);
         //[/UserSliderCode_midiChannelSld]
     }
 
@@ -579,8 +574,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == noteNumsBtn.get())
     {
         //[UserButtonCode_noteNumsBtn] -- add your button handler code here..
-        //svkParameters->grab(IDs::pianoKeysShowNoteNumbers)->setValue(noteNumsBtn->getToggleState());
-		//appCmdMgr->invokeDirectly(IDs::CommandIDs::showMidiNoteNumbers, true);
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::showMidiNoteNumbers, true);
         //[/UserButtonCode_noteNumsBtn]
     }
     else if (buttonThatWasClicked == editColorsBtn.get())
@@ -634,9 +628,6 @@ void PluginControlComponent::connectToProcessor()
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
-    buttonAttachments.add(new ButtonAttachment(processorTree, IDs::pianoKeysShowNoteNumbers.toString(), *noteNumsBtn.get()));
-    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
-    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
 }
 
 void PluginControlComponent::textEditorTextChanged(TextEditor& textEditor)
