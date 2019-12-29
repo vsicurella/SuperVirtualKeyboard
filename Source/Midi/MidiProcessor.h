@@ -155,7 +155,6 @@ public:
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
-    
     void updateMPEMode();
     void setPitchBendNoteMax(int bendAmtIn);
     void setPitchBendGlobalMax(int bendAmtIn);
@@ -183,6 +182,8 @@ public:
     
     void sendMsgToOutputs(const MidiMessage& msgToSend);
     void sendBufferToOutputs(const MidiBuffer& bufferToSend);
+    void allNotesOff();
+    void allNotesOff(int channelNumber);
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
