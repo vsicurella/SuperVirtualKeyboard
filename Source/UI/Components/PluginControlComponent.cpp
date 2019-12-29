@@ -565,7 +565,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode1ViewBtn.get())
     {
         //[UserButtonCode_mode1ViewBtn] -- add your button handler code here..
-        //svkParameters->grab(IDs::modeSlotNumViewed)->setValue(mode2ViewBtn->getToggleState());
 		if (mode1ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
         //[/UserButtonCode_mode1ViewBtn]
@@ -573,7 +572,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode2ViewBtn.get())
     {
         //[UserButtonCode_mode2ViewBtn] -- add your button handler code here..
-        //svkParameters->grab(IDs::modeSlotNumViewed)->setValue(mode2ViewBtn->getToggleState());
 		if (mode2ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
         //[/UserButtonCode_mode2ViewBtn]

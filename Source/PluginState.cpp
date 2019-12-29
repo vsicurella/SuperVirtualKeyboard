@@ -383,27 +383,21 @@ void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 	}
 }
 
-void SvkPluginState::setPresetViewed(int presetViewedIn, bool updateParameter)
+void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::presetSlotViewed, presetViewedIn);
-    
     presetViewed = presetManager->getPresetLoaded(presetViewedIn);
 
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
 }
 
-void SvkPluginState::setModeViewed(int modeViewedIn, bool updateParameter)
+void SvkPluginState::setModeViewed(int modeViewedIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::modeSlotNumViewed, modeViewedIn);
-	
     presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedIn, nullptr);
 	updateModeViewed();
 }
 
-void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn, bool updateParameter)
+void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
     presetManager->handleModeSelection(getPresetSlotNumViewed(), modeBoxNum, idIn);
     
@@ -426,11 +420,8 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn, bool updatePa
     presetEdited = true;
 }
 
-void SvkPluginState::setMapMode(int mapModeSelectionIn, bool updateParameter)
+void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::mappingMode, mapModeSelectionIn);
-	
     presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
 
 	if (mapModeSelectionIn == 2) // Auto Mapping
@@ -454,11 +445,8 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn, bool updateParameter)
 	sendChangeMessage();
 }
 
-void SvkPluginState::setMapStyle(int mapStyleIn, bool updateParameter)
+void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::modeMappingStyle, mapStyleIn);
-	
     presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
 
 	if (isAutoMapping())
@@ -467,71 +455,32 @@ void SvkPluginState::setMapStyle(int mapStyleIn, bool updateParameter)
 	}
 }
 
-void SvkPluginState::setMPEOn(bool mpeOnIn, bool updateParameter)
+void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax)
 {
-    if (updateParameter)
-        setParameterValue(IDs::mpeOn, mpeOnIn);
-    
-    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeOn, mpeOnIn, nullptr);
-    
-    midiProcessor->updateMPEMode();
-}
-
-void SvkPluginState::setMPELegacy(bool mpeLegacyIn, bool updateParameter)
-{
-    if (updateParameter)
-        setParameterValue(IDs::mpeLegacyOn, mpeLegacyIn);
-    
-    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeLegacyIn, nullptr);
-    
-    if (mpeLegacyIn)
-        midiProcessor->getMPEInstrument()->enableLegacyMode();
-    else
-        midiProcessor->updateMPEMode(); // bad if called when MPE is actually off
-    
-}
-
-void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax, bool updateParameter)
-{
-    if (updateParameter)
-        setParameterValue(IDs::pitchBendGlobalMax, globalPitchBendMax);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendGlobalMax, globalPitchBendMax, nullptr);
     midiProcessor->setPitchBendGlobalMax(globalPitchBendMax);
 }
 
-void SvkPluginState::setNotePitchBendMax(int notePitchBendMax, bool updateParameter)
+void SvkPluginState::setNotePitchBendMax(int notePitchBendMax)
 {
-    if (updateParameter)
-        setParameterValue(IDs::pitchBendNoteMax, notePitchBendMax);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendNoteMax, notePitchBendMax, nullptr);
     midiProcessor->setPitchBendGlobalMax(notePitchBendMax);
 }
 
-void SvkPluginState::setMaxPolyphony(int maxVoicesIn, bool updateParameter)
+void SvkPluginState::setMaxPolyphony(int maxVoicesIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::maxVoices, maxVoicesIn);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::maxVoices, maxVoicesIn, nullptr);
     midiProcessor->setVoiceLimit(maxVoicesIn);
 }
 
-void SvkPluginState::setRetuneOn(bool toRetuneIn, bool updateParameter)
+void SvkPluginState::setRetuneOn(bool toRetuneIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::retuneOn, toRetuneIn);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::retuneOn, toRetuneIn, nullptr);
     midiProcessor->setRetuneOn(toRetuneIn);
 }
 
-void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn, bool updateParameter)
+void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::retuneAuto, toRetuneAutoIn);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::retuneAuto, toRetuneAutoIn, nullptr);
     autoRetuneOn = toRetuneAutoIn;
     
@@ -539,135 +488,76 @@ void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn, bool updateParameter)
         setTuningToModeET(2);
 }
 
-void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune, bool updateParameter)
+void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune)
 {
-    if (updateParameter)
-        setParameterValue(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune);
-    
     presetViewed->theMidiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune, nullptr);
     midiProcessor->setTuningPreservesMidiNote(preseveMidiNoteRetune);
 }
 
-void SvkPluginState::setPeriodShift(int shiftIn, bool updateParameter)
+void SvkPluginState::setShowNoteNums(bool showNoteNumsIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::periodShift, shiftIn);
-}
-
-void SvkPluginState::setTransposeAmt(int stepsIn, bool updateParameter)
-{
-    if (updateParameter)
-        setParameterValue(IDs::transposeAmt, stepsIn);
-    
-}
-
-void SvkPluginState::setMidiChannel(int midiChannelIn, bool updateParameter)
-{
-    if (updateParameter)
-        setParameterValue(IDs::keyboardMidiChannel, midiChannelIn);
-	
-    // Can be improved, don't think this needs to be set in both objects
-	virtualKeyboard->setMidiChannelOut(midiChannelIn);
-}
-
-void SvkPluginState::setShowNoteNums(bool showNoteNumsIn, bool updateParameter)
-{
-    if (updateParameter)
-        setParameterValue(IDs::pianoKeysShowNoteNumbers, showNoteNumsIn);
-	
     virtualKeyboard->setShowNoteNumbers(showNoteNumsIn);
 }
 
-void SvkPluginState::setShowFilteredNoteNums(bool showFilteredNoteNumsIn, bool updateParameter)
+void SvkPluginState::setShowFilteredNoteNums(bool showFilteredNoteNumsIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::pianoKeysShowFilteredNotes, showFilteredNoteNumsIn);
-	
     virtualKeyboard->setShowFilteredNumbers(showFilteredNoteNumsIn);
 }
 
-void SvkPluginState::setShowNoteLabels(bool showNoteLabelsIn, bool updateParameter)
+void SvkPluginState::setShowNoteLabels(bool showNoteLabelsIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardShowsNoteLabels, showNoteLabelsIn);
-	
     virtualKeyboard->setShowNoteLabels(showNoteLabelsIn);
 }
 
-void SvkPluginState::setScrollingMode(int modeIn, bool updateParameter)
+void SvkPluginState::setScrollingMode(int modeIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardScrollingMode, modeIn);
 	//TODO: add to virtualKeyboard
 }
 
-void SvkPluginState::setScrollingStyle(int styleIn, bool updateParameter)
+void SvkPluginState::setScrollingStyle(int styleIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardScrollingStyle, styleIn);
-	
     virtualKeyboard->setScrollingStyle(styleIn);
 }
 
-void SvkPluginState::setNumKeysInWidth(int numKeysIn, bool updateParameter)
+void SvkPluginState::setNumKeysInWidth(int numKeysIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::numKeysInWidth, numKeysIn);
 	//TODO: add to virtualKeyboard
 }
 
-void SvkPluginState::setNumKeyboardRows(int rowsIn, bool updateParameter)
+void SvkPluginState::setNumKeyboardRows(int rowsIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardNumRows, rowsIn);
-	
     virtualKeyboard->setNumRows(rowsIn);
 }
 
-void SvkPluginState::setKeyboardOrientation(int orientationIn, bool updateParameter)
+void SvkPluginState::setKeyboardOrientation(int orientationIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardOrientation, orientationIn);
-	
     virtualKeyboard->setShowNoteLabels(orientationIn);
 }
 
-void SvkPluginState::setKeyStyle(int keyStyleIn, bool updateParameter)
+void SvkPluginState::setKeyStyle(int keyStyleIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardKeysStyle, keyStyleIn);
-	
     virtualKeyboard->setKeyStyle(keyStyleIn);
 }
 
-void SvkPluginState::setHighlightStyle(int highlightStyleIn, bool updateParameter)
+void SvkPluginState::setHighlightStyle(int highlightStyleIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::keyboardHighlightStyle, highlightStyleIn);
-	
     virtualKeyboard->setHighlightStyle(highlightStyleIn);
 }
 
-void SvkPluginState::setVelocityBehavior(int velocityIdIn, bool updateParameter)
+void SvkPluginState::setVelocityBehavior(int velocityIdIn)
 {
-    if (updateParameter)
-        setParameterValue(IDs::pianoVelocityBehavior, velocityIdIn);
-	
     virtualKeyboard->setVelocityBehavior(velocityIdIn);
 }
 
-void SvkPluginState::setVelocityScalar(int velocityScalar, bool updateParameter)
+void SvkPluginState::setVelocityScalar(int velocityScalar)
 {
 	//TODO
 	//setParameterValue(IDs::keyboardHighlightStyle, highlightStyleIn);
 	//virtualKeyboard->setHighlightStyle(highlightStyleIn);
 }
 
-void SvkPluginState::setVelocityFixed(int velocityFixed, bool updateParameter)
+void SvkPluginState::setVelocityFixed(int velocityFixed)
 {
-    if (updateParameter)
-        setParameterValue(IDs::pianoVelocityValue, velocityFixed);
-	
     virtualKeyboard->setHighlightStyle(velocityFixed);
 }
 
@@ -685,16 +575,6 @@ void SvkPluginState::setModeSlotRoot(int modeSlotIn, int rootNoteIn, bool update
 
 	if (isAutoMapping())
 		doMapping();
-}
-
-void SvkPluginState::setMode1Root(int rootNoteIn, bool updateParameter)
-{
-	setModeSlotRoot(0, rootNoteIn, updateParameter);
-}
-
-void SvkPluginState::setMode2Root(int rootNoteIn, bool updateParameter)
-{
-	setModeSlotRoot(1, rootNoteIn, updateParameter);
 }
 
 //==============================================================================
@@ -806,6 +686,7 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->applyMode(modeViewed);
+    virtualKeyboard->resized();
 
 	//TODO: Change VirtualKeyboard displayed keyboard state
 }

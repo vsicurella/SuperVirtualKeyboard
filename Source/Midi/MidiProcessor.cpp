@@ -686,7 +686,7 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
     }
     else if (paramID == IDs::keyboardMidiChannel.toString())
     {
-        allNotesOff(midiChannelOut);
+        //allNotesOff(midiChannelOut);
         midiChannelOut = newValue;
     }
     else if (paramID == IDs::mpeOn.toString())
