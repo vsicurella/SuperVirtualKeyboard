@@ -37,7 +37,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private ChangeListener,
                         private ScrollBar::Listener,
-                        private AudioProcessorParameter::Listener,
+                        private AudioProcessorValueTreeState::Listener,
 						private Timer
 {
 public:
@@ -151,9 +151,7 @@ public:
     
     //==============================================================================
     
-    void parameterValueChanged (int parameterIndex, float newValue) override;
-
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
+    void parameterChanged (const String& paramID, float newValue) override;
 
 	 //==============================================================================
 

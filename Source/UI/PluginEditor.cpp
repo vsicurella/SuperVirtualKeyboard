@@ -51,14 +51,13 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     
     pluginState->addChangeListener(this);
     
-    for (int i = 0; i < processor.getParamIDs()->size(); i++)
+    for (auto child : processor.svkValueTree.state)
     {
-        String paramName = processor.getParamIDs()->getUnchecked(i);
-        processor.svkValueTree.getParameter(paramName)->addListener(this);
+        if (child.hasType("PARAM"))
+            processor.svkValueTree.addParameterListener(child["id"].toString(), this);
     }
-    
+
     mappingHelper.reset(new MappingHelper(pluginState));
-    //pluginState->getMidiProcessor()->getOriginalKeyboardState()->addListener(mappingHelper.get());
     
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
@@ -108,7 +107,7 @@ void SvkPluginEditor::updateNodeData()
 
 void SvkPluginEditor::updateUI()
 {
-    controlComponent->setMappingMode(pluginState->getMappingMode());
+    controlComponent->setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
 	controlComponent->setMode1Root(pluginState->getMode1Root());
@@ -504,14 +503,14 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 	return chooser.getResult();
 }
 
-void SvkPluginEditor::parameterValueChanged (int parameterIndex, float newValue)
+void SvkPluginEditor::parameterChanged (const String& paramID, float newValue)
 {
-    DBG("PARAMETER EDITED: " + String(parameterIndex));
-}
-
-void SvkPluginEditor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
-{
-
+    DBG("PARAMETER EDITED: " + paramID + " = " + String(newValue));
+    
+    if (paramID == IDs::mappingMode.toString())
+    {
+        setMappingMode();
+    }
 }
 
 //==============================================================================

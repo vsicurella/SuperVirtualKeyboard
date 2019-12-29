@@ -22,7 +22,8 @@
 #include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
 
 struct SvkPluginState : public ChangeBroadcaster,
-						public ChangeListener
+						public ChangeListener,
+                        private AudioProcessorValueTreeState::Listener
 {
     AudioProcessorValueTreeState& svkValueTree;
 	ValueTree pluginStateNode;
@@ -184,6 +185,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	bool loadModeFromFile();
     
     //==============================================================================
+    
+    void parameterChanged(const String& paramID, float newValue) override;
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     

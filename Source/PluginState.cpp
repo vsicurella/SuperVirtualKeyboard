@@ -12,7 +12,7 @@
 
 SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn)
     : svkValueTree(svkValueTreeIn)
-{
+{    
     pluginStateNode = ValueTree(IDs::pluginStateNode);
     
     modeMapper.reset(new ModeMapper());
@@ -899,6 +899,11 @@ bool SvkPluginState::loadModeFromFile()
 }
 
 //==============================================================================
+
+void SvkPluginState::parameterChanged(const String& paramID, float newValue)
+{
+    DBG("The parameter " + paramID + " has changed to " + String(newValue));
+}
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {
