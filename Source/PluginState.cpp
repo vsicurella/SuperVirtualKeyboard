@@ -10,8 +10,8 @@
 
 #include "PluginState.h"
 
-SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn)
-    : svkValueTree(svkValueTreeIn)
+SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
+    : svkTree(svkTreeIn)
 {    
     pluginStateNode = ValueTree(IDs::pluginStateNode);
     
@@ -19,9 +19,9 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn)
 
 	pluginSettings.reset(new SvkPluginSettings());
 	pluginSettingsNode = pluginSettings->pluginSettingsNode;
-	pluginStateNode.addChild(svkValueTree.state, -1, nullptr);
+	pluginStateNode.addChild(svkTree.state, -1, nullptr);
     
-    midiProcessor.reset(new SvkMidiProcessor());
+    midiProcessor.reset(new SvkMidiProcessor(svkTree));
     midiSettingsNode = midiProcessor->midiSettingsNode;
     pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
     
@@ -128,7 +128,6 @@ void SvkPluginState::resetToPreset(bool sendChange)
     
     pianoNode = presetViewed->theKeyboardNode;
 	virtualKeyboard->restoreNode(pianoNode);
-	virtualKeyboard->setMidiChannelOut(midiProcessor->getMidiChannelOut());
     virtualKeyboard->applyMode(modeViewed);
 
 	doMapping();
@@ -264,7 +263,7 @@ Tuning* SvkPluginState::getTuning()
 
 float SvkPluginState::getParameterValue(Identifier paramId)
 {
-	RangedAudioParameter* param = svkValueTree.getParameter(paramId);
+	RangedAudioParameter* param = svkTree.getParameter(paramId);
 	
 	if (param)
 		return param->convertFrom0to1(param->getValue());
@@ -274,7 +273,7 @@ float SvkPluginState::getParameterValue(Identifier paramId)
 
 float SvkPluginState::getParameterMin(Identifier paramId)
 {
-    RangedAudioParameter* param = svkValueTree.getParameter(paramId);
+    RangedAudioParameter* param = svkTree.getParameter(paramId);
 
 	if (param)
 		return param->convertFrom0to1(0.0f);
@@ -284,7 +283,7 @@ float SvkPluginState::getParameterMin(Identifier paramId)
 
 float SvkPluginState::getParameterMax(Identifier paramId)
 {
-    RangedAudioParameter* param = svkValueTree.getParameter(paramId);
+    RangedAudioParameter* param = svkTree.getParameter(paramId);
 
 	if (param)
 		return param->convertFrom0to1(1.0f);
@@ -294,7 +293,7 @@ float SvkPluginState::getParameterMax(Identifier paramId)
 
 float SvkPluginState::getParameterDefaultValue(Identifier paramId)
 {
-    RangedAudioParameter* param = svkValueTree.getParameter(paramId);
+    RangedAudioParameter* param = svkTree.getParameter(paramId);
 
 	if (param)
 		return param->convertFrom0to1(param->getDefaultValue());
@@ -376,7 +375,7 @@ bool SvkPluginState::isPresetEdited()
 
 void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 {
-    RangedAudioParameter* param = svkValueTree.getParameter(paramIdIn);
+    RangedAudioParameter* param = svkTree.getParameter(paramIdIn);
 
 	if (param)
 	{
@@ -475,7 +474,7 @@ void SvkPluginState::setMPEOn(bool mpeOnIn, bool updateParameter)
     
     presetViewed->theMidiSettingsNode.setProperty(IDs::mpeOn, mpeOnIn, nullptr);
     
-    midiProcessor->setMPEOn(mpeOnIn);
+    midiProcessor->updateMPEMode();
 }
 
 void SvkPluginState::setMPELegacy(bool mpeLegacyIn, bool updateParameter)
@@ -488,7 +487,7 @@ void SvkPluginState::setMPELegacy(bool mpeLegacyIn, bool updateParameter)
     if (mpeLegacyIn)
         midiProcessor->getMPEInstrument()->enableLegacyMode();
     else
-        midiProcessor->setMPEOn(true); // bad if called when MPE is actually off
+        midiProcessor->updateMPEMode(); // bad if called when MPE is actually off
     
 }
 
@@ -553,8 +552,6 @@ void SvkPluginState::setPeriodShift(int shiftIn, bool updateParameter)
 {
     if (updateParameter)
         setParameterValue(IDs::periodShift, shiftIn);
-	
-    midiProcessor->setPeriodShift(shiftIn);
 }
 
 void SvkPluginState::setTransposeAmt(int stepsIn, bool updateParameter)
@@ -562,7 +559,6 @@ void SvkPluginState::setTransposeAmt(int stepsIn, bool updateParameter)
     if (updateParameter)
         setParameterValue(IDs::transposeAmt, stepsIn);
     
-    midiProcessor->setTransposeAmt(stepsIn);
 }
 
 void SvkPluginState::setMidiChannel(int midiChannelIn, bool updateParameter)
@@ -571,7 +567,6 @@ void SvkPluginState::setMidiChannel(int midiChannelIn, bool updateParameter)
         setParameterValue(IDs::keyboardMidiChannel, midiChannelIn);
 	
     // Can be improved, don't think this needs to be set in both objects
-	midiProcessor->setMidiChannelOut(midiChannelIn);
 	virtualKeyboard->setMidiChannelOut(midiChannelIn);
 }
 

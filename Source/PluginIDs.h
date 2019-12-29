@@ -38,6 +38,12 @@ static Identifier modeSlotsNode("ModeSlots");
 static Identifier modeSlotsNumberNode("ModeSlotNumbers");
 static Identifier modeSlotNumber("SlotNumber");
 static Identifier modeSlotNumViewed("ModeSlotViewed");
+static Identifier mode1SlotNum("Mode1SlotNumber");
+static Identifier mode2SlotNum("Mode2SlotNumber");
+static Identifier mode1RootNote("Mode1RootNote");
+static Identifier mode2RootNote("Mode2RootNote");
+static Identifier mode1RootChannel("Mode1RootChannel");
+static Identifier mode2RootChannel("Mode2RootChannel");
 
 // Midi Settings
 static Identifier midiDeviceSettingsNode("MidiDeviceSettings");
