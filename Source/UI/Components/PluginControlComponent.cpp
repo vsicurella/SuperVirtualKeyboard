@@ -469,7 +469,6 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
         //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
-//        svkParameters->grab(IDs::modeMappingStyle)->setValue(mapStyleBox->getSelectedId());
 //        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
 
         if (inMappingMode && (mapStyleBox->getSelectedId() == 3 || mapModeBox->getSelectedId() == 3))
@@ -488,21 +487,18 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
         //[UserComboBoxCode_keyStyleBox] -- add your combo box handling code here..
-//        svkParameters->grab(IDs::keyboardKeysStyle)->setValue(keyStyleBox->getSelectedId());
 //		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
         //[/UserComboBoxCode_keyStyleBox]
     }
     else if (comboBoxThatHasChanged == highlightStyleBox.get())
     {
         //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
-//        svkParameters->grab(IDs::keyboardHighlightStyle)->setValue(highlightStyleBox->getSelectedId());
 //		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
         //[/UserComboBoxCode_highlightStyleBox]
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
-//        svkParameters->grab(IDs::mappingMode)->setValue(svkParameters->grab(IDs::mappingMode)->convertTo0to1(mapModeBox->getSelectedId()));
         //appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
         //[/UserComboBoxCode_mapModeBox]
     }
