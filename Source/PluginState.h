@@ -25,7 +25,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 						public ChangeListener,
                         private AudioProcessorValueTreeState::Listener
 {
-    AudioProcessorValueTreeState& svkValueTree;
+    AudioProcessorValueTreeState& svkTree;
 	ValueTree pluginStateNode;
 	ValueTree pluginSettingsNode;
 	ValueTree midiSettingsNode;

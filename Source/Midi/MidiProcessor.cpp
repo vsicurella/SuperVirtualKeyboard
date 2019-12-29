@@ -10,7 +10,8 @@
 
 #include "MidiProcessor.h"
 
-SvkMidiProcessor::SvkMidiProcessor()
+SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
+    : svkTree(svkTreeIn)
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
@@ -26,7 +27,7 @@ SvkMidiProcessor::SvkMidiProcessor()
     
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
-    
+        
 	retuner.reset(new TunedNoteInterpreter());
     retuner->setPitchBendMax(48);
     
@@ -34,13 +35,18 @@ SvkMidiProcessor::SvkMidiProcessor()
     channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
     channelAssigner->setIgnorePitchbend(true); // temporary
     
+    svkTree.addParameterListener(IDs::periodShift, this);
+    svkTree.addParameterListener(IDs::periodShiftModeSize, this);
+    svkTree.addParameterListener(IDs::transposeAmt, this);
+    svkTree.addParameterListener(IDs::keyboardMidiChannel, this);
+    svkTree.addParameterListener(IDs::mpeOn, this);
+
     // default sample rate
     reset(41000);
     
-    setRootNote(60);
     mpeZone.setLowerZone(maxNumVoices, pitchBendNoteMax, pitchBendGlobalMax);
     mpeInst->setZoneLayout(mpeZone);
-    setMPEOn(true);
+    updateMPEMode();
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -50,12 +56,6 @@ SvkMidiProcessor::~SvkMidiProcessor()
 
 void SvkMidiProcessor::updateNode()
 {
-    midiSettingsNode.setProperty(IDs::rootMidiNote, rootMidiNote, nullptr);
-    midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
-    midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
-    midiSettingsNode.setProperty(IDs::periodShiftModeSize, useModePeriod, nullptr);
-    midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeOn, mpeOn, nullptr);
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
     midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
     midiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeInst->isLegacyModeEnabled(), nullptr);
@@ -144,11 +144,6 @@ MidiKeyboardState* SvkMidiProcessor::getOriginalKeyboardState()
 MidiKeyboardState* SvkMidiProcessor::getRemappedKeyboardState()
 {
     return remappedKeyboardState.get();
-}
-
-int SvkMidiProcessor::getRootNote() const
-{
-    return rootMidiNote;
 }
 
 int SvkMidiProcessor::getPeriodShift() const
@@ -296,50 +291,15 @@ void SvkMidiProcessor::setMode2(Mode* mode2In)
 	mode2 = mode2In;
 }
 
-void SvkMidiProcessor::setRootNote(int rootNoteIn)
-{	
-    midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-    rootMidiNote = rootNoteIn;
-}
-
-void SvkMidiProcessor::setPeriodShift(int shiftIn)
-{
-    midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
-    periodShift = shiftIn;
-}
-
-void SvkMidiProcessor::periodUsesModeSize(bool useModeSizeIn)
-{
-	useModePeriod = useModeSizeIn;
-}
-
-void SvkMidiProcessor::setMidiChannelOut(int channelOut)
-{
-    if (channelOut < 1)
-        channelOut = 1;
-    
-    channelOut = channelOut % 16;
-    
-    midiSettingsNode.setProperty(IDs::keyboardMidiChannel, channelOut, nullptr);
-    midiChannelOut = channelOut;
-}
-
-void SvkMidiProcessor::setTransposeAmt(int notesToTranspose)
-{
-    transposeAmt = notesToTranspose;
-}
-
 void SvkMidiProcessor::setTuning(Tuning* tuningIn)
 {
 	tuning = tuningIn;
 	retuner->resetTuning(tuning);
 }
 
-void SvkMidiProcessor::setMPEOn(bool turnOnMPE)
+void SvkMidiProcessor::updateMPEMode()
 {
-    mpeOn = turnOnMPE;
-    
-    if (mpeOn)
+    if (isMPEOn())
     {
         mpeInst->setZoneLayout(mpeZone);
         channelAssigner->allNotesOff();
@@ -589,7 +549,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         }
     }
     
-    if (mpeOn)
+    if (isMPEOn())
     {
         MidiBuffer mpeBuffer;
         mpeBuffer = convertToMPE(preBuffer);
@@ -696,6 +656,32 @@ bool SvkMidiProcessor::isMidiPaused()
 }
 
 //==============================================================================
+
+void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
+{
+    if (paramID == IDs::periodShift.toString())
+    {
+        periodShift = newValue;
+    }
+    else if (paramID == IDs::periodShiftModeSize.toString())
+    {
+        periodShiftModeSIze = newValue;
+    }
+    else if (paramID == IDs::transposeAmt.toString())
+    {
+        transposeAmt = newValue;
+    }
+    else if (paramID == IDs::keyboardMidiChannel.toString())
+    {
+        midiChannelOut = newValue;
+    }
+    else if (paramID == IDs::mpeOn.toString())
+    {
+        mpeOn = newValue;
+    }
+    
+    DBG("Midi processor updated");
+}
 
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {

@@ -33,11 +33,10 @@ class SvkMidiProcessor : public MidiMessageCollector
 	Mode* mode1;
 	Mode* mode2;
     
-    int rootMidiNote = 60;
-    int midiChannelOut = 1;
-    int periodShift = 0;
-    int transposeAmt = 0;
-    bool useModePeriod = false;
+    float* midiChannelOut;
+    float* periodShift;
+    float* transposeAmt;
+    bool* useModePeriod;
 
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiOutputFilter;

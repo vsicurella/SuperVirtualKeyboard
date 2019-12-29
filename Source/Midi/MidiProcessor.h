@@ -20,8 +20,11 @@
 #include "../Structures/Mode.h"
 #include "../Structures/Tuning.h"
 
-class SvkMidiProcessor : public MidiMessageCollector
+class SvkMidiProcessor : public MidiMessageCollector,
+                         private AudioProcessorValueTreeState::Listener
 {
+    AudioProcessorValueTreeState& svkTree;
+    
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;
     
@@ -38,11 +41,10 @@ class SvkMidiProcessor : public MidiMessageCollector
 	Mode* mode1;
 	Mode* mode2;
     
-    int rootMidiNote = 60;
-    int midiChannelOut = 1;
     int periodShift = 0;
+    bool periodShiftModeSIze = false;
     int transposeAmt = 0;
-    bool useModePeriod = false;
+    int midiChannelOut = 1;
     
     int maxNumVoices = 15;
     int pitchBendNoteMax = 48;
@@ -64,7 +66,7 @@ class SvkMidiProcessor : public MidiMessageCollector
     int mpePressureTrackingMode = 0;
     int mpeTimbreTrackingMode = 0;
     
-    bool mpeOn = false; 	
+    bool mpeOn = false;
     bool doRetuning = false;
     
     bool midiInputPaused = false;
@@ -79,7 +81,7 @@ class SvkMidiProcessor : public MidiMessageCollector
     
 public:
     
-    SvkMidiProcessor();
+    SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn);
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
@@ -139,12 +141,6 @@ public:
 	void setModeViewed(Mode* modeViewedIn);
 	void setMode1(Mode* mode1In);
 	void setMode2(Mode* mode2In);
-    
-    void setRootNote(int rootNoteIn);
-    void setMidiChannelOut(int channelOut);
-	void setPeriodShift(int shiftIn);
-    void setTransposeAmt(int notesToTranspose);
-	void periodUsesModeSize(bool useMode);
 
     void setInputToFilter(bool doRemap=true);
     void setInputToRemap(bool doRemap=true);
@@ -160,7 +156,7 @@ public:
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
     
-    void setMPEOn(bool turnOnMPE);
+    void updateMPEMode();
     void setPitchBendNoteMax(int bendAmtIn);
     void setPitchBendGlobalMax(int bendAmtIn);
     void setTuningPreservesMidiNote(bool preserveMidiNote);
@@ -190,6 +186,8 @@ public:
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
+    
+    void parameterChanged(const String& paramID, float newValue) override;
     
 	// Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;

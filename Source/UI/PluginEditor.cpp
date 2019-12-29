@@ -115,8 +115,8 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
 	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
 	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
-	controlComponent->setPeriodShift(pluginState->getMidiProcessor()->getPeriodShift());
-	controlComponent->setMidiChannel(pluginState->getMidiProcessor()->getMidiChannelOut());
+	controlComponent->setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
+	controlComponent->setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
 	controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
 	controlComponent->setKeyStyleId(pluginState->getKeyboard()->getKeyPlacementStyle());
 	controlComponent->setHighlightStyleId(pluginState->getKeyboard()->getHighlightStyle());
@@ -213,7 +213,6 @@ void SvkPluginEditor::setMode1()
 void SvkPluginEditor::setMode1(int idIn)
 {
     pluginState->handleModeSelection(0, idIn);
-    updateUI();
 }
 
 void SvkPluginEditor::setMode2()
@@ -224,7 +223,6 @@ void SvkPluginEditor::setMode2()
 void SvkPluginEditor::setMode2(int idIn)
 {
     pluginState->handleModeSelection(1, idIn);
-    updateUI();
 }
 
 void SvkPluginEditor::setMode1Root()
