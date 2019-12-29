@@ -94,49 +94,38 @@ struct SvkPluginState : public ChangeBroadcaster,
 	bool isPresetEdited();
 
     //==============================================================================
-    // Parameter setters
 
 	void setParameterValue(Identifier paramIdIn, float valueIn);
 
-	// Should either add arg "bool updateParm=false" to all of these, or implement updateFromParameter()
-    void setPresetViewed(int presetViewedIn, bool updateParameter=false);
-	void setModeViewed(int modeViewedIn, bool updateParameter=false);
-	void handleModeSelection(int modeBoxNum, int idIn, bool updateParameter=false);
+    void setPresetViewed(int presetViewedIn);
 
-	void setMapMode(int mapModeSelectionIn, bool updateParameter=false);
-	void setMapStyle(int mapStyleIn, bool updateParameter=false);
+	void setMapMode(int mapModeSelectionIn);
+	void setMapStyle(int mapStyleIn);
     
-    void setMPEOn(bool mpeOnIn, bool updateParameter=false);
-    void setMPELegacy(bool mpeLegacyIn, bool updateParameter=false);
-    void setGlobalPitchBendMax(int globalPitchBendMax, bool updateParameter=false);
-    void setNotePitchBendMax(int notePitchBendMax, bool updateParameter=false);
-    void setMaxPolyphony(int maxVoicesIn, bool updateParameter=false);
+    void setGlobalPitchBendMax(int globalPitchBendMax);
+    void setNotePitchBendMax(int notePitchBendMax);
+    void setMaxPolyphony(int maxVoicesIn);
     
-    void setRetuneOn(bool toRetuneIn, bool updateParameter=false);
-    void setRetuneAuto(bool toRetuneAutoIn, bool updateParameter=false);
-    void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune, bool updateParameter=false);
+    void setRetuneOn(bool toRetuneIn);
+    void setRetuneAuto(bool toRetuneAutoIn);
+    void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune);
 
-	void setPeriodShift(int shiftIn, bool updateParameter=false);
-    void setTransposeAmt(int stepsIn, bool updateParameter=false);
-	void setMidiChannel(int midiChannelIn, bool updateParameter=false);
-	void setShowNoteNums(bool showNoteNumsIn, bool updateParameter=false);
-	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn, bool updateParameter=false);
-	void setShowNoteLabels(bool showNoteLabelsIn, bool updateParameter=false);
-	void setScrollingMode(int modeIn, bool updateParameter=false);
-	void setScrollingStyle(int styleIn, bool updateParameter=false);
-	void setNumKeysInWidth(int numKeysIn, bool updateParameter=false);
-	void setNumKeyboardRows(int rowsIn, bool updateParameter=false);
-	void setKeyboardOrientation(int orientationIn, bool updateParameter=false);
-	void setKeyStyle(int keyStyleIn, bool updateParameter=false);
-	void setHighlightStyle(int highlightStyleIn, bool updateParameter=false);
+	void setShowNoteNums(bool showNoteNumsIn);
+	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);
+	void setShowNoteLabels(bool showNoteLabelsIn);
+	void setScrollingMode(int modeIn);
+	void setScrollingStyle(int styleIn);
+	void setNumKeysInWidth(int numKeysIn);
+	void setNumKeyboardRows(int rowsIn);
+	void setKeyboardOrientation(int orientationIn);
+	void setKeyStyle(int keyStyleIn);
+	void setHighlightStyle(int highlightStyleIn);
 
-	void setVelocityBehavior(int velocityIdIn, bool updateParameter=false);
-	void setVelocityScalar(int velocityScalar, bool updateParameter=false);
-	void setVelocityFixed(int velocityFixed, bool updateParameter=false);
+	void setVelocityBehavior(int velocityIdIn);
+	void setVelocityScalar(int velocityScalar);
+	void setVelocityFixed(int velocityFixed);
 
 	void setModeSlotRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
-	void setMode1Root(int rootNoteIn, bool updateParameter=false);
-    void setMode2Root(int rootNoteIn, bool updateParameter=false);
     
 	// Move these to VirtualKeyboard?
 /*	void setKeyWidthMod(int keyNumIn, float widthMod);
@@ -146,6 +135,9 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	//==============================================================================
 	// User Functionality
+    
+    void setModeViewed(int modeViewedIn);
+    void handleModeSelection(int modeBoxNum, int idIn);
 
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);

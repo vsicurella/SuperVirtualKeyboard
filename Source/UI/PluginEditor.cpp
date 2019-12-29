@@ -109,17 +109,17 @@ void SvkPluginEditor::updateUI()
 {
     controlComponent->setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
-	controlComponent->setMappingStyleId(pluginState->getMappingStyle());
-	controlComponent->setMode1Root(pluginState->getMode1Root());
-	controlComponent->setMode2Root(pluginState->getMode2Root());
+	controlComponent->setMappingStyleId(pluginState->getParameterValue(IDs::modeMappingStyle));
+	controlComponent->setMode1Root(pluginState->getParameterValue(IDs::mode1RootNote));
+	controlComponent->setMode2Root(pluginState->getParameterValue(IDs::mode2RootNote));
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
 	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
 	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
 	controlComponent->setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
 	controlComponent->setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
 	controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
-	controlComponent->setKeyStyleId(pluginState->getKeyboard()->getKeyPlacementStyle());
-	controlComponent->setHighlightStyleId(pluginState->getKeyboard()->getHighlightStyle());
+	controlComponent->setKeyStyleId(pluginState->getParameterValue(IDs::keyboardKeysStyle));
+	controlComponent->setHighlightStyleId(pluginState->getParameterValue(IDs::keyboardHighlightStyle));
 	controlComponent->setViewPosition(viewportX);
 
 	DBG("Children Updated");
