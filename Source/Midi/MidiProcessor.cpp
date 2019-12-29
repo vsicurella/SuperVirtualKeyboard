@@ -498,6 +498,8 @@ void SvkMidiProcessor::mapNoteForOutputFilter(int noteIn, int noteOut, bool upda
 
 void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 {
+    // TODO: handle note offs if period/transpose is changed before note offs
+    
     // Process external input
     auto inputEvents = MidiBuffer::Iterator(midiMessages);
     MidiMessage msg;
@@ -512,7 +514,6 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
             midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
             msg.setNoteNumber(midiNote);
         }
-        
         
         // check for out of range notes?
         originalKeyboardState->processNextMidiEvent(msg);
@@ -641,6 +642,18 @@ void SvkMidiProcessor::sendBufferToOutputs(const MidiBuffer& bufferToSend)
     }
 }
 
+void SvkMidiProcessor::allNotesOff()
+{
+    for (int i = 1; i <= 16; i++)
+    {
+        addMessageToQueue(MidiMessage::allNotesOff(i));
+    }
+}
+
+void SvkMidiProcessor::allNotesOff(int channelNumber)
+{
+    addMessageToQueue(MidiMessage::allNotesOff(channelNumber));
+}
 
 //==============================================================================
 
@@ -673,6 +686,7 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
     }
     else if (paramID == IDs::keyboardMidiChannel.toString())
     {
+        allNotesOff(midiChannelOut);
         midiChannelOut = newValue;
     }
     else if (paramID == IDs::mpeOn.toString())
