@@ -232,7 +232,7 @@ void SvkPluginEditor::setMode1Root()
 
 void SvkPluginEditor::setMode1Root(int rootIn)
 {
-	pluginState->setMode1Root(rootIn);
+    pluginState->setParameterValue(IDs::mode1RootNote, rootIn);
 }
 
 void SvkPluginEditor::setMode2Root()
@@ -242,7 +242,7 @@ void SvkPluginEditor::setMode2Root()
 
 void SvkPluginEditor::setMode2Root(int rootIn)
 {
-	pluginState->setMode2Root(rootIn);
+    pluginState->setParameterValue(IDs::mode2RootNote, rootIn);
 }
 
 void SvkPluginEditor::setModeView()
@@ -312,7 +312,7 @@ void SvkPluginEditor::setPeriodShift()
 
 void SvkPluginEditor::setPeriodShift(int periodsIn)
 {
-	pluginState->setPeriodShift(periodsIn);
+    pluginState->setParameterValue(IDs::periodShift, periodsIn);
 }
 
 void SvkPluginEditor::setMidiChannel()
@@ -322,7 +322,7 @@ void SvkPluginEditor::setMidiChannel()
 
 void SvkPluginEditor::setMidiChannel(int midiChannelIn)
 {
-	pluginState->setMidiChannel(midiChannelIn);
+    pluginState->setParameterValue(IDs::keyboardMidiChannel, midiChannelIn);
 }
 
 void SvkPluginEditor::beginColorEditing()
@@ -334,7 +334,7 @@ void SvkPluginEditor::beginColorEditing()
 
 void SvkPluginEditor::setNoteNumsVisible()
 {
-	setNoteNumsVisible(pluginState->getParameterValue(IDs::pianoKeysShowNoteNumbers));
+	setNoteNumsVisible(controlComponent->getNoteNumsView());
 }
 
 void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
@@ -545,7 +545,6 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::showMidiNoteNumbers,
 		IDs::CommandIDs::setKeyStyle,
 		IDs::CommandIDs::beginColorEditing,
-        IDs::CommandIDs::showModeInfo,
 	};
 
 	c.addArray(commands);

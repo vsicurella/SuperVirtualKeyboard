@@ -38,8 +38,6 @@ struct SvkPluginState : public ChangeBroadcaster,
     
     void recallState(ValueTree nodeIn);
     
-    bool parametersInitialized = false;
-
 	//==============================================================================
     // Object getters
     

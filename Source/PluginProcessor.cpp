@@ -219,7 +219,6 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
 {
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeSlotNumViewed.toString(), "Mode Slot Viewed", 0, 1, 0));
     
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
