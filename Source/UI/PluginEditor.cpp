@@ -92,7 +92,9 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		pluginState->pluginEditorNode = pluginEditorNode;
 		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
-		viewportX = 0.51f;
+		
+        viewportX = 0.51f;
+        updateNodeData();
 	}
     
     updateUI();
@@ -102,7 +104,7 @@ void SvkPluginEditor::updateNodeData()
 {
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-	pluginEditorNode.setProperty(IDs::viewportPosition, viewport->getViewPositionX(), nullptr);
+    updateScrollbarData();
 }
 
 void SvkPluginEditor::updateUI()
@@ -117,7 +119,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
 	controlComponent->setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
 	controlComponent->setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
-	controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
+    controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
 	controlComponent->setKeyStyleId(pluginState->getParameterValue(IDs::keyboardKeysStyle));
 	controlComponent->setHighlightStyleId(pluginState->getParameterValue(IDs::keyboardHighlightStyle));
 	controlComponent->setViewPosition(viewportX);
