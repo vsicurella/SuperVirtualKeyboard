@@ -110,8 +110,8 @@ void SvkPluginEditor::updateUI()
     controlComponent->setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
 	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 	controlComponent->setMappingStyleId(pluginState->getParameterValue(IDs::modeMappingStyle));
-	controlComponent->setMode1Root(pluginState->getParameterValue(IDs::mode1RootNote));
-	controlComponent->setMode2Root(pluginState->getParameterValue(IDs::mode2RootNote));
+	controlComponent->setMode1Root(pluginState->getMode1()->getRootNote());
+	controlComponent->setMode2Root(pluginState->getMode2()->getRootNote());
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
 	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
 	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
@@ -232,7 +232,7 @@ void SvkPluginEditor::setMode1Root()
 
 void SvkPluginEditor::setMode1Root(int rootIn)
 {
-    pluginState->setParameterValue(IDs::mode1RootNote, rootIn);
+    pluginState->setModeSlotRoot(0, rootIn);
 }
 
 void SvkPluginEditor::setMode2Root()
@@ -242,7 +242,7 @@ void SvkPluginEditor::setMode2Root()
 
 void SvkPluginEditor::setMode2Root(int rootIn)
 {
-    pluginState->setParameterValue(IDs::mode2RootNote, rootIn);
+    pluginState->setModeSlotRoot(1, rootIn);
 }
 
 void SvkPluginEditor::setModeView()

@@ -14,12 +14,13 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     : svkTree(svkTreeIn)
 {    
     pluginStateNode = ValueTree(IDs::pluginStateNode);
+    svkTree.state.addChild(pluginStateNode, -1, nullptr);
     
     modeMapper.reset(new ModeMapper());
 
 	pluginSettings.reset(new SvkPluginSettings());
 	pluginSettingsNode = pluginSettings->pluginSettingsNode;
-	pluginStateNode.addChild(svkTree.state, -1, nullptr);
+	pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
     
     midiProcessor.reset(new SvkMidiProcessor(svkTree));
     midiSettingsNode = midiProcessor->midiSettingsNode;
@@ -132,8 +133,6 @@ void SvkPluginState::resetToPreset(bool sendChange)
 
 	doMapping();
     
-	//updateParameters(); // may want to make a different function or pass in a list of params
-
 	if (sendChange)
 		sendChangeMessage();
 }
@@ -313,7 +312,7 @@ int SvkPluginState::getNumModesInPresetViewed()
 
 int SvkPluginState::getModeViewedNum()
 {
-	return getParameterValue(IDs::modeSlotNumViewed);
+	return modeViewedNum;
 }
 
 int SvkPluginState::getMappingMode()
@@ -393,7 +392,8 @@ void SvkPluginState::setPresetViewed(int presetViewedIn)
 
 void SvkPluginState::setModeViewed(int modeViewedIn)
 {
-    presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedIn, nullptr);
+    modeViewedNum = modeViewedIn;
+    presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
 	updateModeViewed();
 }
 
@@ -680,8 +680,6 @@ void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
 
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
-	setParameterValue(IDs::modeSlotNumViewed, getModeViewedNum());
-
 	modeViewed = presetManager->getModeInSlots(getPresetSlotNumViewed(), getModeViewedNum());
 
 	midiProcessor->setModeViewed(modeViewed);
@@ -721,7 +719,7 @@ void SvkPluginState::commitParametersToPreset()
 	{
 		midiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiMapNode), nullptr);
 	}
-
+    
     presetManager->commitPreset(getPresetSlotNumViewed(), presetViewed->parentNode);
 
 	pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);

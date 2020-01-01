@@ -197,8 +197,10 @@ private:
     
     SvkPreset* presetViewed;
     Mode* modeViewed; // What is currently on screen
+    int modeViewedNum = 1;
     
 	bool presetEdited = false;
+    
 
 	// Mapping parameters
     
