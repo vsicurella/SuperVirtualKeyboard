@@ -167,8 +167,8 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
 	
 	MemoryOutputStream memOut(destData, true);
     pluginState->commitParametersToPreset();
-	pluginState->pluginStateNode.writeToStream(memOut);
-    DBG("Saving Plugin State node to internal memory:" + pluginState->pluginStateNode.toXmlString());
+	svkValueTree.state.writeToStream(memOut);
+    DBG("Saving Plugin State node to internal memory:" + svkValueTree.state.toXmlString());
 }
 
 void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -181,8 +181,8 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
     //presetRecall = ValueTree(); // uncomment this line to test new instantiation
-
-	//pluginState->recallState(presetRecall);
+    svkValueTree.replaceState(presetRecall);
+	pluginState->recallState(svkValueTree.state.getChildWithName(IDs::pluginStateNode));
 }
 
 //==============================================================================
@@ -217,7 +217,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 //==============================================================================
 
 AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
-{
+{    
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
     
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));

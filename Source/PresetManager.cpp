@@ -26,7 +26,7 @@ SvkPreset* SvkPresetManager::getPresetLoaded(int slotNumIn)
 {
 	slotNumIn = slotNumIn % presetsLoaded.size();
 
-	SvkPreset* preset = presetsLoaded[0];
+	SvkPreset* preset = presetsLoaded.getUnchecked(slotNumIn);
 
 	if (!preset)
 	{

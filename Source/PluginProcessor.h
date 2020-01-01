@@ -73,7 +73,7 @@ public:
 private:
     
     AudioProcessorValueTreeState::ParameterLayout createParameters();
-    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
+    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit = {};
     Array<String> paramIDs;
 
 	std::unique_ptr<SvkPluginState> pluginState;
