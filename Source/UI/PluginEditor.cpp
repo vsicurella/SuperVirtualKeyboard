@@ -51,7 +51,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	pluginState->addChangeListener(this);
 
-	for (auto paramID : *processor.getParamIDs())
+	for (auto paramID : processor.getParamIDs())
 	{
 		processor.svkValueTree.addParameterListener(paramID, this);
 	}

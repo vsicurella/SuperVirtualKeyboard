@@ -69,7 +69,7 @@ public:
     UndoManager* getUndoManager();
     ApplicationCommandManager* getAppCmdMgr();
 	SvkPluginState* getPluginState();
-    Array<String>* getParamIDs();
+    const Array<String>& getParamIDs() const;
     
 	//==============================================================================
 

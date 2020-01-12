@@ -72,10 +72,6 @@ void SvkPluginState::recallState(ValueTree nodeIn)
         
 		resetToPreset();
 	}
-    else
-    {
-        svkTree.state.addChild(pluginStateNode, -1, nullptr);
-    }
     
     // Default settings
 	
@@ -105,9 +101,6 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
         setMapOrderOffset2(0);
-    
-    DBG("FINAL RECALL:");
-    DBG(svkTree.state.toXmlString());
 }
 
 void SvkPluginState::resetToPreset(bool sendChange)
