@@ -16,57 +16,61 @@ using namespace VirtualKeyboard;
 //==============================================================================
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	: AudioProcessorEditor(&p), processor(p),
-      pluginState(processor.getPluginState()),
-      appCmdMgr(processor.getAppCmdMgr())
+	pluginState(processor.getPluginState()),
+	appCmdMgr(processor.getAppCmdMgr())
 {
 	setName("Super Virtual Keyboard");
 	setResizable(true, true);
 	setBroughtToFrontOnMouseClick(true);
-    
-    appCmdMgr->registerAllCommandsForTarget(this);
-    appCmdMgr->setFirstCommandTarget(this);
+
+	appCmdMgr->registerAllCommandsForTarget(this);
+	appCmdMgr->setFirstCommandTarget(this);
 
 	controlComponent.reset(new PluginControlComponent(processor.svkValueTree, appCmdMgr, pluginState->getPresetManager()));
-    controlComponent->connectToProcessor();
+	controlComponent->connectToProcessor();
 	addAndMakeVisible(controlComponent.get());
 
 	viewport = controlComponent->getViewport();
 	Rectangle<int> viewportBounds = viewport->getBounds();
-    
+
 	virtualKeyboard = pluginState->getKeyboard();
 	virtualKeyboard->setViewport(controlComponent->getViewport());
-    
+
 	viewport->setBounds(viewportBounds);
 	viewportScroll = &viewport->getHorizontalScrollBar();
 	viewportScroll->addListener(this);
-    
-    colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
-    colorChooserWindow->setSize(450, 450);
+
+	colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
+	colorChooserWindow->setSize(450, 450);
 	colorChooserWindow->addChangeListener(this);
 	colorChooserWindow->addToDesktop();
 
 	colorSelector.reset(new ColourSelector());
 	colorSelector->setSize(450, 450);
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
-    
-    pluginState->addChangeListener(this);
-    
-    for (auto paramID : *processor.getParamIDs())
-    {
+
+	pluginState->addChangeListener(this);
+
+	for (auto paramID : *processor.getParamIDs())
+	{
 		processor.svkValueTree.addParameterListener(paramID, this);
-    }
+	}
 	DBG("PluginEditor listening to parameters");
 
-    mappingHelper.reset(new MappingHelper(pluginState));
-    
+	mappingHelper.reset(new MappingHelper(pluginState));
+
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
-    
-    setSize(1000, 210);
+
+	setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
-    
+
 	controlComponent->setBounds(getBounds());
-    initNodeData();
+	initNodeData();
+
+#if (!JUCE_ANDROID && !JUCE_IOS)
+	startTimerHz(30);
+#endif
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -392,7 +396,7 @@ void SvkPluginEditor::resized()
 
 void SvkPluginEditor::timerCallback()
 {
-	//virtualKeyboard->repaint();
+	virtualKeyboard->repaint();
 }
 
 //==============================================================================
@@ -511,6 +515,10 @@ void SvkPluginEditor::parameterChanged (const String& paramID, float newValue)
     {
         setMappingMode();
     }
+	else if (paramID == IDs::modeMappingStyle.toString())
+	{
+		setMappingStyle();
+	}
 	else if (paramID == IDs::pianoWHRatio.toString())
 	{
 		virtualKeyboard->setKeySizeRatio(newValue);

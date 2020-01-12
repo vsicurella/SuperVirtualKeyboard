@@ -196,6 +196,8 @@ void Keyboard::applyMode(Mode* modeIn)
 			key.toFront(false);
         }
     }
+
+	hasDirtyKeys = true;
 	resized();
 }
 
@@ -214,13 +216,13 @@ void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
 
 void Keyboard::displayKeyboardState(MidiKeyboardState* keyboardStateIn)
 {
-    //if (externalKeyboardToDisplay != nullptr)
-    //    externalKeyboardToDisplay->removeListener(this);
+    if (externalKeyboardToDisplay != nullptr)
+        externalKeyboardToDisplay->removeListener(this);
     
-    //externalKeyboardToDisplay = keyboardStateIn;
+    externalKeyboardToDisplay = keyboardStateIn;
     
-   // if (externalKeyboardToDisplay != nullptr)
-    //    externalKeyboardToDisplay->addListener(this);
+    if (externalKeyboardToDisplay != nullptr)
+        externalKeyboardToDisplay->addListener(this);
 }
 
 //===============================================================================================
@@ -777,13 +779,13 @@ void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 	if (doNoteOn)
 	{
 		noteOn(midiChannelOut, keyNumberIn, velocity);
-		key.isPressed = true;
+		key.isClicked = true;
 		keysOn.addIfNotAlreadyThere(keyNumberIn);
 	}
 	else
 	{
 		noteOff(midiChannelOut, keyNumberIn, 0);
-		key.isPressed = false;
+		key.isClicked = false;
 		keysOn.removeAllInstancesOf(keyNumberIn);
 	}
 
@@ -950,32 +952,20 @@ void Keyboard::paint(Graphics& g)
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
-    /*
-    for (int order = 0; order < keysOrder.size(); order++)
-    {
-        Array<int>& orderArray = keysOrder.getReference(order);
-        
-        for (int k = 0; k < orderArray.size(); k++)
-        {
-     */
-    for (int k = 0; k < keys->size(); k++)
-    {
-            Key& key = keys->getReference(k);
-            // check if key is pressed or moused over, or midi input
-                // set appropriate color
+	if (hasDirtyKeys)
+	{
+		for (int k = 0; k < keys->size(); k++)
+		{
+			Key& key = keys->getReference(k);
+			// Probably can reimplement this color part better
 			Colour c = getKeyColor(key.keyNumber);
-           // g.setColour(c);
-            key.color = c;
-        key.setColour(0, c);
-                // check highlight style
+			key.color = c;
+			key.setColour(0, c);
+			key.repaint();
+		}
+	}
 
-        // g.fillRect(key.getBounds());
-
-            // check if note numbers or pitch names shown
-     
-        }
-    //}
-
+	hasDirtyKeys = false;
 }
 
 void Keyboard::resized()
@@ -1083,7 +1073,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
         {
             if (key)
             {
-				if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->isPressed)
+				if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->isClicked)
 				{
 					// note off
 					lastKeyClicked = key->keyNumber;
@@ -1395,7 +1385,18 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 
 void Keyboard::timerCallback()
 {
-    
+	//if (hasDirtyKeys)
+	//{
+	//	for (auto key : *keys.get())
+	//	{
+	//		if (key.isDirty)
+	//		{
+	//			key.repaint();
+	//		}
+	//	}
+	//}
+
+	//hasDirtyKeys = false;
 }
 
 //===============================================================================================
@@ -1407,7 +1408,10 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     if (uiModeSelected == playMode)
     {
         Key& key = keys->getReference(keyTriggered);
-		// TODO : show keys lit up
+		key.exPressed = true;
+		key.exInputColor = Colour(powf((midiChannel - 1.0 / 16), 2) * 128, 0.667f, 0.667f, 1.0f);
+		key.isDirty = true;
+		hasDirtyKeys = true;
     }
 }
 
@@ -1419,6 +1423,8 @@ void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int mid
     if (uiModeSelected == playMode)
     {
         Key& key = keys->getReference(keyTriggered);
-		// TODO : show keys lit up
+		key.exPressed = false;
+		key.isDirty = true;
+		hasDirtyKeys = true;
     }
 }

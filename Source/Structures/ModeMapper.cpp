@@ -10,9 +10,9 @@
 
 #include "ModeMapper.h"
 
-void ModeMapper::setMapType(int mapTypeIn)
+void ModeMapper::setMappingStyle(int mapTypeIn)
 {
-    mapType = mapTypeIn;
+    mappingStyle = mapTypeIn;
 }
 
 void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
@@ -24,17 +24,17 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
     mapByOrderOffset2 = offset2;
 }
 
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapTypeIn, int order1, int order2, int offset1, int offset2,
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, int order1, int order2, int offset1, int offset2,
                         NoteMap prevMap)
 {
     NoteMap mapOut;
     
-    int mappingTypeUsed = mapType;
+    int mappingStyleUsed = mappingStyle;
     
-    if (mapTypeIn >= 0)
-        mappingTypeUsed = mapTypeIn;
+    if (mapStyleIn >= 0)
+        mappingStyleUsed = mapStyleIn;
     
-    switch (mappingTypeUsed)
+    switch (mappingStyleUsed)
     {
         case ModeToScale:
             mapOut = mapToMode1Scale(mode1, mode2);
