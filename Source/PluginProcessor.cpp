@@ -27,7 +27,6 @@ SvkAudioProcessor::SvkAudioProcessor() :
     svkCmdMgr(new ApplicationCommandManager()),
     svkValueTree(*this, svkUndo.get(), IDs::svkParentNode, createParameters())
 {
-    DBG("Parameters are initialized");
 	pluginState.reset(new SvkPluginState(svkValueTree));
 }
 
@@ -166,7 +165,7 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
 	
 	MemoryOutputStream memOut(destData, true);
-    pluginState->commitParametersToPreset();
+    pluginState->commitStateNode();
 	svkValueTree.state.writeToStream(memOut);
     DBG("Saving Plugin State node to internal memory:" + svkValueTree.state.toXmlString());
 }
@@ -180,9 +179,10 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
 	DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
-    presetRecall.getChildWithName(IDs::pluginStateNode) = ValueTree(); // uncomment this line to test new instantiation
-    svkValueTree.replaceState(presetRecall);
-    //svkValueTree.state.copyPropertiesAndChildrenFrom(presetRecall, nullptr);
+    //presetRecall.getChildWithName(IDs::pluginStateNode) = ValueTree(); // uncomment this line to test new instantiation
+    
+	svkValueTree.replaceState(presetRecall);	
+	recordParamIDs();
 	pluginState->recallState(svkValueTree.state.getChildWithName(IDs::pluginStateNode));
 }
 
@@ -217,9 +217,21 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 
+void SvkAudioProcessor::recordParamIDs()
+{
+	for (auto param : getParameters())
+	{
+		paramIDs.add(dynamic_cast<AudioProcessorParameterWithID*>(param)->paramID);
+	}
+	DBG("Parameters are initialized");
+	DBGArray(paramIDs);
+}
+
 AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
 {    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(),"Preset Slot Viewed", 0, 1, 0));
+	std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
+	
+	paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
     
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
@@ -272,10 +284,6 @@ AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameter
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
     
-    for (int i = 0; i < paramsInit.size(); i++)
-    {
-        paramIDs.add(paramsInit.at(i)->paramID);
-    }
-    
+
     return {paramsInit.begin(), paramsInit.end()};
 }

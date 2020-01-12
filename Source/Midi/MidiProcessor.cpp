@@ -15,8 +15,6 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
-
-	midiSettingsNode.addChild(midiMapNode, -1, nullptr);
     
     midiInputFilter.reset(new MidiFilter());
     midiInputRemap.reset(new MidiFilter());
@@ -83,10 +81,7 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 {
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
-        //midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
-        
-        // Root note
-        //rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
+        midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
         
 		// Set Note Maps
 		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
@@ -524,7 +519,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         }
         
         remappedKeyboardState->processNextMidiEvent(msg);
-        msg.setTimeStamp(smpl + ++msgCount);
+        msg.setTimeStamp((double)smpl + ++msgCount);
         addMessageToQueue(msg);
     }
     

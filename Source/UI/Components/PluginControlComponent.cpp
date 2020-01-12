@@ -33,6 +33,16 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+    scaleTextBox.reset (new TextEditor ("Scale Text Box"));
+    addAndMakeVisible (scaleTextBox.get());
+    scaleTextBox->setMultiLine (false);
+    scaleTextBox->setReturnKeyStartsNewLine (false);
+    scaleTextBox->setReadOnly (false);
+    scaleTextBox->setScrollbarsShown (true);
+    scaleTextBox->setCaretVisible (true);
+    scaleTextBox->setPopupMenuEnabled (true);
+    scaleTextBox->setText (String());
+
     mode1Box.reset (new ReferencedComboBox ("Mode1 Box"));
     addAndMakeVisible (mode1Box.get());
     mode1Box->setEditableText (false);
@@ -214,16 +224,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
 
     mapApplyBtn->setBounds (408, 40, 55, 24);
 
-    scaleTextBox.reset (new TextEditor ("Scale Text Box"));
-    addAndMakeVisible (scaleTextBox.get());
-    scaleTextBox->setMultiLine (false);
-    scaleTextBox->setReturnKeyStartsNewLine (false);
-    scaleTextBox->setReadOnly (false);
-    scaleTextBox->setScrollbarsShown (true);
-    scaleTextBox->setCaretVisible (true);
-    scaleTextBox->setPopupMenuEnabled (true);
-    scaleTextBox->setText (String());
-
     keyboardViewport.reset (new KeyboardViewport ("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
@@ -327,6 +327,7 @@ PluginControlComponent::~PluginControlComponent()
     sliderAttachments.clear();
     //[/Destructor_pre]
 
+    scaleTextBox = nullptr;
     mode1Box = nullptr;
     mode2Box = nullptr;
     mode1RootSld = nullptr;
@@ -350,7 +351,6 @@ PluginControlComponent::~PluginControlComponent()
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
-    scaleTextBox = nullptr;
     keyboardViewport = nullptr;
     saveButton = nullptr;
     openButton = nullptr;
@@ -386,12 +386,13 @@ void PluginControlComponent::resized()
     {
     //[/UserPreResize]
 
+    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2), 8, proportionOfWidth (0.1926f), 24);
     mode1Box->setBounds (getWidth() - 201, 8, 150, 24);
     mode2Box->setBounds (getWidth() - 51 - 150, 40, 150, 24);
     mode1RootSld->setBounds (getWidth() - 293, 8, 79, 24);
     mode2RootSld->setBounds (getWidth() - 293, 40, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) - -641 - 31, 8, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2)) + proportionOfWidth (0.1922f) / 2 + -90, 8, 24, 24);
+    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2)) + proportionOfWidth (0.1926f) - -7, 8, 31, 24);
+    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2)) + -32, 8, 24, 24);
     periodShiftSld->setBounds (108, getHeight() - 48, 86, 24);
     mode1ViewBtn->setBounds (getWidth() - 49, 8, 31, 24);
     mode2ViewBtn->setBounds (getWidth() - 49, 40, 31, 24);
@@ -407,8 +408,7 @@ void PluginControlComponent::resized()
     mapStyleLbl->setBounds (76 - (104 / 2), 40, 104, 24);
     highlightStyleBox->setBounds (584, getHeight() - 48, 96, 24);
     mapOrderEditBtn->setBounds (400 - 96, 40, 96, 24);
-    mapModeBox->setBounds (136, 8, proportionOfWidth (0.1583f), 24);
-    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1922f) / 2), 8, proportionOfWidth (0.1922f), 24);
+    mapModeBox->setBounds (136, 8, proportionOfWidth (0.1585f), 24);
     keyboardViewport->setBounds (32, 72, getWidth() - 48, getHeight() - 132);
     //[UserResized] Add your own custom resize handling here..
     }
@@ -416,9 +416,9 @@ void PluginControlComponent::resized()
     {
 		mapModeBox->setBounds(136, 8, proportionOfWidth(0.1638f), 24);
 
-        scaleTextBox->setBounds ((getWidth() / 2) + -25 - (168 / 2), 8, 168, 24);
-        scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 8, 31, 24);
-        modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 8, 24, 24);
+		scaleTextBox->setBounds((getWidth() / 2) + -26 - (proportionOfWidth(0.1926f) / 2), 8, proportionOfWidth(0.1926f), 24);
+		//scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 8, 31, 24);
+        //modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 8, 24, 24);
 
         mode2RootLbl->setBounds (getWidth() - 333, 8, 32, 24);
         mode2RootSld->setBounds (getWidth() - 301, 8, 79, 24);
@@ -934,6 +934,10 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="1000" initialHeight="250">
   <BACKGROUND backgroundColour="ff323e44"/>
+  <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
+              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 8 19.258% 24"
+              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
+              scrollbars="1" caret="1" popupmenu="1"/>
   <COMBOBOX name="Mode1 Box" id="197cbd0054b3ea6d" memberName="mode1Box"
             virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="201R 8 150 24"
             editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
@@ -951,10 +955,10 @@ BEGIN_JUCER_METADATA
           textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="-641Rr 8 31 24" posRelativeX="39f9f4bff4e94802"
+              virtualName="" explicitFocusOrder="0" pos="-7R 8 31 24" posRelativeX="39f9f4bff4e94802"
               buttonText="OK" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="-90C 8 24 24" posRelativeX="39f9f4bff4e94802"
+              virtualName="" explicitFocusOrder="0" pos="-32 8 24 24" posRelativeX="39f9f4bff4e94802"
               buttonText="i" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
           virtualName="" explicitFocusOrder="0" pos="108 48R 86 24" min="-10.0"
@@ -1019,16 +1023,12 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="400r 40 96 24" buttonText="Edit Mapping"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 8 15.829% 24"
+            virtualName="" explicitFocusOrder="0" pos="136 8 15.855% 24"
             editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
             textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
   <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
               virtualName="" explicitFocusOrder="0" pos="408 40 55 24" buttonText="Apply"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 8 19.221% 24"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
   <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
                     virtualName="" explicitFocusOrder="0" pos="32 72 48M 132M" class="KeyboardViewport"
                     params="&quot;Keyboard Viewport&quot;"/>
