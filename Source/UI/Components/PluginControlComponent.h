@@ -170,6 +170,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<TextEditor> scaleTextBox;
     std::unique_ptr<ReferencedComboBox> mode1Box;
     std::unique_ptr<ReferencedComboBox> mode2Box;
     std::unique_ptr<Slider> mode1RootSld;
@@ -193,7 +194,6 @@ private:
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
-    std::unique_ptr<TextEditor> scaleTextBox;
     std::unique_ptr<KeyboardViewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;
     std::unique_ptr<ImageButton> openButton;

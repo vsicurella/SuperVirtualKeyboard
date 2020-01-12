@@ -167,7 +167,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void resetParameterToPresetValue(Identifier paramId);
 
 	void commitModeInfo();
-    void commitParametersToPreset();
+    void commitStateNode();
 	bool savePresetViewedToFile();
 	bool loadPresetFromFile(bool replaceViewed);
 

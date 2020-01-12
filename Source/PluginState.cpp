@@ -19,11 +19,9 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 
 	pluginSettings.reset(new SvkPluginSettings());
 	pluginSettingsNode = pluginSettings->pluginSettingsNode;
-	pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
     
     midiProcessor.reset(new SvkMidiProcessor(svkTree));
     midiSettingsNode = midiProcessor->midiSettingsNode;
-    pluginStateNode.addChild(midiSettingsNode, -1, nullptr);
     
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	modeLibraryNode = presetManager->modeLibraryNode;
@@ -45,6 +43,7 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 
 void SvkPluginState::recallState(ValueTree nodeIn)
 {
+	DBG("PluginState recalling " + nodeIn.getType().toString());
 	if (nodeIn.isValid() && nodeIn.hasType(IDs::pluginStateNode))
 	{
         pluginStateNode = nodeIn;
@@ -129,6 +128,8 @@ void SvkPluginState::resetToPreset(bool sendChange)
 	updateModeViewed();
 
 	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
+	midiSettingsNode = midiProcessor->midiSettingsNode;
+
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
     
@@ -681,7 +682,8 @@ void SvkPluginState::sendMappingToKeyboard()
 
 void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
 {
-	midiProcessor->setMidiMaps(mapNodeIn);
+	// not sure why this was here, but I don't think it's needed
+	//midiProcessor->setMidiMaps(mapNodeIn); 
 	sendMappingToKeyboard();
 }
 
@@ -711,8 +713,11 @@ void SvkPluginState::commitModeInfo()
 	doMapping();
 }
 
-void SvkPluginState::commitParametersToPreset()
+void SvkPluginState::commitStateNode()
 {
+	pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
+	pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
+
     presetViewed->theKeyboardNode.copyPropertiesAndChildrenFrom(pianoNode, nullptr);
 
 	presetViewed->parentNode.removeChild(presetViewed->parentNode.getChildWithName(IDs::modeCustomNode), nullptr);
@@ -720,30 +725,30 @@ void SvkPluginState::commitParametersToPreset()
 	customModeNode.addChild(presetManager->getModeCustom()->modeNode.createCopy(), -1, nullptr);
 	presetViewed->parentNode.addChild(customModeNode, -1, nullptr);
 
-	if (getParameterValue(IDs::mappingMode) < 3)
+	midiProcessor->updateNode();
+	if (getParameterValue(IDs::mappingMode) > 2)
 	{
-		presetViewed->theMidiSettingsNode.removeChild(midiSettingsNode.getChildWithName(IDs::midiMapNode), nullptr);
+		midiSettingsNode.addChild(midiProcessor->midiMapNode, -1, nullptr);
 	}
-    
+	else if (midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
+	{
+		midiSettingsNode.removeChild(midiSettingsNode.getChild(0), nullptr);
+	}
+   
+	presetViewed->theMidiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
     presetManager->commitPreset(getPresetSlotNumViewed(), presetViewed->parentNode);
-    
-    ValueTree presetChild = pluginStateNode.getChildWithName(IDs::presetNode);
-    if (presetChild.isValid())
-    {
-        presetChild.copyPropertiesAndChildrenFrom(presetViewed->parentNode, nullptr);
-    }
-    else
-    {
-        pluginStateNode.addChild(presetViewed->parentNode, -1, nullptr);
 
-    }
+    pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
+    pluginStateNode.addChild(presetViewed->parentNode.createCopy(), -1, nullptr);
     
+	svkTree.state.removeChild(svkTree.state.getChildWithName(IDs::pluginStateNode), nullptr);
+	svkTree.state.addChild(pluginStateNode, -1, nullptr);
     presetEdited = false;
 }
 
 bool SvkPluginState::savePresetViewedToFile()
 {
-    commitParametersToPreset();
+    commitStateNode();
     return presetManager->savePresetToFile(getPresetSlotNumViewed(), pluginSettings->getPresetPath());
 }
 

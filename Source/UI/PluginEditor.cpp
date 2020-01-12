@@ -51,11 +51,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     
     pluginState->addChangeListener(this);
     
-    for (auto child : processor.svkValueTree.state)
+    for (auto paramID : *processor.getParamIDs())
     {
-        if (child.hasType("PARAM"))
-            processor.svkValueTree.addParameterListener(child["id"].toString(), this);
+		processor.svkValueTree.addParameterListener(paramID, this);
     }
+	DBG("PluginEditor listening to parameters");
 
     mappingHelper.reset(new MappingHelper(pluginState));
     
@@ -91,7 +91,7 @@ void SvkPluginEditor::initNodeData()
 	{
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		pluginState->pluginEditorNode = pluginEditorNode;
-		pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
+		//pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
 		
         viewportX = 0.51f;
         updateNodeData();
@@ -511,6 +511,14 @@ void SvkPluginEditor::parameterChanged (const String& paramID, float newValue)
     {
         setMappingMode();
     }
+	else if (paramID == IDs::pianoWHRatio.toString())
+	{
+		virtualKeyboard->setKeySizeRatio(newValue);
+	}
+	else if (paramID == IDs::keyboardNumRows.toString())
+	{
+		virtualKeyboard->setNumRows(newValue);
+	}
 }
 
 //==============================================================================

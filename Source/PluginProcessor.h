@@ -14,9 +14,12 @@
 #include "UI/PluginEditor.h"
 #include "PluginState.h"
 
+typedef AudioProcessorValueTreeState::Parameter Parameter;
+
 //==============================================================================
 /**
 */
+
 class SvkAudioProcessor  : public AudioProcessor,
                             public ChangeBroadcaster
 {
@@ -71,9 +74,10 @@ public:
 	//==============================================================================
 
 private:
+
+	void recordParamIDs();
     
     AudioProcessorValueTreeState::ParameterLayout createParameters();
-    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit = {};
     Array<String> paramIDs;
 
 	std::unique_ptr<SvkPluginState> pluginState;

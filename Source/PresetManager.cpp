@@ -429,7 +429,7 @@ bool SvkPresetManager::commitPreset(int slotNumber, ValueTree nodeIn)
 
 	if (preset && SvkPreset::isValidPresetNode(nodeIn))
 	{
-		preset->restoreFromNode(nodeIn);// , true);
+		preset->restoreFromNode(nodeIn);
 		return true;
 	}
 
@@ -453,8 +453,17 @@ void SvkPresetManager::initializeModePresets()
 	setModeCustom("1");
     
 	loadPreset(0, ValueTree(IDs::presetNode), false);
-    handleModeSelection(0, 0, 76);
-    handleModeSelection(0, 1, 76);
+
+	int meantoneIndex = 15;
+	int superpyth22Index = 74;
+
+#if JUCE_MAC
+	meantoneIndex = 14;
+	superpyth22Index = 76;
+#endif
+
+    handleModeSelection(0, 0, meantoneIndex);
+    handleModeSelection(0, 1, superpyth22Index);
 }
 
 
