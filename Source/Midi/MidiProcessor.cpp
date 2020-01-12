@@ -33,11 +33,20 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
     channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
     channelAssigner->setIgnorePitchbend(true); // temporary
     
-    svkTree.addParameterListener(IDs::periodShift, this);
-    svkTree.addParameterListener(IDs::periodShiftModeSize, this);
-    svkTree.addParameterListener(IDs::transposeAmt, this);
-    svkTree.addParameterListener(IDs::keyboardMidiChannel, this);
-    svkTree.addParameterListener(IDs::mpeOn, this);
+	Array<Identifier> params(
+	{
+		IDs::periodShift,
+		IDs::periodShiftModeSize,
+		IDs::transposeAmt,
+		IDs::keyboardMidiChannel,
+		IDs::mpeOn,
+		IDs::mappingMode
+	});
+
+	for (auto param : params)
+	{
+		svkTree.addParameterListener(param, this);
+	}
 
     // default sample rate
     reset(41000);
@@ -516,6 +525,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         if (isInputRemapped)
         {
             midiNote = midiInputRemap->getNoteRemapped(msg.getNoteNumber());
+			msg.setNoteNumber(midiNote);
         }
         
         remappedKeyboardState->processNextMidiEvent(msg);
@@ -667,7 +677,11 @@ bool SvkMidiProcessor::isMidiPaused()
 
 void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
 {
-    if (paramID == IDs::periodShift.toString())
+	if (paramID == IDs::mappingMode.toString())
+	{
+		isInputRemapped = newValue > 1;
+	}
+    else if (paramID == IDs::periodShift.toString())
     {
         periodShift = newValue;
     }

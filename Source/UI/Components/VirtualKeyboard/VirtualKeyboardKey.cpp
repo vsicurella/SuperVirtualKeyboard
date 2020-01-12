@@ -100,11 +100,11 @@ void Key::paint(Graphics& g)
 		contrast = 0.25f;
 	}
 
-	if (isPressed)
+	if (isClicked)
 	{
 		contrast = 0.75f;
 	}
-	else if (exInputColor.isOpaque())
+	else if (exPressed)
 	{
 		colorToUse = exInputColor;
 	}
@@ -124,6 +124,8 @@ void Key::paint(Graphics& g)
 		txtArea.removeFromBottom(6);
 		g.drawText(numTxt, txtArea,	Justification::centredBottom);
 	}
+
+	isDirty = false;
 }
 
 
@@ -138,7 +140,7 @@ void Key::mouseExit(const MouseEvent& e)
 	//bool hold = getParentComponent()->reallyContains(e.getEventRelativeTo(getParentComponent()).getPosition(), true);
 	//if (!e.mods.isShiftDown())
 	//{
-	//	isPressed = false;
+	//	isClicked = false;
 	//	repaint();
 	//}
 

@@ -46,8 +46,10 @@ namespace VirtualKeyboard
 		int step = 0; // the interval step that this note is a part of
 
 		float velocity = 0; // recorded when key is clicked
-        bool isPressed = false;
+        bool isClicked = false; // clicked by mouse
+		bool exPressed = false; // pressed by midi input
         Colour exInputColor; // for midi controller input, will use this color if it's opaque
+		bool isDirty = true;
 
 		// Parameters
 		String pitchName = "";

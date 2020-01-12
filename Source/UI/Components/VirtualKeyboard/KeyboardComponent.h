@@ -537,14 +537,14 @@ namespace VirtualKeyboard
 		UndoManager* undo;
         std::unique_ptr<KeyboardGrid> grid;
 		KeyboardViewport* viewport = nullptr;
-
-		MidiKeyboardState* externalKeyboardToDisplay;
-        
+		MidiKeyboardState* externalKeyboardToDisplay = nullptr;
 		NoteMap* noteMapOnDisplay;
+		bool hasDirtyKeys = true;
         
 		MidiBuffer buffer;
 		Array<Key*> keysPause;
 		Array<Key*> keysToMap;
+
 
 		// Parameters
 		int uiModeSelected = 0;

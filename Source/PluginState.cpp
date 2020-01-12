@@ -431,7 +431,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
     presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
-
+	DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
 	if (mapModeSelectionIn == 2) // Auto Mapping
 	{
 		doMapping();
@@ -456,7 +456,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
     presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
-
+	DBG("mapStyle index = " + String(mapStyleIn));
 	if (isAutoMapping())
 	{
 		doMapping();
@@ -644,8 +644,8 @@ void SvkPluginState::doMapping()
 {
 	if (getMappingMode() > 1)
 	{
-		DBG("Mapping new settings");
-		doMapping(getMode1(), getMode2(), getMappingMode(), mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+		DBG("Applygind new MIDI mapping");
+		doMapping(getMode1(), getMode2(), getMappingStyle(), mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
 	}
 	else
 	{
@@ -696,6 +696,8 @@ void SvkPluginState::updateModeViewed(bool sendChange)
     virtualKeyboard->resized();
 
 	//TODO: Change VirtualKeyboard displayed keyboard state
+	getModeViewedNum() ? virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState()) :
+						 virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
 }
 
 void SvkPluginState::commitModeInfo()
