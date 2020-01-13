@@ -180,10 +180,10 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
 	//presetRecall.removeChild(presetRecall.getChildWithName(IDs::pluginStateNode), nullptr); // uncomment this line to test new instantiation
-    
-	svkValueTree.replaceState(presetRecall);	
+
+	//svkValueTree.replaceState(presetRecall);	
 	recordParamIDs();
-	pluginState->recallState(svkValueTree.state.getChildWithName(IDs::pluginStateNode));
+	pluginState->recallState(presetRecall.getChildWithName(IDs::pluginStateNode));
 }
 
 //==============================================================================

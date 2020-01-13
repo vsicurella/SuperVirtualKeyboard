@@ -101,6 +101,14 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
         setMapOrderOffset2(0);
+
+	for (auto child : svkTree.state)
+	{
+		svkTree.addParameterListener(child["id"].toString(), this);
+	}
+
+	DBG("PluginState listening to parameters");
+	midiProcessor->connectToParameters();
 }
 
 void SvkPluginState::resetToPreset(bool sendChange)
@@ -789,7 +797,22 @@ bool SvkPluginState::loadModeFromFile()
 
 void SvkPluginState::parameterChanged(const String& paramID, float newValue)
 {
-    DBG("The parameter " + paramID + " has changed to " + String(newValue));
+	if (paramID == IDs::mappingMode.toString())
+	{
+		setMapMode(newValue);
+	}
+	else if (paramID == IDs::modeMappingStyle.toString())
+	{
+		setMapStyle(newValue);
+	}
+	else if (paramID == IDs::pianoWHRatio.toString())
+	{
+		virtualKeyboard->setKeySizeRatio(newValue);
+	}
+	else if (paramID == IDs::keyboardNumRows.toString())
+	{
+		virtualKeyboard->setNumRows(newValue);
+	}
 }
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
