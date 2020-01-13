@@ -51,11 +51,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	pluginState->addChangeListener(this);
 
-	for (auto paramID : processor.getParamIDs())
-	{
-		processor.svkValueTree.addParameterListener(paramID, this);
-	}
-	DBG("PluginEditor listening to parameters");
+	//for (auto paramID : processor.getParamIDs())
+	//{
+	//	processor.svkValueTree.addParameterListener(paramID, this);
+	//}
+	//DBG("PluginEditor listening to parameters");
 
 	mappingHelper.reset(new MappingHelper(pluginState));
 

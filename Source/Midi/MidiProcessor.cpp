@@ -32,21 +32,6 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
     mpeInst.reset(new MPEInstrument());
     channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
     channelAssigner->setIgnorePitchbend(true); // temporary
-    
-	Array<Identifier> params(
-	{
-		IDs::periodShift,
-		IDs::periodShiftModeSize,
-		IDs::transposeAmt,
-		IDs::keyboardMidiChannel,
-		IDs::mpeOn,
-		IDs::mappingMode
-	});
-
-	for (auto param : params)
-	{
-		svkTree.addParameterListener(param, this);
-	}
 
     // default sample rate
     reset(41000);
@@ -59,6 +44,25 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
 SvkMidiProcessor::~SvkMidiProcessor()
 {
     
+}
+
+void SvkMidiProcessor::connectToParameters()
+{
+	Array<Identifier> params(
+		{
+			IDs::periodShift,
+			IDs::periodShiftModeSize,
+			IDs::transposeAmt,
+			IDs::keyboardMidiChannel,
+			IDs::mpeOn,
+			IDs::mappingMode
+		});
+
+	for (auto param : params)
+	{
+		svkTree.addParameterListener(param, this);
+	}
+	DBG("MidiProcessor connected to parameters");
 }
 
 void SvkMidiProcessor::updateNode()

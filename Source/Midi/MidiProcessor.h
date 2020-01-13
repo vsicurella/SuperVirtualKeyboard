@@ -87,6 +87,7 @@ public:
     ValueTree midiSettingsNode;
     ValueTree midiMapNode;
     
+	void connectToParameters();
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
     
