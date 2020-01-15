@@ -387,7 +387,7 @@ void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 
 	if (param)
 	{
-		param->setValue(param->convertTo0to1(valueIn));
+		param->setValueNotifyingHost(param->convertTo0to1(valueIn));
 	}
 }
 
