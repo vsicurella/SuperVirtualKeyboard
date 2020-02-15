@@ -36,6 +36,14 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
     
+	for (auto child : svkTree.state)
+	{
+		svkTree.addParameterListener(child["id"].toString(), this);
+	}
+
+	DBG("PluginState listening to parameters");
+	midiProcessor->connectToParameters();
+
 	setPresetViewed(0);
     setModeViewed(1);
 	updateModeViewed(false);
@@ -101,14 +109,6 @@ void SvkPluginState::recallState(ValueTree nodeIn)
     
     if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
         setMapOrderOffset2(0);
-
-	for (auto child : svkTree.state)
-	{
-		svkTree.addParameterListener(child["id"].toString(), this);
-	}
-
-	DBG("PluginState listening to parameters");
-	midiProcessor->connectToParameters();
 }
 
 void SvkPluginState::resetToPreset(bool sendChange)
