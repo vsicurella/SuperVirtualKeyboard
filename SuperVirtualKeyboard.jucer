@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
-              jucerVersion="5.4.5" companyName="Everytone" companyEmail="sicurella12@gmail.com"
+              companyName="Everytone" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginProducesMidiOut,pluginWantsMidiIn"
               pluginVST3Category="Instrument,Tools" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
-              pluginAUMainType="'aumi'" version="0.03">
+              pluginAUMainType="'aumi'" version="0.03" displaySplashScreen="1"
+              jucerFormatVersion="1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
     <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
       <FILE id="ytvF67" name="ChannelAssigner.cpp" compile="1" resource="0"

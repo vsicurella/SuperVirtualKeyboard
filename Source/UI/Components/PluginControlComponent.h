@@ -167,6 +167,9 @@ private:
 
     bool inMappingMode = false;
 
+	int barHeight = 24;
+	int gap = 8;
+
     //[/UserVariables]
 
     //==============================================================================
