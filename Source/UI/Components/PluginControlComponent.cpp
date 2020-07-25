@@ -140,7 +140,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     midiChannelSld->addListener (this);
 
     midiChannelLbl.reset (new Label ("Midi Channel Label",
-                                     TRANS("MIDI Channel")));
+                                     TRANS("MIDI Channel:")));
     addAndMakeVisible (midiChannelLbl.get());
     midiChannelLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     midiChannelLbl->setJustificationType (Justification::centredLeft);
@@ -154,7 +154,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     noteNumsBtn->addListener (this);
 
     periodShiftLbl.reset (new Label ("Period Shift Label",
-                                     TRANS("Period Shift")));
+                                     TRANS("Period Shift:")));
     addAndMakeVisible (periodShiftLbl.get());
     periodShiftLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     periodShiftLbl->setJustificationType (Justification::centredLeft);
@@ -222,8 +222,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
-    mapApplyBtn->setBounds (408, 40, 55, 24);
-
     keyboardViewport.reset (new KeyboardViewport ("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
@@ -232,44 +230,39 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     addAndMakeVisible (saveButton.get());
     saveButton->setButtonText (TRANS("Save"));
     saveButton->addListener (this);
-
     saveButton->setImages (false, true, true,
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-    saveButton->setBounds (24, 6, 28, 28);
+	saveButton->setSize(28, 28);
 
     openButton.reset (new ImageButton ("Open Button"));
     addAndMakeVisible (openButton.get());
     openButton->setButtonText (TRANS("Open"));
     openButton->addListener (this);
-
     openButton->setImages (false, true, true,
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-    openButton->setBounds (62, 6, 28, 28);
+	openButton->setSize(28, 28);
 
     settingsButton.reset (new ImageButton ("Settings Button"));
     addAndMakeVisible (settingsButton.get());
     settingsButton->setButtonText (TRANS("Settings"));
     settingsButton->addListener (this);
-
     settingsButton->setImages (false, true, true,
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000));
-    settingsButton->setBounds (100, 6, 28, 28);
+	settingsButton->setSize(28, 28);
 
-
-    //[UserPreSize]
     saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
     openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
 
     saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
     openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
-    mapOrderEditBtn->setVisible(false);
+    mapOrderEditBtn->setVisible(true);
 
 	scaleTextBox->addListener(this);
 
@@ -294,14 +287,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadMode);
     loadMenu->addCommandItem(appCmdMgr, IDs::CommandIDs::loadPreset);
 
-
-
-    //[/UserPreSize]
-
     setSize (1000, 250);
-
-
-    //[Constructor] You can add your own custom stuff here..
 
     settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
@@ -381,61 +367,72 @@ void PluginControlComponent::paint (Graphics& g)
 
 void PluginControlComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
+	scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
+	scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
+	
+	scaleEntryBtn->setBounds(scaleTextBox->getRight() + 8, scaleTextBox->getY(), 31, 24);
+	modeInfoButton->setBounds(scaleTextBox->getX() - 32, scaleTextBox->getY(), 24, 24);
+
+	saveButton->setSize(barHeight, barHeight);
+	saveButton->setTopLeftPosition(gap, scaleTextBox->getY());
+
+	openButton->setSize(barHeight, barHeight);
+	openButton->setTopLeftPosition(saveButton->getRight() + gap, saveButton->getY());
+
+	settingsButton->setSize(barHeight, barHeight);
+	settingsButton->setTopLeftPosition(openButton->getRight() + gap, saveButton->getY());
+
+	mapModeBox->setTopLeftPosition(settingsButton->getRight() + gap, gap);
+	mapModeBox->setSize(jmin(proportionOfWidth(0.15f), modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
+
+	mode1ViewBtn->setBounds(getWidth() - 32, gap, 32, barHeight);
+	mode2ViewBtn->setBounds(getWidth() - 32, mode1ViewBtn->getBottom() + gap, 32, barHeight);
+
+	int keyboardY = barHeight + gap * 2;
+
     if (inMappingMode)
     {
-    //[/UserPreResize]
+		mode1Box->setSize(proportionOfWidth(0.15f), barHeight);
+		mode1Box->setTopLeftPosition(mode1ViewBtn->getX() - mode1Box->getWidth() - gap / 2, gap);
 
-    scaleTextBox->setBounds ((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2), 8, proportionOfWidth (0.1926f), 24);
-    mode1Box->setBounds (getWidth() - 201, 8, 150, 24);
-    mode2Box->setBounds (getWidth() - 51 - 150, 40, 150, 24);
-    mode1RootSld->setBounds (getWidth() - 293, 8, 79, 24);
-    mode2RootSld->setBounds (getWidth() - 293, 40, 79, 24);
-    scaleEntryBtn->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2)) + proportionOfWidth (0.1926f) - -7, 8, 31, 24);
-    modeInfoButton->setBounds (((getWidth() / 2) + -26 - (proportionOfWidth (0.1926f) / 2)) + -32, 8, 24, 24);
-    periodShiftSld->setBounds (108, getHeight() - 48, 86, 24);
-    mode1ViewBtn->setBounds (getWidth() - 49, 8, 31, 24);
-    mode2ViewBtn->setBounds (getWidth() - 49, 40, 31, 24);
-    mode1RootLbl->setBounds (getWidth() - 325, 8, 32, 24);
-    mode2RootLbl->setBounds (getWidth() - 325, 40, 32, 24);
-    mapStyleBox->setBounds (212 - (152 / 2), 40, 152, 24);
-    midiChannelSld->setBounds (292, getHeight() - 48, 86, 24);
-    midiChannelLbl->setBounds (197, getHeight() - 48, 96, 24);
-    noteNumsBtn->setBounds (392, getHeight() - 48, 24, 24);
-    periodShiftLbl->setBounds (24, getHeight() - 48, 88, 24);
-    editColorsBtn->setBounds (696, getHeight() - 48, 79, 24);
-    keyStyleBox->setBounds (432, getHeight() - 48, 136, 24);
-    mapStyleLbl->setBounds (76 - (104 / 2), 40, 104, 24);
-    highlightStyleBox->setBounds (584, getHeight() - 48, 96, 24);
-    mapOrderEditBtn->setBounds (400 - 96, 40, 96, 24);
-    mapModeBox->setBounds (136, 8, proportionOfWidth (0.1585f), 24);
-    keyboardViewport->setBounds (32, 72, getWidth() - 48, getHeight() - 132);
-    //[UserResized] Add your own custom resize handling here..
+		mode2Box->setSize(proportionOfWidth(0.15f), barHeight);
+		mode2Box->setTopLeftPosition(mode1Box->getX(), mode2ViewBtn->getY());
+
+		mapStyleLbl->setTopLeftPosition(gap / 2, scaleTextBox->getBottom() + gap);
+		mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
+		mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapModeBox->getWidth(), barHeight);
+
+		mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
+		mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
+
+
+		keyboardY = (keyboardY * 2) - gap;
     }
     else
     {
-		mapModeBox->setBounds(136, 8, proportionOfWidth(0.1638f), 24);
-
-		scaleTextBox->setBounds((getWidth() / 2) + -26 - (proportionOfWidth(0.1926f) / 2), 8, proportionOfWidth(0.1926f), 24);
-		//scaleEntryBtn->setBounds ((getWidth() / 2) + 82 - (31 / 2), 8, 31, 24);
-        //modeInfoButton->setBounds ((getWidth() / 2) + -129 - (24 / 2), 8, 24, 24);
-
-        mode2RootLbl->setBounds (getWidth() - 333, 8, 32, 24);
-        mode2RootSld->setBounds (getWidth() - 301, 8, 79, 24);
-        mode2Box->setBounds (getWidth() - 51 - 150, 8, 176, 24);
-
-        keyboardViewport->setBounds (24, 40, getWidth() - 40, getHeight() - 86);
-
-        periodShiftSld->setBounds (108, getHeight() - 42, 86, 24);
-        periodShiftLbl->setBounds (24, getHeight() - 42, 88, 24);
-        midiChannelSld->setBounds (292, getHeight() - 42, 86, 24);
-        midiChannelLbl->setBounds (197, getHeight() - 42, 96, 24);
-        noteNumsBtn->setBounds (392, getHeight() - 42, 24, 24);
-        keyStyleBox->setBounds (432, getHeight() - 42, 136, 24);
-        highlightStyleBox->setBounds (584, getHeight() - 42, 96, 24);
-        editColorsBtn->setBounds (696, getHeight() - 42, 79, 24);
+		mode2Box->setSize(proportionOfWidth(0.15f) + mode2ViewBtn->getWidth(), barHeight);
+		mode2Box->setTopLeftPosition(getWidth() - mode2Box->getWidth() - gap, gap);
     }
 
+	mode1RootSld->setBounds(mode1Box->getX() - 80 - gap, mode1Box->getY(), 80, barHeight);
+	mode2RootSld->setBounds(mode2Box->getX() - 80 - gap, mode2Box->getY(), 80, barHeight);
+
+	mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
+	mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
+
+	int bottomBarY = getHeight() - barHeight - gap;
+
+	periodShiftLbl->setBounds(gap, bottomBarY, 88, barHeight);
+	periodShiftSld->setBounds(periodShiftLbl->getRight(), bottomBarY, 88, barHeight);
+	midiChannelLbl->setBounds(periodShiftSld->getRight() + gap, bottomBarY, 96, barHeight);
+	midiChannelSld->setBounds(midiChannelLbl->getRight(), bottomBarY, 86, barHeight);
+
+	editColorsBtn->setBounds(getWidth() - 80 - gap, bottomBarY, 80, barHeight);
+	keyStyleBox->setBounds(editColorsBtn->getX() - 136 - gap, bottomBarY, 136, barHeight);
+	highlightStyleBox->setBounds(keyStyleBox->getX() - 96 - gap, bottomBarY, 96, barHeight);
+	noteNumsBtn->setBounds(highlightStyleBox->getX() - 24 - gap, bottomBarY, 24, barHeight);
+
+	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(bottomBarY - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 
 	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
@@ -445,7 +442,6 @@ void PluginControlComponent::resized()
 		svk->setBounds(0, 0, svk->getPianoWidth(height), height);
 	}
 
-    //[/UserResized]
 }
 
 void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -626,6 +622,8 @@ void PluginControlComponent::connectToProcessor()
 {
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
+	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
+	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
 }
