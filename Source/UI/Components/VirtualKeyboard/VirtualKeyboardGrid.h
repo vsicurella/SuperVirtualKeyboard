@@ -10,42 +10,44 @@
 
 #pragma once
 
+#include "../../../PluginModes.h"
 #include "../../../Structures/FractionalGrid.h"
 #include "../../../Structures/Mode.h"
 #include "VirtualKeyboardKey.h"
 
 namespace VirtualKeyboard
 {
-	enum KeyPlacementType
-	{
-		nestedRight = 1,
-		nestedCenter,
-		flat,
-		adjacent
-	};
-
-    class KeyboardGrid : public FractionalGrid
+    class KeyboardPositioner
     {
-        Mode* mode;
-        std::vector<float> orderedKeyRatios;
-
+		Component* parent;
+		
+		int numModeKeys;
+		int keyGap = 0;
 		int keyPlacement = 1;
-        
-        int xOffset = 0;
-        int yOffset = 0;
+		float baseWidthRatio = 0.8f;
+		float baseHeightRatio = 0.55f;
+
+		float keyWidth = 0;
         
     public:
-                
-		KeyboardGrid(Mode* modeIn, int numRows=1, int keyPlacementType=1);
-        ~KeyboardGrid() {};
-        
-        int getXOffset();
-        int getYOffset();
-        
-        void setXOffset(int xOffsetIn);
-        void setYOffset(int yOffsetIn);
+
+		KeyboardPositioner(Component* parentIn, int numModeKeysIn = 128);
+        ~KeyboardPositioner() {};
+
+		void parentResized();
+
+		float getKeyWidth() const;
+
+		int getKeyGap() const;
+
+		void setNumModeKeys(int numKeysIn);
+
+		void setKeyGap(int keyGapIn);
         
 		void setKeyPlacement(int keyPlacementTypeIn);
+
+		void setLayerKeysWidthRatio(float widthRatioIn);
+		void setLayerKeysHeightRatio(float widthRatioIn);
 
         void resizeKey(Key& key);
         void placeKey(Key& key);

@@ -12,39 +12,57 @@
 
 using namespace VirtualKeyboard;
 
-KeyboardGrid::KeyboardGrid(Mode* modeIn, int numRows, int keyPlacementType)
-: FractionalGrid(modeIn->getKeyboardOrdersSize(0), numRows), mode(modeIn), keyPlacement(keyPlacementType)
+KeyboardPositioner::KeyboardPositioner(Component* parentIn, int numModeKeysIn)
+	: parent(parentIn)
 {
+	setNumModeKeys(numModeKeysIn);
 }
 
-int KeyboardGrid::getXOffset()
+void KeyboardPositioner::parentResized()
 {
-    return xOffset;
+	keyWidth = (parent->getWidth() - keyGap) / numModeKeys;
 }
 
-int KeyboardGrid::getYOffset()
+float KeyboardPositioner::getKeyWidth() const
 {
-    return yOffset;
+	return keyWidth;
 }
 
-void KeyboardGrid::setXOffset(int xOffsetIn)
+int KeyboardPositioner::getKeyGap() const
 {
-    xOffset = xOffsetIn;
+	return keyGap;
 }
 
-void KeyboardGrid::setYOffset(int yOffsetIn)
+void KeyboardPositioner::setNumModeKeys(int numKeysIn)
 {
-    yOffset = yOffsetIn;
+	numModeKeys = numKeysIn;
+	parentResized();
 }
 
-void KeyboardGrid::setKeyPlacement(int keyPlacementTypeIn)
+void KeyboardPositioner::setKeyGap(int keyGapIn)
+{
+	keyGap = keyGapIn;
+	parentResized();
+}
+
+void KeyboardPositioner::setKeyPlacement(int keyPlacementTypeIn)
 {
 	keyPlacement = keyPlacementTypeIn;
 }
 
-void KeyboardGrid::resizeKey(Key& key)
+void KeyboardPositioner::setLayerKeysWidthRatio(float widthRatioIn)
 {
-	float spread = 4;
+	baseWidthRatio = widthRatioIn;
+}
+
+void KeyboardPositioner::setLayerKeysHeightRatio(float heightRatioIn)
+{
+	baseHeightRatio = heightRatioIn;
+}
+
+void KeyboardPositioner::resizeKey(Key& key)
+{
+	float spread = 4; // TODO make setter
 	float height, width;
 	
     if (key.order == 0)
@@ -54,105 +72,37 @@ void KeyboardGrid::resizeKey(Key& key)
     }
     else
     {
+		float stepHeight = baseHeightRatio + (key.step - 2) / 100.0f * spread;
+		width = baseWidthRatio;
+
         switch (keyPlacement)
         {
-            case(KeyPlacementType::nestedCenter):
-            {
-                float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
-                height = stepHeight - stepHeight * (key.order - 1) / (key.step * 1.08f);
-                width = 0.75f - (key.order - 1) * 0.1f;
-                break;
-            }
-
             case(KeyPlacementType::flat):
             {
-                float stepHeight = 0.55 + (key.step - 2) / 100.0f * spread;
                 height = stepHeight - stepHeight * (key.order - 1) / key.step;
-                width = 0.8f;
                 break;
             }
 
             case(KeyPlacementType::adjacent):
             {
-                //if (key.order > 0)
-                //{
-                    height = 0.55;
-                    width = 0.8f / (key.step-1); // shouldn't ever be 1 here
-    //            }
-    //            else
-    //            {
-    //                width += key.step > 1 * (key.step - 2) * (0.02f);
-    //            }
+				height = stepHeight;
+                width /= (key.step - 1) * 0.9f; // mode keys of step 1 will not be in this else condition
                 break;
             }
 
-            default: // 0 & 1, key nested right
+            default: // nested keys
             {
-    //            if (key.order > 0)
-    //            {
-                    float stepHeight = 0.55f + (key.step - 2) / 100.0f * spread;
-                    height = stepHeight - stepHeight * (key.order - 1) / key.step;
-                    width = 0.8f - (key.order - 1) * 0.1f;
-    //            }
+                height = stepHeight - stepHeight * (key.order - 1) / (key.step * 1.08f);
+                width -= (key.order - 1) * 0.1f;
                 break;
             }
         }
     }
     
-    key.setSize(width * colSize, height * rowSize);
+    key.setSize(width * keyWidth, height * parent->getHeight());
 }
 
-void KeyboardGrid::placeKey(Key& key)
+void KeyboardPositioner::placeKey(Key& key)
 {
-    int row = rowSize + rowGap;
-    int rowKeyLimit = round(columns / (mode->getModeSize() * rows)) * mode->getModeSize();
-    
-    float column = colSize + columnGap;
-    float halfColumn = column / 1.75f * (key.order > 0);
-    int colToPlace = (int) ceil(key.modeDegree);
-    int rowToPlace = 0;
-    
-    if (colToPlace >= rowKeyLimit)
-    {
-        rowToPlace = colToPlace / rowKeyLimit;
 
-        // let last row be longer to preserve period
-        if (128 - key.keyNumber - 1 <= mode->getModeSize())
-            rowToPlace -= 1;
-        
-        colToPlace -= rowKeyLimit * rowToPlace;
-    }
-            
-    int x;
-    int y = rowToPlace * row + yOffset;
-    
-	switch (keyPlacement)
-	{
-		case(KeyPlacementType::nestedCenter):
-		{
-            x = colToPlace * column - halfColumn + (column - key.getWidth() / 2) + xOffset;
-            
-            key.setTopLeftPosition(x, y);
-            break;
-		}
-
-		case(KeyPlacementType::adjacent):
-		{
-            int keyCol = (int) key.modeDegree;
-            x = keyCol * column + halfColumn + xOffset;
-            float stepOff = (key.order > 0 && key.step > 2) * (float)(key.order)/key.step;
-//            DBG("KeyMD=" + String(key.modeDegree) + "\tStepOff=" + String(stepOff));
-            x += stepOff * (key.getWidth() * column);
-            key.setTopLeftPosition(x, y);
-
-			break;
-		}
-
-		default: // 0 & 1, key nested right & flat
-		{
-            x = colToPlace * column - halfColumn + (column - key.getWidth()) + xOffset;
-            key.setTopLeftPosition(x, y);
-			break;
-		}
-	}
 }

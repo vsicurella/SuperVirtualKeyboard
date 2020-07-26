@@ -90,6 +90,10 @@
                 file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.cpp"/>
           <FILE id="tb4Bau" name="KeyboardViewport.h" compile="0" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.h"/>
+          <FILE id="dM2sHw" name="VirtualKeyboardGraphics.cpp" compile="1" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.cpp"/>
+          <FILE id="nUaAvH" name="VirtualKeyboardGraphics.h" compile="0" resource="0"
+                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.h"/>
           <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
           <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"
@@ -138,6 +142,7 @@
     <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
           file="Source/CommonFunctions.h"/>
     <FILE id="qf8oNW" name="PluginIDs.h" compile="1" resource="0" file="Source/PluginIDs.h"/>
+    <FILE id="iiiGEu" name="PluginModes.h" compile="0" resource="0" file="Source/PluginModes.h"/>
     <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
     <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
     <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"

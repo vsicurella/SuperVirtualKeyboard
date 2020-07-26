@@ -20,6 +20,7 @@
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
 #include "KeyboardViewport.h"
+#include "VirtualKeyboardGraphics.h"
 
 #include <iostream>     
 
@@ -30,47 +31,11 @@
 
 namespace VirtualKeyboard
 {
-    enum UIMode
-    {
-        playMode = 0,
-        editMode,
-        mapMode
-    };
-    
-    enum Orientation
-    {
-        horizontal = 0,
-        verticalLeft,
-        verticalRight
-    };
-
-	enum HighlightStyle
-	{
-		full = 1,
-		inside,
-		outline,
-		circles,
-		squares
-	};
-
-	enum VelocityStyle
-	{
-		linear = 1,
-		curved,
-		fixed
-	};
-
-	enum ScrollingStyle
-	{
-		smooth = 1,
-		stepped
-	};
-    
-    class Keyboard :
+	class Keyboard :
         public Component,
 		public MidiKeyboardState,
-        public MidiKeyboardStateListener,
-		private Timer
+        public MidiKeyboardStateListener
+		// private Timer
     {
         
     public:
@@ -84,35 +49,49 @@ namespace VirtualKeyboard
                 
         void restoreNode(ValueTree keyboardNodeIn, bool resetIfInvalid=false);
         
-        ValueTree getNode();
-
 		void reset();
 
 		void initializeKeys(int size=128);
+
+		//===============================================================================================
+
+		void paint(juce::Graphics& g) override;
+
+		void paintOverChildren(juce::Graphics& g) override;
+
+		void resized() override;
+
+		//===============================================================================================
+
+		void mouseMove(const MouseEvent& e) override;
+
+		void mouseExit(const MouseEvent& e) override;
+
+		void mouseDown(const MouseEvent& e) override;
+
+		void mouseDrag(const MouseEvent& e) override;
+
+		void mouseUp(const MouseEvent& e) override;
+
+		//===============================================================================================
+
+		bool keyStateChanged(bool isKeyDown) override;
+
+		bool keyPressed(const KeyPress& key) override;
+
+		void modifierKeysChanged(const ModifierKeys& modifiers) override;
+
+		//===============================================================================================
+
+		// void timerCallback() override;
         
         //===============================================================================================
 
 		/*
-			Rearranges the keys to fit the current mode, without changing other key data.
+			Returns Keyboard settings node
 		*/
-        void applyMode(Mode* modeIn);
+		ValueTree getNode();
 
-		/*
-			Applies the key data to the keyboard so that it matches the data passed in.
-		*/
-		void applyKeyData(ValueTree keyDataTreeIn);
-
-		/*
-		Allows the keyboard to listen the filtered midi input
-		*/
-		void displayKeyboardState(MidiKeyboardState* keyboardStateIn);
-        
-        //===============================================================================================
-
-		/*
-			Returns a pointer to the viewport
-		*/
-		KeyboardViewport* getViewport();
 		/*
 			Returns a struct with the given key's data.
 		*/
@@ -268,11 +247,24 @@ namespace VirtualKeyboard
 		int getScrollingStyle();
 
 		//===============================================================================================
-        
+
 		/*
-			Sets the viewport used
+			Rearranges the keys to fit the current mode, without changing other key data.
 		*/
-		void setViewport(KeyboardViewport* viewportIn);
+		void applyMode(Mode* modeIn);
+
+		/*
+			Applies the key data to the keyboard so that it matches the data passed in.
+		*/
+		void applyKeyData(ValueTree keyDataTreeIn);
+
+		/*
+		Allows the keyboard to listen the filtered midi input
+		*/
+		void displayKeyboardState(MidiKeyboardState* keyboardStateIn);
+
+		//===============================================================================================
+
 		/*
 			Sets the keyboards UI mode.
 		*/
@@ -489,44 +481,13 @@ namespace VirtualKeyboard
 			Transposes the keys on to a certain amount of scale degrees.
 		*/
         void transposeKeysOnChromatically(int modalStepsIn);
-        
-        //===============================================================================================
 
-		void paint(Graphics& g) override;
-
-		void resized() override;
-
-		void scaleToHeight(int heightIn);
 
 		//===============================================================================================
 
-		void mouseMove(const MouseEvent& e) override;
+		void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
 
-		void mouseExit(const MouseEvent& e) override;
-        
-        void mouseDown(const MouseEvent& e) override;
-        
-        void mouseDrag(const MouseEvent& e) override;
-        
-        void mouseUp(const MouseEvent& e) override;
-        
-		//===============================================================================================
-        
-        bool keyStateChanged(bool isKeyDown) override;
-        
-        bool keyPressed(const KeyPress& key) override;
-        
-        void modifierKeysChanged(const ModifierKeys& modifiers) override;
-        
-        //===============================================================================================
-        
-        void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
-        
-        void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
-        
-        //===============================================================================================
-
-		void timerCallback() override;
+		void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
 
 		//===============================================================================================
 
@@ -535,8 +496,7 @@ namespace VirtualKeyboard
 
 		// Functionality
 		UndoManager* undo;
-        std::unique_ptr<KeyboardGrid> grid;
-		KeyboardViewport* viewport = nullptr;
+        KeyboardPositioner keyPositioner;
 		MidiKeyboardState* externalKeyboardToDisplay = nullptr;
 		NoteMap* noteMapOnDisplay;
 		bool hasDirtyKeys = true;
@@ -544,7 +504,8 @@ namespace VirtualKeyboard
 		MidiBuffer buffer;
 		Array<Key*> keysPause;
 		Array<Key*> keysToMap;
-
+		
+		Array<Path> keyboardKeysPath;
 
 		// Parameters
 		int uiModeSelected = 0;
@@ -565,11 +526,10 @@ namespace VirtualKeyboard
 		bool scaleMidiInputVelocity = false;
 
 		float keySizeRatio = 0.25f;
-		float keyOrdersSizeScalar = 1;
                 
         // Data
         ValueTree pianoNode;
-        std::unique_ptr<Array<Key>> keys;
+        OwnedArray<Key> keys;
 		std::unique_ptr<Array<Colour>> keyColorsOrders;
 		std::unique_ptr<Array<Colour>> keyColorsDegrees;
         
@@ -591,6 +551,9 @@ namespace VirtualKeyboard
         // Properties
         int keyWidth = 50;
         int keyHeight = 200;
+
+		float layerKeysWidthRatio = 0.8f;
+		float layerKeysHeightRatio = 0.55f;
 
 		int lastKeyOver = 0;
 		int lastKeyClicked = 0;
