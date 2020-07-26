@@ -34,8 +34,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	Rectangle<int> viewportBounds = viewport->getBounds();
 
 	virtualKeyboard = pluginState->getKeyboard();
-	virtualKeyboard->setViewport(controlComponent->getViewport());
 
+	viewport->setViewedComponent(virtualKeyboard, false);
 	viewport->setBounds(viewportBounds);
 	viewportScroll = &viewport->getHorizontalScrollBar();
 	viewportScroll->addListener(this);
@@ -61,12 +61,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
+	initNodeData();
 
-	setSize(1000, 210);
 	setResizeLimits(750, 100, 10e4, 10e4);
 
 	controlComponent->setBounds(getBounds());
-	initNodeData();
 
 #if (!JUCE_ANDROID && !JUCE_IOS)
 	startTimerHz(30);
@@ -88,17 +87,16 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        viewportX = (float)pluginEditorNode[IDs::viewportPosition];
+        setScrollBarPosition((float)pluginEditorNode[IDs::viewportPosition]);
 	}
     // Intialization
 	else
 	{
 		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
 		pluginState->pluginEditorNode = pluginEditorNode;
-		//pluginState->pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
-		
-        viewportX = 0.51f;
-        updateNodeData();
+
+		setSize(1000, 210);
+        setScrollBarPosition(0.51f);
 	}
     
     updateUI();
@@ -134,6 +132,12 @@ void SvkPluginEditor::updateUI()
 void SvkPluginEditor::updateScrollbarData()
 {
 	viewportX = (float) viewport->getViewPositionX() / (float) viewport->getMaximumVisibleWidth();
+	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
+}
+
+void SvkPluginEditor::setScrollBarPosition(float positionIn)
+{
+	viewportX = positionIn;
 	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
 }
 
@@ -383,7 +387,7 @@ void SvkPluginEditor::resized()
 
 	controlComponent->setSize(getWidth(), getHeight());
 
-	viewport->setViewPosition(viewportX * viewport->getMaximumVisibleWidth() * 1.01f, 0);
+	viewport->setViewPosition(viewportX * viewport->getMaximumVisibleWidth(), 0);
 
 //    if (settingsContainer.get())
 //         settingsContainer->setSize(getWidth(), getHeight());

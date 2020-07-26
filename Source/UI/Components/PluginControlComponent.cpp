@@ -270,7 +270,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
 
     scaleTextBox->setInputFilter(&txtFilter, false);
 
-    keyboardViewport->setScrollingMode(3);
+    //keyboardViewport->setScrollingMode(3);
 
 	// allows for implementing mouseDown() to update the menus
 	mode1Box->setInterceptsMouseClicks(false, false);
@@ -667,9 +667,9 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 	}
 }
 
-KeyboardViewport* PluginControlComponent::getViewport()
+Viewport* PluginControlComponent::getViewport()
 {
-	return keyboardViewport.get();
+	return  keyboardViewport.get();
 }
 
 TextEditor* PluginControlComponent::getScaleTextEditor()
