@@ -62,6 +62,10 @@ Key::Key(const Key& keyToCopy)
     node = keyToCopy.node.createCopy();
 }
 
+void Key::setPath(Path keyPathIn)
+{
+	keyPath = keyPathIn;
+}
 
 void Key::applyParameters(ValueTree nodeIn)
 {
@@ -99,7 +103,6 @@ void Key::paint(Graphics& g)
 	{
 		contrast = 0.25f;
 	}
-
 	if (isClicked)
 	{
 		contrast = 0.75f;
@@ -112,9 +115,12 @@ void Key::paint(Graphics& g)
 	g.setColour(colorToUse.contrasting(contrast));
 	g.fillRect(getLocalBounds());
 
-	Rectangle<int> outline = getLocalBounds().expanded(1, 1);
-	g.setColour(Colours::black);
-	g.drawRect(outline, 1.2f);
+	if (order == 0)
+	{
+		Rectangle<int> outline = getLocalBounds();
+		g.setColour(Colours::black);
+		g.drawRect(outline, 1.0f);
+	}
 
 	if (showNoteNumber)
 	{

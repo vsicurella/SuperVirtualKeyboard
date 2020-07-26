@@ -17,7 +17,6 @@ KeyboardViewport::KeyboardViewport(const String& nameIn, int scrollingModeIn, in
 	stepRightLarge->addListener(this);
 	addChildComponent(stepRightLarge.get());
 	
-
 	stepRightSmall.reset(new ImageButton());
 	stepRightSmall->addListener(this);
 	addChildComponent(stepRightSmall.get());

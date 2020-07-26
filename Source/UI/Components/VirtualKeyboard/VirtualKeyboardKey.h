@@ -30,13 +30,17 @@ namespace VirtualKeyboard
         Key(const Key& keyToCopy);
         
 		void applyParameters(ValueTree nodeIn);
+
+		void setPath(Path keyPathIn);
         
-        void paint(Graphics& g) override;
+        void paint(juce::Graphics& g) override;
         void resized() override;
         
         void mouseExit(const MouseEvent& e) override;
 
 		ValueTree node;
+
+		Path keyPath;
 
 		// Properties
 		int keyNumber = 0;
