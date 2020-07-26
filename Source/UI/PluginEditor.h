@@ -61,6 +61,7 @@ public:
 
 	void updateUI();
 	void updateScrollbarData();
+	void setScrollBarPosition(float positionIn);
 
 	//===============================================================================================
 
@@ -176,7 +177,7 @@ private:
     std::unique_ptr<MappingHelper> mappingHelper;
 
 	Keyboard* virtualKeyboard;
-	Viewport* viewport;
+	juce::Viewport* viewport;
 	float viewportX = 0.51f;
 	ScrollBar* viewportScroll;
 
@@ -188,6 +189,8 @@ private:
     //PluginSettingsDialog* pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
-    
+
+	TooltipWindow tooltip;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };
