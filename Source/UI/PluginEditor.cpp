@@ -74,6 +74,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 SvkPluginEditor::~SvkPluginEditor()
 {
+	//for (auto paramID : processor.getParamIDs())
+	//{
+	//	processor.svkValueTree.removeParameterListener(paramID, this);
+	//}
+
     pluginState->removeChangeListener(this);
 }
 
@@ -511,26 +516,26 @@ File SvkPluginEditor::fileDialog(String message, bool forSaving)
 	return chooser.getResult();
 }
 
-void SvkPluginEditor::parameterChanged (const String& paramID, float newValue)
+void SvkPluginEditor::parameterChanged(const String& paramID, float newValue)
 {
-    DBG("PARAMETER EDITED: " + paramID + " = " + String(newValue));
-    
-    if (paramID == IDs::mappingMode.toString())
-    {
-        setMappingMode();
-    }
-	else if (paramID == IDs::modeMappingStyle.toString())
-	{
-		setMappingStyle();
-	}
-	else if (paramID == IDs::pianoWHRatio.toString())
-	{
-		virtualKeyboard->setKeySizeRatio(newValue);
-	}
-	else if (paramID == IDs::keyboardNumRows.toString())
-	{
-		virtualKeyboard->setNumRows(newValue);
-	}
+	//DBG("PARAMETER EDITED: " + paramID + " = " + String(newValue));
+
+	//if (paramID == IDs::mappingMode.toString())
+	//{
+	//	setMappingMode();
+	//}
+	//else if (paramID == IDs::modeMappingStyle.toString())
+	//{
+	//	setMappingStyle();
+	//}
+	//else if (paramID == IDs::pianoWHRatio.toString())
+	//{
+	//	virtualKeyboard->setKeySizeRatio(newValue);
+	//}
+	//else if (paramID == IDs::keyboardNumRows.toString())
+	//{
+	//	virtualKeyboard->setNumRows(newValue);
+	//}
 }
 
 //==============================================================================

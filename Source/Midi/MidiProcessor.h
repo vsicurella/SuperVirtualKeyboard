@@ -13,9 +13,6 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../CommonFunctions.h"
 
-#include "ChannelAssigner.h"
-#include "TunedNoteInterpreter.h"
-
 #include "../Structures/MidiFilter.h"
 #include "../Structures/Mode.h"
 #include "../Structures/Tuning.h"
@@ -57,10 +54,10 @@ class SvkMidiProcessor : public MidiMessageCollector,
     std::unique_ptr<MidiFilter> midiOutputFilter;
 	Tuning* tuning = nullptr;
 
-    std::unique_ptr<MPEInstrument> mpeInst;
-    std::unique_ptr<TunedNoteInterpreter> retuner;
-    std::unique_ptr<SvkMpeChannelAssigner> channelAssigner;
-    MPEZoneLayout mpeZone;
+    //std::unique_ptr<MPEInstrument> mpeInst;
+    //std::unique_ptr<TunedNoteInterpreter> retuner;
+    //std::unique_ptr<SvkMpeChannelAssigner> channelAssigner;
+    //MPEZoneLayout mpeZone;
     
     int mpePitchbendTrackingMode = 0;
     int mpePressureTrackingMode = 0;
@@ -103,8 +100,6 @@ public:
     MidiKeyboardState* getOriginalKeyboardState();
     MidiKeyboardState* getRemappedKeyboardState();
     
-    bool isAutoRemapping();
-
     int getRootNote() const;
     int getPeriodShift() const;
     int getTransposeAmt() const;
@@ -118,19 +113,19 @@ public:
 	MidiFilter* getInputRemapMidiFilter();
 	MidiFilter* getOutputMidiFilter();
     
-    MPEInstrument* getMPEInstrument();
+    //MPEInstrument* getMPEInstrument();
 
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
     
-    bool isMPEOn() const;
-    bool isMPELegacyMode() const;
-    int isTuningPreservesMidiNote() const;
-    int getPitchbendNoteMax() const;
-    
-    int getPitchTrackingMode() const;
-    int getPressureTrackingMode() const;
-    int getTimbreTrackingMode() const;
+    //bool isMPEOn() const;
+    //bool isMPELegacyMode() const;
+    //int isTuningPreservesMidiNote() const;
+    //int getPitchbendNoteMax() const;
+    //
+    //int getPitchTrackingMode() const;
+    //int getPressureTrackingMode() const;
+    //int getTimbreTrackingMode() const;
     
     int getVoiceLimit() const;
     
@@ -156,14 +151,14 @@ public:
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
-    void updateMPEMode();
-    void setPitchBendNoteMax(int bendAmtIn);
-    void setPitchBendGlobalMax(int bendAmtIn);
-    void setTuningPreservesMidiNote(bool preserveMidiNote);
-    
-    void setPitchbendTrackingMode(int modeIn);
-    void setPressureTrackingMode(int modeIn);
-    void setTimbreTrackingMode(int modeIn);
+    //void updateMPEMode();
+    //void setPitchBendNoteMax(int bendAmtIn);
+    //void setPitchBendGlobalMax(int bendAmtIn);
+    //void setTuningPreservesMidiNote(bool preserveMidiNote);
+    //
+    //void setPitchbendTrackingMode(int modeIn);
+    //void setPressureTrackingMode(int modeIn);
+    //void setTimbreTrackingMode(int modeIn);
     
     void setVoiceLimit(int maxVoicesIn);
     
@@ -179,7 +174,7 @@ public:
     void resetOutputFilter(bool updateNode=true);
     
     void processMidi(MidiBuffer& midiMessages);
-    MidiBuffer convertToMPE(const MidiBuffer& bufferToConvert);
+    //MidiBuffer convertToMPE(const MidiBuffer& bufferToConvert);
     
     void sendMsgToOutputs(const MidiMessage& msgToSend);
     void sendBufferToOutputs(const MidiBuffer& bufferToSend);

@@ -421,10 +421,10 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 	if (isAutoMapping())
 		doMapping();
 
-	if (midiProcessor->isMPEOn())
-	{
-		setTuningToET(2, getMode2()->getScaleSize());
-	}
+	//if (midiProcessor->isMPEOn())
+	//{
+	//	setTuningToET(2, getMode2()->getScaleSize());
+	//}
 
     presetEdited = true;
 }
@@ -463,45 +463,45 @@ void SvkPluginState::setMapStyle(int mapStyleIn)
 		doMapping();
 	}
 }
-
-void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendGlobalMax, globalPitchBendMax, nullptr);
-    midiProcessor->setPitchBendGlobalMax(globalPitchBendMax);
-}
-
-void SvkPluginState::setNotePitchBendMax(int notePitchBendMax)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendNoteMax, notePitchBendMax, nullptr);
-    midiProcessor->setPitchBendGlobalMax(notePitchBendMax);
-}
-
-void SvkPluginState::setMaxPolyphony(int maxVoicesIn)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::maxVoices, maxVoicesIn, nullptr);
-    midiProcessor->setVoiceLimit(maxVoicesIn);
-}
-
-void SvkPluginState::setRetuneOn(bool toRetuneIn)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneOn, toRetuneIn, nullptr);
-    midiProcessor->setRetuneOn(toRetuneIn);
-}
-
-void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneAuto, toRetuneAutoIn, nullptr);
-    autoRetuneOn = toRetuneAutoIn;
-    
-    if (midiProcessor->isRetuning() && autoRetuneOn)
-        setTuningToModeET(2);
-}
-
-void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune)
-{
-    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune, nullptr);
-    midiProcessor->setTuningPreservesMidiNote(preseveMidiNoteRetune);
-}
+//
+//void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendGlobalMax, globalPitchBendMax, nullptr);
+//    midiProcessor->setPitchBendGlobalMax(globalPitchBendMax);
+//}
+//
+//void SvkPluginState::setNotePitchBendMax(int notePitchBendMax)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendNoteMax, notePitchBendMax, nullptr);
+//    midiProcessor->setPitchBendGlobalMax(notePitchBendMax);
+//}
+//
+//void SvkPluginState::setMaxPolyphony(int maxVoicesIn)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::maxVoices, maxVoicesIn, nullptr);
+//    midiProcessor->setVoiceLimit(maxVoicesIn);
+//}
+//
+//void SvkPluginState::setRetuneOn(bool toRetuneIn)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneOn, toRetuneIn, nullptr);
+//    midiProcessor->setRetuneOn(toRetuneIn);
+//}
+//
+//void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneAuto, toRetuneAutoIn, nullptr);
+//    autoRetuneOn = toRetuneAutoIn;
+//    
+//    if (midiProcessor->isRetuning() && autoRetuneOn)
+//        setTuningToModeET(2);
+//}
+//
+//void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune)
+//{
+//    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune, nullptr);
+//    midiProcessor->setTuningPreservesMidiNote(preseveMidiNoteRetune);
+//}
 
 void SvkPluginState::setShowNoteNums(bool showNoteNumsIn)
 {
