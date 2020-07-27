@@ -79,7 +79,7 @@ void KeyboardPositioner::resizeKey(Key& key)
         {
             case(KeyPlacementType::flat):
             {
-                height = stepHeight - stepHeight * (key.order - 1) / key.step;
+				height = stepHeight - stepHeight * (key.order - 1) / (float)key.step * 1.125f;
                 break;
             }
 
