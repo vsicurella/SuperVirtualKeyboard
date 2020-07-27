@@ -78,7 +78,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	int getMappingStyle();
     bool isAutoMapping();
 
-    bool isAutoRetuning();
+    //bool isAutoRetuning();
 
 	int getModeSlotRoot(int slotNum);
 	int getMode1Root();
@@ -100,13 +100,13 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setMapMode(int mapModeSelectionIn);
 	void setMapStyle(int mapStyleIn);
     
-    void setGlobalPitchBendMax(int globalPitchBendMax);
-    void setNotePitchBendMax(int notePitchBendMax);
-    void setMaxPolyphony(int maxVoicesIn);
+    //void setGlobalPitchBendMax(int globalPitchBendMax);
+    //void setNotePitchBendMax(int notePitchBendMax);
+    //void setMaxPolyphony(int maxVoicesIn);
     
-    void setRetuneOn(bool toRetuneIn);
-    void setRetuneAuto(bool toRetuneAutoIn);
-    void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune);
+    //void setRetuneOn(bool toRetuneIn);
+    //void setRetuneAuto(bool toRetuneAutoIn);
+    //void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune);
 
 	void setShowNoteNums(bool showNoteNumsIn);
 	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);

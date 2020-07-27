@@ -26,19 +26,19 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
         
-	retuner.reset(new TunedNoteInterpreter());
-    retuner->setPitchBendMax(48);
-    
-    mpeInst.reset(new MPEInstrument());
-    channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
-    channelAssigner->setIgnorePitchbend(true); // temporary
+	//retuner.reset(new TunedNoteInterpreter());
+ //   retuner->setPitchBendMax(48);
+ //   
+ //   mpeInst.reset(new MPEInstrument());
+ //   channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
+ //   channelAssigner->setIgnorePitchbend(true); // temporary
 
     // default sample rate
     reset(41000);
     
-    mpeZone.setLowerZone(maxNumVoices, pitchBendNoteMax, pitchBendGlobalMax);
-    mpeInst->setZoneLayout(mpeZone);
-    updateMPEMode();
+    //mpeZone.setLowerZone(maxNumVoices, pitchBendNoteMax, pitchBendGlobalMax);
+    //mpeInst->setZoneLayout(mpeZone);
+    //updateMPEMode();
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -68,14 +68,14 @@ void SvkMidiProcessor::connectToParameters()
 void SvkMidiProcessor::updateNode()
 {
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeInst->isLegacyModeEnabled(), nullptr);
-    midiSettingsNode.setProperty(IDs::pitchBendNoteMax, pitchBendNoteMax, nullptr);
-    midiSettingsNode.setProperty(IDs::pitchBendGlobalMax, mpeInst->getLegacyModePitchbendRange(), nullptr);
-    midiSettingsNode.setProperty(IDs::mpePitchTrackingMode, mpePitchbendTrackingMode, nullptr);
-    midiSettingsNode.setProperty(IDs::mpePressureTrackingMode, mpePressureTrackingMode, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
-    midiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, mpeTuningPreserveMidiNote, nullptr);
+    //midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
+    //midiSettingsNode.setProperty(IDs::mpeLegacyOn, mpeInst->isLegacyModeEnabled(), nullptr);
+    //midiSettingsNode.setProperty(IDs::pitchBendNoteMax, pitchBendNoteMax, nullptr);
+    //midiSettingsNode.setProperty(IDs::pitchBendGlobalMax, mpeInst->getLegacyModePitchbendRange(), nullptr);
+    //midiSettingsNode.setProperty(IDs::mpePitchTrackingMode, mpePitchbendTrackingMode, nullptr);
+    //midiSettingsNode.setProperty(IDs::mpePressureTrackingMode, mpePressureTrackingMode, nullptr);
+    //midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
+    //midiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, mpeTuningPreserveMidiNote, nullptr);
     
     Array<int> inputFilter = midiInputFilter->getRemappedNotes();
     midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputFilter), nullptr);
@@ -169,30 +169,30 @@ int SvkMidiProcessor::getTransposeAmt() const
     return transposeAmt;
 }
 
-bool SvkMidiProcessor::isMPEOn() const
-{
-    return mpeOn;
-}
-
-int SvkMidiProcessor::getPitchbendNoteMax() const
-{
-    return pitchBendNoteMax;
-}
-
-int SvkMidiProcessor::getPitchTrackingMode() const
-{
-    return mpePitchbendTrackingMode;
-}
-
-int SvkMidiProcessor::getPressureTrackingMode() const
-{
-    return mpePressureTrackingMode;
-}
-
-int SvkMidiProcessor::getTimbreTrackingMode() const
-{
-    return mpeTimbreTrackingMode;
-}
+//bool SvkMidiProcessor::isMPEOn() const
+//{
+//    return mpeOn;
+//}
+//
+//int SvkMidiProcessor::getPitchbendNoteMax() const
+//{
+//    return pitchBendNoteMax;
+//}
+//
+//int SvkMidiProcessor::getPitchTrackingMode() const
+//{
+//    return mpePitchbendTrackingMode;
+//}
+//
+//int SvkMidiProcessor::getPressureTrackingMode() const
+//{
+//    return mpePressureTrackingMode;
+//}
+//
+//int SvkMidiProcessor::getTimbreTrackingMode() const
+//{
+//    return mpeTimbreTrackingMode;
+//}
 
 int SvkMidiProcessor::getVoiceLimit() const
 {
@@ -204,10 +204,10 @@ bool SvkMidiProcessor::isRetuning() const
     return doRetuning;
 }
 
-int SvkMidiProcessor::isTuningPreservesMidiNote() const
-{
-    return mpeTuningPreserveMidiNote;
-}
+//int SvkMidiProcessor::isTuningPreservesMidiNote() const
+//{
+//    return mpeTuningPreserveMidiNote;
+//}
 
 NoteMap* SvkMidiProcessor::getInputNoteRemap()
 {
@@ -228,11 +228,11 @@ MidiFilter* SvkMidiProcessor::getOutputMidiFilter()
 {
 	return midiOutputFilter.get();
 }
-
-MPEInstrument* SvkMidiProcessor::getMPEInstrument()
-{
-    return mpeInst.get();
-}
+//
+//MPEInstrument* SvkMidiProcessor::getMPEInstrument()
+//{
+//    return mpeInst.get();
+//}
 
 int SvkMidiProcessor::getInputNote(int midiNoteIn)
 {
@@ -302,65 +302,65 @@ void SvkMidiProcessor::setMode2(Mode* mode2In)
 void SvkMidiProcessor::setTuning(Tuning* tuningIn)
 {
 	tuning = tuningIn;
-	retuner->resetTuning(tuning);
+	//retuner->resetTuning(tuning);
 }
 
-void SvkMidiProcessor::updateMPEMode()
-{
-    if (isMPEOn())
-    {
-        mpeInst->setZoneLayout(mpeZone);
-        channelAssigner->allNotesOff();
-        // TODO: actually turn notes off
-    }
-    else
-    {
-        mpeInst->setLegacyModeChannelRange(Range<int>(1, 2));
-        channelAssigner->allNotesOff();
-    }
-}
+//void SvkMidiProcessor::updateMPEMode()
+//{
+//    if (isMPEOn())
+//    {
+//        mpeInst->setZoneLayout(mpeZone);
+//        channelAssigner->allNotesOff();
+//        // TODO: actually turn notes off
+//    }
+//    else
+//    {
+//        mpeInst->setLegacyModeChannelRange(Range<int>(1, 2));
+//        channelAssigner->allNotesOff();
+//    }
+//}
+//
+//void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
+//{
+//    pitchBendNoteMax = bendAmtIn;
+//    retuner->setPitchBendMax(pitchBendNoteMax);
+//}
+//
+//void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
+//{
+//    pitchBendGlobalMax = bendAmtIn;
+//    //mpeInst->setLegacyModePitchbendRange(bendAmtIn);
+//}
+//
+//void SvkMidiProcessor::setTuningPreservesMidiNote(bool preserveMidiNote)
+//{
+//    mpeTuningPreserveMidiNote = preserveMidiNote;
+//}
 
-void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
-{
-    pitchBendNoteMax = bendAmtIn;
-    retuner->setPitchBendMax(pitchBendNoteMax);
-}
-
-void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
-{
-    pitchBendGlobalMax = bendAmtIn;
-    //mpeInst->setLegacyModePitchbendRange(bendAmtIn);
-}
-
-void SvkMidiProcessor::setTuningPreservesMidiNote(bool preserveMidiNote)
-{
-    mpeTuningPreserveMidiNote = preserveMidiNote;
-}
-
-void SvkMidiProcessor::setPitchbendTrackingMode(int modeIn)
-{
-    mpePitchbendTrackingMode = modeIn;
-    mpeInst->setPitchbendTrackingMode(MPEInstrument::TrackingMode(mpePitchbendTrackingMode));
-}
-
-void SvkMidiProcessor::setPressureTrackingMode(int modeIn)
-{
-    mpePressureTrackingMode = modeIn;
-    mpeInst->setPressureTrackingMode(MPEInstrument::TrackingMode(mpePressureTrackingMode));
-}
-
-void SvkMidiProcessor::setTimbreTrackingMode(int modeIn)
-{
-    mpeTimbreTrackingMode = modeIn;
-    mpeInst->setTimbreTrackingMode(MPEInstrument::TrackingMode(mpeTimbreTrackingMode));
-}
-
-void SvkMidiProcessor::setVoiceLimit(int maxVoicesIn)
-{
-    maxNumVoices = maxVoicesIn;
-    mpeZone.setLowerZone(maxVoicesIn, pitchBendNoteMax, pitchBendGlobalMax);
-    mpeInst->setZoneLayout(mpeZone);
-}
+//void SvkMidiProcessor::setPitchbendTrackingMode(int modeIn)
+//{
+//    mpePitchbendTrackingMode = modeIn;
+//    mpeInst->setPitchbendTrackingMode(MPEInstrument::TrackingMode(mpePitchbendTrackingMode));
+//}
+//
+//void SvkMidiProcessor::setPressureTrackingMode(int modeIn)
+//{
+//    mpePressureTrackingMode = modeIn;
+//    mpeInst->setPressureTrackingMode(MPEInstrument::TrackingMode(mpePressureTrackingMode));
+//}
+//
+//void SvkMidiProcessor::setTimbreTrackingMode(int modeIn)
+//{
+//    mpeTimbreTrackingMode = modeIn;
+//    mpeInst->setTimbreTrackingMode(MPEInstrument::TrackingMode(mpeTimbreTrackingMode));
+//}
+//
+//void SvkMidiProcessor::setVoiceLimit(int maxVoicesIn)
+//{
+//    maxNumVoices = maxVoicesIn;
+//    mpeZone.setLowerZone(maxVoicesIn, pitchBendNoteMax, pitchBendGlobalMax);
+//    mpeInst->setZoneLayout(mpeZone);
+//}
 
 void SvkMidiProcessor::setRetuneOn(bool retuneOn)
 {
@@ -515,127 +515,136 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
     int midiNote;
     msgCount = 0;
     
+	// Add external input into queue
     while (inputEvents.getNextEvent(msg, smpl))
     {
-        if (isInputFiltered)
-        {
-            midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
-            msg.setNoteNumber(midiNote);
-        }
-        
-        // check for out of range notes?
-        originalKeyboardState->processNextMidiEvent(msg);
-    
-        if (isInputRemapped)
-        {
-            midiNote = midiInputRemap->getNoteRemapped(msg.getNoteNumber());
-			msg.setNoteNumber(midiNote);
-        }
-        
-        remappedKeyboardState->processNextMidiEvent(msg);
-        msg.setTimeStamp((double)smpl + ++msgCount);
+		if (msg.isNoteOnOrOff())
+		{
+			if (isInputFiltered)
+			{
+				midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
+				msg.setNoteNumber(midiNote);
+			}
+
+			// check for out of range notes?
+			originalKeyboardState->processNextMidiEvent(msg);
+
+			if (isInputRemapped)
+			{
+				midiNote = midiInputRemap->getNoteRemapped(msg.getNoteNumber());
+				msg.setNoteNumber(midiNote);
+			}
+
+			remappedKeyboardState->processNextMidiEvent(msg);
+			msg.setTimeStamp((double)smpl + ++msgCount);
+		}
+
         addMessageToQueue(msg);
     }
+
+	// Get all messages
     
     MidiBuffer preBuffer;
     removeNextBlockOfMessages(preBuffer, 4096);
     
+
+	// Output Filtering on all MIDI events
     auto allMidiEvents = MidiBuffer::Iterator(preBuffer);
     msgCount = 0;
-    
-    // Output Filtering
     while (allMidiEvents.getNextEvent(msg, smpl))
     {
         // Process transpositions
-        
-        midiNote = msg.getNoteNumber() + transposeAmt;
-        midiNote += (periodShift * mode2->getScaleSize());
-        msg.setNoteNumber(midiNote);
-        
-        if (isOutputFiltered)
-        {
-            midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
-            msg.setNoteNumber(midiNote);
-        }
+		if (msg.isNoteOnOrOff())
+		{
+			midiNote = msg.getNoteNumber() + transposeAmt;
+			midiNote += (periodShift * mode2->getScaleSize());
+			msg.setNoteNumber(midiNote);
+
+			if (isOutputFiltered)
+			{
+				midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
+				msg.setNoteNumber(midiNote);
+			}
+		}
     }
     
-    if (isMPEOn())
-    {
-        MidiBuffer mpeBuffer;
-        mpeBuffer = convertToMPE(preBuffer);
-        preBuffer = mpeBuffer;
-    }
+    //if (isMPEOn())
+    //{
+    //    MidiBuffer mpeBuffer;
+    //    mpeBuffer = convertToMPE(preBuffer);
+    //    preBuffer = mpeBuffer;
+    //}
     
     midiMessages = preBuffer;
     sendBufferToOutputs(midiMessages);
     msgCount = 0;
 }
 
-MidiBuffer SvkMidiProcessor::convertToMPE(const MidiBuffer& bufferIn)
-{
-    MidiBuffer mpeOut;
-
-    auto midiEvents = MidiBuffer::Iterator(bufferIn);
-    MidiMessage msgIn, msgOut, pitchBendOut;
-    int smpl;
-    int mpeMsgCount = 0;
-
-    MPENote mpeNote;
-    MidiPitch midiPitch(-1, 0);
-    int pitchBend;
-    int newChannel;
-
-    while (midiEvents.getNextEvent(msgIn, smpl))
-    {
-        if (msgIn.isNoteOff())
-        {
-            if (mpeTuningPreserveMidiNote || tuning == nullptr)
-            {
-                midiPitch = MidiPitch(msgIn.getNoteNumber(), 8192);
-            }
-            else
-            {
-                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
-            }
-            
-            newChannel = channelAssigner->noteOff(midiPitch);
-            
-            msgOut = MidiMessage::noteOff(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
-            
-            mpeOut.addEvent(MidiMessage::pitchWheel(newChannel, midiPitch.value), smpl + mpeMsgCount);
-            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
-        }
-        
-        else if (msgIn.isNoteOn())
-        {
-            
-			if (tuning == nullptr)
-			{
-				pitchBend = 8192;
-				midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
-			}
-            if (mpeTuningPreserveMidiNote)
-            {
-                pitchBend = retuner->calculatePitchbendFromStdMidiNote(msgIn.getNoteNumber());
-                midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
-            }
-            else
-            {
-                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
-            }
-
-            newChannel = channelAssigner->findMidiChannelForNote(midiPitch);
-            
-            msgOut = MidiMessage::noteOn(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
-            pitchBendOut = MidiMessage::pitchWheel(newChannel, midiPitch.value);
-            
-            mpeOut.addEvent(pitchBendOut, smpl + mpeMsgCount);
-            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
-        }
-    }
-
-    return mpeOut;
-}
+//MidiBuffer SvkMidiProcessor::convertToMPE(const MidiBuffer& bufferIn)
+//{
+//    MidiBuffer mpeOut;
+//
+//    auto midiEvents = MidiBuffer::Iterator(bufferIn);
+//    MidiMessage msgIn, msgOut, pitchBendOut;
+//    int smpl;
+//    int mpeMsgCount = 0;
+//
+//    MPENote mpeNote;
+//    MidiPitch midiPitch(-1, 0);
+//    int pitchBend;
+//    int newChannel;
+//
+//    while (midiEvents.getNextEvent(msgIn, smpl))
+//    {
+//        if (msgIn.isNoteOff())
+//        {
+//            if (mpeTuningPreserveMidiNote || tuning == nullptr)
+//            {
+//                midiPitch = MidiPitch(msgIn.getNoteNumber(), 8192);
+//            }
+//            else
+//            {
+//                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
+//            }
+//            
+//            newChannel = channelAssigner->noteOff(midiPitch);
+//            
+//            msgOut = MidiMessage::noteOff(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
+//            
+//            mpeOut.addEvent(MidiMessage::pitchWheel(newChannel, midiPitch.value), smpl + mpeMsgCount);
+//            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
+//        }
+//        
+//        else if (msgIn.isNoteOn())
+//        {
+//            
+//			if (tuning == nullptr)
+//			{
+//				pitchBend = 8192;
+//				midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
+//			}
+//            if (mpeTuningPreserveMidiNote)
+//            {
+//                pitchBend = retuner->calculatePitchbendFromStdMidiNote(msgIn.getNoteNumber());
+//                midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
+//            }
+//            else
+//            {
+//                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
+//            }
+//
+//            newChannel = channelAssigner->findMidiChannelForNote(midiPitch);
+//            
+//            msgOut = MidiMessage::noteOn(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
+//            pitchBendOut = MidiMessage::pitchWheel(newChannel, midiPitch.value);
+//            
+//            mpeOut.addEvent(pitchBendOut, smpl + mpeMsgCount);
+//            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
+//        }
+//    }
+//
+//    return mpeOut;
+//}
 
 void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
 {

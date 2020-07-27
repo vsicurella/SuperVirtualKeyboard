@@ -8,17 +8,9 @@
               jucerFormatVersion="1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
     <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
-      <FILE id="ytvF67" name="ChannelAssigner.cpp" compile="1" resource="0"
-            file="Source/Midi/ChannelAssigner.cpp"/>
-      <FILE id="hzQIcx" name="ChannelAssigner.h" compile="0" resource="0"
-            file="Source/Midi/ChannelAssigner.h"/>
       <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
       <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"
             file="Source/Midi/MidiProcessor.cpp"/>
-      <FILE id="K9KkLT" name="TunedNoteInterpreter.h" compile="0" resource="0"
-            file="Source/Midi/TunedNoteInterpreter.h"/>
-      <FILE id="xgxwGW" name="TunedNoteInterpreter.cpp" compile="1" resource="0"
-            file="Source/Midi/TunedNoteInterpreter.cpp"/>
     </GROUP>
     <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
       <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
