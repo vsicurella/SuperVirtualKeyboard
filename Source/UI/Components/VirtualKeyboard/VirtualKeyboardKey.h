@@ -20,7 +20,7 @@ namespace VirtualKeyboard
     {
         
     public:
-        
+
 		Key();
 		Key(int keyNumIn);
 		Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
@@ -28,6 +28,15 @@ namespace VirtualKeyboard
 			bool showNoteNumIn = false, bool showNoteNameIn = false, Colour colorIn = Colours::transparentBlack);
         Key(ValueTree keyNodeIn);
         Key(const Key& keyToCopy);
+
+		Colour getDefaultColor() const;
+
+		Colour getCustomColor() const;
+
+		
+		void setDefaultColor(Colour colorIn);
+
+		void setCustomColor(Colour colorIn);
         
 		void applyParameters(ValueTree nodeIn);
 
@@ -64,6 +73,11 @@ namespace VirtualKeyboard
         bool showNoteNumber = false;
         bool showNoteLabel = false;
 		float velocityFixed = 1;
-		Colour color = Colours::transparentBlack;
+
+
+
+	private:
+		Colour defaultColor = Colours::transparentBlack;
+		Colour customColor = Colours::transparentBlack;
     };
 }

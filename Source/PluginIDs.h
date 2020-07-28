@@ -138,6 +138,7 @@ static Identifier pianoKeyPlaceSingle("KeySinglePlaces");
 static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 static Identifier pianoKeyRatioSingle("KeySingleRatios");
+static Identifier colorSelected("ColorSelected");
 
 // Piano Key Component
 static Identifier pianoKeyTreeNode("PianoKeyTree");

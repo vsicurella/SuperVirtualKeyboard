@@ -18,7 +18,8 @@
 
 */
 class ColorChooserWindow  : public DocumentWindow,
-							public ChangeBroadcaster
+							public ChangeBroadcaster,
+							public ChangeListener
 {
 public:
     //==============================================================================
@@ -32,6 +33,8 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
 

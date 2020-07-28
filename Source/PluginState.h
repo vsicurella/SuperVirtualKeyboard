@@ -13,6 +13,7 @@
 
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
+#include "PluginModes.h"
 #include "PluginSettings.h"
 #include "Midi/MidiProcessor.h"
 #include "PresetManager.h"
