@@ -38,10 +38,14 @@ void ColorChooserWindow::resized()
     DocumentWindow::resized();
 }
 
+void ColorChooserWindow::changeListenerCallback(ChangeBroadcaster* source)
+{
+	sendChangeMessage();
+}
+
 void ColorChooserWindow::closeButtonPressed()
 {
 	sendChangeMessage();
-	setVisible(false);
 }
 
 Colour ColorChooserWindow::getColorSelected()

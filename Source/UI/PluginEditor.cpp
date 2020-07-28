@@ -48,6 +48,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	colorSelector.reset(new ColourSelector());
 	colorSelector->setSize(450, 450);
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
+	colorSelector->addChangeListener(this);
 
 	pluginState->addChangeListener(this);
 
@@ -79,6 +80,9 @@ SvkPluginEditor::~SvkPluginEditor()
 	//	processor.svkValueTree.removeParameterListener(paramID, this);
 	//}
 
+
+	colorSelector->removeChangeListener(this);
+	colorChooserWindow->removeChangeListener(this);
     pluginState->removeChangeListener(this);
 }
 
@@ -343,7 +347,7 @@ void SvkPluginEditor::setMidiChannel(int midiChannelIn)
 void SvkPluginEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
-	//virtualKeyboard->setUIMode(UIMode::colorMode);
+	virtualKeyboard->setUIMode(UIMode::editMode);
     isColorEditing = true;
 }
 
@@ -458,17 +462,24 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		pluginState->updateModeViewed(false);
     }
     
-    // Color editing has finished
+	// Color editing is finished
 	if (source == colorChooserWindow.get())
 	{
-//        if (virtualKeyboard->getUIMode() == UIMode::colorMode)
-//        {
-//            virtualKeyboard->updatePianoNode();
-//            virtualKeyboard->updateKeyColors();
-//            virtualKeyboard->setUIMode(UIMode::playMode);
-//        }
-        
-        isColorEditing = false;
+		isColorEditing = false;
+
+		//virtualKeyboard->updatePianoNode();
+		//virtualKeyboard->updateKeyColors();
+		virtualKeyboard->setUIMode(UIMode::playMode);
+		colorChooserWindow->setVisible(false);
+	}
+
+	// Color changed
+	if (source == colorSelector.get())
+	{
+		virtualKeyboard->getProperties().set(
+			IDs::colorSelected,
+			colorSelector->getCurrentColour().toString()
+		);
 	}
 
 	// Mode Info Changed
@@ -565,7 +576,6 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::beginColorEditing,
 		IDs::CommandIDs::showMidiNoteNumbers,
 		IDs::CommandIDs::setKeyStyle,
-		IDs::CommandIDs::beginColorEditing,
 	};
 
 	c.addArray(commands);

@@ -137,15 +137,6 @@ void Keyboard::initializeKeys(int size)
 void Keyboard::paint(juce::Graphics& g)
 {
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
-
-	for (int i = 0; i < keys.size(); i++)
-	{
-		Colour c = getKeyColor(i);
-		Key* key = keys[i];
-		key->color = c;
-		key->setColour(0, c);
-		//key->repaint();
-	}
 }
 
 void Keyboard::paintOverChildren(juce::Graphics& g)
@@ -317,33 +308,40 @@ void Keyboard::mouseDown(const MouseEvent& e)
 			{
 				if (e.mods.isShiftDown())
 				{
-					//virtualKeyboard->resetKeyOrderColors(key->order, true);
+					resetKeyColorsInOrder(key->order);
 				}
 				else if (e.mods.isCtrlDown())
 				{
-					//virtualKeyboard->resetKeyColor(key->keyNumber);
+					resetKeyColor(key->keyNumber);
 				}
 				else
 				{
-					//virtualKeyboard->resetKeyDegreeColors(key->keyNumber);
+					resetDegreeColors(key->keyNumber);
 				}
 			}
 
 			else if (e.mods.isShiftDown())
 			{
-				//if (virtualKeyboard->getKeyDegreeColor(key->scaleDegree).isOpaque())
-					//virtualKeyboard->resetKeyDegreeColors(key->scaleDegree);
+				if (getKeyDegreeColor(key->scaleDegree).isOpaque())
+					resetDegreeColors(key->scaleDegree);
 
-				//else if (virtualKeyboard->getKeySingleColor(key->keyNumber).isOpaque())
-				//    virtualKeyboard->resetKeyColor(key->keyNumber);
+				else if (getKeyColor(key->keyNumber).isOpaque())
+				    resetKeyColor(key->keyNumber);
 
-				//virtualKeyboard->setKeyColorOrder(key->order, 3, colorSelector->getCurrentColour());
-			//}
-			//else if (e.mods.isCtrlDown())
-			//    virtualKeyboard->beginColorEditing(key->keyNumber, 3, colorSelector->getCurrentColour());
-			//else
-			//    virtualKeyboard->setKeyColorDegree(key->keyNumber, 3, colorSelector->getCurrentColour());
+				setKeyColorOrder(key->order, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
 			}
+
+			else if (e.mods.isCtrlDown())
+			{
+				key->setCustomColor(Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+			}
+
+			else
+			{
+				setKeyColorDegree(key->scaleDegree, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+			}
+			
+			updateKeyColors();
 		}
 	}
 }
@@ -794,6 +792,12 @@ void Keyboard::applyMode(Mode* modeIn)
 	numOrder0Keys = mode->getKeyboardOrdersSize(0);
 	keyPositioner.setNumModeKeys(numOrder0Keys);
 
+	// resize arrays based on new properties
+	keyColorsOrders.clear();
+	keyColorsOrders.resize(mode->getMaxStep());
+	keyColorsDegrees.clear();
+	keyColorsDegrees.resize(mode->getScaleSize());
+
 	int period = 0;
 
 	for (int i = 0; i < keys.size(); i++)
@@ -814,19 +818,6 @@ void Keyboard::applyMode(Mode* modeIn)
 	keysScaleDegree = mode->getNotesInScaleDegrees();
 	keysModalDegree = mode->getNotesInModalDegrees();
 
-	// resize based on new properties
-	if (keyColorsOrders.get())
-	{
-		keyColorsOrders->clear();
-		keyColorsOrders->resize(mode->getMaxStep());
-	}
-
-	if (keyColorsDegrees.get())
-	{
-		keyColorsDegrees->clear();
-		keyColorsDegrees->resize(mode->getScaleSize());
-	}
-
 	// add from back to front
 	for (int o = 0; o < keysOrder.size(); o++)
 	{
@@ -840,6 +831,7 @@ void Keyboard::applyMode(Mode* modeIn)
 		}
 	}
 
+	updateKeyColors();
 	hasDirtyKeys = true;
 }
 
@@ -874,6 +866,12 @@ void Keyboard::setUIMode(int uiModeIn)
     uiModeSelected = uiModeIn;
 	pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
 	
+	if (uiModeIn == playMode)
+	{
+		updateKeyColors();
+		repaint();
+	}
+
 	// Do stuff
 }
 
@@ -1044,27 +1042,18 @@ Colour Keyboard::getKeyColor(int keyNumIn)
 	Colour c;
 	Key* key = keys[keyNumIn];
 
-	if (key->color.isOpaque() && false) // need to fix this for switching modes
-		c = key->color;
+	if (key->getCustomColor().isOpaque()) // need to fix this for switching modes
+		c = key->getCustomColor();
 
-	else if (keyColorsDegrees)
-	{
-		if (keyColorsDegrees->getUnchecked(key->scaleDegree).isOpaque())
-			c = keyColorsDegrees->getUnchecked(key->scaleDegree);
-	}
+	else if (keyColorsDegrees[key->scaleDegree].isOpaque())
+			c = keyColorsDegrees[key->scaleDegree];
 
-	else if (keyColorsOrders)
-	{
-		if (keyColorsOrders->getUnchecked(key->order).isOpaque())
-			c = keyColorsOrders->getUnchecked(key->order);
-	}
-
-	else
-    {
+	else if (keyColorsOrders[key->order].isOpaque())
+			c = keyColorsOrders[key->order];
+	
+	else 
 		c = colorsDefaultOrders[key->order];
-    }
-
-  
+    
   return c;
 }
 
@@ -1072,11 +1061,9 @@ Colour Keyboard::getKeyOrderColor(int orderIn)
 {
 	Colour c;
 
-	if (keyColorsOrders)
-	{
-		if (keyColorsOrders->getUnchecked(orderIn).isOpaque())
-			c = keyColorsOrders->getUnchecked(orderIn);
-	}
+	if (keyColorsOrders[orderIn].isOpaque())
+			c = keyColorsOrders[orderIn];
+
 	else
 		c = colorsDefaultOrders[orderIn];
 
@@ -1087,11 +1074,9 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 {
 	Colour c;
 
-	if (keyColorsDegrees)
-	{
-		if (keyColorsDegrees->getUnchecked(degIn).isOpaque())
-			c = keyColorsDegrees->getUnchecked(degIn);
-	}
+	if (keyColorsDegrees[degIn].isOpaque())
+			c = keyColorsDegrees[degIn];
+	
 	else // this deg->order conversion is probably wrong
 		c = colorsDefaultOrders[mode->getOrder(degIn)];
 
@@ -1100,48 +1085,44 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 
 void Keyboard::setKeyColorOrder(int orderIn, Colour colorIn)
 {
-	if (keyColorsOrders)
-	{
-		keyColorsOrders->set(orderIn, colorIn);
-	}
+	keyColorsOrders.set(orderIn, colorIn);
 }
 
 void Keyboard::setKeyColorDegree(int tuningDegreeIn, Colour colorIn)
 {
-	if (keyColorsDegrees)
+	keyColorsDegrees.set(tuningDegreeIn, colorIn);
+}
+
+void Keyboard::updateKeyColors()
+{
+	for (int i = 0; i < keys.size(); i++)
 	{
-		keyColorsDegrees->set(tuningDegreeIn, colorIn);
+		Key* key = keys[i];
+		key->setDefaultColor(getKeyColor(i));
 	}
 }
 
 void Keyboard::resetKeyColorsInOrder(int orderIn)
 {
-	if (keyColorsOrders)
-	{
-		keyColorsOrders->clear();
-		keyColorsOrders->resize(mode->getMaxStep());
-	}
+	keyColorsOrders.clear();
+	keyColorsOrders.resize(mode->getMaxStep());
 }
 
 void Keyboard::resetDegreeColors(int tuningDegreeIn)
 {
-	if (keyColorsDegrees)
-	{
-		keyColorsDegrees->clear();
-		keyColorsDegrees->resize(mode->getScaleSize());
-	}
+	keyColorsDegrees.clear();
+	keyColorsDegrees.resize(mode->getScaleSize());
+	
 }
 
 void Keyboard::resetKeyColor(int keyNumberIn)
 {
 	Key* key = keys[keyNumberIn];
-	key->color = Colours::transparentBlack;
+	key->setDefaultColor(Colours::transparentBlack);
 }
-
 
 void Keyboard::resetKeyColors()
 {
-
 	for (int i = 0; i < keys.size(); i++)
 	{
 		resetKeyColor(i);

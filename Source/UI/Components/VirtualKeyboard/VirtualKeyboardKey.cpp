@@ -16,6 +16,7 @@ Key::Key()
 {
     setName("Key");
     node = ValueTree(IDs::pianoKeyNode);
+	setDefaultColor(Colours::transparentBlack);
 }
 
 Key::Key(int keyNumIn)
@@ -41,7 +42,7 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 	yOffset = yOff;
 	showNoteNumber = showNoteNumIn;
 	showNoteLabel = showNoteNameIn;
-	color = colorIn;
+	setDefaultColor(colorIn);
 }
 
 Key::Key(ValueTree keyNodeIn)
@@ -57,7 +58,7 @@ Key::Key(ValueTree keyNodeIn)
 Key::Key(const Key& keyToCopy)
 : Key(keyToCopy.keyNumber, keyToCopy.order, keyToCopy.scaleDegree, keyToCopy.modeDegree, keyToCopy.step,
       keyToCopy.pitchName, keyToCopy.widthMod, keyToCopy.heightMod, keyToCopy.xOffset, keyToCopy.yOffset,
-      keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.color)
+      keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.defaultColor)
 {
     node = keyToCopy.node.createCopy();
 }
@@ -90,13 +91,26 @@ void Key::applyParameters(ValueTree nodeIn)
 		else if (id == IDs::keyboardShowsNoteLabels)
 			showNoteLabel = nodeIn.getProperty(id);
 		else if (id == IDs::pianoKeyColor)
-			color = Colour::fromString(nodeIn.getProperty(id).toString());
+			setDefaultColor(Colour::fromString(nodeIn.getProperty(id).toString()));
 	}
+}
+
+Colour Key::getDefaultColor() const
+{
+	return defaultColor;
+}
+
+Colour Key::getCustomColor() const
+{
+	return customColor;
 }
 
 void Key::paint(Graphics& g)
 {
-	Colour colorToUse = color;
+	Colour colorToUse = customColor.isOpaque() 
+		? customColor
+		: defaultColor;
+
 	float contrast = 0;
 
 	if (isMouseOver())
@@ -124,7 +138,7 @@ void Key::paint(Graphics& g)
 
 	if (showNoteNumber)
 	{
-		g.setColour(color.contrasting());
+		g.setColour(defaultColor.contrasting());
 		String numTxt = String(keyNumber);
 		Rectangle<int> txtArea = getLocalBounds();
 		txtArea.removeFromBottom(6);
@@ -150,4 +164,17 @@ void Key::mouseExit(const MouseEvent& e)
 	//	repaint();
 	//}
 
+}
+
+void Key::setDefaultColor(Colour colorIn)
+{
+	defaultColor = colorIn;
+	customColor = Colours::transparentBlack;
+	repaint();
+}
+
+void Key::setCustomColor(Colour colorIn)
+{
+	customColor = colorIn;
+	repaint();
 }

@@ -388,6 +388,11 @@ namespace VirtualKeyboard
 		void setKeyColorDegree(int tuningDegreeIn, Colour colorIn);
 
 		/*
+			Sets the display color of all the keys
+		*/
+		void updateKeyColors();
+
+		/*
 			Resets the color of all the keys in the given order to the current order color.
 		*/
 		void resetKeyColorsInOrder(int orderIn);
@@ -530,8 +535,8 @@ namespace VirtualKeyboard
         // Data
         ValueTree pianoNode;
         OwnedArray<Key> keys;
-		std::unique_ptr<Array<Colour>> keyColorsOrders;
-		std::unique_ptr<Array<Colour>> keyColorsDegrees;
+		Array<Colour> keyColorsOrders;
+		Array<Colour> keyColorsDegrees;
         
         Mode* mode;
 		Mode modeDefault;

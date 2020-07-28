@@ -13,6 +13,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginProcessor.h"
 
+#include "../PluginModes.h"
+
 #include "../Structures/Mode.h"
 #include "../Structures/MappingHelper.h"
 
