@@ -697,8 +697,8 @@ void SvkPluginState::updateModeViewed(bool sendChange)
     virtualKeyboard->resized();
 
 	//TODO: Change VirtualKeyboard displayed keyboard state
-	getModeViewedNum() ? virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState()) :
-						 virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
+	getModeViewedNum() ? virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState())
+					   : virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
 }
 
 void SvkPluginState::commitModeInfo()
@@ -711,7 +711,8 @@ void SvkPluginState::commitModeInfo()
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
-	presetManager->refreshModeSlot(getPresetSlotNumViewed());
+	// Hack for fixing mode rotation, but bad implementation anyway..
+	//presetManager->refreshModeSlot(getPresetSlotNumViewed());
 	updateModeViewed();
 	doMapping();
 }

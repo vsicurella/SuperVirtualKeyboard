@@ -293,7 +293,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
 	// DISABLED BECAUSE NOT IMPLEMENTED
-    editColorsBtn->setEnabled(false);
+    editColorsBtn->setEnabled(true);
     mapModeBox->setItemEnabled(3, false);
 	//keyStyleBox->setItemEnabled(2, false);
 	//keyStyleBox->setItemEnabled(4, false);

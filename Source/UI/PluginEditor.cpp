@@ -92,7 +92,7 @@ void SvkPluginEditor::initNodeData()
 		pluginEditorNode = pluginState->pluginEditorNode;
 
 		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        setScrollBarPosition((float)pluginEditorNode[IDs::viewportPosition]);
+        viewportX = (float) pluginEditorNode[IDs::viewportPosition];
 	}
     // Intialization
 	else
@@ -205,13 +205,13 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-//    updateScrollbarData();
-//    controlComponent->setVisible(false);
-//
-//    settingsContainer.reset(new SettingsContainer(processor.svkValueTree, pluginState));
-//    addAndMakeVisible(settingsContainer.get());
-//    settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
-//    settingsContainer->addChangeListener(this);
+    //updateScrollbarData();
+    //controlComponent->setVisible(false);
+
+    //settingsContainer.reset(new SettingsContainer(processor.svkValueTree, pluginState));
+    //addAndMakeVisible(settingsContainer.get());
+    //settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
+    //settingsContainer->addChangeListener(this);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -470,12 +470,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
         
         isColorEditing = false;
 	}
-    
-    // Prepare to play
-    if (source == &processor)
-    {
-        //pluginState->midiStateIn->addListener(virtualKeyboard);
-    }
 
 	// Mode Info Changed
 	if (source == modeInfo)
