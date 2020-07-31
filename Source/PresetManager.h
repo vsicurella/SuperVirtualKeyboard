@@ -17,7 +17,7 @@
 #include "Structures/Preset.h"
 #include "Structures/Mode.h"
 
-typedef Array<std::shared_ptr<Mode>> ModeSlot;
+typedef OwnedArray<Mode> ModeSlot;
 
 class SvkPresetManager : public ChangeBroadcaster
 {
@@ -35,7 +35,7 @@ class SvkPresetManager : public ChangeBroadcaster
 	OwnedArray<SvkPreset> presetsLoaded;
     OwnedArray<ModeSlot> modeSlots;
     
-	std::shared_ptr<Mode> modeCustom;
+	std::unique_ptr<Mode> modeCustom;
 
 	// Methods
 	void createFactoryModes();
@@ -78,7 +78,6 @@ public:
 
     void removeMode(int presetSlotNum, int modeSlotNum);
     void resetModeSlot(int presetSlotNum);
-	void refreshModeSlot(int presetSlotNum);
 
 	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
 
