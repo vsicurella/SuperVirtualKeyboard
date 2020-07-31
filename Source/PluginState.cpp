@@ -711,7 +711,7 @@ void SvkPluginState::commitModeInfo()
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
-	// Hack for fixing mode rotation, but bad implementation anyway..
+	presetManager->setSlotToMode(getPresetSlotNumViewed(), modeViewedNum, presetManager->getModeCustom()->modeNode);
 	//presetManager->refreshModeSlot(getPresetSlotNumViewed());
 	updateModeViewed();
 	doMapping();

@@ -89,10 +89,9 @@ Mode* SvkPresetManager::getModeInSlots(int presetNumIn, int slotNumIn)
 {
 	SvkPreset* preset = presetsLoaded[presetNumIn];
 
-	if (preset && preset->getModeSlotsSize() > slotNumIn)
+	if (preset && slotNumIn < preset->getModeSlotsSize())
 	{
-		//Mode* mode = modeSlots.getUnchecked(presetNumIn)->getUnchecked(slotNumIn);
-        Mode* mode = modeSlots[presetNumIn]->getReference(slotNumIn).get();
+		Mode* mode = (*modeSlots[presetNumIn])[slotNumIn];
 		//DBG("GRABBING MODE: " + String(slotNumIn) + " which is " + mode->getDescription());
 		return mode;
 	}
@@ -115,21 +114,20 @@ Mode* SvkPresetManager::setModeCustom(Mode* modeIn)
 
 Mode* SvkPresetManager::setModeCustom(ValueTree modeNodeIn)
 {
-    modeCustom = std::make_shared<Mode>(modeNodeIn);
+	modeCustom.reset(new Mode(modeNodeIn));
 	return modeCustom.get();
 }
 
 Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, int rootNoteIn, String nameIn, String infoIn)
 {
-	modeCustom = std::make_shared<Mode>(stepsIn, familyIn, rootNoteIn, nameIn, infoIn);
+	modeCustom.reset(new Mode(stepsIn, familyIn, rootNoteIn, nameIn, infoIn));
     return modeCustom.get();
 }
 
 int SvkPresetManager::setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode)
 {
 	presetsLoaded.getUnchecked(presetSlotNum)->setModeSlot(modeNode, modeSlotNum);
-	//modeSlots.getUnchecked(presetSlotNum)->set(modeSlotNum, new Mode(modeNode, false));
-    modeSlots[presetSlotNum]->set(modeSlotNum, std::make_shared<Mode>(modeNode, false));
+    modeSlots[presetSlotNum]->set(modeSlotNum, new Mode(modeNode, false));
 	return modeSlotNum;
 }
 int SvkPresetManager::addSlot(int presetSlotNum, ValueTree modeNode)
@@ -196,24 +194,6 @@ void SvkPresetManager::resetModeSlot(int presetSlotNum)
     }
 }
 
-void SvkPresetManager::refreshModeSlot(int presetSlotNum)
-{
-	SvkPreset* preset = presetsLoaded.getUnchecked(presetSlotNum);
-	//OwnedArray<Mode>* slot = modeSlots[presetSlotNum];
-    ModeSlot* slot = modeSlots[presetSlotNum];
-
-
-	if (preset && slot)
-	{
-		slot->clear();
-
-		for (int i = 0; i < preset->getModeSlotsSize(); i++)
-		{
-            slot->add(std::make_shared<Mode>(preset->getModeInSlot(i), false));
-		}
-	}
-}
-
 void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn)
 {
     SvkPreset* preset = presetsLoaded.getUnchecked(presetSlotNum);
@@ -237,15 +217,15 @@ void SvkPresetManager::handleModeSelection(int presetSlotNum, int modeBoxNumber,
     
     if (modeLibraryIndex < numSortedModes)
     {
-        modeSelected = getModeInLibrary(modeLibraryIndex);
+        modeSelected = getModeInLibrary(modeLibraryIndex).createCopy();
     }
     else if (userModesIndex < loadedUserModes.size())
     {
-        modeSelected = loadedUserModes[userModesIndex];
+        modeSelected = loadedUserModes[userModesIndex].createCopy();
     }
     else if (favIdx < favoriteModes.size())
     {
-        modeSelected = favoriteModes[favIdx];
+        modeSelected = favoriteModes[favIdx].createCopy();
     }
 	else if (slotIdx < slot->size())
 	{
@@ -284,7 +264,7 @@ bool SvkPresetManager::loadPreset(int presetSlotNum, ValueTree presetNodeIn, boo
 
 		for (int i = 0; i < preset->getModeSlotsSize(); i++)
 		{
-            slot->set(i, std::make_shared<Mode>(preset->getModeInSlot(i)));
+            slot->set(i, new Mode(preset->getModeInSlot(i)));
 		}
 
 		ValueTree customModeNode = preset->parentNode.getChildWithName(IDs::modeCustomNode);
@@ -354,7 +334,7 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 {
 	Mode* mode;
 
-	if (modeSlotNumber < modeSlots.size())
+	if (modeSlotNumber < modeSlots[presetSlotNum]->size())
 		mode = getModeInSlots(presetSlotNum, modeSlotNumber);
 	else
 		mode = modeCustom.get();
@@ -370,7 +350,7 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 		// Reset custom mode, since saved mode is a user mode now
 		// Not sure if this should be done like that...
         if (mode == modeCustom.get())
-            modeCustom = std::make_shared<Mode>("1");
+            modeCustom.reset(new Mode("1"));
     }
     
     return saved;
@@ -688,7 +668,7 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
 
 	for (int i = 0; i < slot->size(); i++)
 	{
-		mode = slot->getUnchecked(i).get();
+		mode = slot->getUnchecked(i);
 		slotsMenu.addItem(++subMenuIndex, mode->getName());
 	}
 
