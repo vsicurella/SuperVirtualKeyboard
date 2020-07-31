@@ -222,7 +222,7 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
-    keyboardViewport.reset (new KeyboardViewport ("Keyboard Viewport"));
+    keyboardViewport.reset (new Viewport("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
 

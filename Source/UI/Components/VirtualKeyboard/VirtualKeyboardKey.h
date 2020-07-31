@@ -29,14 +29,9 @@ namespace VirtualKeyboard
         Key(ValueTree keyNodeIn);
         Key(const Key& keyToCopy);
 
-		Colour getDefaultColor() const;
+		Colour getDisplayColor() const;
 
-		Colour getCustomColor() const;
-
-		
-		void setDefaultColor(Colour colorIn);
-
-		void setCustomColor(Colour colorIn);
+		void setDisplayColor(Colour colorIn);
         
 		void applyParameters(ValueTree nodeIn);
 
@@ -74,10 +69,6 @@ namespace VirtualKeyboard
         bool showNoteLabel = false;
 		float velocityFixed = 1;
 
-
-
-	private:
-		Colour defaultColor = Colours::transparentBlack;
-		Colour customColor = Colours::transparentBlack;
+		Colour color = Colours::transparentBlack;
     };
 }

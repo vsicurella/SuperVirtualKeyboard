@@ -16,7 +16,7 @@ Key::Key()
 {
     setName("Key");
     node = ValueTree(IDs::pianoKeyNode);
-	setDefaultColor(Colours::transparentBlack);
+	setDisplayColor(Colours::transparentBlack);
 }
 
 Key::Key(int keyNumIn)
@@ -42,7 +42,7 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
 	yOffset = yOff;
 	showNoteNumber = showNoteNumIn;
 	showNoteLabel = showNoteNameIn;
-	setDefaultColor(colorIn);
+	color = colorIn;
 }
 
 Key::Key(ValueTree keyNodeIn)
@@ -58,7 +58,7 @@ Key::Key(ValueTree keyNodeIn)
 Key::Key(const Key& keyToCopy)
 : Key(keyToCopy.keyNumber, keyToCopy.order, keyToCopy.scaleDegree, keyToCopy.modeDegree, keyToCopy.step,
       keyToCopy.pitchName, keyToCopy.widthMod, keyToCopy.heightMod, keyToCopy.xOffset, keyToCopy.yOffset,
-      keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.defaultColor)
+      keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.color)
 {
     node = keyToCopy.node.createCopy();
 }
@@ -70,47 +70,43 @@ void Key::setPath(Path keyPathIn)
 
 void Key::applyParameters(ValueTree nodeIn)
 {
-	Identifier id;
-
-	for (int i = 0; i < nodeIn.getNumProperties(); i++)
+	if (nodeIn.hasType(IDs::pianoKeyNode))
 	{
-		id = nodeIn.getPropertyName(i);
+		Identifier id;
+		for (int i = 0; i < nodeIn.getNumProperties(); i++)
+		{
+			id = nodeIn.getPropertyName(i);
 
-		if (id == IDs::pianoKeyNumber)
-			keyNumber = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyWidthMod)
-			widthMod = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyHeightMod)
-			heightMod = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyXOffset)
-			xOffset = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyYOffset)
-			yOffset = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyShowNumber)
-			showNoteNumber = nodeIn.getProperty(id);
-		else if (id == IDs::keyboardShowsNoteLabels)
-			showNoteLabel = nodeIn.getProperty(id);
-		else if (id == IDs::pianoKeyColor)
-			setDefaultColor(Colour::fromString(nodeIn.getProperty(id).toString()));
+			if (id == IDs::pianoKeyNumber)
+				keyNumber = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyWidthMod)
+				widthMod = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyHeightMod)
+				heightMod = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyXOffset)
+				xOffset = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyYOffset)
+				yOffset = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyShowNumber)
+				showNoteNumber = nodeIn.getProperty(id);
+			else if (id == IDs::keyboardShowsNoteLabels)
+				showNoteLabel = nodeIn.getProperty(id);
+			else if (id == IDs::pianoKeyColorsNode)
+				color = Colour::fromString(nodeIn.getProperty(id).toString());
+		}
+
+		node.copyPropertiesAndChildrenFrom(nodeIn, nullptr);
 	}
 }
 
-Colour Key::getDefaultColor() const
+Colour Key::getDisplayColor() const
 {
-	return defaultColor;
-}
-
-Colour Key::getCustomColor() const
-{
-	return customColor;
+	return color;
 }
 
 void Key::paint(Graphics& g)
 {
-	Colour colorToUse = customColor.isOpaque() 
-		? customColor
-		: defaultColor;
-
+	Colour colorToUse = color;
 	float contrast = 0;
 
 	if (isMouseOver())
@@ -138,7 +134,7 @@ void Key::paint(Graphics& g)
 
 	if (showNoteNumber)
 	{
-		g.setColour(defaultColor.contrasting());
+		g.setColour(colorToUse.contrasting());
 		String numTxt = String(keyNumber);
 		Rectangle<int> txtArea = getLocalBounds();
 		txtArea.removeFromBottom(6);
@@ -166,15 +162,9 @@ void Key::mouseExit(const MouseEvent& e)
 
 }
 
-void Key::setDefaultColor(Colour colorIn)
+void Key::setDisplayColor(Colour colorIn)
 {
-	defaultColor = colorIn;
-	customColor = Colours::transparentBlack;
-	repaint();
-}
-
-void Key::setCustomColor(Colour colorIn)
-{
-	customColor = colorIn;
+	color = colorIn;
+	node.setProperty(IDs::pianoKeyColorsNode, color.toString(), nullptr);
 	repaint();
 }
