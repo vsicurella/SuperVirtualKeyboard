@@ -363,9 +363,12 @@ bool SvkPresetManager::saveModeToFile(int presetSlotNum, int modeSlotNumber, Str
 
     if (saved)
     {
-        addAndSortMode(mode->modeNode);
-        loadedUserModes.add(mode->modeNode);
+		ValueTree newCopy = mode->modeNode.createCopy();
+        addAndSortMode(newCopy);
+        loadedUserModes.add(newCopy);
         
+		// Reset custom mode, since saved mode is a user mode now
+		// Not sure if this should be done like that...
         if (mode == modeCustom.get())
             modeCustom = std::make_shared<Mode>("1");
     }

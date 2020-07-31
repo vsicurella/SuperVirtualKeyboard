@@ -522,6 +522,11 @@ Array<Array<int>> Mode::getNotesOrders()
 {
 	Array<Array<int>> notesOut;
 	notesOut.resize(getMaxStep());
+
+	for (int i = 0; i < getMaxStep(); i++)
+	{
+		notesOut.getReference(i).addArray(getNotesOfOrder(i));
+	}
     
     return notesOut;
 }
