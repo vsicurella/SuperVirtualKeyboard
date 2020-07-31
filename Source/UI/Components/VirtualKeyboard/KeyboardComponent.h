@@ -251,7 +251,7 @@ namespace VirtualKeyboard
 		/*
 			Rearranges the keys to fit the current mode, without changing other key data.
 		*/
-		void applyMode(Mode* modeIn);
+		void applyMode(Mode* modeIn, bool resetKeyColors = true);
 
 		/*
 			Applies the key data to the keyboard so that it matches the data passed in.
@@ -378,16 +378,6 @@ namespace VirtualKeyboard
 		Colour getKeyDegreeColor(int degIn);
 
 		/*
-			Sets the color of the given order.
-		*/
-		void setKeyColorOrder(int orderIn, Colour colorIn);
-
-		/*
-			Sets the color of the given scale degree.
-		*/
-		void setKeyColorDegree(int tuningDegreeIn, Colour colorIn);
-
-		/*
 			Sets the display color of all the keys
 		*/
 		void updateKeyColors();
@@ -395,17 +385,12 @@ namespace VirtualKeyboard
 		/*
 			Resets the color of all the keys in the given order to the current order color.
 		*/
-		void resetKeyColorsInOrder(int orderIn);
+		void resetLayerColors();
 
 		/*
 			Resets the color of all the keys of the scale degree to the current order color.
 		*/
-		void resetDegreeColors(int tuningDegreeIn);
-
-		/*
-			Resets the given key's color to the current color of the key's order
-		*/
-		void resetKeyColor(int keyNumberIn);
+		void resetDegreeColors();
 
 		/*
 			Reset all keys to the current colors of their orders.
@@ -534,9 +519,11 @@ namespace VirtualKeyboard
                 
         // Data
         ValueTree pianoNode;
+		ValueTree keyTreeNode;
         OwnedArray<Key> keys;
 		Array<Colour> keyColorsOrders;
 		Array<Colour> keyColorsDegrees;
+		Array<Colour> keyColorsIndividual;
         
         Mode* mode;
 		Mode modeDefault;

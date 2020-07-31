@@ -54,6 +54,8 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 {
 	if (pianoNodeIn.hasType(IDs::pianoNode))
 	{
+		DBG("RESTORING KEYBOARD NODE: " + pianoNode.toXmlString());
+		
 		pianoNode = pianoNodeIn;
         
 		orientationSelected = pianoNode[IDs::keyboardOrientation];
@@ -66,20 +68,24 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
             keySizeRatio = 0.25f;
         
         // unpack key data
-        ValueTree keyTreeNode = pianoNode.getChildWithName(IDs::pianoKeyTreeNode);
-        keys.clear();
-        for (auto keyNode : keyTreeNode)
-        {
-            if (keyNode.hasType(IDs::pianoKeyNode))
-                keys.add(new Key(keyNode));
-        }
-        
-		// workaround until key data is finished
-		if (keys.size() < 128)
-			initializeKeys();
+        keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
+		
+		if (keyTreeNode.getNumChildren() == keys.size())
+		{
+			for (auto key : keys)
+				key->applyParameters(keyTreeNode.getChild(key->keyNumber));
+		}
+		else
+		{
+			keyTreeNode.removeAllChildren(nullptr);
 
-        // unpack color data
-        
+			initializeKeys();
+			
+			for (auto key : keys)
+			{
+				keyTreeNode.addChild(key->node, key->keyNumber, nullptr);
+			}
+		}        
 	}
 	else
 	{
@@ -128,6 +134,8 @@ void Keyboard::initializeKeys(int size)
 		addAndMakeVisible(keys[i]);
 	}
 
+	keyColorsIndividual.resize(keys.size());
+
 	keysOn = Array<int>();
 	keysByMouseTouch = Array<int>();
 }
@@ -165,34 +173,33 @@ void Keyboard::resized()
 	float adjacentStyleStepWidth;
 
 	// Place Keys
-
-	Array<int> modeKeyNums = keysOrder.getReference(0);
+	Array<int>& modeKeys = keysOrder.getReference(0);
 	for (int i = 0; i < numOrder0Keys; i++)
 	{
-		Key* modeKey = keys[modeKeyNums[i]];
+		Key& modeKey = *keys[modeKeys[i]];
 
 		int keyX = (keyWidth + keyPositioner.getKeyGap()) * i;
-		modeKey->setTopLeftPosition(keyX, 0);
+		modeKey.setTopLeftPosition(keyX, 0);
 
-		if (modeKey->step > 1)
+		if (modeKey.step > 1)
 		{
-			adjacentStyleStepWidth = keyOrder1Width / (modeKey->step - 1);
+			adjacentStyleStepWidth = keyOrder1Width / (modeKey.step - 1);
 
-			for (int s = 1; s < modeKey->step; s++)
+			for (int s = 1; s < modeKey.step; s++)
 			{
-				Key* stepKey = keys[modeKey->keyNumber + s];
+				Key* stepKey = keys[modeKey.keyNumber + s];
 
 				if (s > 1 && keyPlacementSelected == KeyPlacementType::nestedRight)
 				{
-					keyX = modeKey->getX() + keyWidth + (keys[modeKey->keyNumber + 1]->getWidth() / 2) - stepKey->getWidth();
+					keyX = modeKey.getX() + keyWidth + (keys[modeKey.keyNumber + 1]->getWidth() / 2) - stepKey->getWidth();
 				}
 				else if (keyPlacementSelected == KeyPlacementType::adjacent)
 				{
-					keyX = modeKey->getX() + keyWidth - (keyOrder1Width / 2) + (stepKey->order - 1) * adjacentStyleStepWidth;
+					keyX = modeKey.getX() + keyWidth - (keyOrder1Width / 2) + (stepKey->order - 1) * adjacentStyleStepWidth;
 				}
 				else
 				{
-					keyX = modeKey->getX() + keyWidth - stepKey->getWidth() / 2;
+					keyX = modeKey.getX() + keyWidth - stepKey->getWidth() / 2;
 				}
 
 				stepKey->setTopLeftPosition(keyX, 0);
@@ -205,16 +212,27 @@ void Keyboard::resized()
 
 void Keyboard::mouseMove(const MouseEvent& e)
 {
+	Key* key = getKeyFromPositionMouseEvent(e);
+
 	if (uiModeSelected == UIMode::playMode)
 	{
-		keys[lastKeyOver]->repaint();
-
-		Key* key = getKeyFromPositionMouseEvent(e);
-
 		if (key)
 		{
 			lastKeyOver = key->keyNumber;
-			key->repaint();
+		}
+	}
+
+	else if (uiModeSelected == UIMode::editMode)
+	{
+		if (key)
+		{
+			lastKeyOver = key->keyNumber;
+			//setMouseCursor(MouseCursor::CrosshairCursor);
+			getMouseCursor() = MouseCursor::CrosshairCursor;
+		}
+		else
+		{
+			setMouseCursor(MouseCursor::NormalCursor);
 		}
 	}
 }
@@ -307,38 +325,37 @@ void Keyboard::mouseDown(const MouseEvent& e)
 			if (e.mods.isRightButtonDown())
 			{
 				if (e.mods.isShiftDown())
-				{
-					resetKeyColorsInOrder(key->order);
-				}
+					keyColorsOrders.set(key->order, Colour());
+				
 				else if (e.mods.isCtrlDown())
-				{
-					resetKeyColor(key->keyNumber);
-				}
+					keyColorsIndividual.set(key->keyNumber, Colour());
+				
 				else
-				{
-					resetDegreeColors(key->keyNumber);
-				}
+					keyColorsDegrees.set(key->scaleDegree, Colour());
 			}
 
 			else if (e.mods.isShiftDown())
 			{
 				if (getKeyDegreeColor(key->scaleDegree).isOpaque())
-					resetDegreeColors(key->scaleDegree);
+					keyColorsDegrees.set(key->scaleDegree, Colour());
 
 				else if (getKeyColor(key->keyNumber).isOpaque())
-				    resetKeyColor(key->keyNumber);
+					keyColorsIndividual.set(key->keyNumber, Colour());
 
-				setKeyColorOrder(key->order, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+				keyColorsOrders.set(key->order, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
 			}
 
 			else if (e.mods.isCtrlDown())
 			{
-				key->setCustomColor(Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+				keyColorsIndividual.set(key->keyNumber, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
 			}
 
 			else
 			{
-				setKeyColorDegree(key->scaleDegree, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+				if (keyColorsIndividual[key->keyNumber].isOpaque())
+					keyColorsIndividual.set(key->keyNumber, Colour());
+
+				keyColorsDegrees.set(key->scaleDegree, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
 			}
 			
 			updateKeyColors();
@@ -360,7 +377,9 @@ void Keyboard::mouseDrag(const MouseEvent& e)
 
 			if (key->keyNumber != keyIndex)
 			{
-				triggerKey(keyIndex, false);
+				if (!e.mods.isShiftDown())
+					triggerKey(keyIndex, false);
+				
 				triggerKey(key->keyNumber);
 				lastKeyClicked = key->keyNumber;
 				keysByMouseTouch.set(touchIndex, key->keyNumber);
@@ -683,14 +702,10 @@ Point<int> Keyboard::getKeyOrderSize(int orderIn)
 Key* Keyboard::getKeyFromPosition(Point<int> posIn)
 {
 	Key* keyOut = nullptr;
+	Component* c = getComponentAt(posIn);
 
-	if (reallyContains(posIn, true))
-	{
-		Component* c = getComponentAt(posIn);
-
-		if (c->getName().startsWith("Key"))
-			keyOut = dynamic_cast<Key*>(c);
-	}
+	if (c != nullptr && c->getName().startsWith("Key"))
+		keyOut = dynamic_cast<Key*>(c);
 
 	return keyOut;
 }
@@ -702,7 +717,7 @@ Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
 }
 
 Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
-{
+{	
 	Point<int> ep = Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY());
 	return getKeyFromPosition(ep);
 }
@@ -779,7 +794,7 @@ int Keyboard::getScrollingStyle()
 //===============================================================================================
 
 
-void Keyboard::applyMode(Mode* modeIn)
+void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
 {
 	mode = modeIn;
 
@@ -789,14 +804,6 @@ void Keyboard::applyMode(Mode* modeIn)
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
 
-	numOrder0Keys = mode->getKeyboardOrdersSize(0);
-	keyPositioner.setNumModeKeys(numOrder0Keys);
-
-	// resize arrays based on new properties
-	keyColorsOrders.clear();
-	keyColorsOrders.resize(mode->getMaxStep());
-	keyColorsDegrees.clear();
-	keyColorsDegrees.resize(mode->getScaleSize());
 
 	int period = 0;
 
@@ -813,8 +820,9 @@ void Keyboard::applyMode(Mode* modeIn)
 		keysOrder.getReference(key->order).add(key->keyNumber);
 	}
 
-	// needs to be implemented
-	//keysOrder = mode->getNotesOrders();
+	numOrder0Keys = keysOrder.getReference(0).size();
+	keyPositioner.setNumModeKeys(numOrder0Keys);
+
 	keysScaleDegree = mode->getNotesInScaleDegrees();
 	keysModalDegree = mode->getNotesInModalDegrees();
 
@@ -829,6 +837,43 @@ void Keyboard::applyMode(Mode* modeIn)
 			//addAndMakeVisible(key);
 			key->toFront(false);
 		}
+	}
+
+	if (resetKeyColors)
+	{
+		keyColorsOrders.clear();
+		keyColorsDegrees.clear();
+		keyColorsIndividual.fill(Colour());
+	}
+
+	keyColorsOrders.resize(mode->getMaxStep());
+	keyColorsDegrees.resize(mode->getScaleSize());
+
+	// unpack color data
+	ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
+
+	for (auto layerColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsLayer))
+	{
+		keyColorsOrders.set(
+			layerColor[IDs::pianoKeyColorsLayer], 
+			Colour::fromString(layerColor[IDs::pianoKeyColorsNode].toString())
+		);
+	}
+
+	for (auto degreeColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsDegree))
+	{
+		keyColorsDegrees.set(
+			degreeColor[IDs::pianoKeyColorsDegree],
+			Colour::fromString(degreeColor[IDs::pianoKeyColorsNode].toString())
+		);
+	}
+
+	for (auto keyColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorIndividual))
+	{
+		keyColorsIndividual.set(
+			keyColor[IDs::pianoKeyColorIndividual],
+			Colour::fromString(keyColor[IDs::pianoKeyColorsNode].toString())
+		);
 	}
 
 	updateKeyColors();
@@ -866,12 +911,6 @@ void Keyboard::setUIMode(int uiModeIn)
     uiModeSelected = uiModeIn;
 	pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
 	
-	if (uiModeIn == playMode)
-	{
-		updateKeyColors();
-		repaint();
-	}
-
 	// Do stuff
 }
 
@@ -1042,8 +1081,8 @@ Colour Keyboard::getKeyColor(int keyNumIn)
 	Colour c;
 	Key* key = keys[keyNumIn];
 
-	if (key->getCustomColor().isOpaque()) // need to fix this for switching modes
-		c = key->getCustomColor();
+	if (keyColorsIndividual[key->keyNumber].isOpaque()) // need to fix this for switching modes
+		c = keyColorsIndividual[key->keyNumber];
 
 	else if (keyColorsDegrees[key->scaleDegree].isOpaque())
 			c = keyColorsDegrees[key->scaleDegree];
@@ -1083,50 +1122,74 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 	return c;
 }
 
-void Keyboard::setKeyColorOrder(int orderIn, Colour colorIn)
-{
-	keyColorsOrders.set(orderIn, colorIn);
-}
-
-void Keyboard::setKeyColorDegree(int tuningDegreeIn, Colour colorIn)
-{
-	keyColorsDegrees.set(tuningDegreeIn, colorIn);
-}
-
 void Keyboard::updateKeyColors()
 {
 	for (int i = 0; i < keys.size(); i++)
 	{
 		Key* key = keys[i];
-		key->setDefaultColor(getKeyColor(i));
+		key->setDisplayColor(getKeyColor(i));
 	}
+
+	ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
+
+	ValueTree layersColorNode = ValueTree(IDs::pianoKeyColorsLayer);
+	for (int i = 0; i < keyColorsOrders.size(); i++)
+	{
+		if (keyColorsOrders[i].isOpaque())
+		{
+			ValueTree node(IDs::pianoKeyColor);
+			node.setProperty(IDs::pianoKeyColorsLayer, i, nullptr);
+			node.setProperty(IDs::pianoKeyColor, keyColorsOrders[i].toString(), nullptr);
+			layersColorNode.appendChild(node, nullptr);
+		}
+	}
+	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsLayer, nullptr).copyPropertiesAndChildrenFrom(layersColorNode, nullptr);
+
+
+	ValueTree degreesColorNode = ValueTree(IDs::pianoKeyColorsDegree);
+	for (int i = 0; i < keyColorsDegrees.size(); i++)
+	{
+		if (keyColorsDegrees[i].isOpaque())
+		{
+			ValueTree node(IDs::pianoKeyColor);
+			node.setProperty(IDs::pianoKeyColorsDegree, i, nullptr);
+			node.setProperty(IDs::pianoKeyColorsNode, keyColorsDegrees[i].toString(), nullptr);
+			degreesColorNode.appendChild(node, nullptr);
+		}
+	}
+	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsDegree, nullptr).copyPropertiesAndChildrenFrom(degreesColorNode, nullptr);
+
+	ValueTree individualColorNode = ValueTree(IDs::pianoKeyColorIndividual);
+	for (int i = 0; i < keyColorsIndividual.size(); i++)
+	{
+		if (keyColorsIndividual[i].isOpaque())
+		{
+			ValueTree node(IDs::pianoKeyColor);
+			node.setProperty(IDs::pianoKeyColorIndividual, i, nullptr);
+			node.setProperty(IDs::pianoKeyColorsNode, keyColorsIndividual[i].toString(), nullptr);
+			individualColorNode.appendChild(node, nullptr);
+		}
+	}
+	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorIndividual, nullptr).copyPropertiesAndChildrenFrom(individualColorNode, nullptr);
 }
 
-void Keyboard::resetKeyColorsInOrder(int orderIn)
+void Keyboard::resetLayerColors()
 {
-	keyColorsOrders.clear();
-	keyColorsOrders.resize(mode->getMaxStep());
+	keyColorsOrders.fill(Colour());
 }
 
-void Keyboard::resetDegreeColors(int tuningDegreeIn)
+void Keyboard::resetDegreeColors()
 {
-	keyColorsDegrees.clear();
-	keyColorsDegrees.resize(mode->getScaleSize());
-	
-}
-
-void Keyboard::resetKeyColor(int keyNumberIn)
-{
-	Key* key = keys[keyNumberIn];
-	key->setDefaultColor(Colours::transparentBlack);
+	keyColorsDegrees.fill(Colour());
 }
 
 void Keyboard::resetKeyColors()
 {
-	for (int i = 0; i < keys.size(); i++)
-	{
-		resetKeyColor(i);
-	}
+	resetLayerColors();
+	resetDegreeColors();
+	keyColorsIndividual.fill(Colour());
+
+	updateKeyColors();
 }
 
 //===============================================================================================
