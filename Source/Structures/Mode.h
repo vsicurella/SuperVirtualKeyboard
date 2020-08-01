@@ -141,6 +141,8 @@ public:
 
 	float getModeDegree(int midiNoteIn) const;
 
+	Point<int> getPeriodsAndDegree(int midiNoteIn) const;
+
 	int getMidiNote(int scaleDegreeIn) const;
 
 	int getMidiNote(int periodIn, int scaleDegreeIn) const;

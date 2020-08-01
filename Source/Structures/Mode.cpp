@@ -434,6 +434,11 @@ float Mode::getModeDegree(int midiNoteIn) const
 	return modeDegrees[midiNoteIn % 128];
 }
 
+Point<int> Mode::getPeriodsAndDegree(int midiNoteIn) const
+{
+	return Point<int>((midiNoteIn - rootNote) / scaleSize, (midiNoteIn - rootNote) % scaleSize);
+}
+
 int Mode::getMidiNote(int scaleDegreeIn) const
 {
 	int periods = scaleDegreeIn / scaleSize;
