@@ -13,6 +13,9 @@
 #include "PluginIDs.h"
 #include "Structures/OwnedHashMap.h"
 
+// Should break this out into a different file
+const short MAX_MODE_SLOTS_INDEX = 127;
+
 struct ScaleSizeSorter
 {
 	// Scale first, then mode, then family
