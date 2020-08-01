@@ -242,7 +242,9 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, S
 void Mode::updateProperties()
 {
     offset = -getOffset();
-    orders = repeatArray(ordersDefault, 128, offset);
+	fixedOffset = (rootNote / scaleSize) * scaleSize + rootNote % scaleSize;
+
+	orders = repeatArray(ordersDefault, 128, offset);
     modeDegrees = ordersToModalDegrees(orders);
     scaleDegrees = generateScaleDegrees(scaleSize, offset);
 	mosClass = reverseArray(intervalAmounts(steps)).removeAllInstancesOf(0);
@@ -432,6 +434,16 @@ int Mode::getScaleDegree(int midiNoteIn) const
 float Mode::getModeDegree(int midiNoteIn) const
 {
 	return modeDegrees[midiNoteIn % 128];
+}
+
+int Mode::getFixedDegree(int midiNoteIn) const
+{
+	return midiNoteIn - fixedOffset;
+}
+
+int Mode::fixedDegreeToNoteNumber(int fixedDegreeIn) const
+{
+	return fixedDegreeIn + fixedOffset;
 }
 
 Point<int> Mode::getPeriodsAndDegree(int midiNoteIn) const

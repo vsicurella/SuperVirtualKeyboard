@@ -132,7 +132,7 @@ static Identifier expressionCCVal("CCForExpression");
 static Identifier pianoKeyColorsNode("KeyColors");
 static Identifier pianoKeyColorsLayer("LayerColors");
 static Identifier pianoKeyColorsDegree("DegreeColors");
-static Identifier pianoKeyColorIndividual("IndividualColors");
+static Identifier pianoKeyColorsIndividual("IndividualColors");
 static Identifier pianoKeyPlaceOrder("KeyOrderPlaces");
 static Identifier pianoKeyPlaceDegree("KeyDegreePlaces");
 static Identifier pianoKeyPlaceSingle("KeySinglePlaces");

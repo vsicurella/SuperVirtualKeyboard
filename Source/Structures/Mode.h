@@ -29,6 +29,7 @@ class Mode
     
     int rootNote = 60;
     int offset;
+	int fixedOffset;
     
     String stepsString;
     Array<int> steps;
@@ -140,6 +141,10 @@ public:
 	int getScaleDegree(int midiNoteIn) const;
 
 	float getModeDegree(int midiNoteIn) const;
+
+	int getFixedDegree(int midiNoteIn) const;
+
+	int fixedDegreeToNoteNumber(int fixedDegreeIn) const;
 
 	Point<int> getPeriodsAndDegree(int midiNoteIn) const;
 
