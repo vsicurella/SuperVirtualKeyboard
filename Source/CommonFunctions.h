@@ -14,7 +14,7 @@
 #include "Structures/OwnedHashMap.h"
 
 // Should break this out into a different file
-const short MAX_MODE_SLOTS_INDEX = 127;
+const int MAX_MODE_SLOTS_INDEX = 127;
 
 struct ScaleSizeSorter
 {
