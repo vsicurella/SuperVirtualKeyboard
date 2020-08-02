@@ -19,12 +19,12 @@ namespace IDs
 static Identifier svkParentNode("SVKValueTreeParent");
 static Identifier pluginStateNode("PluginState");
 static Identifier modeLibraryNode("ModeLibrary");
-static Identifier presetNode("Preset");
-static Identifier modePresetNode("ModeLayout");
-static Identifier modeCustomNode("CurrentCustomMode");
+static Identifier presetNode("SvkPreset");
+static Identifier modePresetNode("SvkModeLayout");
+static Identifier modeCustomNode("CustomMode");
 
 // Global Settings
-static Identifier globalSettingsNode("Preferences");
+static Identifier globalSettingsNode("SvkPreferences");
 static Identifier settingsDirectory("SettingsDirectory");
 static Identifier presetDirectory("PresetDirectory");
 static Identifier modeDirectory("ModeDirectory");
@@ -33,17 +33,11 @@ static Identifier saveFactoryModes("SaveFactoryPresets");
 
 // Preset Properties
 static Identifier presetProperties("PresetProperties");
-static Identifier presetSlotViewed("PresetSlotViewed");
+static Identifier modeSelectorsNode("ModeSelectors");
 static Identifier modeSlotsNode("ModeSlots");
-static Identifier modeSlotsNumberNode("ModeSlotNumbers");
 static Identifier modeSlotNumber("SlotNumber");
-static Identifier modeSlotNumViewed("ModeSlotViewed");
-static Identifier mode1SlotNum("Mode1SlotNumber");
-static Identifier mode2SlotNum("Mode2SlotNumber");
-static Identifier mode1RootNote("Mode1RootNote");
-static Identifier mode2RootNote("Mode2RootNote");
-static Identifier mode1RootChannel("Mode1RootChannel");
-static Identifier mode2RootChannel("Mode2RootChannel");
+static Identifier modeSelectorViewed("ModeSelectorViewed");
+static Identifier modeSelectorRootNote("ModeSelectorRootNote");
 
 // Midi Settings
 static Identifier midiDeviceSettingsNode("MidiDeviceSettings");
@@ -53,7 +47,6 @@ static Identifier rootMidiNote("RootNote");
 static Identifier periodShift("PeriodShift");
 static Identifier periodShiftModeSize("PeriodShiftModeSize");
 static Identifier transposeAmt("TransposeAmt");
-static Identifier sustainPedalOn("SustainPedalOn");
 static Identifier maxVoices("MaxVoices");
 static Identifier midiInputFilter("InputFilter");
 static Identifier midiInputRemap("InputMapping");
