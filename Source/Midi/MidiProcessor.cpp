@@ -94,7 +94,7 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 {
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
-        midiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNodeIn, nullptr);
+		midiSettingsNode = midiSettingsNodeIn;
         
 		// Set Note Maps
 		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())

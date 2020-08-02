@@ -273,7 +273,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
 				triggerKey(key->keyNumber, false);
 
 			}
-			//else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeViewedNum() == 1)
+			//else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeSelectorViewed() == 1)
 			//{
 			//    if (mappingHelper->isWaitingForKeyInput())
 			//    {

@@ -44,97 +44,49 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 	DBG("PluginState listening to parameters");
 	midiProcessor->connectToParameters();
 
-	setPresetViewed(0);
-    setModeViewed(1);
-	updateModeViewed(false);
+	// TODO: set up default settings
+ //   setModeSelectorViewed(1);
+	//updateModeViewed(false);
 }
 
-void SvkPluginState::recallState(ValueTree nodeIn)
+void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
 {
-	DBG("PluginState recalling " + nodeIn.getType().toString());
-	if (nodeIn.isValid() && nodeIn.hasType(IDs::pluginStateNode))
+	DBG("PluginState recalling " + nodeIn.toXmlString());
+	if (nodeIn.hasType(IDs::pluginStateNode))
 	{
-        pluginStateNode = nodeIn;
+		if (!presetManager->loadPreset(nodeIn.getChildWithName(IDs::presetNode), false))
+		{
+			// Might not be good - will actually delete existing properties that are set properly
+			nodeIn = defaultPluginStateNode;
+			presetManager->loadPreset(nodeIn.getChildWithName(IDs::presetNode), false);
+		}
 
-        ValueTree childNode = pluginStateNode.getChildWithName(IDs::presetNode);
-        
-        if (childNode.isValid())
-        {
-            presetManager->loadPreset(0, childNode, false);
-        }
-        
-		childNode = nodeIn.getChildWithName(IDs::globalSettingsNode);
-
-		if (childNode.isValid())
-        {
-			pluginSettings->restoreNode(childNode);
-            pluginSettingsNode = pluginSettings->pluginSettingsNode;
-        }
-
-		childNode = nodeIn.getChildWithName(IDs::pluginEditorNode);
-
-		if (childNode.isValid() && childNode.getNumProperties() > 0)
-        {
-			pluginEditorNode = childNode;
-        }
-        
-		resetToPreset();
+		pluginStateNode = nodeIn.createCopy();
+		revertToSavedPreset(fallbackToDefaultSettings);
 	}
-    
-    // Default settings
-	
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mappingMode))
-		setMapMode(1);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeMappingStyle))
-		setMapStyle(1);
-    
-    if (!presetViewed->theKeyboardNode.hasProperty(IDs::keyboardKeysStyle))
-		setKeyStyle(1);
-    
-    if (!presetViewed->theKeyboardNode.hasProperty(IDs::keyboardHighlightStyle))
-		setHighlightStyle(1);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::modeSlotNumViewed))
-		setModeViewed(1);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode1OrderMapping))
-        setMapOrder1(0);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderMapping))
-        setMapOrder2(0);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode1OrderOffsetMapping))
-        setMapOrderOffset1(0);
-    
-    if (!presetViewed->thePropertiesNode.hasProperty(IDs::mode2OrderOffsetMapping))
-        setMapOrderOffset2(0);
 }
 
-void SvkPluginState::resetToPreset(bool sendChange)
+void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
 {
 	presetEdited = false;
+	presetManager->resetToSavedPreset();
 
-	presetViewed = presetManager->getPreset(getPresetSlotNumViewed());
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetManager->getPreset();
+	svkPreset = pluginStateNode.getChildWithName(IDs::presetNode);
 
-    setModeViewed(presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
-    setParameterValue(IDs::mappingMode, (int)presetViewed->thePropertiesNode[IDs::mappingMode]);
-    setParameterValue(IDs::modeMappingStyle, (int)presetViewed->thePropertiesNode[IDs::modeMappingStyle]);
-    
-    mapOrder1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderMapping];
-    mapOrder2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderMapping];
-    mapOrderOffset1 = (int) presetViewed->thePropertiesNode[IDs::mode1OrderOffsetMapping];
-    mapOrderOffset2 = (int) presetViewed->thePropertiesNode[IDs::mode2OrderOffsetMapping];
-    
-	updateModeViewed();
+	midiSettingsNode = svkPreset.getChildWithName(IDs::midiSettingsNode);
+	midiProcessor->restoreFromNode(midiSettingsNode);
 
-	midiProcessor->restoreFromNode(presetViewed->theMidiSettingsNode);
-	midiSettingsNode = midiProcessor->midiSettingsNode;
+	pluginEditorNode = pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr);
 
+	// TODO revise
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
+
+	loadPropertiesOfNode(pluginStateNode, fallbackToDefaultSettings);
     
-    pianoNode = presetViewed->theKeyboardNode;
+	// TODO: Move to UI side of things
+    pianoNode = svkPreset.getChildWithName(IDs::pianoNode);
 	virtualKeyboard->restoreNode(pianoNode);
     virtualKeyboard->applyMode(modeViewed);
 
@@ -144,48 +96,68 @@ void SvkPluginState::resetToPreset(bool sendChange)
 		sendChangeMessage();
 }
 
-void SvkPluginState::resetParameterToPresetValue(Identifier paramId)
+void SvkPluginState::loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault)
 {
-//	if (paramId == IDs::keyboardMidiChannel)
-//	{
-//		setParameterValue(IDs::keyboardMidiChannel, midiProcessor->getMidiChannelOut());
-//	}
-//	else if (paramId == IDs::pianoKeysShowNoteNumbers)
-//	{
-//		setParameterValue(IDs::pianoKeysShowNoteNumbers, virtualKeyboard->isShowingNoteNumbers());
-//	}
-//	else if (paramId == IDs::pianoKeysShowFilteredNotes)
-//	{
-//		setParameterValue(IDs::pianoKeysShowFilteredNotes, virtualKeyboard->isShowingFilteredNumbers());
-//	}
-//	else if (paramId == IDs::pianoKeyShowNoteLabel)
-//	{
-//		setParameterValue(IDs::pianoKeyShowNoteLabel, virtualKeyboard->isShowingNoteNames());
-//	}
-//	else if (paramId == IDs::keyboardOrientation)
-//	{
-//		setParameterValue(IDs::keyboardOrientation, virtualKeyboard->getOrientation());
-//	}
-//	else if (paramId == IDs::keyboardKeysStyle)
-//	{
-//		setParameterValue(IDs::keyboardKeysStyle, virtualKeyboard->getKeyPlacementStyle());
-//	}
-//	else if (paramId == IDs::keyboardHighlightStyle)
-//	{
-//		setParameterValue(IDs::keyboardHighlightStyle, virtualKeyboard->getHighlightStyle());
-//	}
-//	else if (paramId == IDs::pianoVelocityBehavior)
-//	{
-//		setParameterValue(IDs::pianoVelocityBehavior, virtualKeyboard->getVelocityStyle());
-//	}
-//	else if (paramId == IDs::pianoVelocityValue)
-//	{
-//		setParameterValue(IDs::pianoVelocityValue, (int)(virtualKeyboard->getVelocityFixed() * 127));
-//	}
-//	else if (paramId == IDs::pianoWHRatio)
-//	{
-//		setParameterValue(IDs::pianoWHRatio, virtualKeyboard->getKeySizeRatio());
-//	}
+	for (auto prop : IDs::pluginStateSettings)
+	{
+		var value;
+
+		if (!pluginStateNodeIn.getChildWithProperty(prop, value).isValid())
+		{
+			if (!fallbackToDefault)
+				continue;
+
+			else
+				defaultPluginStateNode.getChildWithProperty(prop, value);
+		}
+
+		if (prop == IDs::modeSelectorViewed)
+		{
+			setModeSelectorViewed(value);
+		}
+		
+		else if (prop == IDs::mappingMode)
+		{
+			setMapMode(value);
+		}
+		
+		else if (prop == IDs::modeMappingStyle)
+		{
+			setMapStyle(value);
+		}
+
+		// MOVE TO MODE MAPPING CLASS ?
+		else if (prop == IDs::mode1OrderMapping)
+		{
+			setMapOrder1(0);
+		}
+
+		else if (prop == IDs::mode2OrderMapping)
+		{
+			setMapOrder2(0);
+		}
+
+		else if (prop == IDs::mode1OrderOffsetMapping)
+		{
+			setMapOrderOffset1(0);
+		}
+
+		else if (prop == IDs::mode2OrderOffsetMapping)
+		{
+			setMapOrderOffset2(0);
+		}
+
+		// MOVE TO KEYBOARD NODE
+		else if (prop == IDs::keyboardKeysStyle)
+		{
+			setKeyStyle(value);
+		}
+
+		else if (prop == IDs::keyboardHighlightStyle)
+		{
+			setHighlightStyle(value);
+		}
+	}
 }
 
 //==============================================================================
@@ -225,19 +197,14 @@ NoteMap* SvkPluginState::getMidiOutputFilterMap()
     return midiProcessor->getOutputMidiFilter()->getNoteMap();
 }
 
-SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
+ValueTree SvkPluginState::getPreset()
 {
-    return presetManager->getPreset(slotNumIn);
-}
-
-SvkPreset* SvkPluginState::getPresetViewed()
-{
-    return presetViewed;
+    return presetManager->getPreset();
 }
 
 Mode* SvkPluginState::getModeInSlot(int slotNumIn)
 {
-	return presetManager->getModeInSlot(getPresetSlotNumViewed(), slotNumIn);
+	return presetManager->getModeInSlot(slotNumIn);
 }
 
 Mode* SvkPluginState::getModeViewed()
@@ -247,12 +214,12 @@ Mode* SvkPluginState::getModeViewed()
 
 Mode* SvkPluginState::getMode1()
 {
-	return presetManager->getModeInSlot(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
+	return presetManager->getModeInSlot(0);
 }
 
 Mode* SvkPluginState::getMode2()
 {
-	return presetManager->getModeInSlot(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
+	return presetManager->getModeInSlot(1);
 }
 
 Mode* SvkPluginState::getModeCustom()
@@ -309,19 +276,14 @@ float SvkPluginState::getParameterDefaultValue(Identifier paramId)
 	return 0.0f;
 }
 
-int SvkPluginState::getPresetSlotNumViewed()
+int SvkPluginState::getNumModesLoaded()
 {
-	return getParameterValue(IDs::presetSlotViewed);
+	return presetManager->getNumModeSlots();
 }
 
-int SvkPluginState::getNumModesInPresetViewed()
+int SvkPluginState::getModeSelectorViewed()
 {
-	return presetViewed->getModeSlotsSize();
-}
-
-int SvkPluginState::getModeViewedNum()
-{
-	return modeViewedNum;
+	return modeSelectorViewedNum;
 }
 
 int SvkPluginState::getMappingMode()
@@ -391,29 +353,21 @@ void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 	}
 }
 
-void SvkPluginState::setPresetViewed(int presetViewedIn)
+void SvkPluginState::setModeSelectorViewed(int modeSelectorViewedIn)
 {
-    presetViewed = presetManager->getPreset(presetViewedIn);
-
-	midiProcessor->setMode1(getMode1());
-	midiProcessor->setMode2(getMode2());
-}
-
-void SvkPluginState::setModeViewed(int modeViewedIn)
-{
-    modeViewedNum = modeViewedIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::modeSlotNumViewed, modeViewedNum, nullptr);
+    modeSelectorViewedNum = modeSelectorViewedIn;
+    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::modeSelectorViewed, modeSelectorViewedNum, nullptr);
 	updateModeViewed();
 }
 
 void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
-    presetManager->handleModeSelection(getPresetSlotNumViewed(), modeBoxNum, idIn);
+    presetManager->handleModeSelection(modeBoxNum, idIn);
     
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
 
-	if (getModeViewedNum() == modeBoxNum)
+	if (getModeSelectorViewed() == modeBoxNum)
 		updateModeViewed();
 	
     sendChangeMessage();
@@ -421,17 +375,12 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 	if (isAutoMapping())
 		doMapping();
 
-	//if (midiProcessor->isMPEOn())
-	//{
-	//	setTuningToET(2, getMode2()->getScaleSize());
-	//}
-
     presetEdited = true;
 }
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    presetViewed->thePropertiesNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
+    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
 	DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
 	if (mapModeSelectionIn == 2) // Auto Mapping
 	{
@@ -440,7 +389,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 	else if (mapModeSelectionIn == 3) // Manual Mapping
 	{
-		ValueTree midiMaps = presetViewed->theMidiSettingsNode.getChildWithName(IDs::midiMapNode);
+		ValueTree midiMaps = midiSettingsNode.getChildWithName(IDs::midiMapNode);
 		midiProcessor->setMidiMaps(midiMaps);
 	}
 
@@ -448,7 +397,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 	{
 		midiProcessor->setInputRemap(NoteMap());
 		midiProcessor->setOutputFilter(NoteMap());
-		setModeViewed(1);
+		setModeSelectorViewed(1);
 	}
 
 	sendChangeMessage();
@@ -456,52 +405,13 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-    presetViewed->thePropertiesNode.setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
+    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
 	DBG("mapStyle index = " + String(mapStyleIn));
 	if (isAutoMapping())
 	{
 		doMapping();
 	}
 }
-//
-//void SvkPluginState::setGlobalPitchBendMax(int globalPitchBendMax)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendGlobalMax, globalPitchBendMax, nullptr);
-//    midiProcessor->setPitchBendGlobalMax(globalPitchBendMax);
-//}
-//
-//void SvkPluginState::setNotePitchBendMax(int notePitchBendMax)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::pitchBendNoteMax, notePitchBendMax, nullptr);
-//    midiProcessor->setPitchBendGlobalMax(notePitchBendMax);
-//}
-//
-//void SvkPluginState::setMaxPolyphony(int maxVoicesIn)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::maxVoices, maxVoicesIn, nullptr);
-//    midiProcessor->setVoiceLimit(maxVoicesIn);
-//}
-//
-//void SvkPluginState::setRetuneOn(bool toRetuneIn)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneOn, toRetuneIn, nullptr);
-//    midiProcessor->setRetuneOn(toRetuneIn);
-//}
-//
-//void SvkPluginState::setRetuneAuto(bool toRetuneAutoIn)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::retuneAuto, toRetuneAutoIn, nullptr);
-//    autoRetuneOn = toRetuneAutoIn;
-//    
-//    if (midiProcessor->isRetuning() && autoRetuneOn)
-//        setTuningToModeET(2);
-//}
-//
-//void SvkPluginState::setRetuneMidiNotePreserved(bool preseveMidiNoteRetune)
-//{
-//    presetViewed->theMidiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, preseveMidiNoteRetune, nullptr);
-//    midiProcessor->setTuningPreservesMidiNote(preseveMidiNoteRetune);
-//}
 
 void SvkPluginState::setShowNoteNums(bool showNoteNumsIn)
 {
@@ -570,16 +480,19 @@ void SvkPluginState::setVelocityFixed(int velocityFixed)
     virtualKeyboard->setHighlightStyle(velocityFixed);
 }
 
-void SvkPluginState::setModeSlotRoot(int modeSlotIn, int rootNoteIn, bool updateParameter)
+void SvkPluginState::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, bool updateParameter)
 {
-	Mode* mode = getModeInSlot(modeSlotIn);
+	svkPreset.getChildWithName(IDs::modeSelectorsNode)
+		.getChild(modeSelectorNumIn)
+		.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+
+	Mode* mode = presetManager->getModeBySelector(modeSelectorNumIn);
 	rootNoteIn = totalModulus(rootNoteIn, 128);
 	mode->setRootNote(rootNoteIn);
 
 	presetEdited = true;
 
-	// May need some tweaking
-	if (getModeViewedNum() == modeSlotIn)
+	if (modeSelectorViewedNum == modeSelectorNumIn)
 		updateModeViewed();
 
 	if (isAutoMapping())
@@ -601,31 +514,31 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 void SvkPluginState::setModeCustom(String stepsIn)
 {
 	presetManager->setModeCustom(stepsIn);
-	handleModeSelection(getModeViewedNum(), 999);
+	handleModeSelection(getModeSelectorViewed(), 999);
 }
 
 void SvkPluginState::setMapOrder1(int orderIn)
 {
     mapOrder1 = orderIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::mode1OrderMapping, mapOrder1, nullptr);
+    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode1OrderMapping, mapOrder1, nullptr);
 }
 
 void SvkPluginState::setMapOrder2(int orderIn)
 {
     mapOrder2 = orderIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::mode2OrderMapping, mapOrder2, nullptr);
+	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode2OrderMapping, mapOrder2, nullptr);
 }
 
 void SvkPluginState::setMapOrderOffset1(int offsetIn)
 {
     mapOrderOffset1 = offsetIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::mode1OrderOffsetMapping, mapOrderOffset1, nullptr);
+	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode1OrderOffsetMapping, mapOrderOffset1, nullptr);
 }
 
 void SvkPluginState::setMapOrderOffset2(int offsetIn)
 {
     mapOrderOffset2 = offsetIn;
-    presetViewed->thePropertiesNode.setProperty(IDs::mode2OrderOffsetMapping, mapOrderOffset2, nullptr);
+	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode2OrderOffsetMapping, mapOrderOffset2, nullptr);
 }
 
 void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mappingType,
@@ -690,14 +603,15 @@ void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
 
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
-	modeViewed = presetManager->getModeInSlot(getPresetSlotNumViewed(), getModeViewedNum());
+	modeViewed = presetManager->getModeBySelector(modeSelectorViewedNum);
 
 	midiProcessor->setModeViewed(modeViewed);
+
+	// MOVE TO UI
 	virtualKeyboard->applyMode(modeViewed);
     virtualKeyboard->resized();
 
-	//TODO: Change VirtualKeyboard displayed keyboard state
-	getModeViewedNum() ? virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState())
+	getModeSelectorViewed() ? virtualKeyboard->displayKeyboardState(midiProcessor->getRemappedKeyboardState())
 					   : virtualKeyboard->displayKeyboardState(midiProcessor->getOriginalKeyboardState());
 }
 
@@ -711,24 +625,22 @@ void SvkPluginState::commitModeInfo()
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
-	presetManager->setSlotToMode(getPresetSlotNumViewed(), modeViewedNum, presetManager->getModeCustom()->modeNode);
-	//presetManager->refreshModeSlot(getPresetSlotNumViewed());
+	presetManager->setSlotToMode(modeSelectorViewedNum, presetManager->getModeCustom()->modeNode);
+	//presetManager->refreshModeSlot();
 	updateModeViewed();
 	doMapping();
 }
 
 void SvkPluginState::commitStateNode()
 {
-	pluginStateNode.addChild(pluginSettingsNode, -1, nullptr);
-	pluginStateNode.addChild(pluginEditorNode, -1, nullptr);
+	// TODO: make it so it's not necessary to call this before saving
+	presetManager->commitPreset();
+	svkPreset = presetManager->getPreset();
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = svkPreset;
 
-    presetViewed->theKeyboardNode.copyPropertiesAndChildrenFrom(pianoNode, nullptr);
+    pluginStateNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pianoNode, nullptr);
 
-	presetViewed->parentNode.removeChild(presetViewed->parentNode.getChildWithName(IDs::modeCustomNode), nullptr);
-	ValueTree customModeNode = ValueTree(IDs::modeCustomNode);
-	customModeNode.addChild(presetManager->getModeCustom()->modeNode.createCopy(), -1, nullptr);
-	presetViewed->parentNode.addChild(customModeNode, -1, nullptr);
-
+	// TODO: revise
 	midiProcessor->updateNode();
 	if (getParameterValue(IDs::mappingMode) > 2)
 	{
@@ -739,44 +651,30 @@ void SvkPluginState::commitStateNode()
 		midiSettingsNode.removeChild(midiSettingsNode.getChild(0), nullptr);
 	}
    
-	presetViewed->theMidiSettingsNode.copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
-    presetManager->commitPreset(getPresetSlotNumViewed(), presetViewed->parentNode);
-
-    pluginStateNode.removeChild(pluginStateNode.getChildWithName(IDs::presetNode), nullptr);
-    pluginStateNode.addChild(presetViewed->parentNode.createCopy(), -1, nullptr);
+	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
     
-	svkTree.state.removeChild(svkTree.state.getChildWithName(IDs::pluginStateNode), nullptr);
-	svkTree.state.addChild(pluginStateNode, -1, nullptr);
-    presetEdited = false;
+	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
+    
+	presetEdited = false;
 }
 
-bool SvkPluginState::savePresetViewedToFile()
+bool SvkPluginState::savePresetToFile()
 {
     commitStateNode();
-    return presetManager->savePresetToFile(getPresetSlotNumViewed(), pluginSettings->getPresetPath());
+    return presetManager->savePresetToFile(pluginSettings->getPresetPath());
 }
 
-bool SvkPluginState::loadPresetFromFile(bool replaceViewed)
+bool SvkPluginState::loadPresetFromFile()
 {
-    // multi preset loading not yet implemented
-	int slotNumber = getPresetSlotNumViewed();
-
-	if (!replaceViewed)
-		slotNumber = presetManager->getNumPresetsLoaded();
-
 	ValueTree presetLoaded = presetManager->presetFromFile(pluginSettings->getPresetPath());
-
 	recallState(presetLoaded);
-
 	return true;
 }
 
 bool SvkPluginState::saveModeViewedToFile()
 {
-	int modeSlotNumber = modeViewed ? 
-		presetViewed->getMode2SlotNumber() : presetViewed->getMode1SlotNumber();
-
-	return presetManager->saveModeToFile(getPresetSlotNumViewed(), modeSlotNumber, pluginSettings->getModePath());
+	return presetManager->saveModeToFile(
+		presetManager->getModeSlotOfSelector(modeSelectorViewedNum), pluginSettings->getModePath());
 }
 
 bool SvkPluginState::loadModeFromFile()
@@ -785,7 +683,7 @@ bool SvkPluginState::loadModeFromFile()
 
 	if (Mode::isValidMode(modeNode))
 	{
-		presetManager->addSlotAndSetSelection(getPresetSlotNumViewed(), getModeViewedNum(), modeNode);
+		presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
 		updateModeViewed();
 		doMapping();
 		return true;
@@ -821,6 +719,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 	// Preset loaded
 	if (source == presetManager.get())
 	{
-        resetToPreset();
+        revertToSavedPreset();
 	}
 }

@@ -78,7 +78,7 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 {
 	if (pluginSettingsNodeIn.hasType(IDs::globalSettingsNode))
 	{
-		pluginSettingsNode = pluginSettingsNodeIn;
+		pluginSettingsNode.copyPropertiesAndChildrenFrom(pluginSettingsNodeIn, nullptr);
 
 		currentSettingsLocation = File(pluginSettingsNode[IDs::settingsDirectory].toString());
 		currentPresetLocation = File(pluginSettingsNode[IDs::presetDirectory].toString());

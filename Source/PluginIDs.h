@@ -153,6 +153,18 @@ static Identifier modeLibraryIndex("ModeLibraryIndex");
 static Identifier modeRootNote("ModeRootNote");
 static Identifier keyNumberToEdit("KeyToDebug");
 
+static Array<Identifier> pluginStateSettings =
+{
+	mappingMode,
+	modeSelectorViewed,
+	modeMappingStyle,
+	keyboardKeysStyle,
+	keyboardHighlightStyle,
+	mode1OrderMapping,
+	mode2OrderMapping,
+	mode1OrderOffsetMapping,
+	mode2OrderOffsetMapping,
+};
 
 enum CommandIDs
 {
@@ -210,3 +222,4 @@ enum SortType
 	familyName,
 	user
 };
+

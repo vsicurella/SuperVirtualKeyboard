@@ -183,7 +183,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 
 	//svkValueTree.replaceState(presetRecall);	
 	recordParamIDs();
-	pluginState->recallState(presetRecall.getChildWithName(IDs::pluginStateNode));
+	pluginState->recallState(presetRecall.getChildWithName(IDs::pluginStateNode), true);
 }
 
 //==============================================================================
@@ -231,14 +231,14 @@ AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameter
 {    
 	std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
 	
-	paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
+	//paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
+ //   
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
+ //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
     
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
     paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));

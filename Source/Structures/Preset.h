@@ -56,24 +56,34 @@ public:
 	bool restoreFromNode(ValueTree presetNodeIn, bool createCopy = false); // TODO: Revise default parameter
 
 	/*
+		Returns array of slot numbers in use
+	*/
+	Array<int> getSlotNumbersInUse() const;
+
+	/*
+		Returns true if given slot number is being used
+	*/
+	bool isSlotNumberInUse(int modeSlotNumberIn) const;
+
+	/*
 		Returns the amount of modes loaded into slots
 	*/
-    int getModeSlotsSize();
+    int getModeSlotsSize() const;
 
 	/*
 		Returns the slot number of the mode loaded by the given selector
 	*/
-	int getSlotNumberBySelector(int selectorNumIn);
+	int getSlotNumberBySelector(int selectorNumIn) const;
 
 	/*
 		Returns the slot number of the mode loaded by selector 0 (input keyboard)
 	*/
-	int getMode1SlotNumber();
+	int getMode1SlotNumber() const;
 
 	/*
 		Returns the slot number of the mode loaded by selector 1 (output keyboard)
 	*/
-	int getMode2SlotNumber();
+	int getMode2SlotNumber() const;
 
 	/*
 		Returns the mode slots node
