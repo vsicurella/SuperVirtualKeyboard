@@ -37,7 +37,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn);
 	~SvkPluginState() {}
     
-    void recallState(ValueTree nodeIn);
+    void recallState(ValueTree nodeIn, bool fallbackToDefaultSettings = false);
     
 	//==============================================================================
     // Object getters
@@ -52,8 +52,7 @@ struct SvkPluginState : public ChangeBroadcaster,
     NoteMap* getMidiInputFilterMap();
     NoteMap* getMidiOutputFilterMap();
 
-	SvkPreset* getPresetinSlot(int slotNumIn = 0);
-	SvkPreset* getPresetViewed();
+	ValueTree getPreset();
 
 	Mode* getModeInSlot(int slotNumIn);
 	Mode* getModeViewed();
@@ -71,9 +70,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	float getParameterMax(Identifier paramId);
 	float getParameterDefaultValue(Identifier paramId);
 
-	int getPresetSlotNumViewed();
-	int getNumModesInPresetViewed();
-	int getModeViewedNum();
+	int getNumModesLoaded();
+	int getModeSelectorViewed();
 
 	int getMappingMode();
 	int getMappingStyle();
@@ -96,18 +94,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 
 	void setParameterValue(Identifier paramIdIn, float valueIn);
 
-    void setPresetViewed(int presetViewedIn);
-
 	void setMapMode(int mapModeSelectionIn);
 	void setMapStyle(int mapStyleIn);
-    
-    //void setGlobalPitchBendMax(int globalPitchBendMax);
-    //void setNotePitchBendMax(int notePitchBendMax);
-    //void setMaxPolyphony(int maxVoicesIn);
-    
-    //void setRetuneOn(bool toRetuneIn);
-    //void setRetuneAuto(bool toRetuneAutoIn);
-    //void setRetuneMidiNotePreserved(bool preseveMidiNoteRetune);
 
 	void setShowNoteNums(bool showNoteNumsIn);
 	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);
@@ -124,7 +112,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setVelocityScalar(int velocityScalar);
 	void setVelocityFixed(int velocityFixed);
 
-	void setModeSlotRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
+	void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
     
 	// Move these to VirtualKeyboard?
 /*	void setKeyWidthMod(int keyNumIn, float widthMod);
@@ -135,7 +123,7 @@ struct SvkPluginState : public ChangeBroadcaster,
 	//==============================================================================
 	// User Functionality
     
-    void setModeViewed(int modeViewedIn);
+    void setModeSelectorViewed(int modeViewedIn);
     void handleModeSelection(int modeBoxNum, int idIn);
 
 	void setMidiInputMap(NoteMap noteMapIn);
@@ -156,35 +144,40 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setTuningToET(double period, double divisions);
     void setTuningToModeET(double period);
 
+	void revertToSavedPreset(bool fallbackToDefaultSettings = false, bool sendChange = true);
+
+	bool savePresetToFile();
+	bool loadPresetFromFile();
+
+	bool saveModeViewedToFile();
+	bool loadModeFromFile();
+
+	void commitModeInfo();
+
+	// TODO: make it so it's not necessary to call this before saving
+	void commitStateNode();
+
+	//==============================================================================
+
+	void parameterChanged(const String& paramID, float newValue) override;
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
+
+	//==============================================================================
+
+	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
+	std::unique_ptr<TextFilterInt> textFilterInt;
+
+private:
 	//==============================================================================
 	// Internal Functionality
+
+	void loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault = false);
 
 	void sendMappingToKeyboard();
 	void sendMappingToKeyboard(ValueTree mapNodeIn);
 
 	void updateModeViewed(bool sendChange=true);
-    void resetToPreset(bool sendChange = true);
-    
-	void resetParameterToPresetValue(Identifier paramId);
-
-	void commitModeInfo();
-    void commitStateNode();
-	bool savePresetViewedToFile();
-	bool loadPresetFromFile(bool replaceViewed);
-
-	bool saveModeViewedToFile();
-	bool loadModeFromFile();
-    
-    //==============================================================================
-    
-    void parameterChanged(const String& paramID, float newValue) override;
-
-	void changeListenerCallback(ChangeBroadcaster* source) override;
-    
-	//==============================================================================
-
-	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
-	std::unique_ptr<TextFilterInt> textFilterInt;
 
 private:
 
@@ -195,10 +188,13 @@ private:
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 	std::unique_ptr<Tuning> tuning;
+
+	ValueTree factoryDefaultPluginStateNode;
+	ValueTree defaultPluginStateNode;
     
-    SvkPreset* presetViewed;
+	ValueTree svkPreset;
     Mode* modeViewed; // What is currently on screen
-    int modeViewedNum = 1;
+    int modeSelectorViewedNum = 1;
     
 	bool presetEdited = false;
     

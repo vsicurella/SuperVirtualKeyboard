@@ -59,8 +59,21 @@ public:
 	ValueTree getPreset();
 	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
 
+	int getNumModeSlots() const;
+	
+	Array<int> getModeSlotsInUse() const;
+
+	int getModeSlotOfSelector(int modeSelectorNumIn) const;
+
 	ValueTree getModeInLibrary(int indexIn);
 	Mode* getModeInSlot(int slotNumIn);
+
+	/*
+		Returns the mode used by given selector
+		If the selector is set to an invalid slot, this will return nullptr
+	*/
+	Mode* getModeBySelector(int selectorNumber);
+
 	Mode* getModeCustom();
     
 	Mode* setModeCustom(ValueTree modeNodeIn);
@@ -82,7 +95,17 @@ public:
 	bool savePresetToFile(String absolutePath="");
 	bool saveModeToFile(int modeSlotNumber, String absolutePath = "");
     
+	/*
+		Saves changes made since the last preset recall
+		Returns true if successful
+	*/
     bool commitPreset();
+
+	/*
+		Reverts the changes made since the last recall
+		Returns true if successful
+	*/
+	bool resetToSavedPreset();
 
 	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
 	static ValueTree modeFromFile(String absoluteFilePath = "");

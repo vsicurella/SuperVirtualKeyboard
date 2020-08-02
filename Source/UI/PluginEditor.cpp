@@ -127,7 +127,7 @@ void SvkPluginEditor::updateUI()
 	controlComponent->setMode2Root(pluginState->getMode2()->getRootNote());
 	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
 	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
-	controlComponent->setMode1View(pluginState->getModeViewedNum() == 0);
+	controlComponent->setMode1View(pluginState->getModeSelectorViewed() == 0);
 	controlComponent->setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
 	controlComponent->setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
     controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
@@ -154,7 +154,7 @@ void SvkPluginEditor::setScrollBarPosition(float positionIn)
 
 bool SvkPluginEditor::savePresetToFile()
 {
-    bool written = pluginState->savePresetViewedToFile();
+    bool written = pluginState->savePresetToFile();
 	if (written)
 		DBG("file was saved");
 	else
@@ -175,7 +175,7 @@ void SvkPluginEditor::showSaveMenu()
 
 bool SvkPluginEditor::loadPreset()
 {
-	if (pluginState->loadPresetFromFile(true))
+	if (pluginState->loadPresetFromFile())
 	{
 		//virtualKeyboard->restoreNode(pluginState->getPresetLoaded()->theKeyboardNode);
 		updateUI();
@@ -251,7 +251,7 @@ void SvkPluginEditor::setMode1Root()
 
 void SvkPluginEditor::setMode1Root(int rootIn)
 {
-    pluginState->setModeSlotRoot(0, rootIn);
+    pluginState->setModeSelectorRoot(0, rootIn);
 }
 
 void SvkPluginEditor::setMode2Root()
@@ -261,7 +261,7 @@ void SvkPluginEditor::setMode2Root()
 
 void SvkPluginEditor::setMode2Root(int rootIn)
 {
-    pluginState->setModeSlotRoot(1, rootIn);
+    pluginState->setModeSelectorRoot(1, rootIn);
 }
 
 void SvkPluginEditor::setModeView()
@@ -271,7 +271,7 @@ void SvkPluginEditor::setModeView()
 
 void SvkPluginEditor::setModeView(int modeNumberIn)
 {
-	pluginState->setModeViewed(modeNumberIn);
+	pluginState->setModeSelectorViewed(modeNumberIn);
     controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
 }
 
@@ -459,7 +459,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     if (source == pluginState)
     {
         updateUI();
-		pluginState->updateModeViewed(false);
+//		pluginState->updateModeViewed(false);
     }
     
 	// Color editing is finished
@@ -800,8 +800,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
         {
             return false;
         }
-            
     }
+
     return true;
 }
-
