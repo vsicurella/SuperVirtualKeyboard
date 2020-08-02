@@ -33,6 +33,7 @@ class SvkPreset
     ValueTree thePropertiesNode;
 	ValueTree theModeSlots;
 	ValueTree theModeSelectors;
+	ValueTree theCustomMode;
 	ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;
 
@@ -75,6 +76,11 @@ public:
 	int getMode2SlotNumber();
 
 	/*
+		Returns the mode slots node
+	*/
+	ValueTree getModeSlots();
+
+	/*
 		Returns the mode with the given slot number (which may be different from the index it's in)
 	*/
 	ValueTree getModeInSlot(int slotNum);
@@ -95,6 +101,16 @@ public:
     ValueTree getMode2();
 
 	/*
+		Returns the current custom mode
+	*/
+	ValueTree getCustomMode();
+
+	/*
+		Finds the slot index of a given slot number, or returns -1 if not found
+	*/
+	int getSlotNumberIndex(int slotNumIn);
+
+	/*
 		Sets the slot number used by the given selector, and returns the slot index
 		If slot number doesn't exist, nothing will happen and this will return -1
 	*/
@@ -113,9 +129,20 @@ public:
 	int addModeSlot(ValueTree modeNodeIn);
 
 	/*
-		Empties the given mode slot
+		Sets the custom mode and returns a reference to the mode node
 	*/
-	void removeModeSlot(int slotNumberIn);
+	ValueTree setCustomMode(ValueTree customModeNodeIn, bool createCopy = false);
+
+	/*
+		Empties the given mode slot and retunrs the slot index it was in
+	*/
+	int removeModeSlot(int slotNumberIn);
+
+	/*
+		Replaces mode slots 1 & 2 with standard tuning, and removes other modes
+		Also resets selectors 0 and 1 to respective mode slots
+	*/
+	void resetModeSlots();
     
 	/*
 		Returns a readable version of the parent node
@@ -126,11 +153,6 @@ public:
 	static bool extractModesIfValid(ValueTree presetNodeIn, Array<ValueTree>& modesContained);
 
 private:
-
-	/*
-		Finds the slot index of a given slot number, or returns -1 if not found
-	*/
-	int getSlotNumberIndex(int slotNumIn);
 
 	int getNextFreeSlotNumber();
 	

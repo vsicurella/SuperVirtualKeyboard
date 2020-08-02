@@ -16,6 +16,7 @@ SvkPreset::SvkPreset()
     thePropertiesNode = parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
 	theModeSlots = parentNode.getOrCreateChildWithName(IDs::modeSlotsNode, nullptr);
 	theModeSelectors = parentNode.getOrCreateChildWithName(IDs::modeSelectorsNode, nullptr);
+	theCustomMode = parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
 	theKeyboardNode = parentNode.getOrCreateChildWithName(IDs::pianoNode, nullptr);
     theMidiSettingsNode = parentNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr);
 }
@@ -37,6 +38,9 @@ ValueTree SvkPreset::getPresetNode(bool sortModeSlots)
 {
 	if (sortModeSlots)
 	{
+		// TODO: Maybe rethink the context of this...
+		// If sorted, PresetManager's ModeSlots will need to be resynched
+
 		HashMap<int, ValueTree> slotMap;
 		for (auto mode : theModeSlots)
 			slotMap.set(mode[IDs::modeSlotNumber], mode);
@@ -57,20 +61,17 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 
 	if (isValidPresetNode(presetNodeIn))
 	{
-		if (createCopy)
-		{
-			DBG("copying this preset: " + presetNodeIn.toXmlString());
-			parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
-		}
-		else
-		{
-			DBG("copying this preset: " + presetNodeIn.toXmlString());
-			parentNode = presetNodeIn;
-		}
+		DBG("restoring this preset: " + presetNodeIn.toXmlString());
 
+		if (createCopy)
+			presetNodeIn = presetNodeIn.createCopy();
+
+		parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
+		
 		thePropertiesNode = parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
 		theModeSlots = parentNode.getOrCreateChildWithName(IDs::modeSlotsNode, nullptr);
 		theModeSelectors = parentNode.getOrCreateChildWithName(IDs::modeSelectorsNode, nullptr);
+		theCustomMode = parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
 		theKeyboardNode = parentNode.getOrCreateChildWithName(IDs::pianoNode, nullptr);
 		theMidiSettingsNode = parentNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr);
 
@@ -137,6 +138,11 @@ int SvkPreset::getNextFreeSlotNumber()
 	return -1;
 }
 
+ValueTree SvkPreset::getModeSlots()
+{
+	return theModeSlots;
+}
+
 ValueTree SvkPreset::getModeInSlot(int slotNum)
 {
 	return theModeSlots.getChild(getSlotNumberIndex(slotNum));
@@ -155,6 +161,11 @@ ValueTree SvkPreset::getMode1()
 ValueTree SvkPreset::getMode2()
 {
 	return getModeBySelector(1);
+}
+
+ValueTree SvkPreset::getCustomMode()
+{
+	return theCustomMode.getChild(0);
 }
 
 int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
@@ -213,7 +224,21 @@ int SvkPreset::addModeSlot(ValueTree modeNodeIn)
 	return setModeSlot(modeNodeIn, slotIndex);
 }
 
-void SvkPreset::removeModeSlot(int slotNumberIn)
+ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool createCopy)
+{
+	if (Mode::isValidMode(customModeNodeIn))
+	{
+		if (createCopy)
+			customModeNodeIn = customModeNodeIn.createCopy();
+
+		theCustomMode.getChild(0) = customModeNodeIn;
+		return customModeNodeIn;
+	}
+
+	return ValueTree();
+}
+
+int SvkPreset::removeModeSlot(int slotNumberIn)
 {
 	int slotIndex = getSlotNumberIndex(slotNumberIn);
 
@@ -222,6 +247,21 @@ void SvkPreset::removeModeSlot(int slotNumberIn)
 		theModeSlots.removeChild(slotIndex, nullptr);
 		slotNumbersInUse.removeFirstMatchingValue(slotNumberIn);
 	}
+
+	return slotIndex;
+}
+
+void SvkPreset::resetModeSlots()
+{
+	theModeSelectors.removeAllChildren(nullptr);
+	slotNumbersInUse.clear();
+
+	// TODO: make standard layout common 
+	addModeSlot(Mode::createNode({ 2, 2, 1, 2, 2, 2, 1 }, "Meantone"));
+	addModeSlot(Mode::createNode({ 2, 2, 1, 2, 2, 2, 1 }, "Meantone"));
+
+	setMode1SlotNumber(0);
+	setMode2SlotNumber(1);
 }
 
 bool SvkPreset::isValidPresetNode(ValueTree presetNodeIn)

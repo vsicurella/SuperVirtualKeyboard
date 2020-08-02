@@ -17,8 +17,6 @@
 #include "Structures/Preset.h"
 #include "Structures/Mode.h"
 
-typedef OwnedArray<Mode> ModeSlot;
-
 class SvkPresetManager : public ChangeBroadcaster
 {
 	Array<ValueTree> loadedFactoryModes;
@@ -31,10 +29,11 @@ class SvkPresetManager : public ChangeBroadcaster
 	ScaleSizeSorter scaleSizeSort;
 	ModeSizeSorter modeSizeSort;
 	FamilyNameSorter familyNameSort;
-       
-	OwnedArray<SvkPreset> presetsLoaded;
-    OwnedArray<ModeSlot> modeSlots;
+
+	SvkPreset svkPresetSaved;
+	SvkPreset svkPresetWorking;
     
+	OwnedArray<Mode> modeSlots;
 	std::unique_ptr<Mode> modeCustom;
 
 	// Methods
@@ -44,11 +43,9 @@ class SvkPresetManager : public ChangeBroadcaster
 	void initializeModePresets();
 	void loadModeDirectory();
 
-	int addModeToLibrary(ValueTree presetNodeIn);
-	void addModeToSort(ValueTree presetNodeIn);
-	int addAndSortMode(ValueTree presetNodeIn);
-
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
+	int addModeToLibrary(ValueTree modeNodeIn);
+	void addModeToSort(ValueTree modeNodeIn);
+	int addAndSortMode(ValueTree modeNodeIn);
 
 public:
 
@@ -59,42 +56,40 @@ public:
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
 
-	SvkPreset* getPresetLoaded(int slotNumIn=0);
-    int getNumPresetsLoaded();
+	ValueTree getPreset();
 	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
 
 	ValueTree getModeInLibrary(int indexIn);
-	Mode* getModeInSlots(int presetNumIn, int slotNumIn);
+	Mode* getModeInSlot(int slotNumIn);
 	Mode* getModeCustom();
     
 	Mode* setModeCustom(ValueTree modeNodeIn);
-	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", int rootNoteIn = 60, String nameIn = "", String infoIn = "");
-    Mode* setModeCustom(Mode* modeIn);
+	Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
 
-	int setSlotToMode(int presetSlotNum, int modeSlotNum, ValueTree modeNode);
-	int addSlot(int presetSlotNum, ValueTree modeNode);
-	int setSlotAndSelection(int presetSlotNum, int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
-	int addSlotAndSetSelection(int presetSlotNum, int modeSelectorNumber, ValueTree modeNode);
+	int setSlotToMode(int modeSlotNum, ValueTree modeNode);
+	int addSlot(ValueTree modeNode);
+	int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
+	int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode);
 
-    void removeMode(int presetSlotNum, int modeSlotNum);
-    void resetModeSlot(int presetSlotNum);
+    void removeMode(int modeSlotNum);
+    void resetModeSlots();
 
-	void handleModeSelection(int presetSlotNum, int modeBoxNumber, int idIn);
+	void handleModeSelection(int selectorNumber, int idIn);
 
-	bool loadPreset(int presetSlotNum, ValueTree presetNodeIn, bool sendChangeSignal=true);
-	bool loadPreset(int presetSlotNum, SvkPreset* presetIn, bool sendChangeSignal = true);
-	bool loadPreset(int presetSlotNum, int presetLibraryId, bool sendChangeSignal=true);
-	bool loadPreset(int presetSlotNum, bool sendChangeSignal=true);
+	bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
 
 	bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
-	bool savePresetToFile(int presetSlotNum = 0, String absolutePath="");
-	bool saveModeToFile(int presetSlotNum, int modeSlotNumber, String absolutePath = "");
+	bool savePresetToFile(String absolutePath="");
+	bool saveModeToFile(int modeSlotNumber, String absolutePath = "");
     
-    bool commitPreset(int slotNumber, ValueTree presetNodeIn);
+    bool commitPreset();
 
 	static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
 	static ValueTree modeFromFile(String absoluteFilePath = "");
 	static ValueTree presetFromFile(String absoluteFilePath = "");
     
     void requestModeMenu(PopupMenu* comboBoxToUse);
+
+private:
+		JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 };
