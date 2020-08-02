@@ -15,7 +15,6 @@
 
 #include "../Structures/MidiFilter.h"
 #include "../Structures/Mode.h"
-#include "../Structures/Tuning.h"
 
 class SvkMidiProcessor : public MidiMessageCollector,
                          private AudioProcessorValueTreeState::Listener
@@ -52,12 +51,6 @@ class SvkMidiProcessor : public MidiMessageCollector,
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiInputRemap;
     std::unique_ptr<MidiFilter> midiOutputFilter;
-	Tuning* tuning = nullptr;
-
-    //std::unique_ptr<MPEInstrument> mpeInst;
-    //std::unique_ptr<TunedNoteInterpreter> retuner;
-    //std::unique_ptr<SvkMpeChannelAssigner> channelAssigner;
-    //MPEZoneLayout mpeZone;
     
     int mpePitchbendTrackingMode = 0;
     int mpePressureTrackingMode = 0;
@@ -113,20 +106,9 @@ public:
 	MidiFilter* getInputRemapMidiFilter();
 	MidiFilter* getOutputMidiFilter();
     
-    //MPEInstrument* getMPEInstrument();
-
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
-    
-    //bool isMPEOn() const;
-    //bool isMPELegacyMode() const;
-    //int isTuningPreservesMidiNote() const;
-    //int getPitchbendNoteMax() const;
-    //
-    //int getPitchTrackingMode() const;
-    //int getPressureTrackingMode() const;
-    //int getTimbreTrackingMode() const;
-    
+
     int getVoiceLimit() const;
     
     bool isRetuning() const;
@@ -151,18 +133,8 @@ public:
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
-    //void updateMPEMode();
-    //void setPitchBendNoteMax(int bendAmtIn);
-    //void setPitchBendGlobalMax(int bendAmtIn);
-    //void setTuningPreservesMidiNote(bool preserveMidiNote);
-    //
-    //void setPitchbendTrackingMode(int modeIn);
-    //void setPressureTrackingMode(int modeIn);
-    //void setTimbreTrackingMode(int modeIn);
-    
     void setVoiceLimit(int maxVoicesIn);
     
-    void setTuning(Tuning* tuningIn);
     void setRetuneOn(bool retuneOn);
 
     void mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode = true);
@@ -191,13 +163,4 @@ public:
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
     
-    //void noteOn(int midiChannel, int midiNoteNumber, MPEValue noteOnVelocity) override;
-    //void noteOff(int midiChannel, int midiNoteNumber, MPEValue noteOffVelocity) override;
-    
-//    void noteAdded(MPENote newNote) override;
-//    void notePressureChanged (MPENote changedNote) override;
-//    void notePitchbendChanged (MPENote changedNote) override;
-//    void noteTimbreChanged (MPENote changedNote) override;
-//    void noteKeyStateChanged (MPENote changedNote) override;
-//    void noteReleased (MPENote finishedNote) override;
 };

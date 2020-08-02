@@ -169,31 +169,6 @@ int SvkMidiProcessor::getTransposeAmt() const
     return transposeAmt;
 }
 
-//bool SvkMidiProcessor::isMPEOn() const
-//{
-//    return mpeOn;
-//}
-//
-//int SvkMidiProcessor::getPitchbendNoteMax() const
-//{
-//    return pitchBendNoteMax;
-//}
-//
-//int SvkMidiProcessor::getPitchTrackingMode() const
-//{
-//    return mpePitchbendTrackingMode;
-//}
-//
-//int SvkMidiProcessor::getPressureTrackingMode() const
-//{
-//    return mpePressureTrackingMode;
-//}
-//
-//int SvkMidiProcessor::getTimbreTrackingMode() const
-//{
-//    return mpeTimbreTrackingMode;
-//}
-
 int SvkMidiProcessor::getVoiceLimit() const
 {
     return maxNumVoices;
@@ -203,11 +178,6 @@ bool SvkMidiProcessor::isRetuning() const
 {
     return doRetuning;
 }
-
-//int SvkMidiProcessor::isTuningPreservesMidiNote() const
-//{
-//    return mpeTuningPreserveMidiNote;
-//}
 
 NoteMap* SvkMidiProcessor::getInputNoteRemap()
 {
@@ -298,69 +268,6 @@ void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
 	mode2 = mode2In;
 }
-
-void SvkMidiProcessor::setTuning(Tuning* tuningIn)
-{
-	tuning = tuningIn;
-	//retuner->resetTuning(tuning);
-}
-
-//void SvkMidiProcessor::updateMPEMode()
-//{
-//    if (isMPEOn())
-//    {
-//        mpeInst->setZoneLayout(mpeZone);
-//        channelAssigner->allNotesOff();
-//        // TODO: actually turn notes off
-//    }
-//    else
-//    {
-//        mpeInst->setLegacyModeChannelRange(Range<int>(1, 2));
-//        channelAssigner->allNotesOff();
-//    }
-//}
-//
-//void SvkMidiProcessor::setPitchBendNoteMax(int bendAmtIn)
-//{
-//    pitchBendNoteMax = bendAmtIn;
-//    retuner->setPitchBendMax(pitchBendNoteMax);
-//}
-//
-//void SvkMidiProcessor::setPitchBendGlobalMax(int bendAmtIn)
-//{
-//    pitchBendGlobalMax = bendAmtIn;
-//    //mpeInst->setLegacyModePitchbendRange(bendAmtIn);
-//}
-//
-//void SvkMidiProcessor::setTuningPreservesMidiNote(bool preserveMidiNote)
-//{
-//    mpeTuningPreserveMidiNote = preserveMidiNote;
-//}
-
-//void SvkMidiProcessor::setPitchbendTrackingMode(int modeIn)
-//{
-//    mpePitchbendTrackingMode = modeIn;
-//    mpeInst->setPitchbendTrackingMode(MPEInstrument::TrackingMode(mpePitchbendTrackingMode));
-//}
-//
-//void SvkMidiProcessor::setPressureTrackingMode(int modeIn)
-//{
-//    mpePressureTrackingMode = modeIn;
-//    mpeInst->setPressureTrackingMode(MPEInstrument::TrackingMode(mpePressureTrackingMode));
-//}
-//
-//void SvkMidiProcessor::setTimbreTrackingMode(int modeIn)
-//{
-//    mpeTimbreTrackingMode = modeIn;
-//    mpeInst->setTimbreTrackingMode(MPEInstrument::TrackingMode(mpeTimbreTrackingMode));
-//}
-//
-//void SvkMidiProcessor::setVoiceLimit(int maxVoicesIn)
-//{
-//    maxNumVoices = maxVoicesIn;
-//    mpeZone.setLowerZone(maxVoicesIn, pitchBendNoteMax, pitchBendGlobalMax);
-//    mpeInst->setZoneLayout(mpeZone);
-//}
 
 void SvkMidiProcessor::setRetuneOn(bool retuneOn)
 {
@@ -740,19 +647,3 @@ void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     ++msgCount;
     addMessageToQueue(myMsg);
 }
-//
-//
-//void SvkMidiProcessor::noteAdded(MPENote newNote)
-//{
-//    MidiMessage msgTuned = MidiMessage::noteOn(newNote.midiChannel, newNote.initialNote, (uint8) newNote.noteOnVelocity.as7BitInt());
-//
-//    MidiMessage pitchbend = MidiMessage::pitchWheel(newNote.midiChannel, tuning->getPitchBendAtMidiNote(newNote.initialNote));
-//    addMessageToQueue(pitchbend);
-//    addMessageToQueue(msgTuned);
-//}
-//
-//void SvkMidiProcessor::noteReleased (MPENote finishedNote)
-//{
-//    MidiMessage msgOff = MidiMessage::noteOff(finishedNote.midiChannel, finishedNote.initialNote, (uint8) finishedNote.noteOffVelocity.as7BitInt());
-//    addMessageToQueue(msgOff);
-//}
