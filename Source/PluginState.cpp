@@ -115,7 +115,7 @@ void SvkPluginState::resetToPreset(bool sendChange)
 {
 	presetEdited = false;
 
-	presetViewed = presetManager->getPresetLoaded(getPresetSlotNumViewed());
+	presetViewed = presetManager->getPreset(getPresetSlotNumViewed());
 
     setModeViewed(presetViewed->thePropertiesNode[IDs::modeSlotNumViewed]);
     setParameterValue(IDs::mappingMode, (int)presetViewed->thePropertiesNode[IDs::mappingMode]);
@@ -227,7 +227,7 @@ NoteMap* SvkPluginState::getMidiOutputFilterMap()
 
 SvkPreset* SvkPluginState::getPresetinSlot(int slotNumIn)
 {
-    return presetManager->getPresetLoaded(slotNumIn);
+    return presetManager->getPreset(slotNumIn);
 }
 
 SvkPreset* SvkPluginState::getPresetViewed()
@@ -237,7 +237,7 @@ SvkPreset* SvkPluginState::getPresetViewed()
 
 Mode* SvkPluginState::getModeInSlot(int slotNumIn)
 {
-	return presetManager->getModeInSlots(getPresetSlotNumViewed(), slotNumIn);
+	return presetManager->getModeInSlot(getPresetSlotNumViewed(), slotNumIn);
 }
 
 Mode* SvkPluginState::getModeViewed()
@@ -247,12 +247,12 @@ Mode* SvkPluginState::getModeViewed()
 
 Mode* SvkPluginState::getMode1()
 {
-	return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
+	return presetManager->getModeInSlot(getPresetSlotNumViewed(), presetViewed->getMode1SlotNumber());
 }
 
 Mode* SvkPluginState::getMode2()
 {
-	return presetManager->getModeInSlots(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
+	return presetManager->getModeInSlot(getPresetSlotNumViewed(), presetViewed->getMode2SlotNumber());
 }
 
 Mode* SvkPluginState::getModeCustom()
@@ -393,7 +393,7 @@ void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 
 void SvkPluginState::setPresetViewed(int presetViewedIn)
 {
-    presetViewed = presetManager->getPresetLoaded(presetViewedIn);
+    presetViewed = presetManager->getPreset(presetViewedIn);
 
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
@@ -690,7 +690,7 @@ void SvkPluginState::sendMappingToKeyboard(ValueTree mapNodeIn)
 
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
-	modeViewed = presetManager->getModeInSlots(getPresetSlotNumViewed(), getModeViewedNum());
+	modeViewed = presetManager->getModeInSlot(getPresetSlotNumViewed(), getModeViewedNum());
 
 	midiProcessor->setModeViewed(modeViewed);
 	virtualKeyboard->applyMode(modeViewed);
