@@ -30,8 +30,6 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 	virtualKeyboard.reset(new VirtualKeyboard::Keyboard(pianoNode));
 	pianoNode = virtualKeyboard->getNode();
     virtualKeyboard->addListener(midiProcessor.get());
-    
-    setTuningToET(2, 12);
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
@@ -225,11 +223,6 @@ Mode* SvkPluginState::getMode2()
 Mode* SvkPluginState::getModeCustom()
 {
 	return presetManager->getModeCustom();
-}
-
-Tuning* SvkPluginState::getTuning()
-{
-	return nullptr;
 }
 
 //==============================================================================
@@ -567,25 +560,6 @@ void SvkPluginState::doMapping()
 		sendMappingToKeyboard();
 	}
 }
-
-void SvkPluginState::setTuning(const Tuning* tuningToCopy)
-{
-	tuning.reset(new Tuning(*tuningToCopy));
-	midiProcessor->setTuning(tuning.get());
-}
-
-void SvkPluginState::setTuningToET(double period, double divisions)
-{
-	tuning.reset(new Tuning(period, divisions));
-	midiProcessor->setTuning(tuning.get());
-}
-
-void SvkPluginState::setTuningToModeET(double period)
-{
-    tuning.reset(new Tuning(period, getMode2()->getScaleSize()));
-    midiProcessor->setTuning(tuning.get());
-}
-
 
 //==============================================================================
 

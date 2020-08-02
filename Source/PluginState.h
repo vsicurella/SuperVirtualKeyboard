@@ -60,8 +60,6 @@ struct SvkPluginState : public ChangeBroadcaster,
 	Mode* getMode2();
 	Mode* getModeCustom();
 
-	Tuning* getTuning();
-
 	//==============================================================================
 	// Parameter Getters
 
@@ -140,10 +138,6 @@ struct SvkPluginState : public ChangeBroadcaster,
                    int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
     void doMapping();
 
-	void setTuning(const Tuning* tuningToCopy);
-	void setTuningToET(double period, double divisions);
-    void setTuningToModeET(double period);
-
 	void revertToSavedPreset(bool fallbackToDefaultSettings = false, bool sendChange = true);
 
 	bool savePresetToFile();
@@ -187,7 +181,6 @@ private:
 
 	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
-	std::unique_ptr<Tuning> tuning;
 
 	ValueTree factoryDefaultPluginStateNode;
 	ValueTree defaultPluginStateNode;
