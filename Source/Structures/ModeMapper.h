@@ -38,6 +38,14 @@ public:
     
     void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);
 
+	void setMode1OrderNum(int orderNumber);
+
+	void setMode2OrderNum(int orderNumber);
+
+	void setMode1OrderOffset(int orderOffset);
+
+	void setMode2OrderOffset(int orderOffset);
+
 	void setPreviousOrderNoteMap(NoteMap prevNoteMapIn);
 
 	NoteMap map(const Mode& mode1, const Mode& mode2);
