@@ -80,11 +80,6 @@ struct SvkPluginState : public ChangeBroadcaster,
 	int getModeSlotRoot(int slotNum);
 	int getMode1Root();
 	int getMode2Root();
-    
-    int getMapOrder1();
-    int getMapOrder2();
-    int getMapOrderOffset1();
-    int getMapOrderOffset2();
 
 	bool isPresetEdited();
 
@@ -166,6 +161,10 @@ private:
 	//==============================================================================
 	// Internal Functionality
 
+	void buildFactoryDefaultState();
+
+	void buildUserDefaultState();
+
 	void loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault = false);
 
 	void sendMappingToKeyboard();
@@ -185,19 +184,11 @@ private:
 	ValueTree factoryDefaultPluginStateNode;
 	ValueTree defaultPluginStateNode;
     
-	ValueTree svkPreset;
+	SvkPreset* svkPreset;
+	ValueTree presetNode;
+
     Mode* modeViewed; // What is currently on screen
     int modeSelectorViewedNum = 1;
     
 	bool presetEdited = false;
-    
-
-	// Mapping parameters
-    
-    int mapOrder1 = 0;
-    int mapOrder2 = 0;
-    int mapOrderOffset1 = 0;
-    int mapOrderOffset2 = 0;
-    
-    bool autoRetuneOn = false;
 };

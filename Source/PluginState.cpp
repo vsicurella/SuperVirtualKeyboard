@@ -69,11 +69,14 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	presetEdited = false;
 	presetManager->resetToSavedPreset();
 
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetManager->getPreset();
-	svkPreset = pluginStateNode.getChildWithName(IDs::presetNode);
-
-	midiSettingsNode = svkPreset.getChildWithName(IDs::midiSettingsNode);
+	svkPreset = &presetManager->getPreset();
+	presetNode = svkPreset->getPresetNode();
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetNode;
+	
+	midiSettingsNode = svkPreset->getMidiSettingsNode();
 	midiProcessor->restoreFromNode(midiSettingsNode);
+
+	modeMapper.reset(new ModeMapper(svkPreset->getMappingsNode()));
 
 	pluginEditorNode = pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr);
 
@@ -84,7 +87,7 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	loadPropertiesOfNode(pluginStateNode, fallbackToDefaultSettings);
     
 	// TODO: Move to UI side of things
-    pianoNode = svkPreset.getChildWithName(IDs::pianoNode);
+	pianoNode = svkPreset->getKeyboardNode();
 	virtualKeyboard->restoreNode(pianoNode);
     virtualKeyboard->applyMode(modeViewed);
 
@@ -122,27 +125,6 @@ void SvkPluginState::loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fall
 		else if (prop == IDs::modeMappingStyle)
 		{
 			setMapStyle(value);
-		}
-
-		// MOVE TO MODE MAPPING CLASS ?
-		else if (prop == IDs::mode1OrderMapping)
-		{
-			setMapOrder1(0);
-		}
-
-		else if (prop == IDs::mode2OrderMapping)
-		{
-			setMapOrder2(0);
-		}
-
-		else if (prop == IDs::mode1OrderOffsetMapping)
-		{
-			setMapOrderOffset1(0);
-		}
-
-		else if (prop == IDs::mode2OrderOffsetMapping)
-		{
-			setMapOrderOffset2(0);
 		}
 
 		// MOVE TO KEYBOARD NODE
@@ -197,7 +179,7 @@ NoteMap* SvkPluginState::getMidiOutputFilterMap()
 
 ValueTree SvkPluginState::getPreset()
 {
-    return presetManager->getPreset();
+	return presetNode;
 }
 
 Mode* SvkPluginState::getModeInSlot(int slotNumIn)
@@ -309,26 +291,6 @@ int SvkPluginState::getMode2Root()
 	return getModeSlotRoot(1);
 }
 
-int SvkPluginState::getMapOrder1()
-{
-    return mapOrder1;
-}
-
-int SvkPluginState::getMapOrder2()
-{
-    return mapOrder2;
-}
-
-int SvkPluginState::getMapOrderOffset1()
-{
-    return mapOrderOffset1;
-}
-
-int SvkPluginState::getMapOrderOffset2()
-{
-    return mapOrderOffset2;
-}
-
 bool SvkPluginState::isPresetEdited()
 {
 	return presetEdited;
@@ -349,7 +311,7 @@ void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
 void SvkPluginState::setModeSelectorViewed(int modeSelectorViewedIn)
 {
     modeSelectorViewedNum = modeSelectorViewedIn;
-    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::modeSelectorViewed, modeSelectorViewedNum, nullptr);
+    presetNode.getChildWithName(IDs::presetProperties).setProperty(IDs::modeSelectorViewed, modeSelectorViewedNum, nullptr);
 	updateModeViewed();
 }
 
@@ -373,7 +335,7 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
+	presetNode.getChildWithName(IDs::presetProperties).setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
 	DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
 	if (mapModeSelectionIn == 2) // Auto Mapping
 	{
@@ -398,7 +360,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
+	presetNode.getChildWithName(IDs::presetProperties).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
 	DBG("mapStyle index = " + String(mapStyleIn));
 	if (isAutoMapping())
 	{
@@ -475,12 +437,10 @@ void SvkPluginState::setVelocityFixed(int velocityFixed)
 
 void SvkPluginState::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, bool updateParameter)
 {
-	svkPreset.getChildWithName(IDs::modeSelectorsNode)
-		.getChild(modeSelectorNumIn)
-		.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-
-	Mode* mode = presetManager->getModeBySelector(modeSelectorNumIn);
 	rootNoteIn = totalModulus(rootNoteIn, 128);
+	svkPreset->setModeSelectorRootNote(modeSelectorNumIn, rootNoteIn);
+	
+	Mode* mode = presetManager->getModeBySelector(modeSelectorNumIn);
 	mode->setRootNote(rootNoteIn);
 
 	presetEdited = true;
@@ -512,26 +472,22 @@ void SvkPluginState::setModeCustom(String stepsIn)
 
 void SvkPluginState::setMapOrder1(int orderIn)
 {
-    mapOrder1 = orderIn;
-    svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode1OrderMapping, mapOrder1, nullptr);
+	modeMapper->setMode1OrderNum(orderIn);
 }
 
 void SvkPluginState::setMapOrder2(int orderIn)
 {
-    mapOrder2 = orderIn;
-	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode2OrderMapping, mapOrder2, nullptr);
+	modeMapper->setMode2OrderNum(orderIn);
 }
 
 void SvkPluginState::setMapOrderOffset1(int offsetIn)
 {
-    mapOrderOffset1 = offsetIn;
-	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode1OrderOffsetMapping, mapOrderOffset1, nullptr);
+	modeMapper->setMode1OrderOffset(offsetIn);
 }
 
 void SvkPluginState::setMapOrderOffset2(int offsetIn)
 {
-    mapOrderOffset2 = offsetIn;
-	svkPreset.getChildWithName(IDs::presetProperties).setProperty(IDs::mode2OrderOffsetMapping, mapOrderOffset2, nullptr);
+	modeMapper->setMode2OrderOffset(offsetIn);
 }
 
 void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, int mappingType,
@@ -551,8 +507,8 @@ void SvkPluginState::doMapping()
 {
 	if (getMappingMode() > 1)
 	{
-		DBG("Applygind new MIDI mapping");
-		doMapping(getMode1(), getMode2(), getMappingStyle(), mapOrder1, mapOrder2, mapOrderOffset1, mapOrderOffset2);
+		DBG("Applying new MIDI mapping");
+		doMapping(getMode1(), getMode2());
 	}
 	else
 	{
@@ -609,8 +565,9 @@ void SvkPluginState::commitStateNode()
 {
 	// TODO: make it so it's not necessary to call this before saving
 	presetManager->commitPreset();
-	svkPreset = presetManager->getPreset();
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = svkPreset;
+	svkPreset = &presetManager->getPreset();
+	presetNode = svkPreset->getPresetNode();
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetNode;
 
     pluginStateNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pianoNode, nullptr);
 
@@ -664,6 +621,23 @@ bool SvkPluginState::loadModeFromFile()
 	}
 
 	return false;
+}
+
+//==============================================================================
+
+void SvkPluginState::buildFactoryDefaultState()
+{
+	factoryDefaultPluginStateNode = ValueTree(IDs::pluginStateNode);
+	
+	ValueTree defaultPreset(IDs::presetNode);
+	defaultPreset.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+
+
+}
+
+void SvkPluginState::buildUserDefaultState()
+{
+	
 }
 
 //==============================================================================
