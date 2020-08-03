@@ -65,3 +65,10 @@ namespace VirtualKeyboard
 		NotchCenter = 0x1000
 	};
 }
+
+enum MappingStyle
+{
+	ModeToMode = 1,
+	ModeToScale,
+	ModeByOrder
+};

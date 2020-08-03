@@ -22,6 +22,7 @@ static Identifier modeLibraryNode("ModeLibrary");
 static Identifier presetNode("SvkPreset");
 static Identifier modePresetNode("SvkModeLayout");
 static Identifier modeCustomNode("CustomMode");
+static Identifier pluginPresetVersion("SvkPresetVersion");
 
 // Global Settings
 static Identifier globalSettingsNode("SvkPreferences");
@@ -153,17 +154,23 @@ static Identifier modeLibraryIndex("ModeLibraryIndex");
 static Identifier modeRootNote("ModeRootNote");
 static Identifier keyNumberToEdit("KeyToDebug");
 
-static Array<Identifier> pluginStateSettings =
+
+static Array<Identifier> pianoSettings =
 {
-	mappingMode,
-	modeSelectorViewed,
-	modeMappingStyle,
+	pianoUIMode,
+	pianoWHRatio,
 	keyboardKeysStyle,
 	keyboardHighlightStyle,
-	mode1OrderMapping,
-	mode2OrderMapping,
-	mode1OrderOffsetMapping,
-	mode2OrderOffsetMapping,
+	pianoKeyShowNumber
+};
+
+static Array<Identifier> midiSettings =
+{
+	periodShift,
+	periodShiftModeSize,
+	transposeAmt,
+	keyboardMidiChannel,
+	rootMidiNote // default root note
 };
 
 enum CommandIDs
