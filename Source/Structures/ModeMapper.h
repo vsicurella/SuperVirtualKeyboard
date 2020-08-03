@@ -11,25 +11,36 @@
 #pragma once
 
 #include "../../JuceLibraryCode/JuceHeader.h"
+#include "../PluginModes.h"
 #include "Mode.h"
 #include "NoteMap.h"
 
 class ModeMapper
 {
-    int mappingStyle;
+	ValueTree mappingNode;
+
+    int mappingStyle = 1;
     
     int mapByOrderNum1 = 0;
     int mapByOrderNum2 = 0;
     int mapByOrderOffset1 = 0;
-    int mapByOrderOffset2 = 0;
+    int mapByOrderOffset2 = 0; 
+
+	NoteMap previousOrderMap;
     
 public:
     
-    ModeMapper() {};
-    
+	ModeMapper();
+	
+	ModeMapper(ValueTree modeMappingNodeIn);
+
     void setMappingStyle(int mapTypeIn);
     
     void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);
+
+	void setPreviousOrderNoteMap(NoteMap prevNoteMapIn);
+
+	NoteMap map(const Mode& mode1, const Mode& mode2);
     
 	// Returns certain type of mapping based off of passed in parameters
     NoteMap map(const Mode& mode1, const Mode& mode2, int mapStyleIn = -1, int order1=0, int order2=0, int offset1=0, int offset2=0,
@@ -55,11 +66,4 @@ public:
     
 	// 
     static Array<int> degreeMapFullMode(const Mode& mode1, const Mode& mode2);
-    
-    enum MappingStyle
-    {
-        ModeToMode = 1,
-        ModeToScale,
-        ModeByOrder
-    };
 };
