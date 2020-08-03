@@ -26,13 +26,13 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
   * Save and load your custom scales and midi mappings!
 
 * Use the mapping function to remap your midi piano keyboard to a microtonal scale. To enable, open the dropdown box on the top left and choose "Auto Mapping". This will reveal some more controls, as well as a mapping style.
- * The first scale selection box on the right represents what scale you're mapping from, the input scale, which should be your hardware MIDI keyboard's layout. This will probably be the standard layout, Meantone[7] 12. The second scale under it is the output scale, the scale you will be remapping to.
- * The "Mode to Mode" style will map your MIDI keyboard's white keys to the white keys of the selected scale and will approxmate closest degrees on the chromatic keys.
- * The "Mode to Scale" style will map your full chromatic MIDI keyboard to the selected scale's white keys. This if useful if your output scale's mode size is equal to your input scale's size (the MIDI keyboard's scale size, which is usually 12).
-  * For example, Meantone[12] 31 (in 31-EDO) works great on a standard midi keyboard, which creates a chromatic layout from 31-EDO.
-  * Superpyth[12] 22 and Pajara[12] 22 are other interesting ones to play around with in this mode.
- * The "by Layers" style will allow you to map a certain layer of keys (layer 1 = diatonic white keys, order 2 = pentatonic black keys) to a certain layer of keys in the output scale.
-  * An example would be making a the scale pattern "7 7 7 7 7" which is 35-EDO, and then mapping your input white keys the 7-EDO output white keys, and your black keys to one of the 5-EDO subsets.
+  * The first scale selection box on the right represents what scale you're mapping from, the input scale, which should be your hardware MIDI keyboard's layout. This will probably be the standard layout, Meantone[7] 12. The second scale under it is the output scale, the scale you will be remapping to.
+  * The "Mode to Mode" style will map your MIDI keyboard's white keys to the white keys of the selected scale and will approxmate closest degrees on the chromatic keys.
+  * The "Mode to Scale" style will map your full chromatic MIDI keyboard to the selected scale's white keys. This if useful if your output scale's mode size is equal to your input scale's size (the MIDI keyboard's scale size, which is usually 12).
+    * For example, Meantone[12] 31 (in 31-EDO) works great on a standard midi keyboard, which creates a chromatic layout from 31-EDO.
+    * Superpyth[12] 22 and Pajara[12] 22 are other interesting ones to play around with in this mode.
+  * The "by Layers" style will allow you to map a certain layer of keys (layer 1 = diatonic white keys, order 2 = pentatonic black keys) to a certain layer of keys in the output scale.
+    * An example would be making a the scale pattern "7 7 7 7 7" which is 35-EDO, and then mapping your input white keys the 7-EDO output white keys, and your black keys to one of the 5-EDO subsets.
 
 ### New in version 0.03:
 1. Improved preset structure and recalling, however *new preset format is incompatible with older presets*
