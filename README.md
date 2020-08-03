@@ -1,72 +1,63 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2019-08-22 (v0.021)
+LATEST VERSION: Alpha 2020-08-?? (v0.03)
 
-SUMMARY:
+## SUMMARY:
 
-Super Virtual Keyboard is a MIDI-generating plugin that allows you to explore different keyboard layouts with the intention of making microtonal scales, particularly
-larger ones, easier to digest and compose with.
+Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore different keyboard layouts with the intention of making microtonal scales easier to digest and compose with.
 
-FEATURES:
+*This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning.*
 
-* This plugin does not yet offer retuning capabilities, so you will have to alter your synth's tuning. *
+## FEATURES:
+* Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
 
- - Select a scale from a large selection of mode presets then click the keys on the keyboard to play.
+* Set custom colors for keys by scale degree, key layer (like all white vs all black), or individual keys, which can be saved and reloaded with your scale. Click "Edit Colors", select the color, and then click the key you want to change the color of.
+  * No key modifiers will paint all keys of the same scale degree
+  * Shift will paint all belonging to the same layer
+  * Control will only paint the clicked key.
+  * Right-clicking, with respective modifiers, resets the key(s) to a default color.
 
- - Use the mapping function to remap your midi piano keyboard to a microtonal scale.
- 	
-	- The first scale selection box represents what scale you're mapping from, which should be your hardware MIDI keyboard's layout. More often than not this will be Meantone[7] 12. The second scale is the scale you will be remapping to.
+* If you don't have a midi controller, here are some features you can take advantage of:
+  * Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to retrigger held notes.
+  * Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
 
-	- Mapping "Mode to Mode" will map your MIDI keyboard's white keys to the white keys of the selected scale and will approxmate closest degrees on the chromatic keys.
+* Save your layout as a text file that Reaper can load as "MIDI Note Names" so that you can see the layout in Reaper's piano roll!    
+  * View and Edit information about your mode in the "View Mode Info" dialog in the "Edit" menu
+  * Save and load your custom scales and midi mappings!
 
-	- Mapping "Mode to Scale" map your full chromatic MIDI keyboard to the selected scale's white keys. This if useful if your scale's mode size is equal to your midi keyboard's scale size
-		- for example, Meantone[12] 31 (in 31edo) works great on a standard midi keyboard
-		- Superpyth[12] 22 is quite interesting ;)
+* Use the mapping function to remap your midi piano keyboard to a microtonal scale. To enable, open the dropdown box on the top left and choose "Auto Mapping". This will reveal some more controls, as well as a mapping style.
+ * The first scale selection box on the right represents what scale you're mapping from, the input scale, which should be your hardware MIDI keyboard's layout. This will probably be the standard layout, Meantone[7] 12. The second scale under it is the output scale, the scale you will be remapping to.
+ * The "Mode to Mode" style will map your MIDI keyboard's white keys to the white keys of the selected scale and will approxmate closest degrees on the chromatic keys.
+ * The "Mode to Scale" style will map your full chromatic MIDI keyboard to the selected scale's white keys. This if useful if your output scale's mode size is equal to your input scale's size (the MIDI keyboard's scale size, which is usually 12).
+  * For example, Meantone[12] 31 (in 31-EDO) works great on a standard midi keyboard, which creates a chromatic layout from 31-EDO.
+  * Superpyth[12] 22 and Pajara[12] 22 are other interesting ones to play around with in this mode.
+ * The "by Layers" style will allow you to map a certain layer of keys (layer 1 = diatonic white keys, order 2 = pentatonic black keys) to a certain layer of keys in the output scale.
+  * An example would be making a the scale pattern "7 7 7 7 7" which is 35-EDO, and then mapping your input white keys the 7-EDO output white keys, and your black keys to one of the 5-EDO subsets.
 
-	- Mapping "Mode by Order" will allow you to map a particular order of keys (order 0 = diatonic white keys, order 1 = pentatonic black keys) to a particular order of keys in the selected scale.
+### New in version 0.03:
+1. Improved preset structure and recalling, however *new preset format is incompatible with older presets*
+  - Modes may still load
+  - I can add support old presets upon request
+  - The new preset structure includes versioning which make backwards-compatibility more feasible
+1. Improved GUI
+1. Reintroduced key color features
+1. Adjacent key placement style
+1. Fixed period shifting and transposition
 
- - If you don't have a midi controller, here are some features you can take advantage of:
+### To do:
+* Add manual mapping
+* Add input/output MIDI device configuration to allow for standalone app
+* Allow piano keys to be triggered by computer keyboard keys
+* Add note names
+* Add tuning capability (??)
+* Add preset tags and improve preset browsing and management
+* Customize key sizes and positions
+* Change keyboard orientation
+* Graphics shading & other niceties
+* Different methods of scale creating
+* I have more grandiose ideas too...
 
- 	- Hold "Shift" to hold down notes, "Alt" for "Mono Legato" mode, and "Space" to retrigger held notes.
-
- 	- Use "Up" & "Down" keys on held notes to transpose by one interval, or "Left" & "Right" keys to transpose by one modal step. 
-
- - Save your layout as a text file that Reaper can load as "MIDI Note Names" so that you can see the layout in Reaper's piano roll!
-    
-  - View and Edit information about your mode in the "View Mode Info" dialog in the "Edit" menu
-
-  - Save and load your custom scales and midi mappings!
-  
-   ** Disabled in v0.021 **
- - Change the colors of the keys! Open up the color chooser from the Edit menu, select a color then click and use a modifier to paint the keys. 
-    - No modifiers will paint all keys of the same scale degree
-    - Shift will paint all belonging to the same mode
-    - Control will only paint the clicked key.
-    - Right-clicking, with respective modifiers, resets the key to either the default mode or degree color.
-  
-New in version 0.021
-- Updated GUI
-- Custom mode folder scanning
-- Saving/Importing both modes and presets
-- MOS scales up through 23EDO, also 31EDO
-- Bug: Ableton export is not yet implemented
-
-TO DO:
- - Add manual mapping
- - Add note names
- - Add MPE Tuning capability
- - Add preset tags and improve preset browsing and management
- - Customize key sizes and positions
- - Change keyboard orientation
- - Set transposition parameters
- - Graphics shading & other niceties
- - Have a complete selection of EDO MOS scales and include more detailed Mode info
- - Allow piano keys to be triggered by computer keyboard keys
- - More...
-
-BUGS:
- - Midi device doesn't get reconfigured when device settings change
+### Known Bugs:
  - Window resizing is bad funky
  - Mapping Mode by Order and setting offsets don't work as intended
  - More...
-
