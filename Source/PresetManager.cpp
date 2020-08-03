@@ -22,9 +22,9 @@ SvkPresetManager::~SvkPresetManager()
 	removeAllChangeListeners();
 }
 
-ValueTree SvkPresetManager::getPreset()
+SvkPreset& SvkPresetManager::getPreset()
 {
-	return svkPresetWorking.getPresetNode();
+	return svkPresetWorking;
 }
 
 int SvkPresetManager::getNumMenuItems(bool withFactoryMenu , bool withUserMenu, bool withFavMenu, bool withSlots)

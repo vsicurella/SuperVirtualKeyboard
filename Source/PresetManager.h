@@ -56,7 +56,7 @@ public:
 	SvkPresetManager(ValueTree pluginSettingsNodeIn);
 	~SvkPresetManager();
 
-	ValueTree getPreset();
+	SvkPreset& getPreset();
 	int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
 
 	int getNumModeSlots() const;
