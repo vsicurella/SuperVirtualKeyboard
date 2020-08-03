@@ -39,17 +39,34 @@ void ModeMapper::setMappingStyle(int mapTypeIn)
 
 void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
 {
-    mapByOrderNum1 = order1;
-	mappingNode.setProperty(IDs::mode1OrderMapping, order1, nullptr);
+	setMode1OrderNum(order1);
+	setMode2OrderNum(order2);
+	setMode1OrderOffset(offset1);
+	setMode2OrderOffset(offset2);
+}
 
-    mapByOrderNum2 = order2;
-	mappingNode.setProperty(IDs::mode2OrderMapping, order2, nullptr);
+void ModeMapper::setMode1OrderNum(int orderNumber)
+{
+	mapByOrderNum1 = orderNumber;
+	mappingNode.setProperty(IDs::mode1OrderMapping, mapByOrderNum1, nullptr);
+}
 
-    mapByOrderOffset1 = offset1;
-	mappingNode.setProperty(IDs::mode1OrderOffsetMapping, offset1, nullptr);
+void ModeMapper::setMode2OrderNum(int orderNumber)
+{
+	mapByOrderNum2 = orderNumber;
+	mappingNode.setProperty(IDs::mode2OrderMapping, mapByOrderNum2, nullptr);
+}
 
-    mapByOrderOffset2 = offset2;
-	mappingNode.setProperty(IDs::mode2OrderOffsetMapping, offset2, nullptr);
+void ModeMapper::setMode1OrderOffset(int orderOffset)
+{
+	mapByOrderOffset1 = orderOffset;
+	mappingNode.setProperty(IDs::mode1OrderOffsetMapping, mapByOrderOffset1, nullptr);
+}
+
+void ModeMapper::setMode2OrderOffset(int orderOffset)
+{
+	mapByOrderOffset2 = orderOffset;
+	mappingNode.setProperty(IDs::mode2OrderOffsetMapping, mapByOrderOffset2, nullptr);
 }
 
 void ModeMapper::setPreviousOrderNoteMap(NoteMap prevNoteMapIn)
@@ -66,15 +83,15 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, in
                         NoteMap prevMap)
 {
     NoteMap mapOut;
-    
-    int mappingStyleUsed = mappingStyle;
-    
-    if (mapStyleIn >= 0)
-        mappingStyleUsed = mapStyleIn;
+        
+	if (mapStyleIn < 0)
+		mapStyleIn = mappingStyle;
+	else
+		setMappingStyle(mapStyleIn);
 
-	mappingNode.setProperty(IDs::modeMappingStyle, mappingStyleUsed, nullptr);
+	mappingNode.setProperty(IDs::modeMappingStyle, mappingStyle, nullptr);
     
-    switch (mappingStyleUsed)
+    switch (mappingStyle)
     {
         case ModeToScale:
             mapOut = mapToMode1Scale(mode1, mode2);
@@ -82,7 +99,8 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, in
             
         case ModeByOrder:
 			setMapOrdersParameters(order1, order2, offset1, offset2);
-            mapOut = mapByOrder(mode1, mode2, order1, order2, offset1, offset2, prevMap);
+			previousOrderMap = prevMap;
+            mapOut = mapByOrder(mode1, mode2, mapByOrderNum1, mapByOrderNum2, mapByOrderOffset1, mapByOrderOffset2, previousOrderMap);
             break;
             
         default:
