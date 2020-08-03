@@ -29,6 +29,8 @@
 
 class SvkPreset
 {
+
+protected:
 	ValueTree parentNode;
     ValueTree thePropertiesNode;
 	ValueTree theModeSlots;
@@ -36,6 +38,7 @@ class SvkPreset
 	ValueTree theCustomMode;
 	ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;
+	ValueTree theMappingsNode;
 
 public:
 
@@ -49,6 +52,21 @@ public:
 		Will sort mode slots by slot number if called with true.
 	*/
 	ValueTree getPresetNode(bool sortModeSlots = false);
+
+	/*
+		Returns the keyboard node of the preset
+	*/
+	ValueTree getKeyboardNode();
+
+	/*
+		Returns the midi settings node of the preset
+	*/
+	ValueTree getMidiSettingsNode();
+
+	/*
+		Returns the mappings node of the preset
+	*/
+	ValueTree getMappingsNode();
 
 	/*
 		Recreate a preset from a ValueTree
@@ -127,6 +145,11 @@ public:
 	int setModeSelectorSlotNum(int selectorNumIn, int slotNumIn);
     void setMode1SlotNumber(int slotNumIn);
     void setMode2SlotNumber(int slotNumIn);
+
+	/*
+		Sets the midi root note used by the mode selector
+	*/
+	void setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn);
     
 	/*
 		Loads the given mode into the given slot number, and returns the slot index
@@ -153,14 +176,15 @@ public:
 		Also resets selectors 0 and 1 to respective mode slots
 	*/
 	void resetModeSlots();
-    
+
 	/*
 		Returns a readable version of the parent node
 	*/
 	String toString();
 
 	static bool isValidPresetNode(ValueTree presetNodeIn);
-	static bool extractModesIfValid(ValueTree presetNodeIn, Array<ValueTree>& modesContained);
+
+	static SvkPreset getDefaultPreset();
 
 private:
 

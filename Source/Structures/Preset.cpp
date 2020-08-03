@@ -13,12 +13,15 @@
 SvkPreset::SvkPreset()
 {
 	parentNode = ValueTree(IDs::presetNode);
+	parentNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+
     thePropertiesNode = parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
 	theModeSlots = parentNode.getOrCreateChildWithName(IDs::modeSlotsNode, nullptr);
 	theModeSelectors = parentNode.getOrCreateChildWithName(IDs::modeSelectorsNode, nullptr);
 	theCustomMode = parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
 	theKeyboardNode = parentNode.getOrCreateChildWithName(IDs::pianoNode, nullptr);
     theMidiSettingsNode = parentNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr);
+	theMappingsNode = parentNode.getOrCreateChildWithName(IDs::midiMapNode, nullptr);
 }
 
 SvkPreset::SvkPreset(const ValueTree presetNodeIn)
@@ -54,11 +57,23 @@ ValueTree SvkPreset::getPresetNode(bool sortModeSlots)
 	return parentNode;
 }
 
+ValueTree SvkPreset::getKeyboardNode()
+{
+	return theKeyboardNode;
+}
+
+ValueTree SvkPreset::getMidiSettingsNode()
+{
+	return theMidiSettingsNode;
+}
+
+ValueTree SvkPreset::getMappingsNode()
+{
+	return theMappingsNode;
+}
+
 bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 {
-	if (!presetNodeIn.isValid())
-		return false;
-
 	if (isValidPresetNode(presetNodeIn))
 	{
 		DBG("restoring this preset: " + presetNodeIn.toXmlString());
@@ -67,6 +82,7 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 			presetNodeIn = presetNodeIn.createCopy();
 
 		parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
+		parentNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 		
 		thePropertiesNode = parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
 		theModeSlots = parentNode.getOrCreateChildWithName(IDs::modeSlotsNode, nullptr);
@@ -74,6 +90,7 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 		theCustomMode = parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
 		theKeyboardNode = parentNode.getOrCreateChildWithName(IDs::pianoNode, nullptr);
 		theMidiSettingsNode = parentNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr);
+		theMappingsNode = parentNode.getOrCreateChildWithName(IDs::midiMapNode, nullptr);
 
 		slotNumbersInUse.clear();
 		for (int i = 0; i < theModeSlots.getNumChildren(); i++)
@@ -92,9 +109,11 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 			selectorNode.setProperty(IDs::modeSelectorRootNote, 60, nullptr); // TODO: default midi root note
 			theModeSelectors.appendChild(selectorNode, nullptr);
 		}
+
+		return true;
 	}
     
-    return true;
+	return false;
 }
 
 Array<int> SvkPreset::getSlotNumbersInUse() const
@@ -204,6 +223,14 @@ void SvkPreset::setMode2SlotNumber(int slotNumIn)
     setModeSelectorSlotNum(1, slotNumIn);
 }
 
+void SvkPreset::setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn)
+{
+	ValueTree node = theModeSelectors.getChild(modeSelectorNumIn);
+
+	if (node.isValid() && rootNoteIn >= 0 && rootNoteIn < 128)
+		node.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+}
+
 int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
 {
 	if (Mode::isValidMode(modeNodeIn))
@@ -284,29 +311,27 @@ void SvkPreset::resetModeSlots()
 bool SvkPreset::isValidPresetNode(ValueTree presetNodeIn)
 {
 	bool isValid = presetNodeIn.hasType(IDs::presetNode);
-	
+
 	if (isValid)
 	{
-		if (extractNodes(presetNodeIn, IDs::modePresetNode).size() > 0)
-			return true;
+		isValid *= presetNodeIn.getChildWithName(IDs::modeSlotsNode).getNumChildren() > 0;
+			
+		// TODO: more checks?
 	}
 
-	return false;
+	return isValid;
 }
 
-bool SvkPreset::extractModesIfValid(ValueTree presetNodeIn, Array<ValueTree>& modesContained)
+SvkPreset SvkPreset::getDefaultPreset()
 {
-	bool isValid = presetNodeIn.hasType(IDs::presetNode);
+	SvkPreset defaultPreset;
 
-	if (isValid)
-	{
-		modesContained = extractNodes(presetNodeIn, IDs::modePresetNode);
+	ValueTree propertiesNode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
+	propertiesNode.setProperty(IDs::modeSelectorViewed, 1, nullptr);
 
-		if (modesContained.size() > 0)
-			return true;
-	}
+	defaultPreset.resetModeSlots();
 
-	return false;
+	return defaultPreset;
 }
 
 String SvkPreset::toString()
