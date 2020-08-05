@@ -18,7 +18,10 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     modeMapper.reset(new ModeMapper());
 
 	pluginSettings.reset(new SvkPluginSettings());
-	pluginSettingsNode = pluginSettings->pluginSettingsNode;
+	pluginSettingsNode = pluginSettings->getSettingsNode();
+
+	buildFactoryDefaultState();
+	buildUserDefaultState();
     
     midiProcessor.reset(new SvkMidiProcessor(svkTree));
     midiSettingsNode = midiProcessor->midiSettingsNode;
@@ -99,45 +102,7 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 
 void SvkPluginState::loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault)
 {
-	for (auto prop : IDs::pluginStateSettings)
-	{
-		var value;
 
-		if (!pluginStateNodeIn.getChildWithProperty(prop, value).isValid())
-		{
-			if (!fallbackToDefault)
-				continue;
-
-			else
-				defaultPluginStateNode.getChildWithProperty(prop, value);
-		}
-
-		if (prop == IDs::modeSelectorViewed)
-		{
-			setModeSelectorViewed(value);
-		}
-		
-		else if (prop == IDs::mappingMode)
-		{
-			setMapMode(value);
-		}
-		
-		else if (prop == IDs::modeMappingStyle)
-		{
-			setMapStyle(value);
-		}
-
-		// MOVE TO KEYBOARD NODE
-		else if (prop == IDs::keyboardKeysStyle)
-		{
-			setKeyStyle(value);
-		}
-
-		else if (prop == IDs::keyboardHighlightStyle)
-		{
-			setHighlightStyle(value);
-		}
-	}
 }
 
 //==============================================================================
@@ -627,17 +592,22 @@ bool SvkPluginState::loadModeFromFile()
 
 void SvkPluginState::buildFactoryDefaultState()
 {
+	SvkPluginSettings settings;
+	SvkPreset preset = SvkPreset::getDefaultPreset();
+
 	factoryDefaultPluginStateNode = ValueTree(IDs::pluginStateNode);
-	
-	ValueTree defaultPreset(IDs::presetNode);
-	defaultPreset.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
-
-
+	factoryDefaultPluginStateNode.appendChild(settings.getSettingsNode(), nullptr);
+	factoryDefaultPluginStateNode.appendChild(preset.getPresetNode(), nullptr);
 }
 
 void SvkPluginState::buildUserDefaultState()
 {
+	ValueTree defaultSettings = pluginSettingsNode.getChildWithName(IDs::presetNode);
 	
+	// TODO: connect to actual user default settings
+
+	if (!defaultSettings.isValid())
+		defaultSettings = factoryDefaultPluginStateNode.createCopy();
 }
 
 //==============================================================================
