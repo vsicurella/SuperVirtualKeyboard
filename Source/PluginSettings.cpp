@@ -12,6 +12,9 @@
 
 SvkPluginSettings::SvkPluginSettings()
 {
+	pluginSettingsNode = ValueTree(IDs::globalSettingsNode);
+	pluginSettingsNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+
 	File settingsDirectory = factoryDefaultSettingsLocation;
 	ValueTree settingsLoad;
 		 
@@ -34,8 +37,6 @@ SvkPluginSettings::SvkPluginSettings()
 	{
 		currentSettingsLocation = factoryDefaultSettingsLocation;
         currentSettingsLocation.createDirectory();
-
-		pluginSettingsNode = ValueTree(IDs::globalSettingsNode);
 	}
 
 	if (currentPresetLocation == File() || !currentPresetLocation.exists() || resetDirectories)
@@ -80,6 +81,8 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 	{
 		pluginSettingsNode.copyPropertiesAndChildrenFrom(pluginSettingsNodeIn, nullptr);
 
+		pluginSettingsNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+
 		currentSettingsLocation = File(pluginSettingsNode[IDs::settingsDirectory].toString());
 		currentPresetLocation = File(pluginSettingsNode[IDs::presetDirectory].toString());
         currentModeLocation = File(pluginSettingsNode[IDs::modeDirectory].toString());
@@ -90,6 +93,11 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 		return true;
 	}
 	return false;
+}
+
+ValueTree SvkPluginSettings::getSettingsNode()
+{
+	return pluginSettingsNode;
 }
 
 

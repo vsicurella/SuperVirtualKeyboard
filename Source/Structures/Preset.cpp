@@ -204,7 +204,10 @@ int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
 	ValueTree modeSelectorNode;
 
 	if (theModeSelectors.getNumChildren() <= selectorNumIn)
+	{
 		modeSelectorNode = ValueTree(IDs::modeSelectorsNode);
+		theModeSelectors.appendChild(modeSelectorNode, nullptr);
+	}
 	else
 		modeSelectorNode = theModeSelectors.getChild(selectorNumIn);
 

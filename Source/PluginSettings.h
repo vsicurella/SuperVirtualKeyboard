@@ -29,6 +29,8 @@ class SvkPluginSettings
 	File currentPresetLocation;
     File currentModeLocation;
 
+	ValueTree pluginSettingsNode;
+	
 	bool createPresetFolder = true;
 	bool saveFactoryModes = false;
     
@@ -41,7 +43,7 @@ public:
 	SvkPluginSettings();
 	~SvkPluginSettings() {}
 
-	ValueTree pluginSettingsNode;
+	ValueTree getSettingsNode();
 
 	bool updateNode(bool writeSettings=false);
 	bool restoreNode(ValueTree pluginSettingsNodeIn);
