@@ -23,7 +23,6 @@
 #include "../../../JuceLibraryCode/JuceHeader.h"
 
 #include "../../CommonFunctions.h"
-#include "../../PluginState.h"
 #include "../../Structures/ModeMapper.h"
 #include "../Components/ReferencedComboBox.h"
 //[/Headers]
@@ -44,7 +43,7 @@ class MapByOrderDialog  : public Component,
 {
 public:
     //==============================================================================
-    MapByOrderDialog (SvkPluginState* pluginStateIn);
+    MapByOrderDialog (ModeMapper* modeMapperIn, Mode* mode1In, Mode* mode2In);
     ~MapByOrderDialog();
 
     //==============================================================================
@@ -62,7 +61,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-    SvkPluginState* pluginState;
+	ModeMapper* modeMapper;
     Mode* mode1;
     Mode* mode2;
 

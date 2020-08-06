@@ -31,6 +31,26 @@ ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
 	mapByOrderOffset2 = mappingNode[IDs::mode2OrderOffsetMapping];
 }
 
+int ModeMapper::getMode1OrderNum() const
+{
+	return mapByOrderNum1;
+}
+
+int ModeMapper::getMode2OrderNum() const
+{
+	return mapByOrderNum2;
+}
+
+int ModeMapper::getMode1OrderOffset() const
+{
+	return mapByOrderOffset1;
+}
+
+int ModeMapper::getMode2OrderOffset() const
+{
+	return mapByOrderOffset2;
+}
+
 void ModeMapper::setMappingStyle(int mapTypeIn)
 {
     mappingStyle = mapTypeIn;

@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-MapByOrderDialog::MapByOrderDialog (SvkPluginState* pluginStateIn)
-    : pluginState(pluginStateIn)
+MapByOrderDialog::MapByOrderDialog (ModeMapper* modeMapperIn, Mode* mode1In, Mode* mode2In)
+    : modeMapper(modeMapperIn)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -98,8 +98,8 @@ MapByOrderDialog::MapByOrderDialog (SvkPluginState* pluginStateIn)
 
     //[UserPreSize]
 
-    mode1 = pluginState->getMode1();
-    mode2 = pluginState->getMode2();
+	mode1 = mode1In;
+	mode2 = mode2In;
 
     mode1OrderBox->clear();
     mode2OrderBox->clear();
@@ -110,10 +110,10 @@ MapByOrderDialog::MapByOrderDialog (SvkPluginState* pluginStateIn)
     for (int i = 0; i < mode2->getMaxStep(); i++)
         mode2OrderBox->addItem(String(i), i+1);
 
-    mode1OrderBox->setSelectedId(pluginState->getMapOrder1() + 1, dontSendNotification);
-    mode2OrderBox->setSelectedId(pluginState->getMapOrder2() + 1, dontSendNotification);
-    orderOffsetSld1->setValue(pluginState->getMapOrderOffset1(), dontSendNotification);
-    orderOffsetSld2->setValue(pluginState->getMapOrderOffset2(), dontSendNotification);
+    mode1OrderBox->setSelectedId(modeMapper->getMode1OrderNum() + 1, dontSendNotification);
+    mode2OrderBox->setSelectedId(modeMapper->getMode2OrderNum() + 1, dontSendNotification);
+    orderOffsetSld1->setValue(modeMapper->getMode1OrderOffset(), dontSendNotification);
+    orderOffsetSld2->setValue(modeMapper->getMode2OrderOffset(), dontSendNotification);
 
     //[/UserPreSize]
 
@@ -171,13 +171,13 @@ void MapByOrderDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     if (comboBoxThatHasChanged == mode1OrderBox.get())
     {
         //[UserComboBoxCode_mode1OrderBox] -- add your combo box handling code here..
-        pluginState->setMapOrder1(mode1OrderBox->getSelectedId()-1);
+		modeMapper->setMode1OrderNum(mode1OrderBox->getSelectedId()-1);
         //[/UserComboBoxCode_mode1OrderBox]
     }
     else if (comboBoxThatHasChanged == mode2OrderBox.get())
     {
         //[UserComboBoxCode_mode2OrderBox] -- add your combo box handling code here..
-        pluginState->setMapOrder2(mode2OrderBox->getSelectedId()-1);
+		modeMapper->setMode2OrderNum(mode2OrderBox->getSelectedId()-1);
         //[/UserComboBoxCode_mode2OrderBox]
     }
 
@@ -194,13 +194,13 @@ void MapByOrderDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == orderOffsetSld1.get())
     {
         //[UserSliderCode_orderOffsetSld1] -- add your slider handling code here..
-        pluginState->setMapOrderOffset1(orderOffsetSld1->getValue());
+		modeMapper->setMode1OrderOffset(orderOffsetSld1->getValue());
         //[/UserSliderCode_orderOffsetSld1]
     }
     else if (sliderThatWasMoved == orderOffsetSld2.get())
     {
         //[UserSliderCode_orderOffsetSld2] -- add your slider handling code here..
-        pluginState->setMapOrderOffset2(orderOffsetSld2->getValue());
+		modeMapper->setMode2OrderOffset(orderOffsetSld2->getValue());
         //[/UserSliderCode_orderOffsetSld2]
     }
 
