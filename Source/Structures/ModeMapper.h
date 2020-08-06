@@ -34,6 +34,14 @@ public:
 	
 	ModeMapper(ValueTree modeMappingNodeIn);
 
+	int getMode1OrderNum() const;
+
+	int getMode2OrderNum() const;
+
+	int getMode1OrderOffset() const;
+
+	int getMode2OrderOffset() const;
+
     void setMappingStyle(int mapTypeIn);
     
     void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);

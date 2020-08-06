@@ -295,7 +295,7 @@ void SvkPluginEditor::setMappingStyle(int mapStyleId)
 
 void SvkPluginEditor::showMapOrderEditDialog()
 {
-    mapByOrderDialog = new MapByOrderDialog(pluginState);
+    mapByOrderDialog = new MapByOrderDialog(pluginState->getModeMapper(), pluginState->getMode1(), pluginState->getMode2());
     CallOutBox::launchAsynchronously(mapByOrderDialog, controlComponent->getMappingStyleBox()->getScreenBounds(), nullptr);
 }
 
