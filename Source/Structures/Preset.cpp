@@ -121,6 +121,11 @@ Array<int> SvkPreset::getSlotNumbersInUse() const
 	return slotNumbersInUse;
 }
 
+int SvkPreset::getModeSelectorViewed() const
+{
+	return thePropertiesNode[IDs::modeSelectorViewed];
+}
+
 bool SvkPreset::isSlotNumberInUse(int modeSlotNumberIn) const
 {
 	return slotNumbersInUse.contains(modeSlotNumberIn);
@@ -163,6 +168,9 @@ int SvkPreset::getNextFreeSlotNumber()
 		if (slotNumbersInUse[i] - slotNumbersInUse[i - 1] > 1)
 			return slotNumbersInUse[i - 1] + 1;
 	}
+
+	if (slotNumbersInUse.size() < MAX_MODE_SLOTS_INDEX + 1)
+		return slotNumbersInUse.size();
 
 	return -1;
 }

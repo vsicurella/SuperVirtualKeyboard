@@ -72,3 +72,12 @@ enum MappingStyle
 	ModeToScale,
 	ModeByOrder
 };
+
+enum PluginStateNodeStatus
+{
+	InvalidNode = 0,
+	CurrentVersion,
+	AlphaVersion,
+
+	IsAPVTSNode = 0x1000
+};

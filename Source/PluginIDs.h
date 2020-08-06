@@ -17,7 +17,7 @@ namespace IDs
 {
 // Plugin State & Presets
 static Identifier svkParentNode("SVKValueTreeParent");
-static Identifier pluginStateNode("PluginState");
+static Identifier pluginStateNode("SvkPluginState");
 static Identifier modeLibraryNode("ModeLibrary");
 static Identifier presetNode("SvkPreset");
 static Identifier modePresetNode("SvkModeLayout");
@@ -147,6 +147,9 @@ static Identifier pianoKeyYOffset("YOffset");
 static Identifier pianoKeyShowNumber("ShowNumber");
 static Identifier pianoKeyShowNoteLabel("ShowKeyNoteLabel");
 static Identifier pianoKeyColor("KeyColor");
+
+// Backwards compatibility
+static Identifier alphaPluginStateNode("PluginState");
 
 // Debug
 static Identifier modeSlotToEdit("ModeSlotToDebug");

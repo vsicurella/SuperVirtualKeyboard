@@ -183,7 +183,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 
 	//svkValueTree.replaceState(presetRecall);	
 	recordParamIDs();
-	pluginState->recallState(presetRecall.getChildWithName(IDs::pluginStateNode), true);
+	pluginState->recallState(presetRecall, true);
 }
 
 //==============================================================================
