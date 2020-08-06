@@ -79,6 +79,11 @@ public:
 	Array<int> getSlotNumbersInUse() const;
 
 	/*
+		Returns the mode selector that's currently in view
+	*/
+	int getModeSelectorViewed() const;
+
+	/*
 		Returns true if given slot number is being used
 	*/
 	bool isSlotNumberInUse(int modeSlotNumberIn) const;

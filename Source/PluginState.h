@@ -146,6 +146,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	// TODO: make it so it's not necessary to call this before saving
 	void commitStateNode();
 
+	static int isValidStateNode(ValueTree pluginStateNodeIn);
+
 	//==============================================================================
 
 	void parameterChanged(const String& paramID, float newValue) override;

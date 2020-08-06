@@ -52,19 +52,38 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 
 void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
 {
-	DBG("PluginState recalling " + nodeIn.toXmlString());
-	if (nodeIn.hasType(IDs::pluginStateNode))
+	ValueTree stateIn = nodeIn;
+	DBG("PluginState recalling " + stateIn.toXmlString());
+	int status = isValidStateNode(stateIn);
+	DBG("Recall status returned: " + String(status));
+
+	if (status & PluginStateNodeStatus::IsAPVTSNode)
 	{
-		if (!presetManager->loadPreset(nodeIn.getChildWithName(IDs::presetNode), false))
+		if (status & 1)
+			stateIn = stateIn.getChildWithName(IDs::pluginStateNode);
+		
+		// TODO
+		else
+		{
+			//stateIn = stateIn.getChildWithName(IDs::alphaPluginStateNode);
+			stateIn = factoryDefaultPluginStateNode.createCopy();
+		}
+	}
+
+	if (stateIn.isValid())
+	{
+		if (!presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false))
 		{
 			// Might not be good - will actually delete existing properties that are set properly
-			nodeIn = defaultPluginStateNode;
-			presetManager->loadPreset(nodeIn.getChildWithName(IDs::presetNode), false);
+			stateIn = defaultPluginStateNode;
+			presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false);
 		}
 
-		pluginStateNode = nodeIn.createCopy();
+		pluginStateNode = stateIn.createCopy();
 		revertToSavedPreset(fallbackToDefaultSettings);
 	}
+
+	DBG("After recall: " + pluginStateNode.toXmlString());
 }
 
 void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
@@ -88,12 +107,15 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	midiProcessor->setMode2(getMode2());
 
 	loadPropertiesOfNode(pluginStateNode, fallbackToDefaultSettings);
+
+	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
+	updateModeViewed();
     
 	// TODO: Move to UI side of things
 	pianoNode = svkPreset->getKeyboardNode();
-	virtualKeyboard->restoreNode(pianoNode);
-    virtualKeyboard->applyMode(modeViewed);
-
+	/*virtualKeyboard->restoreNode(pianoNode);
+    virtualKeyboard->applyMode(modeViewed);*/
+	
 	doMapping();
     
 	if (sendChange)
@@ -102,7 +124,7 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 
 void SvkPluginState::loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault)
 {
-
+	
 }
 
 //==============================================================================
@@ -552,6 +574,52 @@ void SvkPluginState::commitStateNode()
 	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
     
 	presetEdited = false;
+}
+
+int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
+{
+	int status = 0; // TODO: determine status codes
+
+	// Determine if it's a SVK state node or a APVTS node
+	ValueTree stateNode;
+
+	if (pluginStateNodeIn.hasType(IDs::svkParentNode))
+	{
+		status = PluginStateNodeStatus::IsAPVTSNode;
+
+		stateNode = pluginStateNodeIn.getChildWithName(IDs::pluginStateNode);
+		
+		if (!stateNode.isValid())
+		{
+			// Check if it's an alpha preset
+			stateNode = pluginStateNodeIn.getChildWithName(IDs::alphaPluginStateNode);
+		}
+	}
+
+	else if (pluginStateNodeIn.hasType(IDs::pluginStateNode))
+	{
+		stateNode = pluginStateNodeIn;
+	}
+
+	if (stateNode.isValid())
+	{
+		// Determine if it's the current preset version or not
+		if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+		{
+			status += PluginStateNodeStatus::CurrentVersion;
+		}
+		else // Can add more conditions for certain versions if necessary
+		{
+			status += PluginStateNodeStatus::AlphaVersion;
+		}
+
+		if (status == 1)
+		{
+			// TODO: Various validity checks
+		}
+	}
+
+	return status;
 }
 
 bool SvkPluginState::savePresetToFile()
