@@ -14,7 +14,8 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     : svkTree(svkTreeIn)
 {
     pluginStateNode = ValueTree(IDs::pluginStateNode);
-    
+	pluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+
     modeMapper.reset(new ModeMapper());
 
 	pluginSettings.reset(new SvkPluginSettings());
@@ -113,8 +114,8 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
     
 	// TODO: Move to UI side of things
 	pianoNode = svkPreset->getKeyboardNode();
-	/*virtualKeyboard->restoreNode(pianoNode);
-    virtualKeyboard->applyMode(modeViewed);*/
+	virtualKeyboard->restoreNode(pianoNode);
+    virtualKeyboard->applyMode(modeViewed);
 	
 	doMapping();
     
@@ -554,9 +555,13 @@ void SvkPluginState::commitStateNode()
 	presetManager->commitPreset();
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetNode;
+
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
 
     pluginStateNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pianoNode, nullptr);
+
+	DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
+
 
 	// TODO: revise
 	midiProcessor->updateNode();
@@ -572,6 +577,7 @@ void SvkPluginState::commitStateNode()
 	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
     
 	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
+
     
 	presetEdited = false;
 }
@@ -603,6 +609,8 @@ int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
 
 	if (stateNode.isValid())
 	{
+		DBG("Validating:\n" + stateNode.toXmlString());
+
 		// Determine if it's the current preset version or not
 		if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
 		{
@@ -664,6 +672,7 @@ void SvkPluginState::buildFactoryDefaultState()
 	SvkPreset preset = SvkPreset::getDefaultPreset();
 
 	factoryDefaultPluginStateNode = ValueTree(IDs::pluginStateNode);
+	factoryDefaultPluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 	factoryDefaultPluginStateNode.appendChild(settings.getSettingsNode(), nullptr);
 	factoryDefaultPluginStateNode.appendChild(preset.getPresetNode(), nullptr);
 }

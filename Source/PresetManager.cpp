@@ -99,10 +99,12 @@ Mode* SvkPresetManager::getModeInSlot(int slotNumIn)
 
 		return mode;
 	}
-	else
+	else if (slotNumIn > 0)
 	{
 		return modeCustom.get();
 	}
+	
+	return nullptr;
 }
 
 Mode* SvkPresetManager::getModeBySelector(int selectorNumber)
@@ -111,6 +113,11 @@ Mode* SvkPresetManager::getModeBySelector(int selectorNumber)
 	if (svkPresetWorking.isSlotNumberInUse(slotNumber))
 	{
 		return modeSlots[svkPresetWorking.getSlotNumberIndex(slotNumber)];
+	}
+
+	else if (slotNumber < MAX_MODE_SLOTS_INDEX)
+	{
+		return modeCustom.get();
 	}
 
 	return nullptr;
@@ -226,7 +233,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
         //svkPresetWorking.setModeSlot(modeCustom->modeNode, modeSlotNumber);
         //modeSlots.set(modeBoxNumber, modeCustom.make_shared());
         modeSelected = modeCustom->modeNode;
-		modeSlotNumber = svkPresetWorking.getModeSlotsSize();
+		modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
 	}
     
     if (modeSelected.isValid())
@@ -249,11 +256,11 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
         modeSlots.clear();
 		for (auto mode : svkPresetWorking.getModeSlots())
 		{
-			modeSlots.add(new Mode(mode, true));
+			modeSlots.add(new Mode(mode.getChild(0), true));
 		}
 
 		ValueTree customModeNode = svkPresetWorking.getCustomMode();
-		modeCustom.reset(new Mode(customModeNode, false));
+		modeCustom.reset(new Mode(customModeNode.getChild(0), false));
 
 		if (sendChangeSignal)
 			sendChangeMessage();

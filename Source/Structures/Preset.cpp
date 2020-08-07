@@ -207,21 +207,22 @@ ValueTree SvkPreset::getCustomMode()
 
 int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
 {
-	slotNumIn = jlimit(0, MAX_MODE_SLOTS_INDEX, slotNumIn);
-
-	ValueTree modeSelectorNode;
-
-	if (theModeSelectors.getNumChildren() <= selectorNumIn)
+	if (slotNumIn >= 0)
 	{
-		modeSelectorNode = ValueTree(IDs::modeSelectorsNode);
-		theModeSelectors.appendChild(modeSelectorNode, nullptr);
+		ValueTree modeSelectorNode = ValueTree(IDs::modeSelectorsNode);
+		if (theModeSelectors.getNumChildren() <= selectorNumIn)
+		{
+			theModeSelectors.appendChild(modeSelectorNode, nullptr);
+		}
+		else if (slotNumIn <= MAX_MODE_SLOTS_INDEX)
+			modeSelectorNode = theModeSelectors.getChild(selectorNumIn);
+
+		modeSelectorNode.setProperty(IDs::modeSlotNumber, slotNumIn, nullptr);
+		
+		return slotNumIn;
 	}
-	else
-		modeSelectorNode = theModeSelectors.getChild(selectorNumIn);
 
-	modeSelectorNode.setProperty(IDs::modeSlotNumber, slotNumIn, nullptr);
-
-	return slotNumIn;
+	return -1;
 }
 
 void SvkPreset::setMode1SlotNumber(int slotNumIn)
@@ -254,6 +255,7 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
 		if (slotIndex >= 0)
 		{
 			slotNode = theModeSlots.getChild(slotIndex);
+			slotNode.removeAllChildren(nullptr);
 		}
 		else
 		{
@@ -283,11 +285,15 @@ ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool createCopy)
 {
 	if (Mode::isValidMode(customModeNodeIn))
 	{
-		if (createCopy)
-			customModeNodeIn = customModeNodeIn.createCopy();
+		ValueTree nodeToAdd = customModeNodeIn;
 
-		theCustomMode.getChild(0) = customModeNodeIn;
-		return customModeNodeIn;
+		if (createCopy)
+			nodeToAdd = customModeNodeIn.createCopy();
+
+		theCustomMode.removeAllChildren(nullptr);
+		theCustomMode.appendChild(nodeToAdd, nullptr);
+
+		return nodeToAdd;
 	}
 
 	return ValueTree();
