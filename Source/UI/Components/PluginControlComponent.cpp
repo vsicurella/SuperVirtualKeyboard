@@ -374,10 +374,14 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		if (piano.isValid())
 		{
 			keyboard->restoreNode(piano);
-			setViewPosition((float)piano[IDs::viewportPosition]);
 			setNoteNumsView(piano[IDs::pianoKeysShowNoteNumbers]);
 			setKeyStyleId(piano[IDs::keyboardKeysStyle]);
 			setHighlightStyleId(piano[IDs::keyboardHighlightStyle]);
+
+			if (!piano.hasProperty(IDs::viewportPosition))
+				piano.setProperty(IDs::viewportPosition, keyboard->getWidth() / 4, nullptr);
+
+			setViewPosition(piano[IDs::viewportPosition]);
 		}
 
 		ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
@@ -391,12 +395,12 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 				// TODO: generalize
 				if (num == 0)
 				{
-					setMode1Root(selector[IDs::rootMidiNote]);
+					setMode1Root(selector[IDs::modeSelectorRootNote]);
 					setMode1BoxText(mode->getName());
 				}
 				else if (num == 1)
 				{
-					setMode2Root(selector[IDs::rootMidiNote]);
+					setMode2Root(selector[IDs::modeSelectorRootNote]);
 					setMode2BoxText(mode->getName());
 				}
 
@@ -413,7 +417,7 @@ void PluginControlComponent::onModeViewedChange(Mode* modeViewed)
 {
 	setScaleEntryText(modeViewed->getStepsString());
 	keyboard->applyMode(modeViewed);
-	keyboard->resized();
+	resized();
 }
 
 void PluginControlComponent::paint (Graphics& g)
