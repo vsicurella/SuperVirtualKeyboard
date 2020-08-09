@@ -160,12 +160,12 @@ Mode* SvkPluginState::getModeViewed()
 
 Mode* SvkPluginState::getMode1()
 {
-	return presetManager->getModeInSlot(0);
+	return presetManager->getModeBySelector(0);
 }
 
 Mode* SvkPluginState::getMode2()
 {
-	return presetManager->getModeInSlot(1);
+	return presetManager->getModeBySelector(1);
 }
 
 Mode* SvkPluginState::getModeCustom()
@@ -363,10 +363,13 @@ void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
 	midiProcessor->setOutputFilter(noteMapIn);
 }
 
-void SvkPluginState::setModeCustom(String stepsIn)
+void SvkPluginState::setModeCustom(String stepsIn, bool sendChangeMessage)
 {
 	presetManager->setModeCustom(stepsIn);
 	handleModeSelection(getModeSelectorViewed(), 999);
+	
+	if (sendChangeMessage)
+		listeners.call(&Listener::customModeChanged, presetManager->getModeCustom());
 }
 
 void SvkPluginState::setMapOrder1(int orderIn)
@@ -426,19 +429,20 @@ void SvkPluginState::updateModeViewed(bool sendChange)
 		listeners.call(&Listener::modeViewedChanged, modeViewed, modeSelectorViewedNum, presetManager->getModeSlotOfSelector(modeSelectorViewedNum));
 }
 
-void SvkPluginState::commitModeInfo()
+void SvkPluginState::commitModeInfo(bool sendChangeMessage)
 {
 	if (modeViewed == presetManager->getModeCustom())
 	{
-		// what i need to do here is to make it so that custom modes don't get added to slots
-		// when automation is implemented, the custom mode will be accessible with value 0
-		// this might also make menu related (selection id) things easier
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
 	presetManager->setSlotToMode(modeSelectorViewedNum, presetManager->getModeCustom()->modeNode);
-	//presetManager->refreshModeSlot();
+	
 	updateModeViewed();
+
+	if (sendChangeMessage)
+		listeners.call(&Listener::modeInfoChanged, modeViewed);
+
 	doMapping();
 }
 
@@ -470,7 +474,6 @@ void SvkPluginState::commitStateNode()
     
 	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
 
-    
 	presetEdited = false;
 }
 

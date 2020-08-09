@@ -66,7 +66,11 @@ public:
 	int getModeSlotOfSelector(int modeSelectorNumIn) const;
 
 	ValueTree getModeInLibrary(int indexIn);
-	Mode* getModeInSlot(int slotNumIn);
+
+	/*
+		Returns the mode in the given mode slot number
+	*/
+	Mode* getModeInSlot(int modeSlotNumIn);
 
 	/*
 		Returns the mode used by given selector

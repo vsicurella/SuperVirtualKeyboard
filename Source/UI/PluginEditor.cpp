@@ -325,6 +325,18 @@ void SvkPluginEditor::inputMappingChanged(NoteMap* inputNoteMap)
 	virtualKeyboard->setInputNoteMap(inputNoteMap);
 }
 
+void SvkPluginEditor::customModeChanged(Mode* newCustomMode)
+{
+}
+
+void SvkPluginEditor::modeInfoChanged(Mode* modeEdited)
+{
+	if (pluginState->getModeSelectorViewed() == 1)
+		controlComponent->setMode2BoxText(modeEdited->getName());
+	else
+		controlComponent->setMode1BoxText(modeEdited->getName());
+}
+
 //==============================================================================
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)

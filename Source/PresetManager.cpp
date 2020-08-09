@@ -86,20 +86,20 @@ ValueTree SvkPresetManager::getModeInLibrary(int indexIn)
     return ValueTree();
 }
 
-Mode* SvkPresetManager::getModeInSlot(int slotNumIn)
+Mode* SvkPresetManager::getModeInSlot(int modeSlotNumIn)
 {
-	int slotIndex = svkPresetWorking.getSlotNumberIndex(slotNumIn);
+	int slotIndex = svkPresetWorking.getSlotNumberIndex(modeSlotNumIn);
 
 	if (slotIndex >= 0)
 	{
 		jassert(slotIndex < modeSlots.size());
 
 		Mode* mode = modeSlots[slotIndex];
-		DBG("GRABBING MODE: " + String(slotNumIn) + " which is " + mode->getDescription());
+		DBG("GRABBING MODE: " + String(modeSlotNumIn) + " which is " + mode->getDescription());
 
 		return mode;
 	}
-	else if (slotNumIn > 0)
+	else if (modeSlotNumIn > 0)
 	{
 		return modeCustom.get();
 	}
@@ -115,7 +115,7 @@ Mode* SvkPresetManager::getModeBySelector(int selectorNumber)
 		return modeSlots[svkPresetWorking.getSlotNumberIndex(slotNumber)];
 	}
 
-	else if (slotNumber < MAX_MODE_SLOTS_INDEX)
+	else if (slotNumber > MAX_MODE_SLOTS_INDEX)
 	{
 		return modeCustom.get();
 	}
@@ -230,15 +230,13 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
 	else
 	{
         DBG("Custom mode selected");
-        //svkPresetWorking.setModeSlot(modeCustom->modeNode, modeSlotNumber);
-        //modeSlots.set(modeBoxNumber, modeCustom.make_shared());
         modeSelected = modeCustom->modeNode;
 		modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
 	}
     
     if (modeSelected.isValid())
     {
-        setSlotToMode(selectorNumber, modeSelected);
+        setSlotToMode(modeSlotNumber, modeSelected);
     }
     
 	svkPresetWorking.setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
@@ -260,7 +258,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 		}
 
 		ValueTree customModeNode = svkPresetWorking.getCustomMode();
-		modeCustom.reset(new Mode(customModeNode.getChild(0), false));
+		modeCustom.reset(new Mode(customModeNode, false));
 
 		if (sendChangeSignal)
 			sendChangeMessage();
