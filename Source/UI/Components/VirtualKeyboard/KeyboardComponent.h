@@ -251,7 +251,7 @@ namespace VirtualKeyboard
 		/*
 			Rearranges the keys to fit the current mode, without changing other key data.
 		*/
-		void applyMode(Mode* modeIn, bool resetKeyColors = true);
+		void applyMode(Mode* modeIn);
 
 		/*
 			Applies the key data to the keyboard so that it matches the data passed in.
@@ -331,7 +331,6 @@ namespace VirtualKeyboard
 		void setShowNoteLabels(bool shouldShowPitchNames);
 
 		// might want to restructure these so this is not necessary
-		void setKeyProportions(Key* keyIn);
 		void setLastKeyClicked(int keyNumIn);
   
         /*

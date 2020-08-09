@@ -94,9 +94,9 @@ void ModeMapper::setPreviousOrderNoteMap(NoteMap prevNoteMapIn)
 	previousOrderMap = prevNoteMapIn;
 }
 
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2)
+NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, NoteMap prevMap)
 {
-	return map(mode1, mode2, mappingStyle, mapByOrderNum1, mapByOrderNum2, mapByOrderOffset1, mapByOrderOffset2, previousOrderMap);
+	return map(mode1, mode2, mappingStyle, mapByOrderNum1, mapByOrderNum2, mapByOrderOffset1, mapByOrderOffset2, prevMap);
 }
 
 NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, int order1, int order2, int offset1, int offset2,

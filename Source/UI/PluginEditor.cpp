@@ -27,18 +27,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	appCmdMgr->setFirstCommandTarget(this);
 
 	controlComponent.reset(new PluginControlComponent(processor.svkValueTree, appCmdMgr, pluginState->getPresetManager()));
-	controlComponent->connectToProcessor();
+	//controlComponent->connectToProcessor();
 	addAndMakeVisible(controlComponent.get());
 
-	viewport = controlComponent->getViewport();
-	Rectangle<int> viewportBounds = viewport->getBounds();
-
-	virtualKeyboard = pluginState->getKeyboard();
-
-	viewport->setViewedComponent(virtualKeyboard, false);
-	viewport->setBounds(viewportBounds);
-	viewportScroll = &viewport->getHorizontalScrollBar();
-	viewportScroll->addListener(this);
+	virtualKeyboard = controlComponent->getKeyboard();
+	virtualKeyboard->addListener(pluginState->getMidiProcessor());
 
 	colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
 	colorChooserWindow->setSize(450, 450);
@@ -50,7 +43,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	colorChooserWindow->setContentOwned(colorSelector.get(), true);
 	colorSelector->addChangeListener(this);
 
-	pluginState->addChangeListener(this);
+	pluginState->addListener(this);
 
 	//for (auto paramID : processor.getParamIDs())
 	//{
@@ -62,11 +55,27 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
-	initNodeData();
+	
+	pluginEditorNode = ValueTree(IDs::pluginEditorNode);
+
+	// Gui is recreated
+	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
+	{
+		pluginEditorNode = pluginState->pluginEditorNode;
+		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
+	}
+
+	// Intialization
+	else
+	{
+		pluginState->pluginEditorNode = pluginEditorNode;
+		setSize(1000, 210);
+	}
 
 	setResizeLimits(750, 100, 10e4, 10e4);
 
 	controlComponent->setBounds(getBounds());
+	controlComponent->loadPresetNode(pluginState->getPresetNode());
 
 #if (!JUCE_ANDROID && !JUCE_IOS)
 	startTimerHz(30);
@@ -83,71 +92,8 @@ SvkPluginEditor::~SvkPluginEditor()
 
 	colorSelector->removeChangeListener(this);
 	colorChooserWindow->removeChangeListener(this);
-    pluginState->removeChangeListener(this);
-}
-
-//==============================================================================
-
-void SvkPluginEditor::initNodeData()
-{
-    // Gui is recreated
-	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
-	{
-		pluginEditorNode = pluginState->pluginEditorNode;
-
-		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-        viewportX = (float) pluginEditorNode[IDs::viewportPosition];
-	}
-    // Intialization
-	else
-	{
-		pluginEditorNode = ValueTree(IDs::pluginEditorNode);
-		pluginState->pluginEditorNode = pluginEditorNode;
-
-		setSize(1000, 210);
-        setScrollBarPosition(0.51f);
-	}
-    
-    updateUI();
-}
-
-void SvkPluginEditor::updateNodeData()
-{
-	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
-    updateScrollbarData();
-}
-
-void SvkPluginEditor::updateUI()
-{
-    controlComponent->setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
-	controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
-	controlComponent->setMappingStyleId(pluginState->getParameterValue(IDs::modeMappingStyle));
-	controlComponent->setMode1Root(pluginState->getMode1()->getRootNote());
-	controlComponent->setMode2Root(pluginState->getMode2()->getRootNote());
-	controlComponent->setMode1BoxText(pluginState->getMode1()->getName());
-	controlComponent->setMode2BoxText(pluginState->getMode2()->getName());
-	controlComponent->setMode1View(pluginState->getModeSelectorViewed() == 0);
-	controlComponent->setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
-	controlComponent->setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
-    controlComponent->setNoteNumsView(pluginState->getKeyboard()->isShowingNoteNumbers());
-	controlComponent->setKeyStyleId(pluginState->getParameterValue(IDs::keyboardKeysStyle));
-	controlComponent->setHighlightStyleId(pluginState->getParameterValue(IDs::keyboardHighlightStyle));
-	controlComponent->setViewPosition(viewportX);
-
-	DBG("Children Updated");
-}
-
-void SvkPluginEditor::updateScrollbarData()
-{
-	viewportX = (float) viewport->getViewPositionX() / (float) viewport->getMaximumVisibleWidth();
-	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
-}
-
-void SvkPluginEditor::setScrollBarPosition(float positionIn)
-{
-	viewportX = positionIn;
-	pluginEditorNode.setProperty(IDs::viewportPosition, viewportX, nullptr);
+	virtualKeyboard->removeListener(pluginState->getMidiProcessor());
+    pluginState->removeListener(this);
 }
 
 //==============================================================================
@@ -177,9 +123,7 @@ bool SvkPluginEditor::loadPreset()
 {
 	if (pluginState->loadPresetFromFile())
 	{
-		//virtualKeyboard->restoreNode(pluginState->getPresetLoaded()->theKeyboardNode);
-		updateUI();
-
+		controlComponent->loadPresetNode(pluginState->getPresetNode());
 		return true;
 	}
 
@@ -273,6 +217,12 @@ void SvkPluginEditor::setModeView(int modeNumberIn)
 {
 	pluginState->setModeSelectorViewed(modeNumberIn);
     controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
+
+	MidiKeyboardState* displayState = modeNumberIn == 0
+		? pluginState->getMidiProcessor()->getOriginalKeyboardState()
+		: pluginState->getMidiProcessor()->getRemappedKeyboardState();
+	
+	virtualKeyboard->displayKeyboardState(displayState);
 }
 
 void SvkPluginEditor::showModeInfo()
@@ -281,6 +231,16 @@ void SvkPluginEditor::showModeInfo()
 	modeInfo->addChangeListener(this);
 
 	CallOutBox::launchAsynchronously(modeInfo, controlComponent->getScaleTextEditor()->getScreenBounds(), nullptr);
+}
+
+void SvkPluginEditor::setMappingMode()
+{
+	setMappingMode(controlComponent->getMappingMode());
+}
+
+void SvkPluginEditor::setMappingMode(int mappingModeId)
+{
+	pluginState->setMapMode(mappingModeId);
 }
 
 void SvkPluginEditor::setMappingStyle()
@@ -304,83 +264,11 @@ void SvkPluginEditor::applyMap()
 	pluginState->doMapping();
 }
 
-void SvkPluginEditor::setMappingMode()
-{
-	setMappingMode(pluginState->getParameterValue(IDs::mappingMode));
-}
-
-void SvkPluginEditor::setMappingMode(int mappingModeId)
-{
-    pluginState->setMapMode(mappingModeId);
-}
-
-void SvkPluginEditor::setKeyboardRows()
-{
-    setKeyboardRows(pluginState->getParameterValue(IDs::keyboardNumRows));
-}
-
-void SvkPluginEditor::setKeyboardRows(int numRows)
-{
-    virtualKeyboard->setNumRows(numRows);
-}
-
-void SvkPluginEditor::setPeriodShift()
-{
-	setPeriodShift(pluginState->getParameterValue(IDs::periodShift));
-}
-
-void SvkPluginEditor::setPeriodShift(int periodsIn)
-{
-    pluginState->setParameterValue(IDs::periodShift, periodsIn);
-}
-
-void SvkPluginEditor::setMidiChannel()
-{
-	setMidiChannel(pluginState->getParameterValue(IDs::keyboardMidiChannel));
-}
-
-void SvkPluginEditor::setMidiChannel(int midiChannelIn)
-{
-    pluginState->setParameterValue(IDs::keyboardMidiChannel, midiChannelIn);
-}
-
 void SvkPluginEditor::beginColorEditing()
 {
 	colorChooserWindow->setVisible(true);
 	virtualKeyboard->setUIMode(UIMode::editMode);
     isColorEditing = true;
-}
-
-void SvkPluginEditor::setNoteNumsVisible()
-{
-	setNoteNumsVisible(controlComponent->getNoteNumsView());
-}
-
-void SvkPluginEditor::setNoteNumsVisible(bool noteNumsVisible)
-{
-	pluginState->setShowNoteNums(noteNumsVisible);
-}
-
-void SvkPluginEditor::setKeyStyle()
-{
-	setKeyStyle(controlComponent->getKeyStyle());
-}
-
-void SvkPluginEditor::setKeyStyle(int keyStyleId)
-{
-	pluginState->setKeyStyle(keyStyleId);
-    
-    virtualKeyboard->resized();
-}
-
-void SvkPluginEditor::setHighlightStyle()
-{
-    setHighlightStyle(pluginState->getParameterValue(IDs::keyboardHighlightStyle));
-}
-
-void SvkPluginEditor::setHighlightStyle(int highlightStyleId)
-{
-	pluginState->setHighlightStyle(highlightStyleId);
 }
 
 //==============================================================================
@@ -396,13 +284,11 @@ void SvkPluginEditor::resized()
 
 	controlComponent->setSize(getWidth(), getHeight());
 
-	viewport->setViewPosition(viewportX * viewport->getMaximumVisibleWidth(), 0);
-
 //    if (settingsContainer.get())
 //         settingsContainer->setSize(getWidth(), getHeight());
-    
-    if (pluginEditorNode.isValid())
-        updateNodeData();
+	
+	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
+	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
 }
 
 //==============================================================================
@@ -419,49 +305,30 @@ void SvkPluginEditor::userTriedToCloseWindow()
 	if (colorChooserWindow->isVisible())
 		colorChooserWindow->closeButtonPressed();
 
-	updateScrollbarData();
-    updateNodeData();
 	setVisible(false);
 }
 
 //==============================================================================
 
-void SvkPluginEditor::mouseDown(const MouseEvent& e)
+void SvkPluginEditor::presetLoaded(ValueTree presetNodeIn)
 {
- 
+	controlComponent->loadPresetNode(presetNodeIn);
 }
 
-void SvkPluginEditor::mouseDrag(const MouseEvent& e)
+void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
 {
-
+	controlComponent->onModeViewedChange(modeIn);
 }
 
-void SvkPluginEditor::mouseUp(const MouseEvent& e)
+void SvkPluginEditor::inputMappingChanged(NoteMap* inputNoteMap)
 {
-
-}
-
-void SvkPluginEditor::mouseMove(const MouseEvent& e)
-{
-
-}
-
-void SvkPluginEditor::mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w)
-{
-	updateScrollbarData();
+	virtualKeyboard->setInputNoteMap(inputNoteMap);
 }
 
 //==============================================================================
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-    // New Mode loaded
-    if (source == pluginState)
-    {
-        updateUI();
-//		pluginState->updateModeViewed(false);
-    }
-    
 	// Color editing is finished
 	if (source == colorChooserWindow.get())
 	{
@@ -486,7 +353,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	if (source == modeInfo)
 	{
 		pluginState->commitModeInfo();
-        updateUI();
+		controlComponent->onModeViewedChange(pluginState->getModeViewed());
 	}
         
     // Settings closed
@@ -499,11 +366,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 //        controlComponent->setVisible(true);
 //        controlComponent->resized();
 //    }
-}
-
-void SvkPluginEditor::scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart)
-{
-    updateScrollbarData();
 }
 
 //==============================================================================
@@ -571,11 +433,11 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::setMappingStyle,
         IDs::CommandIDs::showMapOrderEdit,
 		IDs::CommandIDs::applyMapping,
+		IDs::CommandIDs::beginColorEditing,
 		IDs::CommandIDs::setPeriodShift,
 		IDs::CommandIDs::setMidiChannelOut,
-		IDs::CommandIDs::beginColorEditing,
-		IDs::CommandIDs::showMidiNoteNumbers,
-		IDs::CommandIDs::setKeyStyle,
+		//IDs::CommandIDs::showMidiNoteNumbers,
+		//IDs::CommandIDs::setKeyStyle
 	};
 
 	c.addArray(commands);
@@ -648,25 +510,24 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
     case IDs::CommandIDs::setMappingMode:
         result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
         break;
-
+	case IDs::CommandIDs::beginColorEditing:
+		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Keyboard", 0);
+		break;
 	case IDs::CommandIDs::setPeriodShift:
-		result.setInfo("Shift by Mode 2 Period0", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
+		result.setInfo("Shift by Mode 2 Period", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
 		break;
 	case IDs::CommandIDs::setMidiChannelOut:
 		result.setInfo("Set MIDI Channel Out", "Set the outgoing MIDI Notes to the selected MIDI Channel.", "Midi", 0);
 		break;
-	case IDs::CommandIDs::beginColorEditing:
-		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Keyboard", 0);
-		break;
-	case IDs::CommandIDs::showMidiNoteNumbers:
-		result.setInfo("Show Midi Note Numbers", "Shows incoming MIDI notes on Mode 1 and outgoing MIDI Notes on Mode 2.", "Keyboard", 0);
-		break;
-	case IDs::CommandIDs::setKeyStyle:
-		result.setInfo("Set Key Style", "Sets the selected style for drawing overlapping degrees between mode degrees.", "Keyboard", 0);
-		break;
-	case IDs::CommandIDs::setHighlightStyle:
-		result.setInfo("Set Highlight Style", "Sets the selected style for drawing triggered notes.", "Keyboard", 0);
-		break;
+	//case IDs::CommandIDs::showMidiNoteNumbers:
+	//	result.setInfo("Show Midi Note Numbers", "Shows incoming MIDI notes on Mode 1 and outgoing MIDI Notes on Mode 2.", "Keyboard", 0);
+	//	break;
+	//case IDs::CommandIDs::setKeyStyle:
+	//	result.setInfo("Set Key Style", "Sets the selected style for drawing overlapping degrees between mode degrees.", "Keyboard", 0);
+	//	break;
+	//case IDs::CommandIDs::setHighlightStyle:
+	//	result.setInfo("Set Highlight Style", "Sets the selected style for drawing triggered notes.", "Keyboard", 0);
+	//	break;
 	default:
 		break;
 	}
@@ -766,34 +627,19 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 			setMappingMode();
 			break;
 		}
-		case IDs::CommandIDs::setPeriodShift:
-		{
-			setPeriodShift();
-			break;
-		}
-		case IDs::CommandIDs::setMidiChannelOut:
-		{
-			setMidiChannel();
-			break;
-		}
 		case IDs::CommandIDs::beginColorEditing:
 		{
 			beginColorEditing();
 			break;
 		}
-		case IDs::CommandIDs::showMidiNoteNumbers:
+		case IDs::CommandIDs::setPeriodShift:
 		{
-			setNoteNumsVisible();
+			// TODO
 			break;
 		}
-		case IDs::CommandIDs::setKeyStyle:
+		case IDs::CommandIDs::setMidiChannelOut:
 		{
-			setKeyStyle();
-			break;
-		}
-		case IDs::CommandIDs::setHighlightStyle:
-		{
-			setHighlightStyle();
+			// TODO
 			break;
 		}
         default:

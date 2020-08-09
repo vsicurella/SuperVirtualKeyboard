@@ -19,7 +19,6 @@
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 
 //#include "../SvkUiPanel.h"
@@ -32,36 +31,44 @@
 typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
 typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class PluginControlComponent  : public Component,
                                 public TextEditor::Listener,
                                 public ComboBox::Listener,
                                 public Slider::Listener,
-                                public Button::Listener
+                                public Button::Listener,
+								private ScrollBar::Listener
 {
 public:
     //==============================================================================
     PluginControlComponent (AudioProcessorValueTreeState& processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn);
     ~PluginControlComponent();
 
+	//==============================================================================
+
+	void paint(Graphics& g) override;
+	void resized() override;
+	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
+	void sliderValueChanged(Slider* sliderThatWasMoved) override;
+	void buttonClicked(Button* buttonThatWasClicked) override;
+
+	void textEditorTextChanged(TextEditor& textEditor) override;
+	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
+	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+	void textEditorFocusLost(TextEditor& textEditor) override;
+
+	void mouseDown(const MouseEvent& e) override;
+
+	void scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
+
     //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 
     void connectToProcessor();
 
 	String getScaleEntryText();
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
+
+	VirtualKeyboard::Keyboard* getKeyboard();
 
 	TextEditor* getScaleTextEditor();
 	Viewport* getViewport();
@@ -74,15 +81,19 @@ public:
 	TextButton* getModeInfoButton();
 
 	/*
-		Returns the X position of the viewport
+		Sets controls to preset settings
 	*/
-	int getViewPosition();
+	void loadPresetNode(ValueTree presetNodeIn);
+
+	/*
+		Updates UI to the new mode
+	*/
+	void onModeViewedChange(Mode* modeViewed);
 
 	/*
 		Sets the X position of the viewport
 	*/
 	void setViewPosition(int xIn);
-	void setViewPosition(float xRatioIn);
 
 	int getMode1BoxSelection();
 	int getMode2BoxSelection();
@@ -128,28 +139,12 @@ public:
 	int getHighlightStyle();
 	void setHighlightStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	void textEditorTextChanged(TextEditor& textEditor) override;
-	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
-	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-	void textEditorFocusLost(TextEditor& textEditor) override;
-
-	void mouseDown(const MouseEvent& e) override;
-
-    //[/UserMethods]
-
-    void paint (Graphics& g) override;
-    void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
-
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     AudioProcessorValueTreeState& processorTree;
 	ApplicationCommandManager* appCmdMgr;
     SvkPresetManager* presetManager;
+
+	ValueTree presetNode;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;
@@ -169,8 +164,6 @@ private:
 
 	int barHeight = 24;
 	int gap = 8;
-
-    //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<TextEditor> scaleTextBox;
@@ -197,16 +190,12 @@ private:
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
+	std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;
     std::unique_ptr<ImageButton> openButton;
     std::unique_ptr<ImageButton> settingsButton;
 
-
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginControlComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

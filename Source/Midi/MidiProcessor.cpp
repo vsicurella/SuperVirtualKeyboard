@@ -95,16 +95,10 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
 		midiSettingsNode = midiSettingsNodeIn;
-        
-		// Set Note Maps
-		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
-		{
-			midiMapNode = ValueTree(IDs::midiMapNode);
-			midiSettingsNode.addChild(midiMapNode, -1, nullptr);
-		}
-
-		setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
-
+      
+		periodShift = midiSettingsNode[IDs::periodShift];
+		midiChannelOut = midiSettingsNode[IDs::keyboardMidiChannel];
+		
         return true;
     }
     
