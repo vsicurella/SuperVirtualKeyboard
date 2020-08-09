@@ -110,6 +110,13 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 			theModeSelectors.appendChild(selectorNode, nullptr);
 		}
 
+		// Make sure mode selectors have a midi root note
+		for (auto selector : theModeSelectors)
+		{
+			if (!selector.hasProperty(IDs::modeSelectorRootNote))
+				selector.setProperty(IDs::modeSelectorRootNote, 60, nullptr);
+		}
+
 		return true;
 	}
     
@@ -148,6 +155,11 @@ int SvkPreset::getMode1SlotNumber() const
 int SvkPreset::getMode2SlotNumber() const
 {
 	return getSlotNumberBySelector(1);
+}
+
+int SvkPreset::getModeViewedSlotNumber() const
+{
+	return getSlotNumberBySelector(getModeSelectorViewed());
 }
 
 int SvkPreset::getSlotNumberIndex(int slotNumIn)
@@ -198,6 +210,11 @@ ValueTree SvkPreset::getMode1()
 ValueTree SvkPreset::getMode2()
 {
 	return getModeBySelector(1);
+}
+
+ValueTree SvkPreset::getModeViewed()
+{
+	return getModeBySelector(thePropertiesNode[IDs::modeSelectorViewed]);
 }
 
 ValueTree SvkPreset::getCustomMode()
@@ -318,8 +335,9 @@ void SvkPreset::resetModeSlots()
 	slotNumbersInUse.clear();
 
 	// TODO: make standard layout common 
-	addModeSlot(Mode::createNode({ 2, 2, 1, 2, 2, 2, 1 }, "Meantone"));
-	addModeSlot(Mode::createNode({ 2, 2, 1, 2, 2, 2, 1 }, "Meantone"));
+	ValueTree meantone12 = Mode::createNode("2 2 1 2 2 2 1", "Meantone");
+	addModeSlot(meantone12);
+	addModeSlot(meantone12.createCopy());
 
 	setMode1SlotNumber(0);
 	setMode2SlotNumber(1);
@@ -345,8 +363,15 @@ SvkPreset SvkPreset::getDefaultPreset()
 
 	ValueTree propertiesNode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
 	propertiesNode.setProperty(IDs::modeSelectorViewed, 1, nullptr);
+	propertiesNode.setProperty(IDs::mappingMode, 1, nullptr);
 
 	defaultPreset.resetModeSlots();
+
+	ValueTree pianoNode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::pianoNode, nullptr);
+	pianoNode.setProperty(IDs::keyboardKeysStyle, 1, nullptr);
+	pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, 0, nullptr);
+	pianoNode.setProperty(IDs::keyboardHighlightStyle, 1, nullptr);
+	
 
 	return defaultPreset;
 }

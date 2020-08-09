@@ -109,6 +109,11 @@ public:
 	int getMode2SlotNumber() const;
 
 	/*
+		Returns the mode slot number of the mode selector currently viewed
+	*/
+	int getModeViewedSlotNumber() const;
+
+	/*
 		Returns the mode slots node
 	*/
 	ValueTree getModeSlots();
@@ -132,6 +137,11 @@ public:
 		Returns the mode loaded in selector 1 (output keyboard)
 	*/
     ValueTree getMode2();
+
+	/*
+		Returns the mode currently being viewed
+	*/
+	ValueTree getModeViewed();
 
 	/*
 		Returns the current custom mode
