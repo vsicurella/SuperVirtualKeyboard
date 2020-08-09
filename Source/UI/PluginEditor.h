@@ -10,24 +10,20 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
+
 #include "../PluginProcessor.h"
-
 #include "../PluginModes.h"
-
 #include "../Structures/Mode.h"
 #include "../Structures/MappingHelper.h"
-
 #include "Components/PluginControlComponent.h"
 #include "Components/VirtualKeyboard/KeyboardComponent.h"
 //#include "Components/Settings/SettingsContainer.h"
-
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
 #include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
 //#include "Dialogs/PluginSettingsDialog.h"
-
 #include "../File IO/ReaperWriter.h"
 
 using namespace VirtualKeyboard;
@@ -37,8 +33,8 @@ using namespace VirtualKeyboard;
 */
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
+						private SvkPluginState::Listener,
 						private ChangeListener,
-                        private ScrollBar::Listener,
                         private AudioProcessorValueTreeState::Listener,
 						private Timer
 {
@@ -57,15 +53,6 @@ public:
 	void userTriedToCloseWindow() override;
     
     //==============================================================================
-
-    void initNodeData();
-	void updateNodeData();
-
-	void updateUI();
-	void updateScrollbarData();
-	void setScrollBarPosition(float positionIn);
-
-	//===============================================================================================
 
 	bool savePresetToFile();
 	bool saveMode();
@@ -100,6 +87,9 @@ public:
 
 	void showModeInfo();
 
+	void setMappingMode();
+	void setMappingMode(int mappingModeId);
+
 	void setMappingStyle();
 	void setMappingStyle(int mapStyleId);
     
@@ -107,48 +97,21 @@ public:
 
 	void applyMap();
 
-	void setMappingMode();
-	void setMappingMode(int mappingModeId);
-
-	void setPeriodShift();
-	void setPeriodShift(int periodsIn);
-	
-	void setMidiChannel();
-	void setMidiChannel(int midiChannelIn);
-
 	void beginColorEditing();
 
-	void setNoteNumsVisible();
-	void setNoteNumsVisible(bool noteNumsVisible);
-    
-    void setKeyboardRows();
-    void setKeyboardRows(int numRows);
-	
-	void setKeyStyle();
-	void setKeyStyle(int keyStyleId);
+	//==============================================================================
 
-	void setHighlightStyle();
-	void setHighlightStyle(int highlightStyleId);
+	void presetLoaded(ValueTree presetNodeIn) override;
 
-	//===============================================================================================
+	void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
-	void mouseDown(const MouseEvent& e) override;
-
-	void mouseDrag(const MouseEvent& e) override;
-
-	void mouseUp(const MouseEvent& e) override;
-
-	void mouseMove(const MouseEvent& e) override;
-
-	void mouseWheelMove(const MouseEvent& e, const MouseWheelDetails& w) override;
+	void inputMappingChanged(NoteMap* inputNoteMap) override;
 
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
-    void scrollBarMoved(ScrollBar *scrollBarThatHasMoved, double newRangeStart) override;
-
-	 //==============================================================================
+	//==============================================================================
 
 	 File fileDialog(String message, bool forSaving);
     
@@ -156,7 +119,7 @@ public:
     
     void parameterChanged (const String& paramID, float newValue) override;
 
-	 //==============================================================================
+	//==============================================================================
 
 	 ApplicationCommandTarget* getNextCommandTarget() override;
 
@@ -179,9 +142,6 @@ private:
     std::unique_ptr<MappingHelper> mappingHelper;
 
 	Keyboard* virtualKeyboard;
-	juce::Viewport* viewport;
-	float viewportX = 0.51f;
-	ScrollBar* viewportScroll;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;

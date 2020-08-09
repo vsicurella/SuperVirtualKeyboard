@@ -53,10 +53,9 @@ Keyboard::Keyboard(ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterM
 void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 {
 	if (pianoNodeIn.hasType(IDs::pianoNode))
-	{
-		DBG("RESTORING KEYBOARD NODE: " + pianoNode.toXmlString());
-		
+	{		
 		pianoNode = pianoNodeIn;
+		DBG("RESTORING KEYBOARD NODE: " + pianoNode.toXmlString());
         
 		orientationSelected = pianoNode[IDs::keyboardOrientation];
 		keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
@@ -67,25 +66,27 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
         if (keySizeRatio < 0.01)
             keySizeRatio = 0.25f;
         
+		// TODO: keyboard key editing
+		pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyTreeNode), nullptr);
         // unpack key data
-        keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
+        //keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
 		
-		if (keyTreeNode.getNumChildren() == keys.size())
-		{
-			for (auto key : keys)
-				key->applyParameters(keyTreeNode.getChild(key->keyNumber));
-		}
-		else
-		{
-			keyTreeNode.removeAllChildren(nullptr);
+		//if (keyTreeNode.getNumChildren() == keys.size())
+		//{
+		//	for (auto key : keys)
+		//		key->applyParameters(keyTreeNode.getChild(key->keyNumber));
+		//}
+		//else
+		//{
+		//	keyTreeNode.removeAllChildren(nullptr);
 
-			initializeKeys();
+		initializeKeys();
 			
-			for (auto key : keys)
-			{
-				keyTreeNode.addChild(key->node, key->keyNumber, nullptr);
-			}
-		}        
+		//for (auto key : keys)
+		//{
+		//	keyTreeNode.addChild(key->node, key->keyNumber, nullptr);
+		//}
+		//}        
 	}
 	else
 	{
@@ -794,7 +795,7 @@ int Keyboard::getScrollingStyle()
 //===============================================================================================
 
 
-void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
+void Keyboard::applyMode(Mode* modeIn)
 {
 	mode = modeIn;
 
@@ -803,7 +804,6 @@ void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
 
 	keysOrder.clear();
 	keysOrder.resize(mode->getMaxStep());
-
 
 	int period = 0;
 
@@ -839,19 +839,13 @@ void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
 		}
 	}
 
-	if (resetKeyColors)
-	{
-		keyColorsOrders.clear();
-		keyColorsDegrees.clear();
-		keyColorsIndividual.fill(Colour());
-	}
-
 	keyColorsOrders.resize(mode->getMaxStep());
 	keyColorsDegrees.resize(mode->getScaleSize());
 
 	// unpack color data
 	ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
 
+	keyColorsOrders.fill(Colour());
 	for (auto layerColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsLayer))
 	{
 		keyColorsOrders.set(
@@ -860,6 +854,7 @@ void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
 		);
 	}
 
+	keyColorsDegrees.fill(Colour());
 	for (auto degreeColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsDegree))
 	{
 		keyColorsDegrees.set(
@@ -868,6 +863,7 @@ void Keyboard::applyMode(Mode* modeIn, bool resetKeyColors)
 		);
 	}
 
+	keyColorsIndividual.fill(Colour());
 	for (auto keyColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsIndividual))
 	{
 		keyColorsIndividual.set(
@@ -933,7 +929,6 @@ void Keyboard::setKeyStyle(int placementIn)
 {
 	keyPlacementSelected = placementIn;
 	keyPositioner.setKeyPlacement(keyPlacementSelected);
-	
 	pianoNode.setProperty(IDs::keyboardKeysStyle, keyPlacementSelected, nullptr);
 }
 
@@ -1003,48 +998,6 @@ void Keyboard::setShowNoteLabels(bool shouldShowPitchNames)
 	pianoNode.setProperty(IDs::keyboardShowsNoteLabels, showNoteLabels, nullptr);
 }
 
-// should be replaced, but keeping here just in case
-void Keyboard::setKeyProportions(Key* keyIn)
-{
-	float spread = 4;
-	float stepHeight;
-	float keyHeight;
-	float width;
-
-	switch (keyPlacementSelected)
-	{
-
-	case KeyPlacementType::nestedCenter:
-		break;
-
-
-
-	case KeyPlacementType::flat:
-
-		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
-		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
-		width = 0.8;
-
-		break;
-
-	default: // Nested Right
-
-		stepHeight = 0.55 + (keyIn->step - 2) / 100.0f * spread;
-		keyHeight = stepHeight - stepHeight * (keyIn->order - 1) / keyIn->step;
-		width = 0.8 - (keyIn->order - 1) * 0.1;
-
-		break;
-	}
-    
-    if (keyIn->order == 0)
-    {
-        keyHeight = 1;
-        width = 1;
-    }
-
-	keyIn->setSize(keyHeight, keyWidth);
-}
-
 void Keyboard::setLastKeyClicked(int keyNumIn)
 {
 	lastKeyClicked = keyNumIn;
@@ -1066,7 +1019,6 @@ void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
 void Keyboard::highlightKey(int keyNumberIn, Colour colorIn, int blinkRateMs)
 {
 	// do stuff
-
 }
 
 void Keyboard::highlightKeys(Array<int> keyNumsIn, Colour colorIn, int blinkRateMs)
@@ -1127,7 +1079,7 @@ void Keyboard::updateKeyColors()
 	for (int i = 0; i < keys.size(); i++)
 	{
 		Key* key = keys[i];
-		key->setDisplayColor(getKeyColor(i));
+ 		key->setDisplayColor(getKeyColor(i));
 	}
 
 	ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);

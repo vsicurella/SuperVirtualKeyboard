@@ -20,10 +20,7 @@
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
 
-#include "UI/Components/VirtualKeyboard/KeyboardComponent.h"
-
-struct SvkPluginState : public ChangeBroadcaster,
-						public ChangeListener,
+struct SvkPluginState : public ChangeListener,
                         private AudioProcessorValueTreeState::Listener
 {
     AudioProcessorValueTreeState& svkTree;
@@ -46,13 +43,12 @@ struct SvkPluginState : public ChangeBroadcaster,
 	SvkMidiProcessor* getMidiProcessor();
 	SvkPluginSettings* getPluginSettings();
     
-    VirtualKeyboard::Keyboard* getKeyboard();
     ModeMapper* getModeMapper();
     
     NoteMap* getMidiInputFilterMap();
     NoteMap* getMidiOutputFilterMap();
 
-	ValueTree getPreset();
+	ValueTree getPresetNode();
 
 	Mode* getModeInSlot(int slotNumIn);
 	Mode* getModeViewed();
@@ -90,29 +86,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setMapMode(int mapModeSelectionIn);
 	void setMapStyle(int mapStyleIn);
 
-	void setShowNoteNums(bool showNoteNumsIn);
-	void setShowFilteredNoteNums(bool showFilteredNoteNumsIn);
-	void setShowNoteLabels(bool showNoteLabelsIn);
-	void setScrollingMode(int modeIn);
-	void setScrollingStyle(int styleIn);
-	void setNumKeysInWidth(int numKeysIn);
-	void setNumKeyboardRows(int rowsIn);
-	void setKeyboardOrientation(int orientationIn);
-	void setKeyStyle(int keyStyleIn);
-	void setHighlightStyle(int highlightStyleIn);
-
-	void setVelocityBehavior(int velocityIdIn);
-	void setVelocityScalar(int velocityScalar);
-	void setVelocityFixed(int velocityFixed);
-
 	void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
     
-	// Move these to VirtualKeyboard?
-/*	void setKeyWidthMod(int keyNumIn, float widthMod);
-	void setKeyHeightMod(int keyNumIn, float heightMod);
-	void setKeyXOffset(int keyNumIn, int xOffset);
-	void setKeyYOffset(int keyNumIn, int yOffset); */   
-
 	//==============================================================================
 	// User Functionality
     
@@ -129,9 +104,8 @@ struct SvkPluginState : public ChangeBroadcaster,
 	void setMapOrderOffset1(int offsetIn);
 	void setMapOrderOffset2(int offsetIn);
 
-    void doMapping(const Mode* mode1, const Mode* mode2, int mappingType=-1,
-                   int mode1OrderIn=0, int mode2OrderIn=0, int mode1OrderOffsetIn=0, int mode2OrderOffsetIn=0);
-    void doMapping();
+    void doMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage = true);
+    void doMapping(bool sendChangeMessage = true);
 
 	void revertToSavedPreset(bool fallbackToDefaultSettings = false, bool sendChange = true);
 
@@ -159,18 +133,37 @@ struct SvkPluginState : public ChangeBroadcaster,
 	std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
 	std::unique_ptr<TextFilterInt> textFilterInt;
 
+	//==============================================================================
+
+	class Listener
+	{
+	public:
+
+		virtual ~Listener() {};
+
+		virtual void presetLoaded(ValueTree presetNodeIn) {};
+
+		virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
+
+		virtual void inputMappingChanged(NoteMap* inputNoteMap) {};
+
+		virtual void outputMappingChanged(NoteMap* outputNoteMap) {};
+	};
+
+	void addListener(SvkPluginState::Listener* listenerIn) { listeners.add(listenerIn); }
+
+	void removeListener(SvkPluginState::Listener* listenerIn) { listeners.remove(listenerIn); }
+
+protected:
+
+	ListenerList<Listener> listeners;
+
 private:
 	//==============================================================================
 	// Internal Functionality
 
 	void buildFactoryDefaultState();
-
 	void buildUserDefaultState();
-
-	void loadPropertiesOfNode(ValueTree pluginStateNodeIn, bool fallbackToDefault = false);
-
-	void sendMappingToKeyboard();
-	void sendMappingToKeyboard(ValueTree mapNodeIn);
 
 	void updateModeViewed(bool sendChange=true);
 
@@ -180,7 +173,6 @@ private:
 	std::unique_ptr<SvkMidiProcessor> midiProcessor;
 	std::unique_ptr<SvkPluginSettings> pluginSettings;
 
-	std::unique_ptr<VirtualKeyboard::Keyboard> virtualKeyboard;
 	std::unique_ptr<ModeMapper> modeMapper;
 
 	ValueTree factoryDefaultPluginStateNode;

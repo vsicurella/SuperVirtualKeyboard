@@ -222,9 +222,12 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
+	keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboardViewport.reset (new Viewport("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
+	keyboardViewport->setViewedComponent(keyboard.get(), false);
+	keyboardViewport->getHorizontalScrollBar().addListener(this);
 
     saveButton.reset (new ImageButton ("Save Button"));
     addAndMakeVisible (saveButton.get());
@@ -301,17 +304,13 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
 	highlightStyleBox->setItemEnabled(3, false);
 	highlightStyleBox->setItemEnabled(4, false);
 	highlightStyleBox->setItemEnabled(5, false);
-
-    //[/Constructor]
 }
 
 PluginControlComponent::~PluginControlComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
     buttonAttachments.clear();
     comboBoxAttachments.clear();
     sliderAttachments.clear();
-    //[/Destructor_pre]
 
     scaleTextBox = nullptr;
     mode1Box = nullptr;
@@ -337,36 +336,102 @@ PluginControlComponent::~PluginControlComponent()
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
+	keyboard = nullptr;
     keyboardViewport = nullptr;
     saveButton = nullptr;
     openButton = nullptr;
     settingsButton = nullptr;
-
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
 //==============================================================================
+
+void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
+{
+	if (presetNodeIn.hasType(IDs::presetNode) && (float)presetNodeIn[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+	{
+		presetNode = presetNodeIn;
+		ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
+		if (properties.isValid())
+		{
+			setMode1View((int)properties[IDs::modeSelectorViewed] == 0);
+			setMappingMode(properties[IDs::mappingMode]);
+		}
+
+		ValueTree midiSettings = presetNode.getChildWithName(IDs::midiSettingsNode);
+		if (midiSettings.isValid())
+		{
+			setPeriodShift(midiSettings[IDs::periodShift]);
+			setMidiChannel(midiSettings[IDs::keyboardMidiChannel]);
+		}
+
+		ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
+		if (mapping.isValid())
+		{
+			setMappingStyleId(mapping[IDs::modeMappingStyle]);
+		}
+			
+		ValueTree piano = presetNode.getChildWithName(IDs::pianoNode);
+		if (piano.isValid())
+		{
+			keyboard->restoreNode(piano);
+			setViewPosition((float)piano[IDs::viewportPosition]);
+			setNoteNumsView(piano[IDs::pianoKeysShowNoteNumbers]);
+			setKeyStyleId(piano[IDs::keyboardKeysStyle]);
+			setHighlightStyleId(piano[IDs::keyboardHighlightStyle]);
+		}
+
+		ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
+		if (modeSelectors.isValid())
+		{
+			for (int num = 0; num < modeSelectors.getNumChildren(); num++)
+			{
+				ValueTree selector = modeSelectors.getChild(num);
+				Mode* mode = presetManager->getModeBySelector(num);
+
+				// TODO: generalize
+				if (num == 0)
+				{
+					setMode1Root(selector[IDs::rootMidiNote]);
+					setMode1BoxText(mode->getName());
+				}
+				else if (num == 1)
+				{
+					setMode2Root(selector[IDs::rootMidiNote]);
+					setMode2BoxText(mode->getName());
+				}
+
+				if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
+				{
+					onModeViewedChange(mode);
+				}
+			}
+		}
+	}
+}
+
+void PluginControlComponent::onModeViewedChange(Mode* modeViewed)
+{
+	setScaleEntryText(modeViewed->getStepsString());
+	keyboard->applyMode(modeViewed);
+	keyboard->resized();
+}
+
 void PluginControlComponent::paint (Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (Colour (0xff323e44));
 
-    //[UserPaint] Add your own custom painting code here..
     Colour buttonFill = getLookAndFeel().findColour(TextButton::ColourIds::buttonColourId);
     Colour buttonOutline = getLookAndFeel().findColour(TextEditor::ColourIds::outlineColourId);
 
     drawSaveIcon(g, saveButton->getBoundsInParent(), buttonFill, buttonOutline);
     drawLoadIcon(g, openButton->getBoundsInParent(), buttonFill, buttonOutline);
     drawSettingsIcon(g, settingsButton->getBoundsInParent(), buttonFill, buttonOutline);
-    //[/UserPaint]
 }
 
 void PluginControlComponent::resized()
 {
+	float scrollPosition = (float)keyboard->getNode()[IDs::viewportPosition] / keyboard->getWidth();
+
 	scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
 	scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
 	
@@ -434,37 +499,28 @@ void PluginControlComponent::resized()
 
 	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(bottomBarY - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
-
-	VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(keyboardViewport->getViewedComponent());
-	if (svk)
-	{
-		int height = keyboardViewport->getMaximumVisibleHeight();
-		svk->setBounds(0, 0, svk->getPianoWidth(height), height);
-	}
-
+	int height = keyboardViewport->getMaximumVisibleHeight();
+	keyboard->setBounds(0, 0, keyboard->getPianoWidth(height), height);
+	keyboardViewport->setViewPosition(keyboard->getWidth() * scrollPosition, 0);
 }
 
 void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
     if (comboBoxThatHasChanged == mode1Box.get())
     {
-        //[UserComboBoxCode_mode1Box] -- add your combo box handling code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1, true);
-        //[/UserComboBoxCode_mode1Box]
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
-        //[UserComboBoxCode_mode2Box] -- add your combo box handling code here..
         //DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
-        //[/UserComboBoxCode_mode2Box]
     }
+	else if (comboBoxThatHasChanged == mapModeBox.get())
+	{
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
+	}
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-        //[UserComboBoxCode_mapStyleBox] -- add your combo box handling code here..
 //        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
 
         if (inMappingMode && (mapStyleBox->getSelectedId() == 3 || mapModeBox->getSelectedId() == 3))
@@ -477,155 +533,89 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
             mapOrderEditBtn->setVisible(false);
             mapApplyBtn->setVisible(false);
         }
-
-        //[/UserComboBoxCode_mapStyleBox]
     }
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
-        //[UserComboBoxCode_keyStyleBox] -- add your combo box handling code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setKeyStyle, true);
-        //[/UserComboBoxCode_keyStyleBox]
+		keyboard->setKeyStyle(keyStyleBox->getSelectedId());
+		keyboard->resized();
     }
     else if (comboBoxThatHasChanged == highlightStyleBox.get())
     {
-        //[UserComboBoxCode_highlightStyleBox] -- add your combo box handling code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setHighlightStyle, true);
-        //[/UserComboBoxCode_highlightStyleBox]
+		keyboard->setHighlightStyle(highlightStyleBox->getSelectedId());
+		keyboard->resized();
     }
-    else if (comboBoxThatHasChanged == mapModeBox.get())
-    {
-        //[UserComboBoxCode_mapModeBox] -- add your combo box handling code here..
-        //[/UserComboBoxCode_mapModeBox]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
     if (sliderThatWasMoved == mode1RootSld.get())
     {
-        //[UserSliderCode_mode1RootSld] -- add your slider handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode1RootNote, true);
 		mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
-        //[/UserSliderCode_mode1RootSld]
     }
     else if (sliderThatWasMoved == mode2RootSld.get())
     {
-        //[UserSliderCode_mode2RootSld] -- add your slider handling code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2RootNote, true);
 		mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
-        //[/UserSliderCode_mode2RootSld]
     }
     else if (sliderThatWasMoved == periodShiftSld.get())
     {
-        //[UserSliderCode_periodShiftSld] -- add your slider handling code here..
-        //[/UserSliderCode_periodShiftSld]
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setPeriodShift, true);
     }
     else if (sliderThatWasMoved == midiChannelSld.get())
     {
-        //[UserSliderCode_midiChannelSld] -- add your slider handling code here..
-        //[/UserSliderCode_midiChannelSld]
+		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMidiChannelOut, true);
     }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 {
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
     if (buttonThatWasClicked == scaleEntryBtn.get())
     {
-        //[UserButtonCode_scaleEntryBtn] -- add your button handler code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::commitCustomScale, true);
-        //[/UserButtonCode_scaleEntryBtn]
     }
     else if (buttonThatWasClicked == modeInfoButton.get())
     {
-        //[UserButtonCode_modeInfoButton] -- add your button handler code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::showModeInfo, true);
-        //[/UserButtonCode_modeInfoButton]
     }
     else if (buttonThatWasClicked == mode1ViewBtn.get())
     {
-        //[UserButtonCode_mode1ViewBtn] -- add your button handler code here..
 		if (mode1ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
-        //[/UserButtonCode_mode1ViewBtn]
     }
     else if (buttonThatWasClicked == mode2ViewBtn.get())
     {
-        //[UserButtonCode_mode2ViewBtn] -- add your button handler code here..
 		if (mode2ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
-        //[/UserButtonCode_mode2ViewBtn]
-    }
-    else if (buttonThatWasClicked == noteNumsBtn.get())
-    {
-        //[UserButtonCode_noteNumsBtn] -- add your button handler code here..
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::showMidiNoteNumbers, true);
-        //[/UserButtonCode_noteNumsBtn]
     }
     else if (buttonThatWasClicked == editColorsBtn.get())
     {
-        //[UserButtonCode_editColorsBtn] -- add your button handler code here..
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::beginColorEditing, true);
-        //[/UserButtonCode_editColorsBtn]
     }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
-        //[UserButtonCode_mapOrderEditBtn] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::showMapOrderEdit, true);
-        //[/UserButtonCode_mapOrderEditBtn]
     }
     else if (buttonThatWasClicked == mapApplyBtn.get())
     {
-        //[UserButtonCode_mapApplyBtn] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::applyMapping, true);
-        //[/UserButtonCode_mapApplyBtn]
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
-        //[UserButtonCode_saveButton] -- add your button handler code here..
         saveMenu->showAt(saveButton.get());
-        //[/UserButtonCode_saveButton]
     }
     else if (buttonThatWasClicked == openButton.get())
     {
-        //[UserButtonCode_openButton] -- add your button handler code here..
         loadMenu->showAt(openButton.get());
-        //[/UserButtonCode_openButton]
     }
     else if (buttonThatWasClicked == settingsButton.get())
     {
-        //[UserButtonCode_settingsButton] -- add your button handler code here..
         appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
-        //[/UserButtonCode_settingsButton]
     }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
-}
-
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-
-void PluginControlComponent::connectToProcessor()
-{
-    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
-    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
-	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
-	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
-    sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
-    sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
+	else if (buttonThatWasClicked == noteNumsBtn.get())
+	{
+		keyboard->setShowNoteNumbers(noteNumsBtn->getToggleState());
+	}
 }
 
 void PluginControlComponent::textEditorTextChanged(TextEditor& textEditor)
@@ -648,6 +638,12 @@ void PluginControlComponent::textEditorFocusLost(TextEditor& textEditor)
 
 }
 
+void PluginControlComponent::scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart)
+{
+	keyboard->getNode()
+		.setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
+}
+
 void PluginControlComponent::mouseDown(const MouseEvent& e)
 {
 	if (mode1Box->getBounds().contains(e.getPosition()))
@@ -665,6 +661,22 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
 		mode2Box->setText(display, dontSendNotification);
 		mode2Box->showPopup();
 	}
+}
+
+void PluginControlComponent::connectToProcessor()
+{
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
+    comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
+	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
+	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
+    sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
+    sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
+}
+
+
+VirtualKeyboard::Keyboard* PluginControlComponent::getKeyboard()
+{
+	return keyboard.get();
 }
 
 Viewport* PluginControlComponent::getViewport()
@@ -707,27 +719,15 @@ void PluginControlComponent::updateModeBoxMenus()
 
 }
 
-
 TextButton* PluginControlComponent::getModeInfoButton()
 {
 	return modeInfoButton.get();
 }
 
-int PluginControlComponent::getViewPosition()
-{
-	return keyboardViewport->getViewPositionX();
-}
-
 void PluginControlComponent::setViewPosition(int xIn)
 {
-	keyboardViewport->setViewPosition(Point<int>(xIn, 0));
+	keyboardViewport->setViewPosition(xIn, 0);
 }
-
-void PluginControlComponent::setViewPosition(float xRatioIn)
-{
-	keyboardViewport->setViewPositionProportionately(xRatioIn, 1);
-}
-
 
 int PluginControlComponent::getMode1BoxSelection()
 {
@@ -781,7 +781,7 @@ bool PluginControlComponent::getMode2View()
 
 int PluginControlComponent::getModeViewed()
 {
-	return mode1ViewBtn->getToggleState() ? 0 : 1;
+	return presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed];
 }
 
 int PluginControlComponent::getMappingMode()
@@ -912,149 +912,3 @@ void PluginControlComponent::setHighlightStyleId(int idIn, NotificationType noti
 {
 	highlightStyleBox->setSelectedId(idIn, notify);
 }
-
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="PluginControlComponent" componentName=""
-                 parentClasses="public Component, public TextEditor::Listener"
-                 constructorParams="AudioProcessorValueTreeState&amp; processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn"
-                 variableInitialisers="processorTree(processorTreeIn), appCmdMgr(appCmdMgrIn), presetManager(presetManagerIn)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="1000" initialHeight="250">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <TEXTEDITOR name="Scale Text Box" id="39f9f4bff4e94802" memberName="scaleTextBox"
-              virtualName="" explicitFocusOrder="0" pos="-25.5Cc 8 19.258% 24"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
-  <COMBOBOX name="Mode1 Box" id="197cbd0054b3ea6d" memberName="mode1Box"
-            virtualName="ReferencedComboBox" explicitFocusOrder="0" pos="201R 8 150 24"
-            editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <COMBOBOX name="Mode2 Box" id="e43718c6ce3f175" memberName="mode2Box" virtualName="ReferencedComboBox"
-            explicitFocusOrder="0" pos="51Rr 40 150 24" editable="0" layout="33"
-            items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <SLIDER name="Mode1 Root Slider" id="e732568ad188d067" memberName="mode1RootSld"
-          virtualName="" explicitFocusOrder="0" pos="293R 8 79 24" min="0.0"
-          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <SLIDER name="mode2RootSld" id="ae29d1ebf57b7bd7" memberName="mode2RootSld"
-          virtualName="" explicitFocusOrder="0" pos="293R 40 79 24" min="0.0"
-          max="127.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <TEXTBUTTON name="Scale Entry Button" id="bbb112b96c51ecf7" memberName="scaleEntryBtn"
-              virtualName="" explicitFocusOrder="0" pos="-7R 8 31 24" posRelativeX="39f9f4bff4e94802"
-              buttonText="OK" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="Mode Info Button" id="c6025abb0c68f4" memberName="modeInfoButton"
-              virtualName="" explicitFocusOrder="0" pos="-32 8 24 24" posRelativeX="39f9f4bff4e94802"
-              buttonText="i" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="Period Shift Slider" id="89742a2afd3a3325" memberName="periodShiftSld"
-          virtualName="" explicitFocusOrder="0" pos="108 48R 86 24" min="-10.0"
-          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <TOGGLEBUTTON name="Mode1 View Button" id="bb818484022dae8c" memberName="mode1ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="49R 8 31 24" buttonText=""
-                connectedEdges="0" needsCallback="1" radioGroupId="10" state="1"/>
-  <TOGGLEBUTTON name="Mode2 View Button" id="a8183216fad07ec6" memberName="mode2ViewBtn"
-                virtualName="" explicitFocusOrder="0" pos="49R 40 31 24" buttonText=""
-                connectedEdges="0" needsCallback="1" radioGroupId="10" state="0"/>
-  <LABEL name="Mode1 Root Label" id="2df91047cc98faf4" memberName="mode1RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="325R 8 32 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="C4" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Mode 2 Root Label" id="c21534178bfcff74" memberName="mode2RootLbl"
-         virtualName="" explicitFocusOrder="0" pos="325R 40 32 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="F5" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <COMBOBOX name="Mapping Style Box" id="217ff7f7b6934ebe" memberName="mapStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="212c 40 152 24" editable="0"
-            layout="33" items="Mode To Mode&#10;Scale To Mode&#10;By Orders"
-            textWhenNonSelected="Mode To Mode" textWhenNoItems="(no choices)"/>
-  <SLIDER name="Midi Channel Slider" id="4f2d4d8b9051247f" memberName="midiChannelSld"
-          virtualName="" explicitFocusOrder="0" pos="292 48R 86 24" min="1.0"
-          max="16.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="40" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <LABEL name="Midi Channel Label" id="d2587185be475d9c" memberName="midiChannelLbl"
-         virtualName="" explicitFocusOrder="0" pos="197 48R 96 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="MIDI Channel" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="Note Numbers Button" id="405a79d645f5f8ac" memberName="noteNumsBtn"
-              virtualName="" explicitFocusOrder="0" pos="392 48R 24 24" buttonText="#"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <LABEL name="Period Shift Label" id="140764aae2291735" memberName="periodShiftLbl"
-         virtualName="" explicitFocusOrder="0" pos="24 48R 88 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Period Shift" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="Edit Colors Button" id="bc86137b1b6a5176" memberName="editColorsBtn"
-              virtualName="" explicitFocusOrder="0" pos="696 48R 79 24" buttonText="Edit Colors"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <COMBOBOX name="Key Style Box" id="292b32e0c6cd0b80" memberName="keyStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="432 48R 136 24" editable="0"
-            layout="33" items="Nested Right&#10;Nested Center&#10;Flat&#10;Adjacent"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <LABEL name="Mapping Style Label" id="27d88f1ce2d645c1" memberName="mapStyleLbl"
-         virtualName="" explicitFocusOrder="0" pos="76c 40 104 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Mapping Style:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <COMBOBOX name="Highlight Style Box" id="ddae7c4ef2fca8a5" memberName="highlightStyleBox"
-            virtualName="" explicitFocusOrder="0" pos="584 48R 96 24" editable="0"
-            layout="33" items="Full Key&#10;Inside&#10;Border&#10;Circles&#10;Squares"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <TEXTBUTTON name="Map Order Edit Button" id="707c2bf20e6d5e6c" memberName="mapOrderEditBtn"
-              virtualName="" explicitFocusOrder="0" pos="400r 40 96 24" buttonText="Edit Mapping"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <COMBOBOX name="Mapping Node Box" id="76c96eb48f8092a" memberName="mapModeBox"
-            virtualName="" explicitFocusOrder="0" pos="136 8 15.855% 24"
-            editable="0" layout="33" items="Mapping Off&#10;Auto Map&#10;Manual Map"
-            textWhenNonSelected="Mapping Off" textWhenNoItems="Mapping Off"/>
-  <TEXTBUTTON name="new button" id="72fd594fae3c08" memberName="mapApplyBtn"
-              virtualName="" explicitFocusOrder="0" pos="408 40 55 24" buttonText="Apply"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <GENERICCOMPONENT name="Keyboard Viewport" id="d4f26fc566a5e713" memberName="keyboardViewport"
-                    virtualName="" explicitFocusOrder="0" pos="32 72 48M 132M" class="KeyboardViewport"
-                    params="&quot;Keyboard Viewport&quot;"/>
-  <IMAGEBUTTON name="Save Button" id="ab59c4c9636981e7" memberName="saveButton"
-               virtualName="" explicitFocusOrder="0" pos="24 6 28 28" buttonText="Save"
-               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
-               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
-               colourDown="0"/>
-  <IMAGEBUTTON name="Open Button" id="ab53896355f7aa6f" memberName="openButton"
-               virtualName="" explicitFocusOrder="0" pos="62 6 28 28" buttonText="Open"
-               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
-               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
-               colourDown="0"/>
-  <IMAGEBUTTON name="Settings Button" id="7e06be94a5e201d9" memberName="settingsButton"
-               virtualName="" explicitFocusOrder="0" pos="100 6 28 28" buttonText="Settings"
-               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="" opacityNormal="1.0" colourNormal="0" resourceOver=""
-               opacityOver="1.0" colourOver="0" resourceDown="" opacityDown="1.0"
-               colourDown="0"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-
