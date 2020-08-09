@@ -107,6 +107,10 @@ public:
 
 	void inputMappingChanged(NoteMap* inputNoteMap) override;
 
+	void customModeChanged(Mode* newCustomMode) override;
+
+	void modeInfoChanged(Mode* modeEdited) override;
+
 	//==============================================================================
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;

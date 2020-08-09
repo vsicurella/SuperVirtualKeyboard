@@ -97,7 +97,7 @@ struct SvkPluginState : public ChangeListener,
 	void setMidiInputMap(NoteMap noteMapIn);
     void setMidiOutputMap(NoteMap noteMapIn);
     
-	void setModeCustom(String stepsIn);
+	void setModeCustom(String stepsIn, bool sendChangeMessage = true);
 
 	void setMapOrder1(int orderIn);
 	void setMapOrder2(int orderIn);
@@ -115,7 +115,7 @@ struct SvkPluginState : public ChangeListener,
 	bool saveModeViewedToFile();
 	bool loadModeFromFile();
 
-	void commitModeInfo();
+	void commitModeInfo(bool sendChangeMessage = true);
 
 	// TODO: make it so it's not necessary to call this before saving
 	void commitStateNode();
@@ -148,6 +148,10 @@ struct SvkPluginState : public ChangeListener,
 		virtual void inputMappingChanged(NoteMap* inputNoteMap) {};
 
 		virtual void outputMappingChanged(NoteMap* outputNoteMap) {};
+
+		virtual void customModeChanged(Mode* newCustomMode) {};
+
+		virtual void modeInfoChanged(Mode* modeEdited) {};
 	};
 
 	void addListener(SvkPluginState::Listener* listenerIn) { listeners.add(listenerIn); }

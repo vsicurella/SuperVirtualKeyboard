@@ -677,7 +677,6 @@ void PluginControlComponent::connectToProcessor()
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
 }
 
-
 VirtualKeyboard::Keyboard* PluginControlComponent::getKeyboard()
 {
 	return keyboard.get();
