@@ -208,21 +208,15 @@ void SvkPluginEditor::setMode2Root(int rootIn)
     pluginState->setModeSelectorRoot(1, rootIn);
 }
 
-void SvkPluginEditor::setModeView()
+void SvkPluginEditor::setModeSelectorViewed()
 {
-	setModeView(controlComponent->getModeViewed());
+	setModeSelectorViewed(controlComponent->getModeSelectorViewed());
 }
 
-void SvkPluginEditor::setModeView(int modeNumberIn)
+void SvkPluginEditor::setModeSelectorViewed(int selectorNumIn)
 {
-	pluginState->setModeSelectorViewed(modeNumberIn);
+	pluginState->setModeSelectorViewed(selectorNumIn);
     controlComponent->setScaleEntryText(pluginState->getModeViewed()->getStepsString());
-
-	MidiKeyboardState* displayState = modeNumberIn == 0
-		? pluginState->getMidiProcessor()->getOriginalKeyboardState()
-		: pluginState->getMidiProcessor()->getRemappedKeyboardState();
-	
-	virtualKeyboard->displayKeyboardState(displayState);
 }
 
 void SvkPluginEditor::showModeInfo()
@@ -245,7 +239,7 @@ void SvkPluginEditor::setMappingMode(int mappingModeId)
 
 void SvkPluginEditor::setMappingStyle()
 {
-	setMappingStyle(pluginState->getParameterValue(IDs::modeMappingStyle));
+	setMappingStyle(controlComponent->getMappingStyle());
 }
 
 void SvkPluginEditor::setMappingStyle(int mapStyleId)
@@ -317,6 +311,12 @@ void SvkPluginEditor::presetLoaded(ValueTree presetNodeIn)
 
 void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
 {
+	MidiKeyboardState* displayState = selectorNumber == 0
+		? pluginState->getMidiProcessor()->getOriginalKeyboardState()
+		: pluginState->getMidiProcessor()->getRemappedKeyboardState();
+
+	virtualKeyboard->displayKeyboardState(displayState);
+
 	controlComponent->onModeViewedChange(modeIn);
 }
 
@@ -611,7 +611,7 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		}
 		case IDs::CommandIDs::setModeViewed:
 		{
-			setModeView();
+			setModeSelectorViewed();
 			break;
 		}
 		case IDs::CommandIDs::showModeInfo:

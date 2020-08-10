@@ -110,7 +110,7 @@ public:
 	void setMode2View(bool isViewed, NotificationType notify = NotificationType::dontSendNotification);
 	bool getMode2View();
 
-	int getModeViewed();
+	int getModeSelectorViewed();
 
 	int getMappingMode();
 	void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);

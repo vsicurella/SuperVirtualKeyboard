@@ -69,7 +69,8 @@ void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSetting
 
 	if (stateIn.isValid())
 	{
-		if (!presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false))
+		bool loaded = presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false);
+		if (!loaded)
 		{
 			// Might not be good - will actually delete existing properties that are set properly
 			stateIn = defaultPluginStateNode;
@@ -91,6 +92,7 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
 	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetNode;
+	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
 	pianoNode = svkPreset->getKeyboardNode();
 	pluginEditorNode = pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr);
@@ -103,7 +105,6 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	midiProcessor->setMode1(getMode1());
 	midiProcessor->setMode2(getMode2());
 
-	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 	updateModeViewed(!sendChange);
 	doMapping(!sendChange);
 
@@ -326,7 +327,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
-	presetNode.getChildWithName(IDs::presetProperties).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
+	presetNode.getChildWithName(IDs::midiMapNode).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
 	DBG("mapStyle index = " + String(mapStyleIn));
 	if (isAutoMapping())
 	{
