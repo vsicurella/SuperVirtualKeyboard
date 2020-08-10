@@ -91,6 +91,10 @@ public:
     void removeMode(int modeSlotNum);
     void resetModeSlots();
 
+	/*
+		Replaces the mode slot the selector is pointed to with a new mode
+		- See note above definition -
+	*/
 	void handleModeSelection(int selectorNumber, int idIn);
 
 	bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
