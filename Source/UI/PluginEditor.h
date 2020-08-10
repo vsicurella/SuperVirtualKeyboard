@@ -82,8 +82,8 @@ public:
 	void setMode2Root();
 	void setMode2Root(int rootIn);
 
-	void setModeView();
-	void setModeView(int modeNumberIn);
+	void setModeSelectorViewed();
+	void setModeSelectorViewed(int selectorNumIn);
 
 	void showModeInfo();
 

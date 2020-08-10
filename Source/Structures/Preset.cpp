@@ -367,6 +367,8 @@ SvkPreset SvkPreset::getDefaultPreset()
 	pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, 0, nullptr);
 	pianoNode.setProperty(IDs::keyboardHighlightStyle, 1, nullptr);
 	
+	ValueTree mappingMode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::midiMapNode, nullptr);
+	mappingMode.setProperty(IDs::modeMappingStyle, 1, nullptr);
 
 	return defaultPreset;
 }

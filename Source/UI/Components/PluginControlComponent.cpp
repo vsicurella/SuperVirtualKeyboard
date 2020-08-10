@@ -353,7 +353,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
 		if (properties.isValid())
 		{
-			setMode1View((int)properties[IDs::modeSelectorViewed] == 0);
+			setMode2View((int)properties[IDs::modeSelectorViewed]);
 			setMappingMode(properties[IDs::mappingMode]);
 		}
 
@@ -516,27 +516,17 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
-        //DBG("MODE 2 SELECTED ID: " + String(mode2Box->getSelectedId()));
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2, true);
     }
 	else if (comboBoxThatHasChanged == mapModeBox.get())
 	{
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingMode, true);
+		setMappingMode(mapModeBox->getSelectedId());
 	}
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-//        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
-
-        if (inMappingMode && (mapStyleBox->getSelectedId() == 3 || mapModeBox->getSelectedId() == 3))
-        {
-            mapOrderEditBtn->setVisible(true);
-            mapApplyBtn->setVisible(true);
-        }
-        else
-        {
-            mapOrderEditBtn->setVisible(false);
-            mapApplyBtn->setVisible(false);
-        }
+        appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
+		setMappingStyleId(mapStyleBox->getSelectedId());
     }
     else if (comboBoxThatHasChanged == keyStyleBox.get())
     {
@@ -782,9 +772,9 @@ bool PluginControlComponent::getMode2View()
 	return mode2ViewBtn->getToggleState();
 }
 
-int PluginControlComponent::getModeViewed()
+int PluginControlComponent::getModeSelectorViewed()
 {
-	return presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed];
+	return mode2ViewBtn->getToggleState();
 }
 
 int PluginControlComponent::getMappingMode()
