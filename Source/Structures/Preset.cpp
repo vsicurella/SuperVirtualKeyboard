@@ -194,12 +194,12 @@ ValueTree SvkPreset::getModeSlots()
 
 ValueTree SvkPreset::getModeInSlot(int slotNum)
 {
-	return theModeSlots.getChild(getSlotNumberIndex(slotNum));
+	return theModeSlots.getChild(getSlotNumberIndex(slotNum)).getChild(0);
 }
 
 ValueTree SvkPreset::getModeBySelector(int selectorNumIn)
 {
-	return theModeSlots.getChild(getSlotNumberIndex(getSlotNumberBySelector(selectorNumIn)));
+	return theModeSlots.getChild(getSlotNumberIndex(getSlotNumberBySelector(selectorNumIn))).getChild(0);
 }
 
 ValueTree SvkPreset::getMode1()
@@ -227,6 +227,7 @@ int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
 	if (selectorNumIn >= 0 && slotNumIn >= 0)
 	{
 		ValueTree modeSelectorNode = ValueTree(IDs::modeSelectorsNode);
+
 		if (selectorNumIn < theModeSelectors.getNumChildren())
 			modeSelectorNode = theModeSelectors.getChild(selectorNumIn);
 	
@@ -262,7 +263,7 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
 {
 	if (Mode::isValidMode(modeNodeIn) && slotNumberIn >= 0 && slotNumberIn <= MAX_MODE_SLOTS_INDEX)
 	{
-		ValueTree slotNode;
+		ValueTree slotNode = ValueTree(IDs::modeSlotsNode);
 		int slotIndex = getSlotNumberIndex(slotNumberIn);
 		if (slotIndex >= 0)
 		{
@@ -271,15 +272,15 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
 		}
 		else
 		{
-			slotIndex = theModeSlots.getNumChildren() - 1;
-			slotNode = ValueTree(IDs::modeSlotsNode);
+			slotIndex = theModeSlots.getNumChildren();
 			theModeSlots.appendChild(slotNode, nullptr);
 		}
 
 		slotNode.setProperty(IDs::modeSlotNumber, slotNumberIn, nullptr);
 		slotNode.appendChild(modeNodeIn.createCopy(), nullptr);
 
-		slotNumbersInUse.addUsingDefaultSort(slotNumberIn);
+		if (slotNumbersInUse.indexOf(slotNumberIn) < 0)
+			slotNumbersInUse.addUsingDefaultSort(slotNumberIn);
 
 		return slotIndex;
 	}

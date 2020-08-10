@@ -143,10 +143,11 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, String na
 int SvkPresetManager::setSlotToMode(int modeSlotNum, ValueTree modeNode)
 {
 	int slotIndex = svkPresetWorking.setModeSlot(modeNode, modeSlotNum);
+	modeNode = svkPresetWorking.getModeInSlot(modeSlotNum);
 	
 	if (slotIndex >= 0)
 	{
-		if (modeSlots.size() <= slotIndex)
+		if (slotIndex >= modeSlots.size())
 			modeSlots.add(new Mode(modeNode, false));
 
 		else
@@ -192,6 +193,12 @@ void SvkPresetManager::resetModeSlots()
 	modeSlots.add(new Mode(svkPresetWorking.getMode2()));
 }
 
+/*
+	This operation should be completely revised, as it's piecing together two systems without full implementation.
+	Currently, modes can be inserted in one of 128 slots, and mode selectors can point to a certain slot.
+	But inserting modes into different slots is not fully implemented yet, so the mode slot containing a mode that
+	the mode selector is pointed to will be replaced by the mode chosen in calling this function.
+*/
 void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
 {
 	int numSortedModes = getNumMenuItems(true, false, false, false);
@@ -201,12 +208,11 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     int favIdx = userModesIndex - loadedUserModes.size();
     int slotIdx = favIdx - favoriteModes.size();
     
-//    DBG("Sorted Index: " + String(modeLibraryIndex) + " out of " + String(numSortedModes));
-//    DBG("User Index: " + String(userModesIndex) + " out of " + String(loadedUserModes.size()));
-//    DBG("Fav Index: " + String(favIdx) + " out of " + String(favoriteModes.size()));
-//    DBG("Slot Index: " + String(slotIdx) + " out of " + String(modeSlots.size()));
+	int modeSlotNumber = svkPresetWorking.getSlotNumberBySelector(selectorNumber);
 
-	int modeSlotNumber = selectorNumber;
+	// if selector was set to a custom mode, change the slot to the selector's number
+	if (modeSlotNumber > MAX_MODE_SLOTS_INDEX)
+		modeSlotNumber = selectorNumber;
 
     ValueTree modeSelected;
     
@@ -224,6 +230,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     }
 	else if (slotIdx < modeSlots.size())
 	{
+		// Currently the only way to switch a selector's mode slot pointer
 		modeSelected = ValueTree();
 		modeSlotNumber = slotIdx;
 	}
@@ -234,7 +241,8 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
 		modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
 	}
     
-    if (modeSelected.isValid())
+	// Replaces the mode selector's mode slot with new mode
+    if (modeSelected.isValid() && selectorNumber < 2 && modeSlotNumber <= MAX_MODE_SLOTS_INDEX)
     {
         setSlotToMode(modeSlotNumber, modeSelected);
     }
@@ -254,7 +262,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
         modeSlots.clear();
 		for (auto mode : svkPresetWorking.getModeSlots())
 		{
-			modeSlots.add(new Mode(mode.getChild(0), true));
+			modeSlots.add(new Mode(mode.getChild(0), false));
 		}
 
 		ValueTree customModeNode = svkPresetWorking.getCustomMode();
@@ -405,7 +413,7 @@ void SvkPresetManager::initializeModePresets()
 	createFactoryModes();
 	loadModeDirectory();
 
-	loadPreset(ValueTree(IDs::presetNode), false);
+	loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
 	setModeCustom("1");
 
 	int meantoneIndex = 15;
