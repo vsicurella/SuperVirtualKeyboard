@@ -788,14 +788,22 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
 
     inMappingMode = mappingModeId > 1;
 
-    mapStyleLbl->setVisible(inMappingMode);
-    mapStyleBox->setVisible(inMappingMode);
-    mapOrderEditBtn->setVisible(inMappingMode);
-    mode1RootLbl->setVisible(inMappingMode);
-    mode1RootSld->setVisible(inMappingMode);
-    mode1Box->setVisible(inMappingMode);
-    mode1ViewBtn->setVisible(inMappingMode);
-    mode2ViewBtn->setVisible(inMappingMode);
+	Array<Component*> mappingComponents = {
+		mapStyleLbl.get(),
+		mapStyleBox.get(),
+		mapOrderEditBtn.get(),
+		mode1RootLbl.get(),
+		mode1RootSld.get(),
+		mode1Box.get(),
+		mode1ViewBtn.get(),
+		mode2ViewBtn.get()
+	};
+	
+	for (auto c : mappingComponents)
+	{
+		c->setVisible(inMappingMode);
+		c->setEnabled(inMappingMode);
+	}
 
     if (mappingModeId == 3 || mapStyleBox->getSelectedId() == 3)
     {
