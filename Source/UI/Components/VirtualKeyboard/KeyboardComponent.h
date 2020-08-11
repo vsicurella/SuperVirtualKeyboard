@@ -251,7 +251,7 @@ namespace VirtualKeyboard
 		/*
 			Rearranges the keys to fit the current mode, without changing other key data.
 		*/
-		void applyMode(Mode* modeIn);
+		void applyMode(Mode* modeIn, bool resize = false);
 
 		/*
 			Applies the key data to the keyboard so that it matches the data passed in.
