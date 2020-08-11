@@ -21,7 +21,7 @@ static Identifier pluginStateNode("SvkPluginState");
 static Identifier modeLibraryNode("ModeLibrary");
 static Identifier presetNode("SvkPreset");
 static Identifier modePresetNode("SvkModeLayout");
-static Identifier modeCustomNode("CustomMode");
+static Identifier modeCustomNode("SvkCustomMode");
 static Identifier pluginPresetVersion("SvkPresetVersion");
 
 // Global Settings
@@ -103,7 +103,7 @@ static Identifier viewportPosition("ViewportPosition");
 
 // TODO: Refactor piano -> keyboard
 // Keyboard Component
-static Identifier pianoNode("PianoNode");
+static Identifier pianoNode("SvkPianoNode");
 static Identifier pianoUIMode("PianoUIMode");
 static Identifier keyboardOrientation("KeyboardOrientation");
 static Identifier pianoLastKeyClicked("PianoLastKeyClicked");
@@ -150,6 +150,8 @@ static Identifier pianoKeyColor("KeyColor");
 
 // Backwards compatibility
 static Identifier alphaPluginStateNode("PluginState");
+static Identifier alphaVirtualKeyboardNode("PianoNode");
+static Identifier alphaCustomMode("CustomMode");
 
 // Debug
 static Identifier modeSlotToEdit("ModeSlotToDebug");
