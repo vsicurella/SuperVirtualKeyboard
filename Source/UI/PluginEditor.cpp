@@ -646,12 +646,12 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		}
 		case IDs::CommandIDs::setPeriodShift:
 		{
-			// TODO
+			pluginState->getMidiProcessor()->setPeriodShift(controlComponent->getPeriodShift());
 			break;
 		}
 		case IDs::CommandIDs::setMidiChannelOut:
 		{
-			// TODO
+			pluginState->getMidiProcessor()->setMidiChannelOut(controlComponent->getMidiChannel());
 			break;
 		}
         default:

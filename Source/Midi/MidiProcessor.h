@@ -133,8 +133,18 @@ public:
     void setOutputFilter(Array<int> mapIn, bool updateNode = true);
 	void setOutputFilter(NoteMap mapIn, bool updateNode = true);
 
+	/*
+		How many periods to shift notes.
+		Notes held will be transposed for now.
+	*/
+	void setPeriodShift(int periodsToShift);
+
+	/*
+		The MIDI channel for mouse-based virtual keyboard interaction
+	*/
+	void setMidiChannelOut(int virtualKeyboardMidiChannelOut);
+
     void setVoiceLimit(int maxVoicesIn);
-    
     void setRetuneOn(bool retuneOn);
 
     void mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode = true);
