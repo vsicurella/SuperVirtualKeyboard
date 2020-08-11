@@ -89,7 +89,6 @@ SvkPluginEditor::~SvkPluginEditor()
 	//	processor.svkValueTree.removeParameterListener(paramID, this);
 	//}
 
-
 	colorSelector->removeChangeListener(this);
 	colorChooserWindow->removeChangeListener(this);
 	virtualKeyboard->removeListener(pluginState->getMidiProcessor());

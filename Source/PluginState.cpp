@@ -33,14 +33,16 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
-    
-	for (auto child : svkTree.state)
-	{
-		svkTree.addParameterListener(child["id"].toString(), this);
-	}
 
-	DBG("PluginState listening to parameters");
-	midiProcessor->connectToParameters();
+	recallState(factoryDefaultPluginStateNode);
+    
+	//for (auto child : svkTree.state)
+	//{
+	//	svkTree.addParameterListener(child["id"].toString(), this);
+	//}
+
+	//DBG("PluginState listening to parameters");
+	//midiProcessor->connectToParameters();
 
 	// TODO: set up default settings
  //   setModeSelectorViewed(1);
@@ -230,12 +232,12 @@ int SvkPluginState::getModeSelectorViewed()
 
 int SvkPluginState::getMappingMode()
 {
-	return getParameterValue(IDs::mappingMode);
+	return presetNode.getChildWithName(IDs::presetProperties)[IDs::mappingMode];
 }
 
 int SvkPluginState::getMappingStyle()
 {
-	return getParameterValue(IDs::modeMappingStyle);
+	return presetNode.getChildWithName(IDs::midiMapNode)[IDs::modeMappingStyle];
 }
 
 bool SvkPluginState::isAutoMapping()
@@ -327,6 +329,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
 void SvkPluginState::setMapStyle(int mapStyleIn)
 {
+	modeMapper->setMappingStyle(mapStyleIn);
 	presetNode.getChildWithName(IDs::midiMapNode).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
 	DBG("mapStyle index = " + String(mapStyleIn));
 	if (isAutoMapping())
