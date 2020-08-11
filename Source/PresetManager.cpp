@@ -659,10 +659,10 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
     menuToUse->addSubMenu("Slots", slotsMenu);
     menuToUse->addSeparator();
 
-    String customModeName = "Custom Mode";
+    String customModeName = modeCustom->getName();
 
-    if (modeCustom->getFamily() != "undefined")
-        customModeName = modeCustom->getDescription();
+	if (customModeName == "undefined[1] 1")
+		customModeName = "Custom Mode";
 
     menuToUse->addItem(++subMenuIndex, customModeName);
 }
