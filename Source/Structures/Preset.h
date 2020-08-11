@@ -114,6 +114,11 @@ public:
 	int getModeViewedSlotNumber() const;
 
 	/*
+		Return the root note of the given mode selector
+	*/
+	int getModeSelectorRootNote(int modeSelectorNum) const;
+
+	/*
 		Returns the mode slots node
 	*/
 	ValueTree getModeSlots();

@@ -187,6 +187,11 @@ int SvkPreset::getNextFreeSlotNumber()
 	return -1;
 }
 
+int SvkPreset::getModeSelectorRootNote(int modeSelectorNum) const
+{
+	return theModeSelectors.getChild(modeSelectorNum)[IDs::modeSelectorRootNote];
+}
+
 ValueTree SvkPreset::getModeSlots()
 {
 	return theModeSlots;
@@ -256,7 +261,7 @@ void SvkPreset::setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn)
 	ValueTree node = theModeSelectors.getChild(modeSelectorNumIn);
 
 	if (node.isValid() && rootNoteIn >= 0 && rootNoteIn < 128)
-		node.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
+		node.setProperty(IDs::modeSelectorRootNote, rootNoteIn, nullptr);
 }
 
 int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)

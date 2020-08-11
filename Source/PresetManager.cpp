@@ -248,6 +248,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     }
     
 	svkPresetWorking.setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
+	getModeInSlot(modeSlotNumber)->setRootNote(svkPresetWorking.getModeSelectorRootNote(selectorNumber));
 }
 
 bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
