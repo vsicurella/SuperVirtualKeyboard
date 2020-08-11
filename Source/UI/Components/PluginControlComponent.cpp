@@ -374,6 +374,8 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		if (piano.isValid())
 		{
 			keyboard->restoreNode(piano);
+			piano = keyboard->getNode();
+
 			setNoteNumsView(piano[IDs::pianoKeysShowNoteNumbers]);
 			setKeyStyleId(piano[IDs::keyboardKeysStyle]);
 			setHighlightStyleId(piano[IDs::keyboardHighlightStyle]);

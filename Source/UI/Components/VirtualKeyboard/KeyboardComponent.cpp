@@ -57,6 +57,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 		pianoNode = pianoNodeIn;
 		DBG("RESTORING KEYBOARD NODE: " + pianoNode.toXmlString());
         
+		showNoteNumbers = pianoNode[IDs::pianoKeysShowNoteNumbers];
 		orientationSelected = pianoNode[IDs::keyboardOrientation];
 		keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
@@ -101,6 +102,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 
 void Keyboard::reset()
 {
+	DBG("Resetting Keyboard.");
 	pianoNode = ValueTree(IDs::pianoNode);
 
 	setUIMode(UIMode::playMode);
@@ -131,8 +133,9 @@ void Keyboard::initializeKeys(int size)
 
 	for (int i = 0; i < size; i++)
 	{
-		keys.add(new Key(i));
-		addAndMakeVisible(keys[i]);
+		Key* key = keys.add(new Key(i));
+		addAndMakeVisible(key); 
+		key->showNoteNumber = showNoteNumbers; // hacky ?
 	}
 
 	keyColorsIndividual.resize(keys.size());
@@ -980,7 +983,7 @@ void Keyboard::setInputVelocityScaled(bool shouldBeScaled)
 void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
 {
 	showNoteNumbers = shouldShowNumbers;
-	pianoNode.setProperty(IDs::pianoKeyShowNumber, showNoteNumbers, nullptr);
+	pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, showNoteNumbers, nullptr);
 
 	for (int i = 0; i < keys.size(); i++)
 	{
