@@ -94,6 +94,11 @@ SvkPluginEditor::~SvkPluginEditor()
 	colorChooserWindow->removeChangeListener(this);
 	virtualKeyboard->removeListener(pluginState->getMidiProcessor());
     pluginState->removeListener(this);
+
+	controlComponent = nullptr;
+	mappingHelper = nullptr;
+	colorSelector = nullptr;
+	colorChooserWindow = nullptr;
 }
 
 //==============================================================================
@@ -160,6 +165,8 @@ void SvkPluginEditor::showSettingsDialog()
     //addAndMakeVisible(settingsContainer.get());
     //settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
     //settingsContainer->addChangeListener(this);
+	Rectangle<int> mouseArea = Rectangle<int>().withPosition(getMouseXYRelative());
+	CallOutBox& callout = CallOutBox::launchAsynchronously(new PluginSettingsDialog(pluginState), mouseArea, nullptr);	
 }
 
 void SvkPluginEditor::commitCustomScale()

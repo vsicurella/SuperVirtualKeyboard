@@ -57,6 +57,11 @@ SvkPluginSettings::SvkPluginSettings()
     updateNode();
 }
 
+SvkPluginSettings::~SvkPluginSettings()
+{
+	updateNode(true);
+}
+
 bool SvkPluginSettings::updateNode(bool writeSettings)
 {
 	pluginSettingsNode.setProperty(IDs::settingsDirectory, currentSettingsLocation.getFullPathName(), nullptr);

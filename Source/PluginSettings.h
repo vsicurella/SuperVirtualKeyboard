@@ -17,7 +17,7 @@
 class SvkPluginSettings
 {
 	const String appFolderName = "SuperVirtualKeyboard";
-	const String settingsFileName = "SuperVirtualKeyboard.settings";
+	const String settingsFileName = "SuperVirtualKeyboard.svksettings";
     const String presetSubDirectory = "Presets";
     const String modeSubDirectory = "Modes";
 
@@ -41,7 +41,7 @@ class SvkPluginSettings
 public:
 
 	SvkPluginSettings();
-	~SvkPluginSettings() {}
+	~SvkPluginSettings();
 
 	ValueTree getSettingsNode();
 

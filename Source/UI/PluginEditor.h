@@ -23,7 +23,7 @@
 #include "Dialogs/MidiSettingsWindow.h"
 #include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
-//#include "Dialogs/PluginSettingsDialog.h"
+#include "Dialogs/PluginSettingsDialog.h"
 #include "../File IO/ReaperWriter.h"
 
 using namespace VirtualKeyboard;
@@ -152,7 +152,7 @@ private:
     bool isColorEditing = false;
 
     //std::unique_ptr<SettingsContainer> settingsContainer;
-    //PluginSettingsDialog* pluginSettingsDialog;
+	//std::unique_ptr<PluginSettingsDialog> pluginSettingsDialog;
 	ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
 
