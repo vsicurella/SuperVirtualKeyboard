@@ -326,6 +326,15 @@ void SvkPluginEditor::inputMappingChanged(NoteMap* inputNoteMap)
 
 void SvkPluginEditor::customModeChanged(Mode* newCustomMode)
 {
+	// This is a hack and should be handled better
+	
+	String customModeName = newCustomMode->getName();
+
+	if (pluginState->getModeSelectorViewed() == 1)
+		controlComponent->setMode2BoxText(customModeName);
+	else
+		controlComponent->setMode1BoxText(customModeName);
+
 }
 
 void SvkPluginEditor::modeInfoChanged(Mode* modeEdited)
