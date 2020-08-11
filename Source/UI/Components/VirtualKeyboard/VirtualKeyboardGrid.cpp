@@ -87,6 +87,10 @@ void KeyboardPositioner::resizeKey(Key& key)
             {
 				height = stepHeight;
                 width /= (key.step - 1) * 0.9f; // mode keys of step 1 will not be in this else condition
+
+				if (key.step == 2)
+					width *= 0.75f;
+
                 break;
             }
 

@@ -194,7 +194,7 @@ void Keyboard::resized()
 				{
 					keyX = modeKey.getX() + keyWidth + (keys[modeKey.keyNumber + 1]->getWidth() / 2) - stepKey->getWidth();
 				}
-				else if (keyPlacementSelected == KeyPlacementType::adjacent)
+				else if (stepKey->step > 2 && keyPlacementSelected == KeyPlacementType::adjacent)
 				{
 					keyX = modeKey.getX() + keyWidth - (keyOrder1Width / 2) + (stepKey->order - 1) * adjacentStyleStepWidth;
 				}
