@@ -71,7 +71,7 @@
 3 2 3 2 3 2 3 2 2, Orwell; MOS from 5\22, good tuning for this temperament
 5 1 1 5 1 1 5 1 1 1, Magic; MOS from 7\22, good tuning for this temperament
 4 4 1 4 4 4 1, Superpyth; MOS from 9\22 and close to Meantone but skewed. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
-1 3 1 3 1 1 3 1 3 1 3 1, Superpyth; MOS from 9\22 and close to Meantone but skewed. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
+3 1 3 1 1 3 1 3 1 3 1 1, Superpyth; MOS from 9\22 and close to Meantone but skewed. The thirds are closer to a Pythagorean major third 81/64 rather than a 5-limit third of 5/4.
 2 2 2 2 3 2 2 2 2 3, Pajara; Symmetrical scale with period of 11\22, MOS of 2\11
 2 2 2 2 2 1 2 2 2 2 2 1, Pajara; Symmetrical scale with period of 11\22, MOS of 2\11
 2 2 2 3 2 2 2 2 2 3, Pajara MODMOS; Pentachordal scale from the Pajara MOS
@@ -80,7 +80,7 @@
 3 1 3 1 3 3 1 3 1 3, Astrology; Symmetrical scale with period of 11\12, MOS of 4\11
 1 4 1 4 1 1 4 1 4 1, Doublewide; Symmetrical scale with period of 11\12, MOS of 5\11
 2 2 2 2 2 2 2 2 2 2 2 1, Ripple; MOS from 2\23, a quasi-equal 12-tone scale
-3 3 3 3 3 3 3 2, Totem3; MOS from 3\23, also known as "Grumpy"
+3 3 3 3 3 3 3 2, Totem; MOS from 3\23, also known as "Grumpy"
 1 3 1 3 1 3 1 3 1 3 3, Hemismate; MOS from 4\23
 2 3 2 3 2 3 2 3 3, Superpelog; MOS from 5\23
 1 1 4 1 1 4 1 1 4 1 4, Mish; MOS from 6\23
@@ -122,5 +122,5 @@
 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 1, Magic
 3 3 3 5 3 3 3 5 3 3 3 5 3 3 5, Hanson
 4 3 3 3 3 3 3 3 4 3 3 3 3 3 3 3 3, Tricot
-2 1 1 2 1 2 1 2 1, Lambda; MOS from 9\13 intended for 13EDT known as the Bohlen-Pierce Scale
-2 1 1 2 1 2 1 1 2, Dur; A scale for 13EDT known as the Bohlen-Pierce Scale
+2 1 1 2 1 2 1 2 1, Lambda; MOS from 9\13 intended for 13EDT (the Bohlen-Pierce Scale)
+2 1 1 2 1 2 1 1 2, Dur; A scale for 13EDT (the Bohlen-Pierce Scale)
