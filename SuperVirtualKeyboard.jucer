@@ -117,7 +117,7 @@
               file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
         <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
               file="Source/UI/Dialogs/ModeInfoDialog.h"/>
-        <FILE id="qw1lej" name="PluginSettingsDialog.cpp" compile="0" resource="0"
+        <FILE id="qw1lej" name="PluginSettingsDialog.cpp" compile="1" resource="0"
               file="Source/UI/Dialogs/PluginSettingsDialog.cpp"/>
         <FILE id="becyrW" name="PluginSettingsDialog.h" compile="0" resource="0"
               file="Source/UI/Dialogs/PluginSettingsDialog.h"/>
