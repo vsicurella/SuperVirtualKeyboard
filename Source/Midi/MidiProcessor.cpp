@@ -97,8 +97,8 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 		midiSettingsNode = midiSettingsNodeIn;
       
 		periodShift = midiSettingsNode[IDs::periodShift];
-		midiChannelOut = midiSettingsNode[IDs::keyboardMidiChannel];
-		
+		midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
+
         return true;
     }
     
@@ -261,6 +261,22 @@ void SvkMidiProcessor::setMode1(Mode* mode1In)
 void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
 	mode2 = mode2In;
+}
+
+void SvkMidiProcessor::setPeriodShift(int periodsToShift)
+{
+	periodShift = periodsToShift;
+	midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
+
+	// TODO: remove notes and transpose, or better yet...use a note queue for the proper note off
+}
+
+void SvkMidiProcessor::setMidiChannelOut(int virtualKeyboardMidiChannelOut)
+{
+	midiChannelOut = virtualKeyboardMidiChannelOut;
+	midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
+
+	// TODO: remove notes or better yet...use a note queue for the proper note off
 }
 
 void SvkMidiProcessor::setRetuneOn(bool retuneOn)
@@ -468,84 +484,11 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 			}
 		}
     }
-    
-    //if (isMPEOn())
-    //{
-    //    MidiBuffer mpeBuffer;
-    //    mpeBuffer = convertToMPE(preBuffer);
-    //    preBuffer = mpeBuffer;
-    //}
-    
+
     midiMessages = preBuffer;
     sendBufferToOutputs(midiMessages);
     msgCount = 0;
 }
-
-//MidiBuffer SvkMidiProcessor::convertToMPE(const MidiBuffer& bufferIn)
-//{
-//    MidiBuffer mpeOut;
-//
-//    auto midiEvents = MidiBuffer::Iterator(bufferIn);
-//    MidiMessage msgIn, msgOut, pitchBendOut;
-//    int smpl;
-//    int mpeMsgCount = 0;
-//
-//    MPENote mpeNote;
-//    MidiPitch midiPitch(-1, 0);
-//    int pitchBend;
-//    int newChannel;
-//
-//    while (midiEvents.getNextEvent(msgIn, smpl))
-//    {
-//        if (msgIn.isNoteOff())
-//        {
-//            if (mpeTuningPreserveMidiNote || tuning == nullptr)
-//            {
-//                midiPitch = MidiPitch(msgIn.getNoteNumber(), 8192);
-//            }
-//            else
-//            {
-//                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
-//            }
-//            
-//            newChannel = channelAssigner->noteOff(midiPitch);
-//            
-//            msgOut = MidiMessage::noteOff(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
-//            
-//            mpeOut.addEvent(MidiMessage::pitchWheel(newChannel, midiPitch.value), smpl + mpeMsgCount);
-//            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
-//        }
-//        
-//        else if (msgIn.isNoteOn())
-//        {
-//            
-//			if (tuning == nullptr)
-//			{
-//				pitchBend = 8192;
-//				midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
-//			}
-//            if (mpeTuningPreserveMidiNote)
-//            {
-//                pitchBend = retuner->calculatePitchbendFromStdMidiNote(msgIn.getNoteNumber());
-//                midiPitch = MidiPitch(msgIn.getNoteNumber(), pitchBend);
-//            }
-//            else
-//            {
-//                midiPitch = retuner->calculateClosestMidiPitchForSemitone(tuning->getNoteInSemitones(msgIn.getNoteNumber()));
-//            }
-//
-//            newChannel = channelAssigner->findMidiChannelForNote(midiPitch);
-//            
-//            msgOut = MidiMessage::noteOn(newChannel, midiPitch.key, (uint8) msgIn.getVelocity());
-//            pitchBendOut = MidiMessage::pitchWheel(newChannel, midiPitch.value);
-//            
-//            mpeOut.addEvent(pitchBendOut, smpl + mpeMsgCount);
-//            mpeOut.addEvent(msgOut, smpl + ++mpeMsgCount);
-//        }
-//    }
-//
-//    return mpeOut;
-//}
 
 void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
 {
@@ -622,21 +565,20 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
 
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
-    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
+    MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
     msg.setTimeStamp(++msgCount);
     addMessageToQueue(msg);
 }
 
 void SvkMidiProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
-    MidiMessage msg = MidiMessage::noteOn(midiChannel, midiNoteNumber, velocity);
+    MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
     msg.setTimeStamp(++msgCount);
     addMessageToQueue(msg);
 }
 
 void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg)
 {
-    
     MidiMessage myMsg = MidiMessage(msg);
     ++msgCount;
     addMessageToQueue(myMsg);
