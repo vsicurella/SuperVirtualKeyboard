@@ -416,7 +416,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 void PluginControlComponent::onModeViewedChange(Mode* modeViewed)
 {
 	setScaleEntryText(modeViewed->getStepsString());
-	keyboard->applyMode(modeViewed);
+	keyboard->applyMode(modeViewed, true);
 	resized();
 }
 

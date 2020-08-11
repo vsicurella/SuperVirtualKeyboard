@@ -316,7 +316,6 @@ void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int sl
 		: pluginState->getMidiProcessor()->getRemappedKeyboardState();
 
 	virtualKeyboard->displayKeyboardState(displayState);
-
 	controlComponent->onModeViewedChange(modeIn);
 }
 

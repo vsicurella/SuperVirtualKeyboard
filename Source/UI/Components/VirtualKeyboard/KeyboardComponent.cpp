@@ -795,7 +795,7 @@ int Keyboard::getScrollingStyle()
 //===============================================================================================
 
 
-void Keyboard::applyMode(Mode* modeIn)
+void Keyboard::applyMode(Mode* modeIn, bool resize)
 {
 	mode = modeIn;
 
@@ -873,7 +873,11 @@ void Keyboard::applyMode(Mode* modeIn)
 	}
 
 	updateKeyColors();
-	hasDirtyKeys = true;
+
+	if (resize)
+		resized();
+	else
+		hasDirtyKeys = true;
 }
 
 void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
