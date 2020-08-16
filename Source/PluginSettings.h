@@ -13,6 +13,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginIDs.h"
 #include "CommonFunctions.h"
+#include "Constants.h"
 
 class SvkPluginSettings
 {

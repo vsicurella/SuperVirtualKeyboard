@@ -34,6 +34,8 @@ public:
 	
 	ModeMapper(ValueTree modeMappingNodeIn);
 
+	ValueTree getMappingNode();
+
 	int getMode1OrderNum() const;
 
 	int getMode2OrderNum() const;

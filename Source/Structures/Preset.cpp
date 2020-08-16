@@ -76,8 +76,6 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
 {
 	if (isValidPresetNode(presetNodeIn))
 	{
-		DBG("restoring this preset: " + presetNodeIn.toXmlString());
-
 		if (createCopy)
 			presetNodeIn = presetNodeIn.createCopy();
 
@@ -335,10 +333,8 @@ void SvkPreset::resetModeSlots()
 	theModeSelectors.removeAllChildren(nullptr);
 	slotNumbersInUse.clear();
 
-	// TODO: make standard layout common 
-	ValueTree meantone12 = Mode::createNode("2 2 1 2 2 2 1", "Meantone");
-	addModeSlot(meantone12);
-	addModeSlot(meantone12.createCopy());
+	addModeSlot(STD_TUNING_MODE_NODE);
+	addModeSlot(STD_TUNING_MODE_NODE);
 
 	setMode1SlotNumber(0);
 	setMode2SlotNumber(1);
@@ -375,6 +371,9 @@ SvkPreset SvkPreset::getDefaultPreset()
 	
 	ValueTree mappingMode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::midiMapNode, nullptr);
 	mappingMode.setProperty(IDs::modeMappingStyle, 1, nullptr);
+
+	ValueTree customMode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
+	customMode.appendChild(Mode::createNode("1"), nullptr);
 
 	return defaultPreset;
 }

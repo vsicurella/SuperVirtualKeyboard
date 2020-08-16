@@ -13,6 +13,8 @@
 ModeMapper::ModeMapper()
 {
 	mappingNode = ValueTree(IDs::midiMapNode);
+	setMappingStyle(0);
+	setMapOrdersParameters(0, 0, 0, 0);
 }
 
 ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
@@ -32,6 +34,11 @@ ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
 
 	mapByOrderOffset1 = mappingNode[IDs::mode1OrderOffsetMapping];
 	mapByOrderOffset2 = mappingNode[IDs::mode2OrderOffsetMapping];
+}
+
+ValueTree ModeMapper::getMappingNode()
+{
+	return mappingNode;
 }
 
 int ModeMapper::getMode1OrderNum() const
@@ -289,7 +296,7 @@ NoteMap ModeMapper::mapToMode1Scale(const Mode& mode1, const Mode& mode2, int mo
 
 NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
 {
-    Mode meantone7_12 = Mode("2 2 1 2 2 2 1", "Meantone", rootNoteStd);
+	Mode meantone7_12(STD_TUNING_MODE_NODE);
 	
 	if (modeMapped.getModeSize() == meantone7_12.getModeSize())
 		return mapToMode1Period(meantone7_12, modeMapped);
