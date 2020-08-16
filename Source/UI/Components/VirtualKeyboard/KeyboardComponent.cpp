@@ -17,32 +17,30 @@ Keyboard::Keyboard()
 	: keyPositioner(this)
 {
     setName("VirtualKeyboard");
-	reset();
-	initializeKeys();
-	pianoNode = ValueTree(IDs::pianoNode);
-    
-    modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
-	applyMode(mode);
-    
-    addMouseListener(this, true);
+	addMouseListener(this, true);
 	setWantsKeyboardFocus(true);
-    
-    setSize(1000, 250);
+
+	initializeKeys();
+	reset();
+
+	setSize(1000, 250);
     setOpaque(true);
 }
 
 Keyboard::Keyboard(ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterMapIn)
 	: keyPositioner(this)
 {
+	setName("VirtualKeyboard");
+	addMouseListener(this, true);
+	setWantsKeyboardFocus(true);
+
 	initializeKeys(); // todo: load keyboard size
 	restoreNode(keyboardNodeIn, true);
 	
-	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
-	mode = modeIn;
+	if (modeIn)
+		mode = modeIn;
+
 	applyMode(mode);
-    
-    addMouseListener(this, true);
-	setWantsKeyboardFocus(true);
 
 	setSize(1000, 250);
 	setOpaque(true);
@@ -102,7 +100,6 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 
 void Keyboard::reset()
 {
-	DBG("Resetting Keyboard.");
 	pianoNode = ValueTree(IDs::pianoNode);
 
 	setUIMode(UIMode::playMode);
@@ -123,8 +120,8 @@ void Keyboard::reset()
 	setKeySizeRatio(0.25f);
 	setKeyOrderSizeScalar(1);
 
-	modeDefault = Mode("2 2 1 2 2 2 1", "Meantone");
-	mode = nullptr;
+	mode = &modeDefault;
+	applyMode(mode);
 }
 
 void Keyboard::initializeKeys(int size)

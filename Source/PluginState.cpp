@@ -16,25 +16,26 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     pluginStateNode = ValueTree(IDs::pluginStateNode);
 	pluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 
-    modeMapper.reset(new ModeMapper());
-
+	// TODO: Factory default settings, use a function call to load user settings
 	pluginSettings.reset(new SvkPluginSettings());
 	pluginSettingsNode = pluginSettings->getSettingsNode();
 
-	buildFactoryDefaultState();
-	buildUserDefaultState();
-    
-    midiProcessor.reset(new SvkMidiProcessor(svkTree));
-    midiSettingsNode = midiProcessor->midiSettingsNode;
-    
 	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
 	modeLibraryNode = presetManager->modeLibraryNode;
 	presetManager->addChangeListener(this);
 
+	// TODO: Factory default MIDI settings
+	midiProcessor.reset(new SvkMidiProcessor(svkTree));
+	midiSettingsNode = midiProcessor->midiSettingsNode;
+
+	buildFactoryDefaultState();
+	buildUserDefaultState();
+
+	// TODO: revise
 	textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
 	textFilterInt.reset(new TextFilterInt());
 
-	recallState(factoryDefaultPluginStateNode);
+	revertToSavedPreset(true, false);
     
 	//for (auto child : svkTree.state)
 	//{
@@ -52,9 +53,8 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
 {
 	ValueTree stateIn = nodeIn;
-	DBG("PluginState recalling " + stateIn.toXmlString());
 	int status = isValidStateNode(stateIn);
-	DBG("Recall status returned: " + String(status));
+	DBG("Validity status returned: " + String(status));
 
 	if (status & PluginStateNodeStatus::IsAPVTSNode)
 	{
@@ -83,7 +83,7 @@ void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSetting
 		revertToSavedPreset(fallbackToDefaultSettings);
 	}
 
-	DBG("After recall: " + pluginStateNode.toXmlString());
+	DBG("Plugin State Node after recall:\n" + pluginStateNode.toXmlString());
 }
 
 void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
@@ -103,12 +103,8 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	midiSettingsNode = svkPreset->getMidiSettingsNode();
 	midiProcessor->restoreFromNode(midiSettingsNode);
 	midiProcessor->setMidiMaps(svkPreset->getMappingsNode());
-	
-	midiProcessor->setMode1(getMode1());
-	midiProcessor->setMode2(getMode2());
 
-	updateModeViewed(!sendChange);
-	doMapping(!sendChange);
+	onModeUpdate(!sendChange, !sendChange);
 
 	if (sendChange)
 		listeners.call(&Listener::presetLoaded, presetNode);
@@ -287,16 +283,7 @@ void SvkPluginState::setModeSelectorViewed(int modeSelectorViewedIn)
 void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 {
     presetManager->handleModeSelection(modeBoxNum, idIn);
-    
-	midiProcessor->setMode1(getMode1());
-	midiProcessor->setMode2(getMode2());
-
-	if (getModeSelectorViewed() == modeBoxNum)
-		updateModeViewed();
-
-	if (isAutoMapping())
-		doMapping();
-
+	onModeUpdate();
     presetEdited = true;
 }
 
@@ -353,6 +340,17 @@ void SvkPluginState::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, 
 
 	if (isAutoMapping())
 		doMapping();
+}
+
+void SvkPluginState::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMappingChangeMessage)
+{
+	midiProcessor->setMode1(getMode1());
+	midiProcessor->setMode2(getMode2());
+
+	updateModeViewed(sendMappingChangeMessage);
+	
+	if (isAutoMapping())
+		doMapping(sendMappingChangeMessage);
 }
 
 //==============================================================================
@@ -442,12 +440,10 @@ void SvkPluginState::commitModeInfo(bool sendChangeMessage)
 
 	presetManager->setSlotToMode(modeSelectorViewedNum, presetManager->getModeCustom()->modeNode);
 	
-	updateModeViewed();
+	onModeUpdate(sendChangeMessage, sendChangeMessage);
 
 	if (sendChangeMessage)
 		listeners.call(&Listener::modeInfoChanged, modeViewed);
-
-	doMapping();
 }
 
 void SvkPluginState::commitStateNode()
@@ -458,14 +454,13 @@ void SvkPluginState::commitStateNode()
 	presetNode = svkPreset->getPresetNode();
 
 	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
-
 	presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pianoNode, nullptr);
 
-	DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
+	onModeUpdate();
 
 	// TODO: revise
 	midiProcessor->updateNode();
-	if (getParameterValue(IDs::mappingMode) > 2)
+	if (getMappingMode() > 2)
 	{
 		midiSettingsNode.addChild(midiProcessor->midiMapNode, -1, nullptr);
 	}
@@ -475,8 +470,9 @@ void SvkPluginState::commitStateNode()
 	}
    
 	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
-    
 	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
+
+	DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
 
 	presetEdited = false;
 }
@@ -508,8 +504,6 @@ int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
 
 	if (stateNode.isValid())
 	{
-		DBG("Validating:\n" + stateNode.toXmlString());
-
 		// Determine if it's the current preset version or not
 		if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
 		{
@@ -555,8 +549,7 @@ bool SvkPluginState::loadModeFromFile()
 	if (Mode::isValidMode(modeNode))
 	{
 		presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
-		updateModeViewed();
-		doMapping();
+		onModeUpdate();
 		return true;
 	}
 
@@ -567,13 +560,13 @@ bool SvkPluginState::loadModeFromFile()
 
 void SvkPluginState::buildFactoryDefaultState()
 {
-	SvkPluginSettings settings;
-	SvkPreset preset = SvkPreset::getDefaultPreset();
+	ModeMapper mapper;
 
 	factoryDefaultPluginStateNode = ValueTree(IDs::pluginStateNode);
 	factoryDefaultPluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
-	factoryDefaultPluginStateNode.appendChild(settings.getSettingsNode(), nullptr);
-	factoryDefaultPluginStateNode.appendChild(preset.getPresetNode(), nullptr);
+	factoryDefaultPluginStateNode.appendChild(pluginSettings->getSettingsNode().createCopy(), nullptr);
+	factoryDefaultPluginStateNode.appendChild(presetManager->getPreset().getPresetNode(), nullptr);
+	factoryDefaultPluginStateNode.appendChild(mapper.getMappingNode(), nullptr);
 }
 
 void SvkPluginState::buildUserDefaultState()

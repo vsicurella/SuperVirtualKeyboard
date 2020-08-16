@@ -12,6 +12,7 @@
 #include "JuceHeader.h"
 
 #include "CommonFunctions.h"
+#include "Constants.h"
 #include "PluginIDs.h"
 #include "PluginModes.h"
 #include "PluginSettings.h"
@@ -87,6 +88,11 @@ struct SvkPluginState : public ChangeListener,
 	void setMapStyle(int mapStyleIn);
 
 	void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
+
+	/*
+		Should be called whenever a mode is initialized in the PresetManager
+	*/
+	void onModeUpdate(bool sendModeViewedChangeMessage = true, bool sendMappingChangeMessage = true);
     
 	//==============================================================================
 	// User Functionality

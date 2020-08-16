@@ -7,6 +7,7 @@
               pluginAUMainType="'aumi'" version="0.03" displaySplashScreen="1"
               jucerFormatVersion="1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
+    <FILE id="jXtU8j" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
     <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
       <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
       <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"

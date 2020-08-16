@@ -9,13 +9,9 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
+#include <JuceHeader.h>
 #include "PluginIDs.h"
 #include "Structures/OwnedHashMap.h"
-
-// Should break this out into a different file
-const int MAX_MODE_SLOTS_INDEX = 127;
-const float SVK_PRESET_VERSION = 1.0; 
 
 struct ScaleSizeSorter
 {

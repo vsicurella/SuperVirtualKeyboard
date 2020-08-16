@@ -14,6 +14,7 @@
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "../../../CommonFunctions.h"
+#include "../../../Constants.h"
 #include "../../../PluginIDs.h"
 #include "../../../Midi/MidiProcessor.h"
 #include "../../../Structures/Mode.h"
@@ -525,8 +526,8 @@ namespace VirtualKeyboard
 		Array<Colour> keyColorsIndividual;
         
         Mode* mode;
-		Mode modeDefault;
-
+		Mode modeDefault = Mode(STD_TUNING_MODE_NODE, true);
+		
 		Array<Colour> colorsDefaultOrders = {
 			Colours::white,
 			Colours::black,

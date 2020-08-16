@@ -13,8 +13,9 @@
 SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
-
     initializeModePresets();
+	
+	loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -95,7 +96,7 @@ Mode* SvkPresetManager::getModeInSlot(int modeSlotNumIn)
 		jassert(slotIndex < modeSlots.size());
 
 		Mode* mode = modeSlots[slotIndex];
-		DBG("GRABBING MODE: " + String(modeSlotNumIn) + " which is " + mode->getDescription());
+		DBG("GRABBING MODE " + String(modeSlotNumIn) + " which is: " + mode->getDescription());
 
 		return mode;
 	}
@@ -399,6 +400,7 @@ bool SvkPresetManager::commitPreset()
 
 bool SvkPresetManager::resetToSavedPreset()
 {
+	DBG("PRESET MANAGER: Resetting to last saved preset.");
 	return loadPreset(svkPresetSaved.getPresetNode(), false);
 }
 
@@ -413,20 +415,6 @@ void SvkPresetManager::initializeModePresets()
 
 	createFactoryModes();
 	loadModeDirectory();
-
-	loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
-	setModeCustom("1");
-
-	int meantoneIndex = 15;
-	int superpyth22Index = 74;
-
-#if JUCE_MAC
-	meantoneIndex = 14;
-	superpyth22Index = 76;
-#endif
-
-    handleModeSelection(0, meantoneIndex);
-    handleModeSelection(1, superpyth22Index);
 }
 
 
