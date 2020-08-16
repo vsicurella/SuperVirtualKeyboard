@@ -38,8 +38,10 @@ class SvkMidiProcessor : public MidiMessageCollector,
 	Mode* mode2;
     
     int periodShift = 0;
-    bool periodShiftModeSIze = false;
+    bool periodShiftModeSize = false;
     int transposeAmt = 0;
+	int currentNoteShift = 0;
+
     int midiChannelOut = 1;
     
     int maxNumVoices = 15;
@@ -144,6 +146,11 @@ public:
 	*/
 	void setMidiChannelOut(int virtualKeyboardMidiChannelOut);
 
+	/*
+		Updates the note number transposition cache
+	*/
+	void updateNoteTransposition();
+
     void setVoiceLimit(int maxVoicesIn);
     void setRetuneOn(bool retuneOn);
 
@@ -172,5 +179,4 @@ public:
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
-    
 };
