@@ -261,14 +261,14 @@ void SvkMidiProcessor::setMode1(Mode* mode1In)
 void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
 	mode2 = mode2In;
+	updateNoteTransposition();
 }
 
 void SvkMidiProcessor::setPeriodShift(int periodsToShift)
 {
 	periodShift = periodsToShift;
 	midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
-
-	// TODO: remove notes and transpose, or better yet...use a note queue for the proper note off
+	updateNoteTransposition();
 }
 
 void SvkMidiProcessor::setMidiChannelOut(int virtualKeyboardMidiChannelOut)
@@ -277,6 +277,17 @@ void SvkMidiProcessor::setMidiChannelOut(int virtualKeyboardMidiChannelOut)
 	midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
 
 	// TODO: remove notes or better yet...use a note queue for the proper note off
+}
+
+void SvkMidiProcessor::updateNoteTransposition()
+{
+	currentNoteShift = transposeAmt;
+	if (periodShiftModeSize)
+		currentNoteShift += periodShift * mode2->getModeSize();
+	else
+		currentNoteShift += periodShift * mode2->getScaleSize();
+
+	// TODO: handle sustained notes
 }
 
 void SvkMidiProcessor::setRetuneOn(bool retuneOn)
@@ -430,64 +441,65 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
     MidiMessage msg;
     int smpl;
     int midiNote;
-    msgCount = 0;
     
 	// Add external input into queue
     while (inputEvents.getNextEvent(msg, smpl))
     {
 		if (msg.isNoteOnOrOff())
 		{
+			midiNote = msg.getNoteNumber();
+
 			if (isInputFiltered)
 			{
-				midiNote = midiInputFilter->getNoteRemapped(msg.getNoteNumber());
-				msg.setNoteNumber(midiNote);
+				midiNote = midiInputFilter->getNoteRemapped(midiNote);
 			}
 
-			// check for out of range notes?
 			originalKeyboardState->processNextMidiEvent(msg);
 
 			if (isInputRemapped)
 			{
-				midiNote = midiInputRemap->getNoteRemapped(msg.getNoteNumber());
-				msg.setNoteNumber(midiNote);
+				midiNote = midiInputRemap->getNoteRemapped(midiNote);
 			}
 
+			if (midiNote < 0 || midiNote > 127)
+				continue;
+
+			msg.setNoteNumber(midiNote);
 			remappedKeyboardState->processNextMidiEvent(msg);
-			msg.setTimeStamp((double)smpl + ++msgCount);
 		}
 
         addMessageToQueue(msg);
     }
 
-	// Get all messages
-    
+	// Combine all MIDI input
     MidiBuffer preBuffer;
     removeNextBlockOfMessages(preBuffer, 4096);
-    
+	midiMessages.clear();
 
 	// Output Filtering on all MIDI events
     auto allMidiEvents = MidiBuffer::Iterator(preBuffer);
-    msgCount = 0;
     while (allMidiEvents.getNextEvent(msg, smpl))
     {
         // Process transpositions
 		if (msg.isNoteOnOrOff())
 		{
-			midiNote = msg.getNoteNumber() + transposeAmt;
-			midiNote += (periodShift * mode2->getScaleSize());
-			msg.setNoteNumber(midiNote);
+			midiNote = msg.getNoteNumber() + currentNoteShift;
 
 			if (isOutputFiltered)
 			{
-				midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
-				msg.setNoteNumber(midiNote);
+				midiNote = midiOutputFilter->getNoteRemapped(midiNote);
 			}
+
+			if (midiNote < 0 || midiNote > 127)
+				continue;
+
+			msg.setNoteNumber(midiNote);
 		}
+
+		midiMessages.addEvent(msg, smpl);
     }
 
-    midiMessages = preBuffer;
     sendBufferToOutputs(midiMessages);
-    msgCount = 0;
 }
 
 void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
@@ -541,14 +553,16 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
     else if (paramID == IDs::periodShift.toString())
     {
         periodShift = newValue;
+		updateNoteTransposition();
     }
     else if (paramID == IDs::periodShiftModeSize.toString())
     {
-        periodShiftModeSIze = newValue;
+        periodShiftModeSize = newValue;
     }
     else if (paramID == IDs::transposeAmt.toString())
     {
         transposeAmt = newValue;
+		updateNoteTransposition();
     }
     else if (paramID == IDs::keyboardMidiChannel.toString())
     {
@@ -560,7 +574,7 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
         mpeOn = newValue;
     }
     
-    DBG("Midi processor updated");
+    DBG("Midi processor updated parameter " + paramID + " to " + String(newValue));
 }
 
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
