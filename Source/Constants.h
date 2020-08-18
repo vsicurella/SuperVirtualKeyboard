@@ -10,7 +10,7 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include "Structures\Mode.h"
+#include "Structures/Mode.h"
 
 #define STD_TUNING_MODE_NODE Mode::createNode("2 2 1 2 2 2 1", "Meantone")
 
