@@ -46,6 +46,12 @@ Keyboard::Keyboard(ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterM
 	setOpaque(true);
 }
 
+Keyboard::~Keyboard()
+{
+	if (externalKeyboardToDisplay)
+		externalKeyboardToDisplay->removeListener(this);
+}
+
 //===============================================================================================
 
 void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
@@ -895,12 +901,12 @@ void Keyboard::applyKeyData(ValueTree keyDataTreeIn)
 
 void Keyboard::displayKeyboardState(MidiKeyboardState* keyboardStateIn)
 {
-	if (externalKeyboardToDisplay != nullptr)
+	if (externalKeyboardToDisplay)
 		externalKeyboardToDisplay->removeListener(this);
 
 	externalKeyboardToDisplay = keyboardStateIn;
 
-	if (externalKeyboardToDisplay != nullptr)
+	if (externalKeyboardToDisplay)
 		externalKeyboardToDisplay->addListener(this);
 }
 

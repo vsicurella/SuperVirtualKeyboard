@@ -44,7 +44,7 @@ namespace VirtualKeyboard
         
         Keyboard();
 		Keyboard(ValueTree keyboardNodeIn, Mode* modeIn=nullptr, NoteMap* inputFilterMapIn = nullptr);
-		~Keyboard() {};
+		~Keyboard();
         
         //===============================================================================================
                 
