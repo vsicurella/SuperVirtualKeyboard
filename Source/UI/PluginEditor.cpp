@@ -32,6 +32,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	virtualKeyboard = controlComponent->getKeyboard();
 	virtualKeyboard->addListener(pluginState->getMidiProcessor());
+	modeViewedChanged(pluginState->getModeViewed(), pluginState->getModeSelectorViewed(), pluginState->getModeViewedSlotNumber());
 
 	colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
 	colorChooserWindow->setSize(450, 450);
