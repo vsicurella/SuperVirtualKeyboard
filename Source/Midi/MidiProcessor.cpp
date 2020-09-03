@@ -25,6 +25,13 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
     
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
+
+	startTime = Time::getMillisecondCounterHiRes();
+
+	// Create all-notes-off buffer
+	for (int i = 0; i < 128; i++)
+		for (int ch = 1; ch <= 16; ch++)
+			allNotesOffBuffer.addEvent(MidiMessage::noteOff(ch, i), ch * 16 + i);
         
 	//retuner.reset(new TunedNoteInterpreter());
  //   retuner->setPitchBendMax(48);
@@ -441,7 +448,10 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
     MidiMessage msg;
     int smpl;
     int midiNote;
-    
+	int inputSize = 0;
+
+	MidiBuffer combinedMessages;
+	
 	// Add external input into queue
     while (inputEvents.getNextEvent(msg, smpl))
     {
@@ -461,26 +471,28 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 				midiNote = midiInputRemap->getNoteRemapped(midiNote);
 			}
 
-			if (midiNote < 0 || midiNote > 127)
-				continue;
-
 			msg.setNoteNumber(midiNote);
 			remappedKeyboardState->processNextMidiEvent(msg);
 		}
 
-        addMessageToQueue(msg);
+		combinedMessages.addEvent(msg, smpl);
+		inputSize++;
     }
 
-	// Combine all MIDI input
-    MidiBuffer preBuffer;
-    removeNextBlockOfMessages(preBuffer, 4096);
-	midiMessages.clear();
+	MidiBuffer svkBuffer;
+	if (numMsgs > 0)
+	{
+		// TODO: Figure out why SVK messages don't go through if I use numMsgs as numSamples arg
+		// even when I can confirm numMsgs is greater than 0
+		removeNextBlockOfMessages(svkBuffer, 4096);
+		numMsgs = 0;
+	}
 
 	// Output Filtering on all MIDI events
-    auto allMidiEvents = MidiBuffer::Iterator(preBuffer);
-    while (allMidiEvents.getNextEvent(msg, smpl))
-    {
-        // Process transpositions
+	auto allMidiEvents = MidiBuffer::Iterator(svkBuffer);
+	while (allMidiEvents.getNextEvent(msg, smpl))
+	{
+		// Process transpositions
 		if (msg.isNoteOnOrOff())
 		{
 			midiNote = msg.getNoteNumber() + currentNoteShift;
@@ -496,10 +508,11 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 			msg.setNoteNumber(midiNote);
 		}
 
-		midiMessages.addEvent(msg, smpl);
-    }
+		combinedMessages.addEvent(msg, inputSize + smpl);
+	}
 
-    sendBufferToOutputs(midiMessages);
+	midiMessages.swapWith(combinedMessages);
+	sendBufferToOutputs(midiMessages);
 }
 
 void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
@@ -518,15 +531,14 @@ void SvkMidiProcessor::sendBufferToOutputs(const MidiBuffer& bufferToSend)
 
 void SvkMidiProcessor::allNotesOff()
 {
-    for (int i = 1; i <= 16; i++)
-    {
-        addMessageToQueue(MidiMessage::allNotesOff(i));
-    }
-}
-
-void SvkMidiProcessor::allNotesOff(int channelNumber)
-{
-    addMessageToQueue(MidiMessage::allNotesOff(channelNumber));
+	auto events = MidiBuffer::Iterator(allNotesOffBuffer);
+	MidiMessage msg;
+	int smplNum;
+	while (events.getNextEvent(msg, smplNum))
+	{
+		numMsgs++;
+		addMessageToQueue(msg);
+	}
 }
 
 //==============================================================================
@@ -580,20 +592,22 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
-    msg.setTimeStamp(++msgCount);
-    addMessageToQueue(msg);
+	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
+	numMsgs++;
+	addMessageToQueue(msg);
 }
 
 void SvkMidiProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
-    msg.setTimeStamp(++msgCount);
-    addMessageToQueue(msg);
+	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
+	numMsgs++;
+	addMessageToQueue(msg);
 }
 
 void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg)
 {
     MidiMessage myMsg = MidiMessage(msg);
-    ++msgCount;
-    addMessageToQueue(myMsg);
+	numMsgs++;
+	addMessageToQueue(myMsg);
 }
