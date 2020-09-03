@@ -19,61 +19,9 @@
 class SvkMidiProcessor : public MidiMessageCollector,
                          private AudioProcessorValueTreeState::Listener
 {
-    AudioProcessorValueTreeState& svkTree;
-    
-    std::unique_ptr<MidiInput> midiInput;
-    std::unique_ptr<MidiOutput> midiOutput;
-    
-    String midiInputName = "";
-    String midiOutputName = "";
-    
-    String inputSelected = "";
-    String outputSelected = "";
-    
-    MidiBuffer midiBuffer;
-    int msgCount = 0;
-
-	Mode* modeViewed;
-	Mode* mode1;
-	Mode* mode2;
-    
-    int periodShift = 0;
-    bool periodShiftModeSize = false;
-    int transposeAmt = 0;
-	int currentNoteShift = 0;
-
-    int midiChannelOut = 1;
-    
-    int maxNumVoices = 15;
-    int pitchBendNoteMax = 48;
-    int pitchBendGlobalMax = 2;
-    
-    bool mpeTuningPreserveMidiNote = true;
-
-    std::unique_ptr<MidiFilter> midiInputFilter;
-    std::unique_ptr<MidiFilter> midiInputRemap;
-    std::unique_ptr<MidiFilter> midiOutputFilter;
-    
-    int mpePitchbendTrackingMode = 0;
-    int mpePressureTrackingMode = 0;
-    int mpeTimbreTrackingMode = 0;
-    
-    bool mpeOn = false;
-    bool doRetuning = false;
-    
-    bool midiInputPaused = false;
-    bool isInputFiltered = false;
-    bool isInputRemapped = true;
-    bool isOutputFiltered = false;
-    
-    bool noteMapIsCustom = false;
-    
-    std::unique_ptr<MidiKeyboardState> originalKeyboardState; // post-filtered input
-    std::unique_ptr<MidiKeyboardState> remappedKeyboardState; // remapped input
-    
 public:
     
-    SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn);
+    SvkMidiProcessor(AudioProcessorValueTreeState&);
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
@@ -168,7 +116,6 @@ public:
     void sendMsgToOutputs(const MidiMessage& msgToSend);
     void sendBufferToOutputs(const MidiBuffer& bufferToSend);
     void allNotesOff();
-    void allNotesOff(int channelNumber);
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
@@ -179,4 +126,60 @@ public:
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
+
+private:
+
+	AudioProcessorValueTreeState& svkTree;
+
+	std::unique_ptr<MidiInput> midiInput;
+	std::unique_ptr<MidiOutput> midiOutput;
+
+	String midiInputName = "";
+	String midiOutputName = "";
+
+	String inputSelected = "";
+	String outputSelected = "";
+
+	double startTime;
+	int numMsgs = 0;
+
+	MidiBuffer allNotesOffBuffer;
+
+	Mode* modeViewed;
+	Mode* mode1;
+	Mode* mode2;
+
+	int periodShift = 0;
+	bool periodShiftModeSize = false;
+	int transposeAmt = 0;
+	int currentNoteShift = 0;
+
+	int midiChannelOut = 1;
+
+	int maxNumVoices = 15;
+	int pitchBendNoteMax = 48;
+	int pitchBendGlobalMax = 2;
+
+	bool mpeTuningPreserveMidiNote = true;
+
+	std::unique_ptr<MidiFilter> midiInputFilter;
+	std::unique_ptr<MidiFilter> midiInputRemap;
+	std::unique_ptr<MidiFilter> midiOutputFilter;
+
+	int mpePitchbendTrackingMode = 0;
+	int mpePressureTrackingMode = 0;
+	int mpeTimbreTrackingMode = 0;
+
+	bool mpeOn = false;
+	bool doRetuning = false;
+
+	bool midiInputPaused = false;
+	bool isInputFiltered = false;
+	bool isInputRemapped = true;
+	bool isOutputFiltered = false;
+
+	bool noteMapIsCustom = false;
+
+	std::unique_ptr<MidiKeyboardState> originalKeyboardState; // post-filtered input
+	std::unique_ptr<MidiKeyboardState> remappedKeyboardState; // remapped input
 };
