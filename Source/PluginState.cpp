@@ -147,7 +147,7 @@ ValueTree SvkPluginState::getPresetNode()
 	return presetNode;
 }
 
-Mode* SvkPluginState::getModeInSlot(int slotNumIn)
+Mode* SvkPluginState::getModeInSlot(int slotNumIn) const
 {
 	return presetManager->getModeInSlot(slotNumIn);
 }
@@ -216,42 +216,47 @@ float SvkPluginState::getParameterDefaultValue(Identifier paramId)
 	return 0.0f;
 }
 
-int SvkPluginState::getNumModesLoaded()
+int SvkPluginState::getNumModesLoaded() const
 {
 	return presetManager->getNumModeSlots();
 }
 
-int SvkPluginState::getModeSelectorViewed()
+int SvkPluginState::getModeSelectorViewed() const
 {
 	return modeSelectorViewedNum;
 }
 
-int SvkPluginState::getMappingMode()
+int SvkPluginState::getModeViewedSlotNumber() const
+{
+	return presetManager->getModeSlotOfSelector(modeSelectorViewedNum);
+}
+
+int SvkPluginState::getMappingMode() const
 {
 	return presetNode.getChildWithName(IDs::presetProperties)[IDs::mappingMode];
 }
 
-int SvkPluginState::getMappingStyle()
+int SvkPluginState::getMappingStyle() const
 {
 	return presetNode.getChildWithName(IDs::midiMapNode)[IDs::modeMappingStyle];
 }
 
-bool SvkPluginState::isAutoMapping()
+bool SvkPluginState::isAutoMapping() const
 {
 	return getMappingMode() == 2.0f;
 }
 
-int SvkPluginState::getModeSlotRoot(int slotNum)
+int SvkPluginState::getModeSlotRoot(int slotNum) const
 {
 	return getModeInSlot(slotNum)->getRootNote();
 }
 
-int SvkPluginState::getMode1Root()
+int SvkPluginState::getMode1Root() const
 {
 	return getModeSlotRoot(0);
 }
 
-int SvkPluginState::getMode2Root()
+int SvkPluginState::getMode2Root() const
 {
 	return getModeSlotRoot(1);
 }

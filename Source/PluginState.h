@@ -32,7 +32,7 @@ struct SvkPluginState : public ChangeListener,
 	ValueTree pluginEditorNode;
 	ValueTree pianoNode;
     
-    SvkPluginState(AudioProcessorValueTreeState& svkValueTreeIn);
+    SvkPluginState(AudioProcessorValueTreeState&);
 	~SvkPluginState() {}
     
     void recallState(ValueTree nodeIn, bool fallbackToDefaultSettings = false);
@@ -51,7 +51,7 @@ struct SvkPluginState : public ChangeListener,
 
 	ValueTree getPresetNode();
 
-	Mode* getModeInSlot(int slotNumIn);
+	Mode* getModeInSlot(int slotNumIn) const;
 	Mode* getModeViewed();
 	Mode* getMode1();
 	Mode* getMode2();
@@ -65,18 +65,19 @@ struct SvkPluginState : public ChangeListener,
 	float getParameterMax(Identifier paramId);
 	float getParameterDefaultValue(Identifier paramId);
 
-	int getNumModesLoaded();
-	int getModeSelectorViewed();
+	int getNumModesLoaded() const;
+	int getModeSelectorViewed() const;
+	int getModeViewedSlotNumber() const;
 
-	int getMappingMode();
-	int getMappingStyle();
-    bool isAutoMapping();
+	int getMappingMode() const;
+	int getMappingStyle() const;
+    bool isAutoMapping() const;
 
     //bool isAutoRetuning();
 
-	int getModeSlotRoot(int slotNum);
-	int getMode1Root();
-	int getMode2Root();
+	int getModeSlotRoot(int slotNum) const;
+	int getMode1Root() const;
+	int getMode2Root() const;
 
 	bool isPresetEdited();
 
