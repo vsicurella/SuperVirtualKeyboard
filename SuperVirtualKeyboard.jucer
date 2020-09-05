@@ -57,7 +57,7 @@
                 file="Source/UI/Components/Settings/DeviceSettingsPanel.cpp"/>
           <FILE id="sinhC5" name="DeviceSettingsPanel.h" compile="0" resource="0"
                 file="Source/UI/Components/Settings/DeviceSettingsPanel.h"/>
-          <FILE id="RbrLvj" name="GeneralSettingsPanel.cpp" compile="0" resource="0"
+          <FILE id="RbrLvj" name="GeneralSettingsPanel.cpp" compile="1" resource="0"
                 file="Source/UI/Components/Settings/GeneralSettingsPanel.cpp"/>
           <FILE id="TKlTxI" name="GeneralSettingsPanel.h" compile="0" resource="0"
                 file="Source/UI/Components/Settings/GeneralSettingsPanel.h"/>

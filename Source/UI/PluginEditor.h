@@ -19,11 +19,13 @@
 #include "Components/PluginControlComponent.h"
 #include "Components/VirtualKeyboard/KeyboardComponent.h"
 //#include "Components/Settings/SettingsContainer.h"
+
 #include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MidiSettingsWindow.h"
 #include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
-#include "Dialogs/PluginSettingsDialog.h"
+//#include "Dialogs/PluginSettingsDialog.h"
+#include "Components/Settings/GeneralSettingsPanel.h"
 #include "../File IO/ReaperWriter.h"
 
 using namespace VirtualKeyboard;
@@ -146,6 +148,8 @@ private:
     std::unique_ptr<MappingHelper> mappingHelper;
 
 	Keyboard* virtualKeyboard;
+
+	std::unique_ptr<GeneralSettingsPanel> generalSettingsPanel;
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
