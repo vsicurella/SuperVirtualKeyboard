@@ -158,15 +158,11 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-    //updateScrollbarData();
-    //controlComponent->setVisible(false);
-
-    //settingsContainer.reset(new SettingsContainer(processor.svkValueTree, pluginState));
-    //addAndMakeVisible(settingsContainer.get());
-    //settingsContainer->setBounds(0, 0, controlComponent->getWidth(), controlComponent->getHeight());
-    //settingsContainer->addChangeListener(this);
-	Rectangle<int> mouseArea = Rectangle<int>().withPosition(getMouseXYRelative());
-	CallOutBox& callout = CallOutBox::launchAsynchronously(new PluginSettingsDialog(pluginState), mouseArea, nullptr);	
+	generalSettingsPanel.reset(new GeneralSettingsPanel(pluginState));
+	
+	controlComponent->setVisible(false);
+	addAndMakeVisible(generalSettingsPanel.get());
+	generalSettingsPanel->setBounds(controlComponent->getBoundsInParent());
 }
 
 void SvkPluginEditor::commitCustomScale()
