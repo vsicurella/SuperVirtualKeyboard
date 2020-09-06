@@ -33,19 +33,9 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
 		for (int ch = 1; ch <= 16; ch++)
 			allNotesOffBuffer.addEvent(MidiMessage::noteOff(ch, i), ch * 16 + i);
         
-	//retuner.reset(new TunedNoteInterpreter());
- //   retuner->setPitchBendMax(48);
- //   
- //   mpeInst.reset(new MPEInstrument());
- //   channelAssigner.reset(new SvkMpeChannelAssigner(mpeInst.get()));
- //   channelAssigner->setIgnorePitchbend(true); // temporary
-
     // default sample rate
     reset(41000);
-    
-    //mpeZone.setLowerZone(maxNumVoices, pitchBendNoteMax, pitchBendGlobalMax);
-    //mpeInst->setZoneLayout(mpeZone);
-    //updateMPEMode();
+  
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -113,16 +103,6 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 }
 
 //==============================================================================
-
-StringArray SvkMidiProcessor::getAvailableInputs() const
-{
-    return MidiInput::getDevices();
-}
-
-Array<MidiDeviceInfo> SvkMidiProcessor::getAvailableOutputs() const
-{
-    return MidiOutput::getAvailableDevices();
-}
 
 MidiInput* SvkMidiProcessor::getInputDevice()
 {
@@ -219,12 +199,20 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(String deviceID)
 {
-    //midiInput = MidiInput::openDevice(deviceID, this);
-    midiInputName = midiInput->getName();
-    if (midiInputName.isNotEmpty())
-    {
+	std::unique_ptr<MidiInput> inputToOpen = MidiInput::openDevice(deviceID, this);
+
+	if (inputToOpen.get())
+	{
+		if (midiInput.get())
+			midiInput->stop();
+
+		midiInput.swap(inputToOpen);
+		midiInput->start();
+
+		midiInputName = midiInput->getName();
         inputSelected = deviceID;
-        midiSettingsNode.setProperty(IDs::midiInputName, midiInput->getIdentifier(), nullptr);
+        midiSettingsNode.setProperty(IDs::midiInputName, inputSelected, nullptr);
+		DBG("Successfully opened input " + midiInputName);
     }
     else
     {
@@ -237,14 +225,16 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
 
 String SvkMidiProcessor::setMidiOutput(String deviceID)
 {
-    midiOutput = MidiOutput::openDevice(deviceID);
-    
-    if (midiOutput.get())
-    {
-        midiOutputName = midiOutput->getName();
-        outputSelected = deviceID;
-        midiSettingsNode.setProperty(IDs::midiOutputName, midiOutput->getIdentifier(), nullptr);
-    }
+	std::unique_ptr<MidiOutput> outputToOpen = MidiOutput::openDevice(deviceID);
+
+	if (outputToOpen.get())
+	{
+		midiOutput.swap(outputToOpen);
+		midiOutputName = midiOutput->getName();
+		outputSelected = deviceID;
+		midiSettingsNode.setProperty(IDs::midiOutputName, outputSelected, nullptr);
+		DBG("Successfully opened output " + midiOutputName);
+	}
     else
     {
         midiOutputName = "";
