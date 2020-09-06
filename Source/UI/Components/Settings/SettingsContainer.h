@@ -9,18 +9,13 @@
 */
 
 #pragma once
-
-#include "../../../../JuceLibraryCode/JuceHeader.h"
-
 #include "../../../PluginState.h"
 
 #include "GeneralSettingsPanel.h"
-#include "ViewSettingsPanel.h"
-#include "ControlSettingsPanel.h"
 #include "DeviceSettingsPanel.h"
+#include "ViewSettingsPanel.h"
+//#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
-
-#include "../../Dialogs/PluginSettingsDialog.h"
 
 //==============================================================================
 /*
@@ -28,55 +23,55 @@
 class SettingsContainer : public TabbedComponent,
                             public ChangeBroadcaster
                             
-{
-    AudioProcessorValueTreeState& svkTree;
-    SvkPluginState* pluginState;
-    
-    OwnedArray<SvkUiPanel> panels;
-    std::unique_ptr<Viewport> view;
-
-    Component* componentViewed = nullptr;
-
-    int defaultControlHeight = 50;
-    
+{    
 public:
     
-    SettingsContainer(AudioProcessorValueTreeState& processorTreeIn, SvkPluginState* pluginStateIn)
+    SettingsContainer(SvkPluginState* pluginStateIn)
     : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
-      svkTree(processorTreeIn)
+		pluginState(pluginStateIn)
     {
-        view.reset(new Viewport("SettingsViewport"));
-        view->setScrollOnDragEnabled(true);
-        view->setScrollBarsShown(true, false);
-        addAndMakeVisible(view.get());
+		tabColour = Colour(0xff323e44);
+		backgroundColour = tabColour.darker();
+		textColour = tabColour.contrasting();
 
-        addChildComponent(new Component());
-        //addChildComponent(panels.add(new GeneralDialog(pluginState)));
-        addChildComponent(panels.add(new PluginSettingsDialog(svkTree, pluginState)));
-        addChildComponent(panels.add(new ViewSettingsPanel(svkTree)));
-        addChildComponent(panels.add(new ControlSettingsPanel(svkTree)));
-        addChildComponent(panels.add(new DeviceSettingsPanel(svkTree)));
-        addChildComponent(panels.add(new DebugSettingsPanel(svkTree, pluginState)));
+		setColour(backgroundColourId, backgroundColour);
+
+        //view.reset(new Viewport("SettingsViewport"));
+        //view->setScrollOnDragEnabled(true);
+        //view->setScrollBarsShown(true, false);
+        //addAndMakeVisible(view.get());
+
+		for (auto panelName : panelNames)
+		{
+			if (panelName == "General")
+				panels.add(new GeneralSettingsPanel(pluginState));
+
+			else if (panelName == "Device")
+				panels.add(new DeviceSettingsPanel(pluginState));
+
+			else if (panelName == "View")
+				panels.add(new ViewSettingsPanel(pluginState));
+
+			else if (panelName == "Debug")
+				panels.add(new DebugSettingsPanel(pluginState));
+		}
+
         
-        for (auto panel : panels)
-        {
-            panel->connectToProcessor();
-        }
-        
-        addTab("X", Colours::red, getChild(0), true);
-        addTab("General", Colours::lightgrey, panels.getUnchecked(0), true);
-        addTab("View", Colours::lightgrey, panels.getUnchecked(1), true);
-        addTab("Device", Colours::lightgrey, panels.getUnchecked(2), true);
-        addTab("Control", Colours::lightgrey, panels.getUnchecked(3), true);
-        addTab("Debug", Colours::palegreen, panels.getUnchecked(4), true);
+		addTab("Back", tabColour.brighter(), new Component(), true);
+
+		for (int i = 0; i < panels.size(); i++)
+		{
+			addTab(panelNames[i], tabColour, panels[i], false);
+		}
         
         setCurrentTabIndex(1);
-        
         setSize(100, 100);
     }
 
     ~SettingsContainer()
     {
+		view = nullptr;
+		panels.clear();
     }
     
     Component* getComponentViewed()
@@ -92,8 +87,7 @@ public:
             return;
         }
         
-        componentViewed = panels.getUnchecked(newCurrentTabIndex);
-        view->setViewedComponent(componentViewed, false);
+        componentViewed = panels.getUnchecked(newCurrentTabIndex - 1);
         
         if (getParentComponent())
             resized();
@@ -106,14 +100,40 @@ public:
     
     void resized() override
     {
-        int tabHeight = getTabBarDepth();
-        
-        getTabbedButtonBar().setBounds(0, 0, getWidth(), tabHeight);
-        view->setBounds(0, tabHeight, getWidth(), getHeight() - tabHeight);
-        
-        if (componentViewed && componentViewed->getNumChildComponents() > 0)
-            componentViewed->setBounds(0, tabHeight, view->getMaximumVisibleWidth()*0.9, componentViewed->getChildComponent(componentViewed->getNumChildComponents()-1)->getBottom() * 1.2);
+		TabbedComponent::resized();
+		int tabHeight = getTabBarDepth();
+
+		if (componentViewed && componentViewed->getNumChildComponents() > 0)
+			componentViewed->setBounds(getLocalBounds().withHeight(getHeight() - tabHeight).withY(tabHeight));
     }
+
+private:
+
+	SvkPluginState* pluginState;
+
+	OwnedArray<SvkSettingsPanel> panels;
+	std::unique_ptr<Viewport> view;
+
+	Component* componentViewed = nullptr;
+
+	int defaultControlHeight = 50;
+
+	Colour backgroundColour;
+	Colour tabColour;
+	Colour textColour;
+
+
+	StringArray panelNames =
+	{
+		"General"
+#if JUCE_STANDALONE_APPLICATION || JUCE_ANDROID || JUCE_IOS
+		, "Device"
+#endif
+		, "View"
+#if JUCE_DEBUG
+		, "Debug"
+#endif
+	};
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContainer)
