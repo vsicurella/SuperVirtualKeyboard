@@ -14,25 +14,26 @@
 #pragma once
 #include "../../JuceLibraryCode/JuceHeader.h"
 
-typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
-typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
-typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+//typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+//typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
+//typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
 
 
 class SvkUiPanel : public Component
 {
 protected:
     
-    AudioProcessorValueTreeState& processorTree;
+    //AudioProcessorValueTreeState& processorTree;
 
 public:
     
-    SvkUiPanel(AudioProcessorValueTreeState& processorTreeIn)
-        : processorTree(processorTreeIn) {};
+    SvkUiPanel(/*AudioProcessorValueTreeState& processorTreeIn*/)
+      //  : processorTree(processorTreeIn) 
+		{};
     
     virtual ~SvkUiPanel() = 0;
         
-    virtual void connectToProcessor() = 0;
+    //virtual void connectToProcessor() = 0;
     
     virtual void paint(Graphics& g) override;
     

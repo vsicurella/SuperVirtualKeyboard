@@ -63,7 +63,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
 	{
 		pluginEditorNode = pluginState->pluginEditorNode;
-		setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
+		restoreWindowState();
 	}
 
 	// Intialization
@@ -102,6 +102,12 @@ SvkPluginEditor::~SvkPluginEditor()
 }
 
 //==============================================================================
+
+void SvkPluginEditor::restoreWindowState()
+{
+	setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
+	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
+}
 
 bool SvkPluginEditor::savePresetToFile()
 {
@@ -158,11 +164,12 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-	generalSettingsPanel.reset(new GeneralSettingsPanel(pluginState));
+	settingsPanel.reset(new SettingsContainer(pluginState));
 	
 	controlComponent->setVisible(false);
-	addAndMakeVisible(generalSettingsPanel.get());
-	generalSettingsPanel->setBounds(controlComponent->getBoundsInParent());
+	addAndMakeVisible(settingsPanel.get());
+	settingsPanel->setBounds(getLocalBounds());
+	settingsPanel->addChangeListener(this);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -272,7 +279,7 @@ void SvkPluginEditor::beginColorEditing()
 
 void SvkPluginEditor::paint(Graphics& g)
 {
-	g.fillAll(Colours::darkgrey);
+	g.fillAll(Colour(0xff323e44));
 }
 
 void SvkPluginEditor::resized()
@@ -281,8 +288,8 @@ void SvkPluginEditor::resized()
 
 	controlComponent->setSize(getWidth(), getHeight());
 
-//    if (settingsContainer.get())
-//         settingsContainer->setSize(getWidth(), getHeight());
+    if (settingsPanel.get())
+		settingsPanel->setSize(getWidth(), getHeight());
 	
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
@@ -380,15 +387,16 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 	}
         
     // Settings closed
-//    if (source == settingsContainer.get())
-//    {
-//        settingsContainer->removeChangeListener(this);
-//        settingsContainer->setVisible(false);
-//        settingsContainer.reset();
-//
-//        controlComponent->setVisible(true);
-//        controlComponent->resized();
-//    }
+    if (source == settingsPanel.get())
+    {
+		settingsPanel->removeChangeListener(this);
+		settingsPanel->setVisible(false);
+		settingsPanel = nullptr;
+
+        controlComponent->setVisible(true);
+        controlComponent->resized();
+		restoreWindowState();
+    }
 }
 
 //==============================================================================
