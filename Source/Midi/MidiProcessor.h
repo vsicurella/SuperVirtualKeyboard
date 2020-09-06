@@ -31,9 +31,6 @@ public:
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
     
-    StringArray getAvailableInputs() const;
-    Array<MidiDeviceInfo> getAvailableOutputs() const;
-    
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
     

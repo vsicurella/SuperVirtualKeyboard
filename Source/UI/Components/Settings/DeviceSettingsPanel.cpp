@@ -42,16 +42,23 @@ void DeviceSettingsPanel::resized()
 
 void DeviceSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
 {
-	// Midi Input Changed
-	if (idToControl[IDs::midiInputName] == comboBoxThatChanged)
+	if (pluginState && pluginState->getMidiProcessor())
 	{
-		DBG("Midi Input Selected");
-	}
+		// Midi Input Changed
+		if (idToControl[IDs::midiInputName] == comboBoxThatChanged)
+		{
+			MidiDeviceInfo& device = availableIns.getReference(comboBoxThatChanged->getSelectedId() - 1);
+			DBG("Midi Input Selected: " + device.name);
+			pluginState->getMidiProcessor()->setMidiInput(device.identifier);
+		}
 
-	// Midi Output Changed
-	else if (idToControl[IDs::midiOutputName] == comboBoxThatChanged)
-	{
-		DBG("Midi Output Selected");
+		// Midi Output Changed
+		else if (idToControl[IDs::midiOutputName] == comboBoxThatChanged)
+		{
+			MidiDeviceInfo& device = availableOuts.getReference(comboBoxThatChanged->getSelectedId() - 1);
+			DBG("Midi Output Selected: " + device.name);
+			pluginState->getMidiProcessor()->setMidiOutput(device.identifier);
+		}
 	}
 }
 

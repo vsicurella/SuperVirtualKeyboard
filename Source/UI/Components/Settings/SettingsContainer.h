@@ -126,7 +126,7 @@ private:
 	StringArray panelNames =
 	{
 		"General"
-#if JUCE_STANDALONE_APPLICATION || JUCE_ANDROID || JUCE_IOS
+#if JucePlugin_Build_Standalone
 		, "Device"
 #endif
 		, "View"

@@ -283,7 +283,7 @@ void PluginSettingsDialog::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 
 void PluginSettingsDialog::timerCallback()
 {
-    Array<MidiDeviceInfo> devices = pluginState->getMidiProcessor()->getAvailableOutputs();
+	Array<MidiDeviceInfo> devices;// = pluginState->getMidiProcessor()->getAvailableOutputs();
     midiDeviceBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
 
     if (availableOuts != devices && !midiDeviceBox->isPopupActive())
