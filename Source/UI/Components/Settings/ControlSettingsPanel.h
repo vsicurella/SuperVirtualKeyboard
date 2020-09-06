@@ -10,10 +10,9 @@
 
 #pragma once
 
-#include "../../SvkUiPanel.h"
 #include "../../../PluginState.h"
 
-class ControlSettingsPanel : public SvkUiPanel
+class ControlSettingsPanel : public Component
 {
     
 public:
@@ -22,7 +21,7 @@ public:
     
     ~ControlSettingsPanel();
     
-    void connectToProcessor() override;
+    //void connectToProcessor() override;
     
     void paint(Graphics& g) override;
     void resized() override;

@@ -9,38 +9,27 @@
 */
 
 #pragma once
+#include "SvkSettingsPanel.h"
 
-#include "../../../../JuceLibraryCode/JuceHeader.h"
-#include "../../SvkUiPanel.h"
-#include "../../../Structures/OwnedHashMap.h"
-#include "../../../PluginIDs.h"
-#include "../../../PluginState.h"
-
-class DebugSettingsPanel : public SvkUiPanel, public Slider::Listener
+class DebugSettingsPanel : public SvkSettingsPanel, public Timer
 {
-    
+
 public:
-    
-    DebugSettingsPanel(AudioProcessorValueTreeState& processorTreeIn, Array<String>* paramIDsIn);
-    ~DebugSettingsPanel();
-    
-    void connectToProcessor() override;
-    
-    void paint(Graphics& g) override;
-    void resized() override;
-    
-    void sliderValueChanged(Slider *slider) override;
-    
+
+	DebugSettingsPanel(SvkPluginState*);
+
+	~DebugSettingsPanel();
+
+
+	void paint(Graphics& g) override;
+	void resized() override;
+
+	void timerCallback() override;
+
 private:
 
-    OwnedArray<Component> controls;
-    OwnedArray<Label> labels;
-    
-    Array<String>* paramIDs;
-    
-    OwnedArray<ButtonAttachment> buttonAttachments;
-    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<SliderAttachment> sliderAttachments;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DebugSettingsPanel)
+	SvkPluginState* pluginState;
+
+
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DebugSettingsPanel)
 };

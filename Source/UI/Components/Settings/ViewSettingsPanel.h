@@ -10,30 +10,17 @@
 
 #pragma once
 
-#include "../../SvkUiPanel.h"
-#include "../../../PluginState.h"
+#include "SvkSettingsPanel.h"
 
-class ViewSettingsPanel : public SvkUiPanel
+class ViewSettingsPanel : public SvkSettingsPanel
 {
     
 public:
     
-    ViewSettingsPanel(AudioProcessorValueTreeState& processorTreeIn);
-    
+    ViewSettingsPanel(SvkPluginState*);
     ~ViewSettingsPanel();
-    
-    void connectToProcessor() override;
-    
-    void paint(Graphics& g) override;
-    void resized() override;
-    
+      
 private:
-    
-    SvkPluginState* pluginState;
-    
-    OwnedArray<ButtonAttachment> buttonAttachments;
-    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<SliderAttachment> sliderAttachments;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ViewSettingsPanel)
 };

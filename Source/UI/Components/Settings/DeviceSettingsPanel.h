@@ -10,30 +10,33 @@
 
 #pragma once
 
-#include "../../SvkUiPanel.h"
-#include "../../../PluginState.h"
+#include "SvkSettingsPanel.h"
 
-class DeviceSettingsPanel : public SvkUiPanel
+class DeviceSettingsPanel : public SvkSettingsPanel, public Timer
 {
     
 public:
     
-    DeviceSettingsPanel(AudioProcessorValueTreeState& processorTreeIn);
+    DeviceSettingsPanel(SvkPluginState*);
     
     ~DeviceSettingsPanel();
     
-    void connectToProcessor() override;
     
     void paint(Graphics& g) override;
     void resized() override;
+
+	void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
+
+	void timerCallback() override;
+
+	void refreshDevices();
     
 private:
     
     SvkPluginState* pluginState;
-    
-    OwnedArray<ButtonAttachment> buttonAttachments;
-    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<SliderAttachment> sliderAttachments;
+
+	Array<MidiDeviceInfo> availableIns;
+	Array<MidiDeviceInfo> availableOuts;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeviceSettingsPanel)

@@ -10,27 +10,12 @@
 
 #include "ViewSettingsPanel.h"
 
-ViewSettingsPanel::ViewSettingsPanel(AudioProcessorValueTreeState& processorTreeIn)
-    : SvkUiPanel(processorTreeIn)
+ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
+	: SvkSettingsPanel(pluginStateIn, {}, {})
 {
 
 }
 
 ViewSettingsPanel::~ViewSettingsPanel()
 {
-}
-
-void ViewSettingsPanel::connectToProcessor()
-{
-    
-}
-
-void ViewSettingsPanel::paint(Graphics& g)
-{
-    
-}
-
-void ViewSettingsPanel::resized()
-{
-    
 }
