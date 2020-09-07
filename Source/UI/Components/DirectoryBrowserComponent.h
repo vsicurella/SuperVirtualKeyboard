@@ -5,6 +5,9 @@
     Created: 5 Sep 2020 9:59:39pm
     Author:  Vincenzo
 
+	Simple combination of a text editor and button to trigger browsing for a 
+	directory and then displaying the full directory path.
+
   ==============================================================================
 */
 
