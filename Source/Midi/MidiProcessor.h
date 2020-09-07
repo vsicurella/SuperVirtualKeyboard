@@ -16,7 +16,8 @@
 #include "../Structures/MidiFilter.h"
 #include "../Structures/Mode.h"
 
-class SvkMidiProcessor : public MidiMessageCollector,
+class SvkMidiProcessor : public MidiInputCallback,
+						 public MidiKeyboardStateListener,
                          private AudioProcessorValueTreeState::Listener
 {
 public:
@@ -138,7 +139,12 @@ private:
 	String outputSelected = "";
 
 	double startTime;
-	int numMsgs = 0;
+
+	MidiBuffer externalInputBuffer;
+	int numInputMsgs = 0;
+
+	MidiBuffer svkBuffer;
+	int numSvkMsgs = 0;
 
 	MidiBuffer allNotesOffBuffer;
 
