@@ -24,16 +24,6 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 		}
 	)
 {
-	//presetDirectoryText->setBounds(128, 32, 320, 24);
-	//presetDirectoryLbl->setBounds(16, 32, 112, 24);
-	//modeDirectoryText->setBounds(128, 72, 320, 24);
-	//modeDirectoryLbl->setBounds(20, 72, 112, 24);
-	//modeDirectoryBtn->setBounds(456, 72, 23, 24);
-	//settingsDirectoryText->setBounds(128, 112, 320, 24);
-	//settingsDirectoryLbl->setBounds(16, 112, 111, 24);
-	//settingsDirectoryBtn->setBounds(456, 112, 23, 24);
-	//localDirectoryBtn->setBounds(24, 153, 184, 24);
-
 	for (int i = 0; i < flexBox.items.size(); i++)
 	{
 		FlexItem& item = flexBox.items.getReference(i);
@@ -41,30 +31,20 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 		item.minWidth = 500;
 	}
 
-	for (auto control : controls)
-	{
-		LabelledComponent<DirectoryBrowserComponent>* labelledComponent = (LabelledComponent<DirectoryBrowserComponent>*)control;
-		DirectoryBrowserComponent* controlPtr = labelledComponent->get();
-		String controlName = controlPtr->getName();
-		
-		if (controlName == "Preset Directory")
-		{
-			controlPtr->setText(pluginState->getPluginSettings()->getPresetPath());
-		}
-		else if (controlName == "Mode Directory")
-		{
-			controlPtr->setText(pluginState->getPluginSettings()->getModePath());
-		}
-		else if (controlName == "Settings Directory")
-		{
-			controlPtr->setText(pluginState->getPluginSettings()->getSettingsPath());
-		}
-		
-		if (labelledComponent)
-		{
-			labelledComponent->setComponentSize(320, 24);
-		}
-	}
+	presetDirectoryBrowser = static_cast<LabelledComponent<DirectoryBrowserComponent>*>(controls[0]);
+	presetDirectoryBrowser->get()->setText(pluginState->getPluginSettings()->getPresetPath());
+	presetDirectoryBrowser->setComponentSize(320, 24);
+	presetDirectoryBrowser->get()->addListener(this);
+
+	modeDirectoryBrowser = static_cast<LabelledComponent<DirectoryBrowserComponent>*>(controls[1]);
+	modeDirectoryBrowser->get()->setText(pluginState->getPluginSettings()->getModePath());
+	modeDirectoryBrowser->setComponentSize(320, 24);
+	modeDirectoryBrowser->get()->addListener(this);
+
+	settingsDirectoryBrowser = static_cast<LabelledComponent<DirectoryBrowserComponent>*>(controls[2]);
+	settingsDirectoryBrowser->get()->setText(pluginState->getPluginSettings()->getSettingsPath());
+	settingsDirectoryBrowser->setComponentSize(320, 24);
+	settingsDirectoryBrowser->get()->addListener(this);
 
 	setSize(100, 100);
 }
@@ -74,19 +54,20 @@ GeneralSettingsPanel::~GeneralSettingsPanel()
 
 }
 
-void GeneralSettingsPanel::buttonClicked(Button* buttonThatWasClicked)
+void GeneralSettingsPanel::directoryChanged(DirectoryBrowserComponent* browser, File directorySelected)
 {
+	if (browser == presetDirectoryBrowser->get())
+	{
+		pluginState->getPluginSettings()->setPresetDirectory(directorySelected);
+	}
 
+	else if (browser == modeDirectoryBrowser->get())
+	{
+		pluginState->getPluginSettings()->setModeDirectory(directorySelected);
+	}
 
-}
-
-void GeneralSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
-{
-	//if (comboBoxThatHasChanged == midiDeviceBox.get())
-	//{
-	//	int deviceNum = comboBoxThatHasChanged->getSelectedId() - 1;
-
-	//	if (deviceNum >= 0)
-	//		pluginState->getMidiProcessor()->setMidiOutput(availableOuts.getUnchecked(deviceNum).identifier);
-	//}
+	else if (browser == settingsDirectoryBrowser->get())
+	{
+		pluginState->getPluginSettings()->setSettingsDirectory(directorySelected);
+	}
 }

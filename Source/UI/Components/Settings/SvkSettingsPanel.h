@@ -17,7 +17,7 @@ class SvkSettingsPanel : public Component,
 	protected Slider::Listener,
 	protected Button::Listener,
 	protected ComboBox::Listener,
-	protected TextEditor::Listener
+	protected DirectoryBrowserComponent::Listener
 {
 
 public:
@@ -71,11 +71,13 @@ public:
 
 	//=============================================================================================================
 
-	virtual void sliderValueChanged(Slider* sliderThatChanged) override {};
+	virtual void sliderValueChanged(Slider*) override {};
 
-	virtual void buttonClicked(Button* buttonThatWasClicked) override {};
+	virtual void buttonClicked(Button*) override {};
 
-	virtual void comboBoxChanged(ComboBox* comboBoxThatChanged) override {};
+	virtual void comboBoxChanged(ComboBox*) override {};
+
+	virtual void directoryChanged(DirectoryBrowserComponent*, File) override {};
 
 private:
 
