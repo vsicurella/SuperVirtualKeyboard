@@ -18,8 +18,8 @@ class DirectoryBrowserComponent : public Component, public Button::Listener
 {
 public:
 
-	DirectoryBrowserComponent(const String dialogBoxTitle, const File& directoryIn = File(), std::function<void(const File&)> callbackIn = {})
-		: chooser(dialogBoxTitle, directoryIn), directorySetCallback(callbackIn)
+	DirectoryBrowserComponent(const String dialogBoxTitle, const File& directoryIn = File())
+		: chooser(dialogBoxTitle, directoryIn)
 	{
 		setName(dialogBoxTitle);
 
@@ -53,7 +53,7 @@ public:
 		if (chooser.browseForDirectory())
 		{
 			editor->setText(chooser.getResult().getFullPathName(), false);
-			directorySetCallback(chooser.getResult());
+			listeners.call(&DirectoryBrowserComponent::Listener::directoryChanged, this, chooser.getResult());
 		}
 	}
 
@@ -61,6 +61,27 @@ public:
 	{
 		editor->setText(textIn);
 	}
+
+	class Listener
+	{
+	public:
+
+		virtual void directoryChanged(DirectoryBrowserComponent* source, File directorySelected) = 0;
+	};
+
+	void addListener(DirectoryBrowserComponent::Listener* listenerIn)
+	{
+		listeners.add(listenerIn);
+	}
+
+	void removeListener(DirectoryBrowserComponent::Listener* listenerIn)
+	{
+		listeners.remove(listenerIn);
+	}
+
+protected:
+
+	ListenerList<DirectoryBrowserComponent::Listener> listeners;
 
 private:
 
