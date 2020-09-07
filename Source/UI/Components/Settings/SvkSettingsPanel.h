@@ -11,6 +11,7 @@
 #pragma once
 #include "../../../PluginState.h"
 #include "../DirectoryBrowserComponent.h"
+#include "../LabelledComponent.h"
 
 class SvkSettingsPanel : public Component,
 	private Slider::Listener,
@@ -49,11 +50,11 @@ public:
 		: pluginState(pluginStateIn), controlIdentifiers(controlIdsIn), controlTypes(controlTypesIn)
 	{
 		flexBox = FlexBox(
-			FlexBox::Direction::row,
+			FlexBox::Direction::column,
 			FlexBox::Wrap::wrap,
 			FlexBox::AlignContent::flexStart,
-			FlexBox::AlignItems::stretch,
-			FlexBox::JustifyContent::flexStart);
+			FlexBox::AlignItems::flexStart,
+			FlexBox::JustifyContent::center);
 
 		setupControls();
 	}
@@ -87,8 +88,8 @@ private:
 			Identifier id = controlIdentifiers[i];
 			SvkControlProperties properties = controlTypes[i];
 
-			Component* control;
-			Label* controlLabel;
+			Component* control = nullptr;
+
 
 			switch (properties.controlType)
 			{
@@ -98,32 +99,20 @@ private:
 			
 			case ControlTypeNames::MenuControl:
 				control = new ComboBox(properties.controlName);
-				controlLabel = (Label*)controls.add(new Label(properties.controlName));
-				controlLabels.set(control, controlLabel);
+				control = new LabelledComponent<ComboBox>(*((ComboBox*)control), properties.controlName + ":");
+				((LabelledComponent<ComboBox>*)control)->setComponentSize(320, 24);
 				break;
 			
 			case ControlTypeNames::DirectoryControl:
 				control = new DirectoryBrowserComponent(properties.controlName);
-				controlLabel = (Label*)controls.add(new Label(properties.controlName));
-				controlLabels.set(control, controlLabel);
+				control = new LabelledComponent<DirectoryBrowserComponent>(*((DirectoryBrowserComponent*)control), properties.controlName + ":");
+				((LabelledComponent<DirectoryBrowserComponent>*)control)->setComponentSize(320, 24);
 				break;
 
 			default:
 				control = new Slider(properties.controlName);
-				controlLabel = (Label*)controls.add(new Label(properties.controlName));
-				controlLabels.set(control, controlLabel);
-			}
-
-			if (controlLabel)
-			{
-				controlLabel->setText(controlLabel->getName() + ":", dontSendNotification);
-				controlLabel->setName(controlLabel->getName() + "_Label");
-				flexBox.items.add(FlexItem(*controlLabel)
-					.withMinWidth(controlMinWidth)
-					.withMinHeight(controlMinHeight)
-					.withMargin(controlMargin)
-					.withFlex(controlFlex));
-				addAndMakeVisible(controlLabel);
+				control = new LabelledComponent<Slider>(*((Slider*)control), properties.controlName + ":");
+				((LabelledComponent<Slider>*)control)->setComponentSize(320, 24);
 			}
 
 			if (control)
@@ -154,7 +143,7 @@ protected:
 	HashMap<Identifier, Component*, IDasStringHash> idToControl;
 
 	int controlMinWidth = 250;
-	int controlMinHeight = 50;
+	int controlMinHeight = 48;
 	FlexItem::Margin controlMargin = FlexItem::Margin(10, 5, 10, 10);
 	float controlFlex = 1.0f;
 };
