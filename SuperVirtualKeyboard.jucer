@@ -3,7 +3,7 @@
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
               companyName="Everytone" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Instrument,Tools" pluginFormats="buildStandalone,buildVST,buildVST3"
+              pluginVST3Category="Tools" pluginFormats="buildStandalone,buildVST,buildVST3"
               pluginAUMainType="'aumi'" version="0.03" displaySplashScreen="1"
               jucerFormatVersion="1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
