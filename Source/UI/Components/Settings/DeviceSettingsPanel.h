@@ -35,6 +35,11 @@ private:
     
     SvkPluginState* pluginState;
 
+	LabelledComponent<ComboBox>* inputBoxLabelled;
+	LabelledComponent<ComboBox>* outputBoxLabelled;
+	ComboBox* inputBox;
+	ComboBox* outputBox;
+
 	Array<MidiDeviceInfo> availableIns;
 	Array<MidiDeviceInfo> availableOuts;
 
