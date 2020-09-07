@@ -32,10 +32,6 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
 	for (int i = 0; i < 128; i++)
 		for (int ch = 1; ch <= 16; ch++)
 			allNotesOffBuffer.addEvent(MidiMessage::noteOff(ch, i), ch * 16 + i);
-        
-    // default sample rate
-    reset(41000);
-  
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -96,6 +92,13 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 		periodShift = midiSettingsNode[IDs::periodShift];
 		midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
 
+		// TODO: check if devices exist, give a name to imply if it doesn't
+		if (JUCEApplication::isStandaloneApp)
+		{
+			setMidiInput(midiSettingsNode[IDs::midiInputName]);
+			setMidiOutput(midiSettingsNode[IDs::midiOutputName]);
+		}
+
         return true;
     }
     
@@ -128,7 +131,6 @@ MidiKeyboardState* SvkMidiProcessor::getOriginalKeyboardState()
 {
     return originalKeyboardState.get();
 }
-
 
 MidiKeyboardState* SvkMidiProcessor::getRemappedKeyboardState()
 {
@@ -433,6 +435,11 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 {
     // TODO: handle note offs if period/transpose is changed before note offs
     
+	// Combine external inputs
+	midiMessages.addEvents(externalInputBuffer, 0, numInputMsgs, 0);
+	externalInputBuffer.clear();
+	numInputMsgs = 0;
+
     // Process external input
     auto inputEvents = MidiBuffer::Iterator(midiMessages);
     MidiMessage msg;
@@ -469,15 +476,6 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 		inputSize++;
     }
 
-	MidiBuffer svkBuffer;
-	if (numMsgs > 0)
-	{
-		// TODO: Figure out why SVK messages don't go through if I use numMsgs as numSamples arg
-		// even when I can confirm numMsgs is greater than 0
-		removeNextBlockOfMessages(svkBuffer, 4096);
-		numMsgs = 0;
-	}
-
 	// Output Filtering on all MIDI events
 	auto allMidiEvents = MidiBuffer::Iterator(svkBuffer);
 	while (allMidiEvents.getNextEvent(msg, smpl))
@@ -500,6 +498,9 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 
 		combinedMessages.addEvent(msg, inputSize + smpl);
 	}
+
+	svkBuffer.clear();
+	numSvkMsgs = 0;
 
 	midiMessages.swapWith(combinedMessages);
 	sendBufferToOutputs(midiMessages);
@@ -526,8 +527,7 @@ void SvkMidiProcessor::allNotesOff()
 	int smplNum;
 	while (events.getNextEvent(msg, smplNum))
 	{
-		numMsgs++;
-		addMessageToQueue(msg);
+		externalInputBuffer.addEvent(msg, numInputMsgs++);
 	}
 }
 
@@ -583,21 +583,18 @@ void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, 
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
 	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
-	numMsgs++;
-	addMessageToQueue(msg);
+	svkBuffer.addEvent(msg, numSvkMsgs++);
 }
 
 void SvkMidiProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
 	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
-	numMsgs++;
-	addMessageToQueue(msg);
+	svkBuffer.addEvent(msg, numSvkMsgs++);
 }
 
 void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg)
 {
-    MidiMessage myMsg = MidiMessage(msg);
-	numMsgs++;
-	addMessageToQueue(myMsg);
+	MidiMessage myMsg = MidiMessage(msg);
+	externalInputBuffer.addEvent(myMsg, numInputMsgs++);
 }

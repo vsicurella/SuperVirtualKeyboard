@@ -100,7 +100,6 @@ void SvkAudioProcessor::changeProgramName (int index, const String& newName)
 //==============================================================================
 void SvkAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-	pluginState->getMidiProcessor()->reset(sampleRate);
     sendChangeMessage();
 }
 
