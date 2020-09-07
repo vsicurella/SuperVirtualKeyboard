@@ -18,12 +18,13 @@ class DeviceSettingsPanel : public SvkSettingsPanel, public Timer
 public:
     
     DeviceSettingsPanel(SvkPluginState*);
-    
     ~DeviceSettingsPanel();
     
     
     void paint(Graphics& g) override;
     void resized() override;
+
+	void visibilityChanged() override;
 
 	void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
 
@@ -33,8 +34,6 @@ public:
     
 private:
     
-    SvkPluginState* pluginState;
-
 	LabelledComponent<ComboBox>* inputBoxLabelled;
 	LabelledComponent<ComboBox>* outputBoxLabelled;
 	ComboBox* inputBox;

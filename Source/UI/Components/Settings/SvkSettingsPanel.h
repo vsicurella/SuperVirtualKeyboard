@@ -14,10 +14,10 @@
 #include "../LabelledComponent.h"
 
 class SvkSettingsPanel : public Component,
-	private Slider::Listener,
-	private Button::Listener,
-	private ComboBox::Listener,
-	private TextEditor::Listener
+	protected Slider::Listener,
+	protected Button::Listener,
+	protected ComboBox::Listener,
+	protected TextEditor::Listener
 {
 
 public:
@@ -130,7 +130,7 @@ private:
 	}
 
 protected:
-
+	
 	SvkPluginState* pluginState;
 
 	Array<Identifier> controlIdentifiers;

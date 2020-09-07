@@ -41,6 +41,10 @@ public:
         //view->setScrollBarsShown(true, false);
         //addAndMakeVisible(view.get());
 
+		// Ability to change input and output device for Standalone version
+		if (JUCEApplicationBase::isStandaloneApp())
+			panelNames.insert(1, "Device");
+
 		for (auto panelName : panelNames)
 		{
 			if (panelName == "General")
@@ -126,9 +130,6 @@ private:
 	StringArray panelNames =
 	{
 		"General"
-#if JucePlugin_Build_Standalone
-		, "Device"
-#endif
 		, "View"
 #if JUCE_DEBUG
 		, "Debug"
