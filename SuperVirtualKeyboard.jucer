@@ -94,6 +94,8 @@
         </GROUP>
         <FILE id="V4qizf" name="DirectoryBrowserComponent.h" compile="0" resource="0"
               file="Source/UI/Components/DirectoryBrowserComponent.h"/>
+        <FILE id="bA5eBo" name="LabelledComponent.h" compile="0" resource="0"
+              file="Source/UI/Components/LabelledComponent.h"/>
         <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
               file="Source/UI/Components/PluginControlComponent.cpp"/>
         <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"

@@ -34,17 +34,19 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 	//settingsDirectoryBtn->setBounds(456, 112, 23, 24);
 	//localDirectoryBtn->setBounds(24, 153, 184, 24);
 
-	for (auto item : flexBox.items)
+	for (int i = 0; i < flexBox.items.size(); i++)
 	{
-		item.minHeight = 24;
+		FlexItem& item = flexBox.items.getReference(i);
 		item.maxHeight = 24;
+		item.minWidth = 500;
 	}
 
 	for (auto control : controls)
 	{
-		DirectoryBrowserComponent* controlPtr = (DirectoryBrowserComponent*)control;
-		String controlName = control->getName();
-
+		LabelledComponent<DirectoryBrowserComponent>* labelledComponent = (LabelledComponent<DirectoryBrowserComponent>*)control;
+		DirectoryBrowserComponent* controlPtr = labelledComponent->get();
+		String controlName = controlPtr->getName();
+		
 		if (controlName == "Preset Directory")
 		{
 			controlPtr->setText(pluginState->getPluginSettings()->getPresetPath());
@@ -56,6 +58,11 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 		else if (controlName == "Settings Directory")
 		{
 			controlPtr->setText(pluginState->getPluginSettings()->getSettingsPath());
+		}
+		
+		if (labelledComponent)
+		{
+			labelledComponent->setComponentSize(320, 24);
 		}
 	}
 

@@ -22,6 +22,20 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 		}
 	)
 {
+	inputBoxLabelled = (LabelledComponent<ComboBox>*) flexBox.items[0].associatedComponent;
+	inputBoxLabelled->setComponentSize(320, 24);
+	inputBox = inputBoxLabelled->get();
+
+	outputBoxLabelled = (LabelledComponent<ComboBox>*) flexBox.items[1].associatedComponent;
+	outputBoxLabelled->setComponentSize(320, 24);
+	outputBox = outputBoxLabelled->get();
+
+	FlexItem& itemIn = flexBox.items.getReference(0);
+	itemIn = itemIn.withMaxHeight(48).withMinWidth(inputBoxLabelled->getWidth());
+
+	FlexItem& itemOut = flexBox.items.getReference(1);
+	itemOut = itemOut.withMaxHeight(48).withMinWidth(outputBoxLabelled->getWidth());
+
 	refreshDevices();
 	startTimer(1000);
 }
@@ -71,35 +85,35 @@ void DeviceSettingsPanel::refreshDevices()
 {
 	Array<MidiDeviceInfo> inputDevices = MidiInput::getAvailableDevices();
 
-	ComboBox* midiInputMenu = dynamic_cast<ComboBox*>(controls[1]);
-	//midiInputMenu->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
+	//if (pluginState->getMidiProcessor())
+	//	inputBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
 
-	if (availableIns != inputDevices && !midiInputMenu->isPopupActive())
+	if (availableIns != inputDevices && !inputBox->isPopupActive())
 	{
 		availableOuts = inputDevices;
-		midiInputMenu->clear();
+		inputBox->clear();
 
 		int i = 0;
 		for (auto device : availableOuts)
 		{
-			midiInputMenu->addItem(device.name, ++i);
+			inputBox->addItem(device.name, ++i);
 		}
 	}
 
 	Array<MidiDeviceInfo> outputDevices = MidiOutput::getAvailableDevices();
+	
+	//if (pluginState->getMidiProcessor())
+	//	outputBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
 
-	ComboBox* midiOutputMenu = dynamic_cast<ComboBox*>(controls[1]);
-	//midiOutputMenu->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
-
-	if (availableOuts != outputDevices && !midiOutputMenu->isPopupActive())
+	if (availableOuts != outputDevices && !outputBox->isPopupActive())
 	{
 		availableOuts = outputDevices;
-		midiOutputMenu->clear();
+		outputBox->clear();
 
 		int i = 0;
 		for (auto device : availableOuts)
 		{
-			midiOutputMenu->addItem(device.name, ++i);
+			outputBox->addItem(device.name, ++i);
 		}
 	}
 }
