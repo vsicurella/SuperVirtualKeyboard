@@ -65,6 +65,9 @@ public:
 	class Listener
 	{
 	public:
+        
+        Listener() {};
+        virtual ~Listener() {};
 
 		virtual void directoryChanged(DirectoryBrowserComponent* source, File directorySelected) = 0;
 	};
