@@ -174,7 +174,7 @@ public:
 
 	bool hasOwnership() const
 	{
-		return isdeleteComponent;
+		return deleteComponent;
 	}
 
 	LabelPosition getLabelPosition() const
