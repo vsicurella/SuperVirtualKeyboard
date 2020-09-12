@@ -164,12 +164,35 @@ bool SvkPluginEditor::exportAbletonMap()
 
 void SvkPluginEditor::showSettingsDialog()
 {
-	settingsPanel.reset(new SettingsContainer(pluginState));
-	
-	controlComponent->setVisible(false);
-	addAndMakeVisible(settingsPanel.get());
-	settingsPanel->setBounds(getLocalBounds());
-	settingsPanel->addChangeListener(this);
+	if (!settingsPanelOpen)
+	{
+		settingsPanel.reset(new SettingsContainer(pluginState));
+		settingsPanel->addChangeListener(this);
+
+		settingsPanelOpen = true;
+		pluginEditorNode.setProperty(IDs::settingsOpen, true, nullptr);
+
+		setSize(getWidth(), getHeight() + defaultSettingsHeight);
+		settingsPanel->setBounds(getLocalBounds().withY(getHeight() - defaultSettingsHeight));
+		addAndMakeVisible(settingsPanel.get());
+	}
+	else
+	{
+		hideSettings();
+	}
+}
+
+void SvkPluginEditor::hideSettings()
+{
+	settingsPanel->removeChangeListener(this);
+	settingsPanel->setVisible(false);
+	settingsPanel = nullptr;
+
+	settingsPanelOpen = false;
+	pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
+
+	setSize(pluginEditorNode[IDs::windowBoundsW], getHeight() - defaultSettingsHeight);
+	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -284,15 +307,18 @@ void SvkPluginEditor::paint(Graphics& g)
 
 void SvkPluginEditor::resized()
 {	
-	AudioProcessorEditor::resized();
+	int basicHeight = getHeight();
 
-	controlComponent->setSize(getWidth(), getHeight());
+	if (settingsPanelOpen)
+	{
+		basicHeight -= defaultSettingsHeight;
+		settingsPanel->setBounds(0, controlComponent->getY() + basicHeight, getWidth(), defaultSettingsHeight);
+	}
 
-    if (settingsPanel.get())
-		settingsPanel->setSize(getWidth(), getHeight());
+	controlComponent->setSize(getWidth(), basicHeight);
 	
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-	pluginEditorNode.setProperty(IDs::windowBoundsH, getHeight(), nullptr);
+	pluginEditorNode.setProperty(IDs::windowBoundsH, basicHeight, nullptr);
 }
 
 //==============================================================================
@@ -389,13 +415,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     // Settings closed
     if (source == settingsPanel.get())
     {
-		settingsPanel->removeChangeListener(this);
-		settingsPanel->setVisible(false);
-		settingsPanel = nullptr;
-
-        controlComponent->setVisible(true);
-        controlComponent->resized();
-		restoreWindowState();
+		hideSettings();
     }
 }
 

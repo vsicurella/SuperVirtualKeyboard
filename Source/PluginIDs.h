@@ -100,6 +100,8 @@ static Identifier pluginEditorNode("PluginWindow");
 static Identifier windowBoundsW("WindowW");
 static Identifier windowBoundsH("WindowH");
 static Identifier viewportPosition("ViewportPosition");
+static Identifier settingsOpen("SettingsOpen");
+static Identifier settingsTabNum("SettingsTabNum");
 
 // TODO: Refactor piano -> keyboard
 // Keyboard Component

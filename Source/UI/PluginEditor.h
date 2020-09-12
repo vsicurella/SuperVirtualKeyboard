@@ -68,6 +68,7 @@ public:
     void showExportMenu();
     
     void showSettingsDialog();
+	void hideSettings();
 
 	void commitCustomScale();
 
@@ -152,6 +153,9 @@ private:
 
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
+
+	int defaultSettingsHeight = 300;
+	bool settingsPanelOpen = false;
     bool isColorEditing = false;
 
     //std::unique_ptr<SettingsContainer> settingsContainer;
