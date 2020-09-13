@@ -129,14 +129,12 @@ static Identifier pianoKeyColorsNode("KeyColors");
 static Identifier pianoKeyColorsLayer("LayerColors");
 static Identifier pianoKeyColorsDegree("DegreeColors");
 static Identifier pianoKeyColorsIndividual("IndividualColors");
-static Identifier pianoKeyColorReset("ResetColor");
 static Identifier pianoKeyPlaceOrder("KeyOrderPlaces");
 static Identifier pianoKeyPlaceDegree("KeyDegreePlaces");
 static Identifier pianoKeyPlaceSingle("KeySinglePlaces");
 static Identifier pianoKeyRatioOrder("KeyOrderRatios");
 static Identifier pianoKeyRatioDegree("KeyDegreeRatios");
 static Identifier pianoKeyRatioSingle("KeySingleRatios");
-static Identifier colorSelected("ColorSelected");
 
 // Piano Key Component
 static Identifier pianoKeyTreeNode("PianoKeyTree");
@@ -150,6 +148,11 @@ static Identifier pianoKeyYOffset("YOffset");
 static Identifier pianoKeyShowNumber("ShowNumber");
 static Identifier pianoKeyShowNoteLabel("ShowKeyNoteLabel");
 static Identifier pianoKeyColor("KeyColor");
+
+// Control Related IDs
+static Identifier colorSelected("ColorSelected");
+static Identifier pianoKeyColorReset("ResetColor");
+static Identifier pianoKeyPaintType("PaintType");
 
 // Backwards compatibility
 static Identifier alphaPluginStateNode("PluginState");

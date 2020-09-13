@@ -12,7 +12,8 @@
 
 #include "SvkSettingsPanel.h"
 
-class ColourSettingsPanel : public SvkSettingsPanel
+class ColourSettingsPanel : public SvkSettingsPanel,
+							public ChangeListener
 {
 public:
 
@@ -29,6 +30,10 @@ public:
 	void mouseDown(const MouseEvent& event) override;
 
 	void mouseUp(const MouseEvent& event) override;
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
+
+	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
 
 	ColourSelector* getColourSelector();
 

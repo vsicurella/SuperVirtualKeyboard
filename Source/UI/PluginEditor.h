@@ -153,7 +153,6 @@ private:
 	Keyboard* virtualKeyboard;
 
 	std::unique_ptr<SettingsContainer> settingsPanel;
-    ColourSelector* colourSelector;
 
 	int defaultHeight = 210;
 	bool settingsPanelOpen = false;
