@@ -162,11 +162,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     periodShiftLbl->setColour (TextEditor::textColourId, Colours::black);
     periodShiftLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    editColorsBtn.reset (new TextButton ("Edit Colors Button"));
-    addAndMakeVisible (editColorsBtn.get());
-    editColorsBtn->setButtonText (TRANS("Edit Colors"));
-    editColorsBtn->addListener (this);
-
     keyStyleBox.reset (new ComboBox ("Key Style Box"));
     addAndMakeVisible (keyStyleBox.get());
     keyStyleBox->setEditableText (false);
@@ -296,7 +291,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
 	// DISABLED BECAUSE NOT IMPLEMENTED
-    editColorsBtn->setEnabled(true);
     mapModeBox->setItemEnabled(3, false);
 	//keyStyleBox->setItemEnabled(2, false);
 	//keyStyleBox->setItemEnabled(4, false);
@@ -329,7 +323,6 @@ PluginControlComponent::~PluginControlComponent()
     midiChannelLbl = nullptr;
     noteNumsBtn = nullptr;
     periodShiftLbl = nullptr;
-    editColorsBtn = nullptr;
     keyStyleBox = nullptr;
     mapStyleLbl = nullptr;
     highlightStyleBox = nullptr;
@@ -498,8 +491,7 @@ void PluginControlComponent::resized()
 	midiChannelLbl->setBounds(periodShiftSld->getRight() + gap, bottomBarY, 96, barHeight);
 	midiChannelSld->setBounds(midiChannelLbl->getRight(), bottomBarY, 86, barHeight);
 
-	editColorsBtn->setBounds(getWidth() - 80 - gap, bottomBarY, 80, barHeight);
-	keyStyleBox->setBounds(editColorsBtn->getX() - 136 - gap, bottomBarY, 136, barHeight);
+	keyStyleBox->setBounds(getWidth() - 136 - gap, bottomBarY, 136, barHeight);
 	highlightStyleBox->setBounds(keyStyleBox->getX() - 96 - gap, bottomBarY, 96, barHeight);
 	noteNumsBtn->setBounds(highlightStyleBox->getX() - 24 - gap, bottomBarY, 24, barHeight);
 
@@ -583,10 +575,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     {
 		if (mode2ViewBtn->getToggleState())
 			appCmdMgr->invokeDirectly(IDs::CommandIDs::setModeViewed, true);
-    }
-    else if (buttonThatWasClicked == editColorsBtn.get())
-    {
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::beginColorEditing, true);
     }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {

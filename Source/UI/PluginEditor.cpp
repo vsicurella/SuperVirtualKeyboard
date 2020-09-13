@@ -34,16 +34,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	virtualKeyboard->addListener(pluginState->getMidiProcessor());
 	modeViewedChanged(pluginState->getModeViewed(), pluginState->getModeSelectorViewed(), pluginState->getModeViewedSlotNumber());
 
-	colorChooserWindow.reset(new ColorChooserWindow("Color Chooser", Colours::slateblue, DocumentWindow::closeButton));
-	colorChooserWindow->setSize(450, 450);
-	colorChooserWindow->addChangeListener(this);
-	colorChooserWindow->addToDesktop();
-
-	colorSelector.reset(new ColourSelector());
-	colorSelector->setSize(450, 450);
-	colorChooserWindow->setContentOwned(colorSelector.get(), true);
-	colorSelector->addChangeListener(this);
-
 	pluginState->addListener(this);
 
 	//for (auto paramID : processor.getParamIDs())
@@ -90,15 +80,12 @@ SvkPluginEditor::~SvkPluginEditor()
 	//	processor.svkValueTree.removeParameterListener(paramID, this);
 	//}
 
-	colorSelector->removeChangeListener(this);
-	colorChooserWindow->removeChangeListener(this);
 	virtualKeyboard->removeListener(pluginState->getMidiProcessor());
     pluginState->removeListener(this);
 
+	settingsPanel = nullptr;
 	controlComponent = nullptr;
 	mappingHelper = nullptr;
-	colorSelector = nullptr;
-	colorChooserWindow = nullptr;
 }
 
 //==============================================================================
@@ -292,7 +279,7 @@ void SvkPluginEditor::applyMap()
 
 void SvkPluginEditor::beginColorEditing()
 {
-	colorChooserWindow->setVisible(true);
+	//colorChooserWindow->setVisible(true);
 	virtualKeyboard->setUIMode(UIMode::editMode);
     isColorEditing = true;
 }
@@ -332,9 +319,6 @@ void SvkPluginEditor::timerCallback()
 
 void SvkPluginEditor::userTriedToCloseWindow()
 {
-	if (colorChooserWindow->isVisible())
-		colorChooserWindow->closeButtonPressed();
-
 	setVisible(false);
 }
 
@@ -386,28 +370,33 @@ void SvkPluginEditor::modeInfoChanged(Mode* modeEdited)
 void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo)
 {
 	DBG("Settings changed to " + tabName + ", tab: " + String(tabIndex));
-	panelChangedTo->resized();
+	
+	if (panelChangedTo->getName() == "ColourSettingsPanel")
+	{
+		// TODO clean up
+		beginColorEditing();
+
+		colourSelector = static_cast<ColourSettingsPanel*>(panelChangedTo)->getColourSelector();
+		colourSelector->addChangeListener(this);
+	}
+
+	else if (isColorEditing)
+	{
+		isColorEditing = false;
+		colourSelector->removeChangeListener(this);
+		colourSelector = nullptr;
+		virtualKeyboard->setUIMode(UIMode::playMode);
+	}
 }
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	// Color editing is finished
-	if (source == colorChooserWindow.get())
-	{
-		isColorEditing = false;
-
-		//virtualKeyboard->updatePianoNode();
-		//virtualKeyboard->updateKeyColors();
-		virtualKeyboard->setUIMode(UIMode::playMode);
-		colorChooserWindow->setVisible(false);
-	}
-
 	// Color changed
-	if (source == colorSelector.get())
+	if (source == colourSelector)
 	{
 		virtualKeyboard->getProperties().set(
 			IDs::colorSelected,
-			colorSelector->getCurrentColour().toString()
+			colourSelector->getCurrentColour().toString()
 		);
 	}
 
