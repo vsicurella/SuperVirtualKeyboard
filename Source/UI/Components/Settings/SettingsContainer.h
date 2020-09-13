@@ -14,6 +14,7 @@
 #include "GeneralSettingsPanel.h"
 #include "DeviceSettingsPanel.h"
 #include "ViewSettingsPanel.h"
+#include "ColourSettingsPanel.h"
 //#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
 
@@ -54,6 +55,9 @@ public:
 			else if (panelName == "View")
 				panels.add(new ViewSettingsPanel(pluginState));
 
+			else if (panelName == "Colors")
+				panels.add(new ColourSettingsPanel(pluginState));
+
 			else if (panelName == "Debug")
 				panels.add(new DebugSettingsPanel(pluginState));
 		}
@@ -62,8 +66,8 @@ public:
 		{
 			addTab(panelNames[i], tabColour, panels[i], true);
 		}
-        
-        setCurrentTabIndex(0);
+
+        setCurrentTabIndex(0, false);
         setSize(100, 100);
     }
 
@@ -125,6 +129,7 @@ private:
 	{
 		"General"
 		, "View"
+		, "Colors"
 #if JUCE_DEBUG
 		, "Debug"
 #endif
