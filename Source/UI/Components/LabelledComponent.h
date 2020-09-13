@@ -13,7 +13,6 @@
 #pragma once
 #include <JuceHeader.h>
 
-template<class ComponentType>
 class LabelledComponent : public Component
 {
 
@@ -37,22 +36,27 @@ public:
 public:
 
 	LabelledComponent(
-		ComponentType&      componentIn, 
+		Component&          componentIn, 
 		String              labelTextIn, 
 		bool                ownsComponent = true, 
 		LabelPosition       positionIn = LabelPosition::LeftOfComponent, 
 		LabelJustification  justificationIn = LabelJustification::LeftJustify,
-		Font                fontIn = Font()) 
-		 : 
-		componentReference(componentIn), 
-		deleteComponent(ownsComponent), 
-		position(positionIn), 
-		justification(justificationIn),
-		font(fontIn)
+		Font                fontIn = Font()
+	) : 
+		componentReference  (componentIn), 
+		deleteComponent     (ownsComponent), 
+		position            (positionIn), 
+		justification       (justificationIn),
+		font                (fontIn)
 	{
-		componentCheck(&componentIn);
+		(Component*)&componentReference;
+
+		if (deleteComponent)
+		{
+			component.reset(&componentReference);
+		}
 		
-		addAndMakeVisible((Component*) &componentReference);
+		addAndMakeVisible(&componentReference);
 
 		label.reset(new Label(componentReference.getName() + "_Label"));
 		label->setText(labelTextIn, dontSendNotification);
@@ -66,7 +70,7 @@ public:
 	~LabelledComponent()
 	{
 		if (deleteComponent)
-			delete (ComponentType*) &componentReference;
+			component = nullptr;
 
 		label = nullptr;
 	}
@@ -157,7 +161,7 @@ public:
 		resized();
 	}
 
-	ComponentType* get()
+	Component* get()
 	{
 		return &componentReference;
 	}
@@ -182,13 +186,18 @@ public:
 		return position;
 	}
 
+public:
+
+	template <class ComponentType>
+	static ComponentType* getComponentPointer(LabelledComponent* labelledComponentIn)
+	{
+		return dynamic_cast<ComponentType*>(labelledComponentIn->get());
+	}
+
 private:
 
-	void componentCheck(Component* componentIn) {};
-
-private:
-
-	ComponentType& componentReference;
+	std::unique_ptr<Component> component;
+	Component& componentReference;
 	bool deleteComponent;
 	LabelPosition position;
 	LabelJustification justification;
