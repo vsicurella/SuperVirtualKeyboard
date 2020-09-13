@@ -20,10 +20,8 @@
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent,
-                            public ChangeBroadcaster
-                            
-{    
+class SettingsContainer : public TabbedComponent
+{
 public:
     
     SettingsContainer(SvkPluginState* pluginStateIn)
@@ -60,65 +58,61 @@ public:
 				panels.add(new DebugSettingsPanel(pluginState));
 		}
 
-        
-		addTab("Back", tabColour.brighter(), new Component(), true);
-
 		for (int i = 0; i < panels.size(); i++)
 		{
-			addTab(panelNames[i], tabColour, panels[i], false);
+			addTab(panelNames[i], tabColour, panels[i], true);
 		}
         
-        setCurrentTabIndex(1);
+        setCurrentTabIndex(0);
         setSize(100, 100);
     }
 
     ~SettingsContainer()
     {
 		view = nullptr;
-		panels.clear();
     }
     
-    Component* getComponentViewed()
+    SvkSettingsPanel* getComponentViewed()
     {
         return componentViewed;
     }
     
     void currentTabChanged (int newCurrentTabIndex, const String &newCurrentTabName) override
     {
-        if (newCurrentTabIndex == 0)
-        {
-            sendChangeMessage();
-            return;
-        }
-        
-        componentViewed = panels.getUnchecked(newCurrentTabIndex - 1);
-        
-        if (getParentComponent())
-            resized();
+        componentViewed = panels.getUnchecked(newCurrentTabIndex);
+		componentViewed->resized();
+
+		listeners.call(&SettingsContainer::Listener::settingsTabChanged, 
+			newCurrentTabIndex, 
+			newCurrentTabName, 
+			componentViewed
+		);
     }
 
-    void popupMenuClickOnTab (int tabIndex, const String &tabName) override
-    {
-        
-    }
-    
-    void resized() override
-    {
-		TabbedComponent::resized();
-		int tabHeight = getTabBarDepth();
+public:
 
-		if (componentViewed && componentViewed->getNumChildComponents() > 0)
-			componentViewed->setBounds(getLocalBounds().withHeight(getHeight() - tabHeight).withY(tabHeight));
-    }
+	class Listener
+	{
+	public:
+		virtual void settingsTabChanged(int newTabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) = 0;
+	};
+
+	void addListener(SettingsContainer::Listener* listenerIn) { listeners.add(listenerIn); }
+
+	void removeListener(SettingsContainer::Listener* listenerIn) { listeners.remove(listenerIn); }
+
+protected:
+
+	ListenerList<Listener> listeners;
 
 private:
 
 	SvkPluginState* pluginState;
 
-	OwnedArray<SvkSettingsPanel> panels;
+	Array<SvkSettingsPanel*> panels;
 	std::unique_ptr<Viewport> view;
 
-	Component* componentViewed = nullptr;
+	SvkSettingsPanel* componentViewed = nullptr;
 
 	int defaultControlHeight = 50;
 

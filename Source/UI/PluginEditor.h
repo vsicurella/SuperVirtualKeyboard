@@ -33,6 +33,7 @@ using namespace VirtualKeyboard;
 class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private SvkPluginState::Listener,
+						private SettingsContainer::Listener,
 						private ChangeListener,
                         private AudioProcessorValueTreeState::Listener,
 						private Timer
@@ -115,6 +116,8 @@ public:
 
 	//==============================================================================
 
+	void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
+
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     
 	//==============================================================================
@@ -154,7 +157,7 @@ private:
 	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
     std::unique_ptr<ColourSelector> colorSelector;
 
-	int defaultSettingsHeight = 300;
+	int defaultHeight = 210;
 	bool settingsPanelOpen = false;
     bool isColorEditing = false;
 
