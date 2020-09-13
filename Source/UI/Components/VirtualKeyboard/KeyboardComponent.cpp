@@ -151,7 +151,7 @@ void Keyboard::initializeKeys(int size)
 
 void Keyboard::paint(juce::Graphics& g)
 {
-	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
+	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 }
 
 void Keyboard::paintOverChildren(juce::Graphics& g)
