@@ -19,8 +19,24 @@ public:
     
     ViewSettingsPanel(SvkPluginState*);
     ~ViewSettingsPanel();
+
+	void comboBoxChanged(ComboBox*) override;
+	void sliderValueChanged(Slider*) override;
+	void buttonClicked(Button*) override;
+
+	void setKeyboardPointer(VirtualKeyboard::Keyboard*) override;
       
 private:
+
+	LabelledComponent* layoutLabel;
+	LabelledComponent* highlightLabel;
+	LabelledComponent* ratioLabel;
+
+	ComboBox* keyLayoutBox;
+	ComboBox* keyHighlightBox;
+	Slider* keyRatioSlider;
+
+	TextButton* showNoteNumbers;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ViewSettingsPanel)
 };
