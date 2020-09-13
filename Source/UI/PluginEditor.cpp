@@ -177,6 +177,15 @@ void SvkPluginEditor::hideSettings()
 	settingsPanelOpen = false;
 	pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
 
+	// TODO clean up
+	if (isColorEditing)
+	{
+		isColorEditing = false;
+		colourSelector->removeChangeListener(this);
+		colourSelector = nullptr;
+		virtualKeyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+	}
+
 	setSize(pluginEditorNode[IDs::windowBoundsW], getHeight() - defaultHeight);
 	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
 }
