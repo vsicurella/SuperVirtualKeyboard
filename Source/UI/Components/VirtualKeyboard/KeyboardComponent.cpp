@@ -66,6 +66,8 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
 		keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
 		lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
 		keySizeRatio = (float) pianoNode[IDs::pianoWHRatio];
+
+		keyPositioner.setKeyPlacement(keyPlacementSelected);
         
         // safeguard
         if (keySizeRatio < 0.01)
@@ -1160,6 +1162,7 @@ void Keyboard::setKeySizeRatio(float keySizeRatioIn)
 {
 	keySizeRatio = keySizeRatioIn;
 	pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
+	setSize(getPianoWidth(getHeight()), getHeight());
 }
 
 void Keyboard::setKeyWidthSize(int widthSizeIn)
