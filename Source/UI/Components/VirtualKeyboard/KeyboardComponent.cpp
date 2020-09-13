@@ -1180,7 +1180,7 @@ void Keyboard::allNotesOff()
 
 	for (int i = 0; i < keys.size(); i++)
 	{
-			triggerKey(i, false);
+		triggerKey(i, false);
 	}
 }
 
@@ -1199,11 +1199,8 @@ void Keyboard::isolateLastNote()
 void Keyboard::retriggerNotes()
 {
 	Array<int> retrigger = Array<int>(keysOn);
-
-	allNotesOff();
-
-	for (int i = 0; i < retrigger.size(); i++)
-		noteOn(midiChannelOut, retrigger[i], 0.6f);
+	triggerKeys(retrigger, false, 0);
+	triggerKeys(retrigger, true, 0.7f);
 }
 
 void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
@@ -1232,9 +1229,9 @@ void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 
 void Keyboard::triggerKeys(Array<int> keyNumbers, bool doNoteOn, float velocity)
 {
-	for (int i = 0; i < keyNumbers.size(); i++)
+	for (auto keyNum : keyNumbers)
 	{
-		triggerKey(keyNumbers[i], doNoteOn, velocity);
+		triggerKey(keyNum, doNoteOn, velocity);
 	}
 }
 
