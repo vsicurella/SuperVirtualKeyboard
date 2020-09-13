@@ -130,15 +130,6 @@ public:
 	int getMidiChannel();
 	void setMidiChannel(int channelIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	bool getNoteNumsView();
-	void setNoteNumsView(bool isViewed, NotificationType notify = NotificationType::dontSendNotification);
-
-	int getKeyStyle();
-	void setKeyStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
-
-	int getHighlightStyle();
-	void setHighlightStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
-
 private:
     AudioProcessorValueTreeState& processorTree;
 	ApplicationCommandManager* appCmdMgr;
@@ -181,11 +172,8 @@ private:
     std::unique_ptr<ComboBox> mapStyleBox;
     std::unique_ptr<Slider> midiChannelSld;
     std::unique_ptr<Label> midiChannelLbl;
-    std::unique_ptr<TextButton> noteNumsBtn;
     std::unique_ptr<Label> periodShiftLbl;
-    std::unique_ptr<ComboBox> keyStyleBox;
     std::unique_ptr<Label> mapStyleLbl;
-    std::unique_ptr<ComboBox> highlightStyleBox;
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;

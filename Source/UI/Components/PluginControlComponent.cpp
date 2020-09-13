@@ -148,11 +148,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     midiChannelLbl->setColour (TextEditor::textColourId, Colours::black);
     midiChannelLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    noteNumsBtn.reset (new TextButton ("Note Numbers Button"));
-    addAndMakeVisible (noteNumsBtn.get());
-    noteNumsBtn->setButtonText (TRANS("#"));
-    noteNumsBtn->addListener (this);
-
     periodShiftLbl.reset (new Label ("Period Shift Label",
                                      TRANS("Period Shift:")));
     addAndMakeVisible (periodShiftLbl.get());
@@ -162,18 +157,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     periodShiftLbl->setColour (TextEditor::textColourId, Colours::black);
     periodShiftLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    keyStyleBox.reset (new ComboBox ("Key Style Box"));
-    addAndMakeVisible (keyStyleBox.get());
-    keyStyleBox->setEditableText (false);
-    keyStyleBox->setJustificationType (Justification::centredLeft);
-    keyStyleBox->setTextWhenNothingSelected (String());
-    keyStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    keyStyleBox->addItem (TRANS("Nested Right"), 1);
-    keyStyleBox->addItem (TRANS("Nested Center"), 2);
-    keyStyleBox->addItem (TRANS("Flat"), 3);
-    keyStyleBox->addItem (TRANS("Adjacent"), 4);
-    keyStyleBox->addListener (this);
-
     mapStyleLbl.reset (new Label ("Mapping Style Label",
                                   TRANS("Mapping Style:")));
     addAndMakeVisible (mapStyleLbl.get());
@@ -182,19 +165,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     mapStyleLbl->setEditable (false, false, false);
     mapStyleLbl->setColour (TextEditor::textColourId, Colours::black);
     mapStyleLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    highlightStyleBox.reset (new ComboBox ("Highlight Style Box"));
-    addAndMakeVisible (highlightStyleBox.get());
-    highlightStyleBox->setEditableText (false);
-    highlightStyleBox->setJustificationType (Justification::centredLeft);
-    highlightStyleBox->setTextWhenNothingSelected (String());
-    highlightStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    highlightStyleBox->addItem (TRANS("Full Key"), 1);
-    highlightStyleBox->addItem (TRANS("Inside"), 2);
-    highlightStyleBox->addItem (TRANS("Border"), 3);
-    highlightStyleBox->addItem (TRANS("Circles"), 4);
-    highlightStyleBox->addItem (TRANS("Squares"), 5);
-    highlightStyleBox->addListener (this);
 
     mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
     addAndMakeVisible (mapOrderEditBtn.get());
@@ -264,8 +234,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
 
 	scaleTextBox->addListener(this);
 
-	noteNumsBtn->setClickingTogglesState(true);
-
     scaleTextBox->setInputFilter(&txtFilter, false);
 
     //keyboardViewport->setScrollingMode(3);
@@ -289,15 +257,10 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
 
     settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
+	settingsButton->setClickingTogglesState(true);
 
 	// DISABLED BECAUSE NOT IMPLEMENTED
     mapModeBox->setItemEnabled(3, false);
-	//keyStyleBox->setItemEnabled(2, false);
-	//keyStyleBox->setItemEnabled(4, false);
-	highlightStyleBox->setItemEnabled(2, false);
-	highlightStyleBox->setItemEnabled(3, false);
-	highlightStyleBox->setItemEnabled(4, false);
-	highlightStyleBox->setItemEnabled(5, false);
 }
 
 PluginControlComponent::~PluginControlComponent()
@@ -321,11 +284,8 @@ PluginControlComponent::~PluginControlComponent()
     mapStyleBox = nullptr;
     midiChannelSld = nullptr;
     midiChannelLbl = nullptr;
-    noteNumsBtn = nullptr;
     periodShiftLbl = nullptr;
-    keyStyleBox = nullptr;
     mapStyleLbl = nullptr;
-    highlightStyleBox = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
@@ -368,10 +328,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		{
 			keyboard->restoreNode(piano);
 			piano = keyboard->getNode();
-
-			setNoteNumsView(piano[IDs::pianoKeysShowNoteNumbers]);
-			setKeyStyleId(piano[IDs::keyboardKeysStyle]);
-			setHighlightStyleId(piano[IDs::keyboardHighlightStyle]);
 
 			if (!piano.hasProperty(IDs::viewportPosition))
 				piano.setProperty(IDs::viewportPosition, keyboard->getWidth() / 4, nullptr);
@@ -491,10 +447,6 @@ void PluginControlComponent::resized()
 	midiChannelLbl->setBounds(periodShiftSld->getRight() + gap, bottomBarY, 96, barHeight);
 	midiChannelSld->setBounds(midiChannelLbl->getRight(), bottomBarY, 86, barHeight);
 
-	keyStyleBox->setBounds(getWidth() - 136 - gap, bottomBarY, 136, barHeight);
-	highlightStyleBox->setBounds(keyStyleBox->getX() - 96 - gap, bottomBarY, 96, barHeight);
-	noteNumsBtn->setBounds(highlightStyleBox->getX() - 24 - gap, bottomBarY, 24, barHeight);
-
 	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(bottomBarY - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 	int height = keyboardViewport->getMaximumVisibleHeight();
@@ -521,16 +473,6 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         appCmdMgr->invokeDirectly(IDs::CommandIDs::setMappingStyle, true);
 		setMappingStyleId(mapStyleBox->getSelectedId());
-    }
-    else if (comboBoxThatHasChanged == keyStyleBox.get())
-    {
-		keyboard->setKeyStyle(keyStyleBox->getSelectedId());
-		keyboard->resized();
-    }
-    else if (comboBoxThatHasChanged == highlightStyleBox.get())
-    {
-		keyboard->setHighlightStyle(highlightStyleBox->getSelectedId());
-		keyboard->resized();
     }
 }
 
@@ -596,10 +538,6 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         appCmdMgr->invokeDirectly(IDs::CommandIDs::showSettingsDialog, true);
     }
-	else if (buttonThatWasClicked == noteNumsBtn.get())
-	{
-		keyboard->setShowNoteNumbers(noteNumsBtn->getToggleState());
-	}
 }
 
 void PluginControlComponent::textEditorTextChanged(TextEditor& textEditor)
@@ -651,8 +589,6 @@ void PluginControlComponent::connectToProcessor()
 {
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
-	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardKeysStyle.toString(), *keyStyleBox.get()));
-	comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::keyboardHighlightStyle.toString(), *highlightStyleBox.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
     sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
 }
@@ -873,33 +809,4 @@ int PluginControlComponent::getMidiChannel()
 void PluginControlComponent::setMidiChannel(int channelIn, NotificationType notify)
 {
 	midiChannelSld->setValue(channelIn, notify);
-}
-
-bool PluginControlComponent::getNoteNumsView()
-{
-	return noteNumsBtn->getToggleState();
-}
-
-void PluginControlComponent::setNoteNumsView(bool isViewed, NotificationType notify)
-{
-	noteNumsBtn->setToggleState(isViewed, notify);
-}
-
-int PluginControlComponent::getKeyStyle()
-{
-	return keyStyleBox->getSelectedId();
-}
-
-void PluginControlComponent::setKeyStyleId(int idIn, NotificationType notify)
-{
-	keyStyleBox->setSelectedId(idIn);
-}
-
-int PluginControlComponent::getHighlightStyle()
-{
-	return highlightStyleBox->getSelectedId();
-}
-void PluginControlComponent::setHighlightStyleId(int idIn, NotificationType notify)
-{
-	highlightStyleBox->setSelectedId(idIn, notify);
 }
