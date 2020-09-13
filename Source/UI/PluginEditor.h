@@ -153,9 +153,7 @@ private:
 	Keyboard* virtualKeyboard;
 
 	std::unique_ptr<SettingsContainer> settingsPanel;
-
-	std::unique_ptr<ColorChooserWindow> colorChooserWindow;
-    std::unique_ptr<ColourSelector> colorSelector;
+    ColourSelector* colourSelector;
 
 	int defaultHeight = 210;
 	bool settingsPanelOpen = false;

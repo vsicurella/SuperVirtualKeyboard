@@ -183,7 +183,6 @@ private:
     std::unique_ptr<Label> midiChannelLbl;
     std::unique_ptr<TextButton> noteNumsBtn;
     std::unique_ptr<Label> periodShiftLbl;
-    std::unique_ptr<TextButton> editColorsBtn;
     std::unique_ptr<ComboBox> keyStyleBox;
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<ComboBox> highlightStyleBox;
