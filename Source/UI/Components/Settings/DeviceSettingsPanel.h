@@ -34,8 +34,8 @@ public:
     
 private:
     
-	LabelledComponent<ComboBox>* inputBoxLabelled;
-	LabelledComponent<ComboBox>* outputBoxLabelled;
+	LabelledComponent* inputBoxLabelled;
+	LabelledComponent* outputBoxLabelled;
 	ComboBox* inputBox;
 	ComboBox* outputBox;
 

@@ -24,10 +24,13 @@ public:
     
 private:
 
-	LabelledComponent<DirectoryBrowserComponent>* presetDirectoryBrowser;
-	LabelledComponent<DirectoryBrowserComponent>* modeDirectoryBrowser;
-	LabelledComponent<DirectoryBrowserComponent>* settingsDirectoryBrowser;
-	
+	LabelledComponent* presetLabel;
+	LabelledComponent* modeLabel;
+	LabelledComponent* settingsLabel;
+
+	DirectoryBrowserComponent* presetDirectoryBrowser;
+	DirectoryBrowserComponent* modeDirectoryBrowser;
+	DirectoryBrowserComponent* settingsDirectoryBrowser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralSettingsPanel)
 };
