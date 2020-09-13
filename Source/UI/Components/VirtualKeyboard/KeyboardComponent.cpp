@@ -331,7 +331,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
 	{
 		if (key)
 		{
-			if (e.mods.isRightButtonDown())
+			if (e.mods.isRightButtonDown() || getProperties()[IDs::pianoKeyColorReset])
 			{
 				if (e.mods.isShiftDown())
 					keyColorsOrders.set(key->order, Colour());
@@ -340,10 +340,20 @@ void Keyboard::mouseDown(const MouseEvent& e)
 					keyColorsIndividual.set(key->keyNumber, Colour());
 				
 				else
+				{
+					if (keyColorsIndividual[key->keyNumber].isOpaque())
+						keyColorsIndividual.set(key->keyNumber, Colour());
+
 					keyColorsDegrees.set(key->scaleDegree, Colour());
+				}
 			}
 
-			else if (e.mods.isShiftDown())
+			else if (e.mods.isCtrlDown() || (int)getProperties()[IDs::pianoKeyPaintType] == 2)
+			{
+				keyColorsIndividual.set(key->keyNumber, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
+			}
+
+			else if (e.mods.isShiftDown() || (int)getProperties()[IDs::pianoKeyPaintType] == 1)
 			{
 				if (getKeyDegreeColor(key->scaleDegree).isOpaque())
 					keyColorsDegrees.set(key->scaleDegree, Colour());
@@ -352,11 +362,6 @@ void Keyboard::mouseDown(const MouseEvent& e)
 					keyColorsIndividual.set(key->keyNumber, Colour());
 
 				keyColorsOrders.set(key->order, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
-			}
-
-			else if (e.mods.isCtrlDown())
-			{
-				keyColorsIndividual.set(key->keyNumber, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
 			}
 
 			else

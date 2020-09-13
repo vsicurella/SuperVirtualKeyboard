@@ -34,18 +34,23 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 		+ ColourSelector::ColourSelectorOptions::showColourspace
 	, 4, 0));
 	addAndMakeVisible(colourSelector.get());
+	colourSelector->addChangeListener(this);
 
 	degreePaintButton = static_cast<TextButton*>(controls[0]);
 	degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	degreePaintButton->setToggleState(true, dontSendNotification);
+	degreePaintButton->addListener(this);
 
 	layerPaintButton = static_cast<TextButton*>(controls[1]);
 	layerPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
+	layerPaintButton->addListener(this);
 
 	keyPaintButton = static_cast<TextButton*>(controls[2]);
 	keyPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
+	keyPaintButton->addListener(this);
 
 	resetColourToggle = static_cast<TextButton*>(controls[3]);
+	resetColourToggle->addListener(this);
 
 	FlexItem selectorItem = FlexItem(*colourSelector.get());
 	selectorItem = selectorItem.withFlex(0);
@@ -59,6 +64,9 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 ColourSettingsPanel::~ColourSettingsPanel()
 {
 	colourSelector = nullptr;
+
+	if (virtualKeyboard)
+		virtualKeyboard->removeMouseListener(this);
 }
 
 void ColourSettingsPanel::resized()
@@ -73,22 +81,23 @@ void ColourSettingsPanel::resized()
 
 void ColourSettingsPanel::buttonClicked(Button* buttonThatWasClicked)
 {
-	//if (buttonThatWasClicked == degreePaintButton)
-	//{
-
-	//}
-	//else if (buttonThatWasClicked == layerPaintButton)
-	//{
-
-	//}
-	//else if (buttonThatWasClicked == keyPaintButton)
-	//{
-
-	//}
+	if (buttonThatWasClicked == degreePaintButton)
+	{
+		virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 0);
+	}
+	else if (buttonThatWasClicked == layerPaintButton)
+	{
+		virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 1);
+	}
+	else if (buttonThatWasClicked == keyPaintButton)
+	{
+		virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 2);
+	}
 
 	if (buttonThatWasClicked == resetColourToggle)
 	{
-		userClickedReset = true;
+		virtualKeyboard->getProperties().set(IDs::pianoKeyColorReset, buttonThatWasClicked->getToggleState());
+		userClickedReset = buttonThatWasClicked->getToggleState();
 	}
 }
 
@@ -105,13 +114,13 @@ void ColourSettingsPanel::modifierKeysChanged(const ModifierKeys& modifiers)
 		shiftHeld = false;
 
 	if (ctrlHeld)
-		keyPaintButton->setToggleState(true, dontSendNotification);
+		keyPaintButton->setToggleState(true, sendNotification);
 
 	else if (shiftHeld)
-		layerPaintButton->setToggleState(true, dontSendNotification);
+		layerPaintButton->setToggleState(true, sendNotification);
 
 	else
-		degreePaintButton->setToggleState(true, dontSendNotification);
+		degreePaintButton->setToggleState(true, sendNotification);
 }
 
 void ColourSettingsPanel::mouseDown(const MouseEvent& event)
@@ -127,6 +136,26 @@ void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 {
 	if (!userClickedReset && resetColourToggle->getToggleState())
 		resetColourToggle->setToggleState(false, dontSendNotification);
+}
+
+void ColourSettingsPanel::changeListenerCallback(ChangeBroadcaster* source)
+{
+	if (source == colourSelector.get())
+	{
+		virtualKeyboard->getProperties().set(
+			IDs::colorSelected,
+			colourSelector->getCurrentColour().toString()
+		);
+	}
+}
+
+void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+{
+	virtualKeyboard = keyboardPointer;
+
+	// TODO fill swatches
+
+	virtualKeyboard->addMouseListener(this, true);
 }
 
 ColourSelector* ColourSettingsPanel::getColourSelector()

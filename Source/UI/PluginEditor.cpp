@@ -182,8 +182,6 @@ void SvkPluginEditor::hideSettings()
 	if (isColorEditing)
 	{
 		isColorEditing = false;
-		colourSelector->removeChangeListener(this);
-		colourSelector = nullptr;
 		virtualKeyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
 	}
 
@@ -385,31 +383,17 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
 	{
 		// TODO clean up
 		beginColorEditing();
-
-		colourSelector = static_cast<ColourSettingsPanel*>(panelChangedTo)->getColourSelector();
-		colourSelector->addChangeListener(this);
 	}
 
 	else if (isColorEditing)
 	{
 		isColorEditing = false;
-		colourSelector->removeChangeListener(this);
-		colourSelector = nullptr;
 		virtualKeyboard->setUIMode(UIMode::playMode);
 	}
 }
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	// Color changed
-	if (source == colourSelector)
-	{
-		virtualKeyboard->getProperties().set(
-			IDs::colorSelected,
-			colourSelector->getCurrentColour().toString()
-		);
-	}
-
 	// Mode Info Changed
 	if (source == modeInfo)
 	{
