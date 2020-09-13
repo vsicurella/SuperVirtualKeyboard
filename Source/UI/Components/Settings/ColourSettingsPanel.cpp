@@ -35,18 +35,17 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 	, 4, 0));
 	addAndMakeVisible(colourSelector.get());
 
-	degreePaintButton = static_cast<TextButton*>(flexBox.items[0].associatedComponent);
+	degreePaintButton = static_cast<TextButton*>(controls[0]);
 	degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	degreePaintButton->setToggleState(true, dontSendNotification);
 
-	layerPaintButton = static_cast<TextButton*>(flexBox.items[1].associatedComponent);
+	layerPaintButton = static_cast<TextButton*>(controls[1]);
 	layerPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 
-	keyPaintButton = static_cast<TextButton*>(flexBox.items[2].associatedComponent);
+	keyPaintButton = static_cast<TextButton*>(controls[2]);
 	keyPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 
-
-	resetColourToggle = static_cast<TextButton*>(flexBox.items[3].associatedComponent);
+	resetColourToggle = static_cast<TextButton*>(controls[3]);
 
 	FlexItem selectorItem = FlexItem(*colourSelector.get());
 	selectorItem = selectorItem.withFlex(0);

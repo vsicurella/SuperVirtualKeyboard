@@ -154,6 +154,7 @@ void SvkPluginEditor::showSettingsDialog()
 	if (!settingsPanelOpen)
 	{
 		settingsPanel.reset(new SettingsContainer(pluginState));
+		settingsPanel->setKeyboardPointer(virtualKeyboard);
 		settingsPanel->addListener(this);
 
 		settingsPanelOpen = true;
@@ -484,9 +485,7 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
 		IDs::CommandIDs::applyMapping,
 		IDs::CommandIDs::beginColorEditing,
 		IDs::CommandIDs::setPeriodShift,
-		IDs::CommandIDs::setMidiChannelOut,
-		//IDs::CommandIDs::showMidiNoteNumbers,
-		//IDs::CommandIDs::setKeyStyle
+		IDs::CommandIDs::setMidiChannelOut
 	};
 
 	c.addArray(commands);

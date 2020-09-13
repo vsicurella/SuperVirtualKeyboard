@@ -17,19 +17,19 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 			IDs::midiOutputName 
 		},
 		{ 
-			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Input Device"),
-			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Output Device")
+			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Input Device", true),
+			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Output Device", true)
 		}
 	)
 {
-	inputBoxLabelled = (LabelledComponent<ComboBox>*) flexBox.items[0].associatedComponent;
+	inputBoxLabelled = static_cast<LabelledComponent*>(flexBox.items[0].associatedComponent);
 	inputBoxLabelled->setComponentSize(320, 24);
-	inputBox = inputBoxLabelled->get();
+	inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
 	inputBox->addListener(this);
 
-	outputBoxLabelled = (LabelledComponent<ComboBox>*) flexBox.items[1].associatedComponent;
+	outputBoxLabelled = static_cast<LabelledComponent*>(flexBox.items[1].associatedComponent);
 	outputBoxLabelled->setComponentSize(320, 24);
-	outputBox = outputBoxLabelled->get();
+	outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
 	outputBox->addListener(this);
 
 	FlexItem& itemIn = flexBox.items.getReference(0);

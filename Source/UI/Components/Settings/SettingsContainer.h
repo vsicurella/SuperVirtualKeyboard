@@ -40,9 +40,9 @@ public:
         //view->setScrollBarsShown(true, false);
         //addAndMakeVisible(view.get());
 
-		// Ability to change input and output device for Standalone version
-		if (JUCEApplicationBase::isStandaloneApp())
-			panelNames.insert(1, "Device");
+		// Ability to change input and output device, only for Standalone version
+		if (!JUCEApplicationBase::isStandaloneApp())
+			panelNames.remove(1);
 
 		for (auto panelName : panelNames)
 		{
@@ -93,6 +93,15 @@ public:
 		);
     }
 
+	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPtrIn)
+	{
+		for (int i = 0; i < panelNames.size(); i++)
+		{
+			if (keyboardPanels.contains(panelNames[i]))
+				panels[i]->setKeyboardPointer(keyboardPtrIn);
+		}
+	}
+
 public:
 
 	class Listener
@@ -124,10 +133,10 @@ private:
 	Colour tabColour;
 	Colour textColour;
 
-
 	StringArray panelNames =
 	{
 		"General"
+		, "Device"
 		, "View"
 		, "Colors"
 #if JUCE_DEBUG
@@ -135,6 +144,7 @@ private:
 #endif
 	};
 
+	StringArray keyboardPanels = { "View", "Colors", "Debug" };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContainer)
 };

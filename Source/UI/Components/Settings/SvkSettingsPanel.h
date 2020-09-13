@@ -12,6 +12,7 @@
 #include "../../../PluginState.h"
 #include "../DirectoryBrowserComponent.h"
 #include "../LabelledComponent.h"
+#include "../VirtualKeyboard/KeyboardComponent.h"
 
 class SvkSettingsPanel : public Component,
 	protected Slider::Listener,
@@ -34,13 +35,18 @@ public:
 	{
 		int controlType;
 		String controlName;
+		bool controlLabelled;
 		var defaultValue;
 		var minValue;
 		var maxValue;
 		var increment;
 
-		SvkControlProperties(int typeIn = 1, String nameIn = "", var defaultIn = var(), var minIn = 0, var maxIn = 1, var incrementIn = 1)
-			: controlType(typeIn), controlName(nameIn), defaultValue(defaultIn), minValue(minIn), maxValue(maxIn), increment(incrementIn)
+		SvkControlProperties(
+			int typeIn = 1, String nameIn = "", bool labelled = false,
+			var defaultIn = var(), var minIn = 0, var maxIn = 1, var incrementIn = 1
+		) : 
+			controlType(typeIn), controlName(nameIn), controlLabelled(labelled), 
+			defaultValue(defaultIn), minValue(minIn), maxValue(maxIn), increment(incrementIn)
 		{};
 	};
 
@@ -67,6 +73,11 @@ public:
 	void resized() override
 	{
 		flexBox.performLayout(getLocalBounds());
+	}
+
+	virtual void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+	{
+		virtualKeyboard = keyboardPointer;
 	}
 
 	//=============================================================================================================
@@ -101,24 +112,23 @@ private:
 			
 			case ControlTypeNames::MenuControl:
 				control = new ComboBox(properties.controlName);
-				control = new LabelledComponent<ComboBox>(*((ComboBox*)control), properties.controlName + ":");
-				((LabelledComponent<ComboBox>*)control)->setComponentSize(320, 24);
 				break;
 			
 			case ControlTypeNames::DirectoryControl:
 				control = new DirectoryBrowserComponent(properties.controlName);
-				control = new LabelledComponent<DirectoryBrowserComponent>(*((DirectoryBrowserComponent*)control), properties.controlName + ":");
-				((LabelledComponent<DirectoryBrowserComponent>*)control)->setComponentSize(320, 24);
 				break;
 
 			default:
 				control = new Slider(properties.controlName);
-				control = new LabelledComponent<Slider>(*((Slider*)control), properties.controlName + ":");
-				((LabelledComponent<Slider>*)control)->setComponentSize(320, 24);
 			}
 
 			if (control)
 			{
+				if (properties.controlLabelled)
+				{
+					control = new LabelledComponent(*control, properties.controlName + ":");
+				}
+
 				controls.add(control);
 				flexBox.items.add(FlexItem(*control)
 					.withMinWidth(controlMinWidth)
@@ -145,7 +155,9 @@ protected:
 	HashMap<Identifier, Component*, IDasStringHash> idToControl;
 
 	int controlMinWidth = 250;
-	int controlMinHeight = 48;
+	int controlMinHeight = 24;
 	FlexItem::Margin controlMargin = FlexItem::Margin(10, 5, 10, 10);
 	float controlFlex = 1.0f;
+
+	VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
 };
