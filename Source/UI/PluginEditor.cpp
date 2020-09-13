@@ -70,7 +70,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	else
 	{
 		pluginState->pluginEditorNode = pluginEditorNode;
-		setSize(1000, 210);
+		setSize(1000, defaultHeight);
 	}
 
 	setResizeLimits(750, 100, 10e4, 10e4);
@@ -167,13 +167,12 @@ void SvkPluginEditor::showSettingsDialog()
 	if (!settingsPanelOpen)
 	{
 		settingsPanel.reset(new SettingsContainer(pluginState));
-		settingsPanel->addChangeListener(this);
+		settingsPanel->addListener(this);
 
 		settingsPanelOpen = true;
 		pluginEditorNode.setProperty(IDs::settingsOpen, true, nullptr);
 
-		setSize(getWidth(), getHeight() + defaultSettingsHeight);
-		settingsPanel->setBounds(getLocalBounds().withY(getHeight() - defaultSettingsHeight));
+		setSize(getWidth(), getHeight() + defaultHeight);
 		addAndMakeVisible(settingsPanel.get());
 	}
 	else
@@ -184,14 +183,14 @@ void SvkPluginEditor::showSettingsDialog()
 
 void SvkPluginEditor::hideSettings()
 {
-	settingsPanel->removeChangeListener(this);
+	settingsPanel->removeListener(this);
 	settingsPanel->setVisible(false);
 	settingsPanel = nullptr;
 
 	settingsPanelOpen = false;
 	pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
 
-	setSize(pluginEditorNode[IDs::windowBoundsW], getHeight() - defaultSettingsHeight);
+	setSize(pluginEditorNode[IDs::windowBoundsW], getHeight() - defaultHeight);
 	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
 }
 
@@ -311,8 +310,9 @@ void SvkPluginEditor::resized()
 
 	if (settingsPanelOpen)
 	{
-		basicHeight -= defaultSettingsHeight;
-		settingsPanel->setBounds(0, controlComponent->getY() + basicHeight, getWidth(), defaultSettingsHeight);
+		basicHeight -= defaultHeight;
+		settingsPanel->setBounds(0, controlComponent->getY() + basicHeight, getWidth(), defaultHeight);
+		settingsPanel->resized();
 	}
 
 	controlComponent->setSize(getWidth(), basicHeight);
@@ -383,6 +383,12 @@ void SvkPluginEditor::modeInfoChanged(Mode* modeEdited)
 
 //==============================================================================
 
+void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo)
+{
+	DBG("Settings changed to " + tabName + ", tab: " + String(tabIndex));
+	panelChangedTo->resized();
+}
+
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
 	// Color editing is finished
@@ -411,12 +417,6 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
 		pluginState->commitModeInfo();
 		controlComponent->onModeViewedChange(pluginState->getModeViewed());
 	}
-        
-    // Settings closed
-    if (source == settingsPanel.get())
-    {
-		hideSettings();
-    }
 }
 
 //==============================================================================
