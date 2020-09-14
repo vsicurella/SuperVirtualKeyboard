@@ -20,7 +20,6 @@
 #include "Components/VirtualKeyboard/KeyboardComponent.h"
 #include "Components/Settings/SettingsContainer.h"
 
-#include "Dialogs/ColorChoosingWindow.h"
 #include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
 #include "../File IO/ReaperWriter.h"
