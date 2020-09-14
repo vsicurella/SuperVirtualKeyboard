@@ -110,10 +110,6 @@
               file="Source/UI/Components/ReferencedComboBox.h"/>
       </GROUP>
       <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
-        <FILE id="xH4xEW" name="ColorChoosingWindow.cpp" compile="1" resource="0"
-              file="Source/UI/Dialogs/ColorChoosingWindow.cpp"/>
-        <FILE id="OW7jdx" name="ColorChoosingWindow.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/ColorChoosingWindow.h"/>
         <FILE id="KNufAG" name="MapByOrderDialog.cpp" compile="1" resource="0"
               file="Source/UI/Dialogs/MapByOrderDialog.cpp"/>
         <FILE id="Pt2NrT" name="MapByOrderDialog.h" compile="0" resource="0"
@@ -122,10 +118,6 @@
               file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
         <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
               file="Source/UI/Dialogs/ModeInfoDialog.h"/>
-        <FILE id="qw1lej" name="PluginSettingsDialog.cpp" compile="1" resource="0"
-              file="Source/UI/Dialogs/PluginSettingsDialog.cpp"/>
-        <FILE id="becyrW" name="PluginSettingsDialog.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/PluginSettingsDialog.h"/>
       </GROUP>
       <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/UI/PluginEditor.cpp"/>
