@@ -125,22 +125,21 @@ void Key::paint(Graphics& g)
 	g.setColour(colorToUse.contrasting(contrast));
 	g.fillRect(getLocalBounds());
 
-	if (colorToUse.getBrightness() < 0.6667f)
-		g.setColour(colorToUse.contrasting(0.333f));
-	
-	else
-		g.setColour(Colours::black);
-
-	
-
 	if (order == 0)
 	{
+		if (colorToUse.getBrightness() < 0.6667f)
+			g.setColour(colorToUse.contrasting(0.333f));
+
+		else
+			g.setColour(Colours::black);
+
 		Rectangle<int> outline = getLocalBounds();	
 		g.drawRect(outline, 1.0f);
 	}
 
 	if (showNoteNumber)
 	{
+		g.setColour(colorToUse.contrasting());
 		String numTxt = String(keyNumber);
 		Rectangle<int> txtArea = getLocalBounds();
 		txtArea.removeFromBottom(6);
