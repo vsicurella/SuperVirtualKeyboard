@@ -146,7 +146,8 @@ bool SvkPluginEditor::exportReaperMap()
 
 bool SvkPluginEditor::exportAbletonMap()
 {
-	return false;
+	AbletonMidiWriter amw(*pluginState->getModeViewed());
+	return amw.write();
 }
 
 void SvkPluginEditor::showSettingsDialog()

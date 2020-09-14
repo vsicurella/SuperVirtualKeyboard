@@ -22,7 +22,9 @@
 
 #include "Dialogs/MapByOrderDialog.h"
 #include "Dialogs/ModeInfoDialog.h"
+
 #include "../File IO/ReaperWriter.h"
+#include "../File IO/AbletonMidiWriter.h"
 
 using namespace VirtualKeyboard;
 
