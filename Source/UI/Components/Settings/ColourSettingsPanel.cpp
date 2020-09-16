@@ -24,7 +24,7 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Scale Degree", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Layer (hold Shift)", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Individual Key (hold Ctrl)", false, 1),
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 2)
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 1)
 		},
 		FlexBox(), {}, { FlexItem() }
 	)
@@ -39,7 +39,7 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 	colourSelector->addChangeListener(this);
 	controls.set(0, colourSelector, true);
 	getSectionFlexBox(0)->items.getReference(0).associatedComponent = colourSelector;
-	
+
 	degreePaintButton = static_cast<TextButton*>(controls[1]);
 	degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	degreePaintButton->setToggleState(true, dontSendNotification);
@@ -69,9 +69,7 @@ ColourSettingsPanel::~ColourSettingsPanel()
 
 void ColourSettingsPanel::resized()
 {
-	getSectionFlexBox(0)->items.getReference(0).width = getHeight() * 1.62;
 	getSectionFlexBox(0)->items.getReference(0).height = getHeight();
-
 	SvkSettingsPanel::resized();
 }
 
