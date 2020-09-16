@@ -99,24 +99,13 @@ void ColourSettingsPanel::buttonClicked(Button* buttonThatWasClicked)
 
 void ColourSettingsPanel::modifierKeysChanged(const ModifierKeys& modifiers)
 {
-	if (modifiers.isCtrlDown() && !ctrlHeld)
-		ctrlHeld = true;
-	else if (ctrlHeld && !modifiers.isCtrlDown())
-		ctrlHeld = false;
+	checkModifiers(modifiers);
+}
 
-	else if (modifiers.isShiftDown() && !shiftHeld)
-		shiftHeld = true;
-	else if (shiftHeld && !modifiers.isShiftDown())
-		shiftHeld = false;
-
-	if (ctrlHeld)
-		keyPaintButton->setToggleState(true, sendNotification);
-
-	else if (shiftHeld)
-		layerPaintButton->setToggleState(true, sendNotification);
-
-	else
-		degreePaintButton->setToggleState(true, sendNotification);
+void ColourSettingsPanel::mouseMove(const MouseEvent& event)
+{
+	if (!virtualKeyboard->isMouseOver())
+		checkModifiers(event.mods);
 }
 
 void ColourSettingsPanel::mouseDown(const MouseEvent& event)
@@ -149,6 +138,11 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 {
 	virtualKeyboard = keyboardPointer;
 
+	Colour init = Colour::fromString(virtualKeyboard->getProperties()[IDs::colorSelected].toString());
+	if (init.isTransparent())
+		init = virtualKeyboard->getKeyOrderColor(0);
+	colourSelector->setCurrentColour(init, dontSendNotification);
+
 	// TODO fill swatches
 
 	virtualKeyboard->addMouseListener(this, true);
@@ -159,3 +153,43 @@ ColourSelector* ColourSettingsPanel::getColourSelector()
 	return colourSelector;
 }
 
+void ColourSettingsPanel::checkModifiers(const ModifierKeys& modifiers)
+{
+	bool valueChanged = false;
+
+	if (modifiers.isCtrlDown() && !ctrlHeld)
+	{
+		ctrlHeld = true;
+		valueChanged = true;
+	}
+
+	else if (ctrlHeld && !modifiers.isCtrlDown())
+	{
+		ctrlHeld = false;
+		valueChanged = true;
+	}
+
+	else if (modifiers.isShiftDown() && !shiftHeld)
+	{
+		shiftHeld = true;
+		valueChanged = true;
+	}
+
+	else if (shiftHeld && !modifiers.isShiftDown())
+	{
+		shiftHeld = false;
+		valueChanged = true;
+	}
+
+	if (valueChanged)
+	{
+		if (ctrlHeld)
+			keyPaintButton->setToggleState(true, sendNotification);
+
+		else if (shiftHeld)
+			layerPaintButton->setToggleState(true, sendNotification);
+
+		else
+			degreePaintButton->setToggleState(true, sendNotification);
+	}
+}
