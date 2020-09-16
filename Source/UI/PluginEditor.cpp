@@ -28,13 +28,14 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	controlComponent.reset(new PluginControlComponent(processor.svkValueTree, appCmdMgr, pluginState->getPresetManager()));
 	//controlComponent->connectToProcessor();
+	controlComponent->loadPresetNode(pluginState->getPresetNode());
 	addAndMakeVisible(controlComponent.get());
 
 	virtualKeyboard = controlComponent->getKeyboard();
 	virtualKeyboard->addListener(pluginState->getMidiProcessor());
 	modeViewedChanged(pluginState->getModeViewed(), pluginState->getModeSelectorViewed(), pluginState->getModeViewedSlotNumber());
 
-	pluginState->addListener(this);
+	keyboardViewport = controlComponent->getViewport();
 
 	//for (auto paramID : processor.getParamIDs())
 	//{
@@ -47,26 +48,31 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 	setMouseClickGrabsKeyboardFocus(true);
 	addMouseListener(this, true);
 	
-	pluginEditorNode = ValueTree(IDs::pluginEditorNode);
-
 	// Gui is recreated
-	if (pluginState->pluginEditorNode.isValid() && pluginState->pluginEditorNode.getNumProperties() > 2)
+	if (pluginState->pluginStateNode.getChildWithName(IDs::pluginEditorNode).isValid())
 	{
-		pluginEditorNode = pluginState->pluginEditorNode;
-		restoreWindowState();
+		pluginEditorNode = pluginState->pluginStateNode.getChildWithName(IDs::pluginEditorNode);
 	}
 
 	// Intialization
 	else
 	{
-		pluginState->pluginEditorNode = pluginEditorNode;
-		setSize(1000, defaultHeight);
+		pluginEditorNode = pluginState->pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr);
+		pluginEditorNode.setProperty(IDs::windowBoundsW, 1000, nullptr);
+		pluginEditorNode.setProperty(IDs::windowBoundsH, defaultHeight, nullptr);
+		pluginEditorNode.setProperty(IDs::viewportPosition, 250, nullptr);
 	}
 
+	setSize(
+		jmax((int)pluginEditorNode[IDs::windowBoundsW], 1000),
+		jmax((int)pluginEditorNode[IDs::windowBoundsH], defaultHeight)
+	);
 	setResizeLimits(750, 100, 10e4, 10e4);
 
-	controlComponent->setBounds(getBounds());
-	controlComponent->loadPresetNode(pluginState->getPresetNode());
+	controlComponent->setViewPosition((int)pluginEditorNode[IDs::viewportPosition]);
+	
+	pluginState->addListener(this);
+	keyboardViewport->getHorizontalScrollBar().addListener(this);
 
 #if (!JUCE_ANDROID && !JUCE_IOS)
 	startTimerHz(30);
@@ -89,12 +95,6 @@ SvkPluginEditor::~SvkPluginEditor()
 }
 
 //==============================================================================
-
-void SvkPluginEditor::restoreWindowState()
-{
-	setSize(pluginEditorNode[IDs::windowBoundsW], pluginEditorNode[IDs::windowBoundsH]);
-	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
-}
 
 bool SvkPluginEditor::savePresetToFile()
 {
@@ -187,7 +187,6 @@ void SvkPluginEditor::hideSettings()
 	}
 
 	setSize(pluginEditorNode[IDs::windowBoundsW], getHeight() - defaultHeight);
-	controlComponent->setViewPosition(pluginEditorNode[IDs::viewportPosition]);
 }
 
 void SvkPluginEditor::commitCustomScale()
@@ -295,6 +294,16 @@ void SvkPluginEditor::beginColorEditing()
 
 //==============================================================================
 
+void SvkPluginEditor::scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart)
+{
+	pluginEditorNode.setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
+	
+	// TODO: probably temp method, but take advantage of properties across the whole application
+	controlComponent->getProperties().set(IDs::viewportPosition, keyboardViewport->getViewPositionX());
+}
+
+//==============================================================================
+
 void SvkPluginEditor::paint(Graphics& g)
 {
 	g.fillAll(Colour(0xff323e44));
@@ -315,6 +324,7 @@ void SvkPluginEditor::resized()
 	
 	pluginEditorNode.setProperty(IDs::windowBoundsW, getWidth(), nullptr);
 	pluginEditorNode.setProperty(IDs::windowBoundsH, basicHeight, nullptr);
+
 }
 
 //==============================================================================

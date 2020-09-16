@@ -192,7 +192,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
 	keyboardViewport->setViewedComponent(keyboard.get(), false);
-	keyboardViewport->getHorizontalScrollBar().addListener(this);
 
     saveButton.reset (new ImageButton ("Save Button"));
     addAndMakeVisible (saveButton.get());
@@ -322,18 +321,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		{
 			setMappingStyleId(mapping[IDs::modeMappingStyle]);
 		}
-			
-		ValueTree piano = presetNode.getChildWithName(IDs::pianoNode);
-		if (piano.isValid())
-		{
-			keyboard->restoreNode(piano);
-			piano = keyboard->getNode();
-
-			if (!piano.hasProperty(IDs::viewportPosition))
-				piano.setProperty(IDs::viewportPosition, keyboard->getWidth() / 4, nullptr);
-
-			setViewPosition(piano[IDs::viewportPosition]);
-		}
 
 		ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
 		if (modeSelectors.isValid())
@@ -385,8 +372,6 @@ void PluginControlComponent::paint (Graphics& g)
 
 void PluginControlComponent::resized()
 {
-	float scrollPosition = (float)keyboard->getNode()[IDs::viewportPosition] / keyboard->getWidth();
-
 	scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
 	scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
 	
@@ -425,7 +410,6 @@ void PluginControlComponent::resized()
 		mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
 		mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
 
-
 		keyboardY = (keyboardY * 2) - gap;
     }
     else
@@ -447,8 +431,11 @@ void PluginControlComponent::resized()
 	midiChannelLbl->setBounds(periodShiftSld->getRight() + gap, bottomBarY, 96, barHeight);
 	midiChannelSld->setBounds(midiChannelLbl->getRight(), bottomBarY, 86, barHeight);
 
+	float scrollPosition = (float)getProperties()[IDs::viewportPosition] / keyboard->getWidth();
+	
 	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(bottomBarY - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
+	
 	int height = keyboardViewport->getMaximumVisibleHeight();
 	keyboard->setBounds(0, 0, keyboard->getPianoWidth(height), height);
 	keyboardViewport->setViewPosition(keyboard->getWidth() * scrollPosition, 0);
@@ -558,12 +545,6 @@ void PluginControlComponent::textEditorReturnKeyPressed(TextEditor& textEditor)
 void PluginControlComponent::textEditorFocusLost(TextEditor& textEditor)
 {
 
-}
-
-void PluginControlComponent::scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart)
-{
-	keyboard->getNode()
-		.setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
 }
 
 void PluginControlComponent::mouseDown(const MouseEvent& e)

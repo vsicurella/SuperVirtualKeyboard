@@ -36,8 +36,7 @@ class PluginControlComponent  : public Component,
                                 public TextEditor::Listener,
                                 public ComboBox::Listener,
                                 public Slider::Listener,
-                                public Button::Listener,
-								private ScrollBar::Listener
+                                public Button::Listener
 {
 public:
     //==============================================================================
@@ -59,8 +58,6 @@ public:
 
 	void mouseDown(const MouseEvent& e) override;
 
-	void scrollBarMoved(ScrollBar* scrollBarThatHasMoved, double newRangeStart) override;
-
     //==============================================================================
 
     void connectToProcessor();
@@ -72,7 +69,7 @@ public:
 
 	TextEditor* getScaleTextEditor();
 	Viewport* getViewport();
-    ComboBox* getMappingStyleBox();
+	ComboBox* getMappingStyleBox();
 
 	ReferencedComboBox* getMode1Box();
 	ReferencedComboBox* getMode2Box();

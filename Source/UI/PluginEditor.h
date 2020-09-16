@@ -35,6 +35,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
 						public ApplicationCommandTarget,
 						private SvkPluginState::Listener,
 						private SettingsContainer::Listener,
+						private ScrollBar::Listener,
 						private ChangeListener,
                         private AudioProcessorValueTreeState::Listener,
 						private Timer
@@ -55,19 +56,15 @@ public:
     
     //==============================================================================
 
-	void restoreWindowState();
-
 	bool savePresetToFile();
 	bool saveMode();
     void showSaveMenu();
 
 	bool loadPreset();
 	bool loadMode();
-    void showLoadMenu();
 
 	bool exportReaperMap();
 	bool exportAbletonMap();
-    void showExportMenu();
     
     void showSettingsDialog();
 	void hideSettings();
@@ -102,6 +99,10 @@ public:
 	void applyMap();
 
 	void beginColorEditing();
+
+	//==============================================================================
+
+	void scrollBarMoved(ScrollBar* bar, double newRangeStart) override;
 
 	//==============================================================================
 
@@ -152,6 +153,7 @@ private:
     std::unique_ptr<MappingHelper> mappingHelper;
 
 	Keyboard* virtualKeyboard;
+	Viewport* keyboardViewport;
 
 	std::unique_ptr<SettingsContainer> settingsPanel;
 
