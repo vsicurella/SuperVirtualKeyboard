@@ -27,6 +27,8 @@ public:
 
 	void modifierKeysChanged(const ModifierKeys&) override;
 
+	void mouseMove(const MouseEvent& event) override;
+
 	void mouseDown(const MouseEvent& event) override;
 
 	void mouseUp(const MouseEvent& event) override;
@@ -36,6 +38,10 @@ public:
 	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
 
 	ColourSelector* getColourSelector();
+
+private:
+
+	void checkModifiers(const ModifierKeys& keys);
 
 private:
 
