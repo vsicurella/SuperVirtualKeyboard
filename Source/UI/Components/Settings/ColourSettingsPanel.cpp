@@ -155,31 +155,22 @@ ColourSelector* ColourSettingsPanel::getColourSelector()
 
 void ColourSettingsPanel::checkModifiers(const ModifierKeys& modifiers)
 {
-	bool valueChanged = false;
+	bool valueChanged = true;
 
 	if (modifiers.isCtrlDown() && !ctrlHeld)
-	{
 		ctrlHeld = true;
-		valueChanged = true;
-	}
 
 	else if (ctrlHeld && !modifiers.isCtrlDown())
-	{
 		ctrlHeld = false;
-		valueChanged = true;
-	}
 
 	else if (modifiers.isShiftDown() && !shiftHeld)
-	{
 		shiftHeld = true;
-		valueChanged = true;
-	}
 
 	else if (shiftHeld && !modifiers.isShiftDown())
-	{
 		shiftHeld = false;
-		valueChanged = true;
-	}
+
+	else
+		valueChanged = false;
 
 	if (valueChanged)
 	{
