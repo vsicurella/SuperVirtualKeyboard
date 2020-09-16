@@ -63,7 +63,7 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
 
 	ratioLabel = static_cast<LabelledComponent*>(controls[2]);
 	ratioLabel->setComponentSize(225, controlMinHeight);
-	flexSections.getReference(0).items.set(2,  flexSections[0].items[2].withMinWidth(ratioLabel->getWidth()));
+	flexSections.getReference(0).items.getReference(2).minWidth = ratioLabel->getWidth();
 
 	keyRatioSlider = LabelledComponent::getComponentPointer<Slider>(ratioLabel);
 	keyRatioSlider->setRange(0.01, 1, 0.01);
