@@ -627,6 +627,7 @@ TextButton* PluginControlComponent::getModeInfoButton()
 void PluginControlComponent::setViewPosition(int xIn)
 {
 	keyboardViewport->setViewPosition(xIn, 0);
+	getProperties().set(IDs::viewportPosition, xIn);
 }
 
 int PluginControlComponent::getMode1BoxSelection()

@@ -67,13 +67,15 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 		jmax((int)pluginEditorNode[IDs::windowBoundsW], 1000),
 		jmax((int)pluginEditorNode[IDs::windowBoundsH], defaultHeight)
 	);
+
 	setResizeLimits(750, 100, 10e4, 10e4);
 
-	controlComponent->setViewPosition((int)pluginEditorNode[IDs::viewportPosition]);
-	
 	pluginState->addListener(this);
 	keyboardViewport->getHorizontalScrollBar().addListener(this);
 
+	controlComponent->setViewPosition((int)pluginEditorNode[IDs::viewportPosition]);
+	controlComponent->resized(); // TODO: this is a fix - investigate
+	
 #if (!JUCE_ANDROID && !JUCE_IOS)
 	startTimerHz(30);
 #endif
