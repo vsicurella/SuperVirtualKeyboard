@@ -11,7 +11,7 @@
 #include "GeneralSettingsPanel.h"
 
 GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel(pluginStateIn,
+	: SvkSettingsPanel("GeneralSettingsPanel", pluginStateIn, 1,
 		{
 			IDs::presetDirectory,
 			IDs::modeDirectory,
@@ -21,12 +21,21 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 			SvkControlProperties(ControlTypeNames::DirectoryControl, "Preset Directory", true),
 			SvkControlProperties(ControlTypeNames::DirectoryControl, "Mode Directory", true),
 			SvkControlProperties(ControlTypeNames::DirectoryControl, "Settings Directory", true)
-		}
+		},
+		FlexBox(),
+		{ FlexBox(
+			FlexBox::Direction::column,
+			FlexBox::Wrap::wrap,
+			FlexBox::AlignContent::spaceBetween,
+			FlexBox::AlignItems::center,
+			FlexBox::JustifyContent::spaceAround
+		)}
 	)
 {
-	for (int i = 0; i < flexBox.items.size(); i++)
+	FlexBox& col1 = flexSections.getReference(0);
+	for (int i = 0; i < col1.items.size(); i++)
 	{
-		FlexItem& item = flexBox.items.getReference(i);
+		FlexItem& item = col1.items.getReference(i);
 		item.maxHeight = 24;
 		item.minWidth = 500;
 	}

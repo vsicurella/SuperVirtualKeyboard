@@ -11,7 +11,7 @@
 #include "DeviceSettingsPanel.h"
 
 DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel(pluginStateIn,
+	: SvkSettingsPanel("DeviceSettingsPanel", pluginStateIn, 1,
 		{ 
 			IDs::midiInputName,
 			IDs::midiOutputName 
@@ -22,20 +22,22 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 		}
 	)
 {
-	inputBoxLabelled = static_cast<LabelledComponent*>(flexBox.items[0].associatedComponent);
+	FlexBox& col1 = flexSections.getReference(0);
+
+	inputBoxLabelled = static_cast<LabelledComponent*>(col1.items[0].associatedComponent);
 	inputBoxLabelled->setComponentSize(320, 24);
 	inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
 	inputBox->addListener(this);
 
-	outputBoxLabelled = static_cast<LabelledComponent*>(flexBox.items[1].associatedComponent);
+	outputBoxLabelled = static_cast<LabelledComponent*>(col1.items[1].associatedComponent);
 	outputBoxLabelled->setComponentSize(320, 24);
 	outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
 	outputBox->addListener(this);
 
-	FlexItem& itemIn = flexBox.items.getReference(0);
+	FlexItem& itemIn = col1.items.getReference(0);
 	itemIn = itemIn.withMaxHeight(48).withMinWidth(inputBoxLabelled->getWidth());
 
-	FlexItem& itemOut = flexBox.items.getReference(1);
+	FlexItem& itemOut = col1.items.getReference(1);
 	itemOut = itemOut.withMaxHeight(48).withMinWidth(outputBoxLabelled->getWidth());
 }
 

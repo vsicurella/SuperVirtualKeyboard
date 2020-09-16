@@ -11,7 +11,7 @@
 #include "DebugSettingsPanel.h"
 
 DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel(pluginState, {}, {}),
+	: SvkSettingsPanel("DebugSettingsPanel", pluginState, 1, {}, {}),
 	  pluginState(pluginStateIn)
 {
     setSize(100, 100);
@@ -81,10 +81,6 @@ void DebugSettingsPanel::paint(Graphics& g)
     }
 }
 
-void DebugSettingsPanel::resized()
-{
-	flexBox.performLayout(getLocalBounds());
-}
 //
 //void DebugSettingsPanel::sliderValueChanged(Slider *slider)
 //{

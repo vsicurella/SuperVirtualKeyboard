@@ -11,53 +11,51 @@
 #include "ColourSettingsPanel.h"
 
 ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
-	: SvkSettingsPanel(stateIn, 
+	: SvkSettingsPanel("ColourSettingsPanel", stateIn, 3,
 		{
+			IDs::pianoKeyColor,
 			IDs::pianoKeyColorsDegree,
 			IDs::pianoKeyColorsLayer,
 			IDs::pianoKeyColorsIndividual,
 			IDs::pianoKeyColorReset
 		},
 		{
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Scale Degree"),
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Layer (hold Shift)"),
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Individual Key (hold Ctrl)"),
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)")
-		}
-)
+			SvkControlProperties(ControlTypeNames::GenericControl, "Color Selector"),
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Scale Degree", false, 1),
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Layer (hold Shift)", false, 1),
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Individual Key (hold Ctrl)", false, 1),
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 2)
+		},
+		FlexBox(), {}, { FlexItem() }
+	)
 {
-	setName("ColourSettingsPanel");
-
-	colourSelector.reset(new ColourSelector(
+	// Set up Color Selector and replace generic control
+	colourSelector = new ColourSelector(
 		  ColourSelector::ColourSelectorOptions::showColourAtTop
 		+ ColourSelector::ColourSelectorOptions::editableColour
 		+ ColourSelector::ColourSelectorOptions::showColourspace
-	, 4, 0));
-	addAndMakeVisible(colourSelector.get());
+	, 4, 0);
+	addAndMakeVisible(colourSelector);
 	colourSelector->addChangeListener(this);
-
-	degreePaintButton = static_cast<TextButton*>(controls[0]);
+	controls.set(0, colourSelector, true);
+	getSectionFlexBox(0)->items.getReference(0).associatedComponent = colourSelector;
+	
+	degreePaintButton = static_cast<TextButton*>(controls[1]);
 	degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	degreePaintButton->setToggleState(true, dontSendNotification);
 	degreePaintButton->addListener(this);
 
-	layerPaintButton = static_cast<TextButton*>(controls[1]);
+	layerPaintButton = static_cast<TextButton*>(controls[2]);
 	layerPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	layerPaintButton->addListener(this);
 
-	keyPaintButton = static_cast<TextButton*>(controls[2]);
+	keyPaintButton = static_cast<TextButton*>(controls[3]);
 	keyPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	keyPaintButton->addListener(this);
 
-	resetColourToggle = static_cast<TextButton*>(controls[3]);
+	resetColourToggle = static_cast<TextButton*>(controls[4]);
 	resetColourToggle->addListener(this);
 
-	FlexItem selectorItem = FlexItem(*colourSelector.get());
-	selectorItem = selectorItem.withFlex(0);
-
-	flexBox.items.insert(0, selectorItem);
-	colourSelectorFlex = &flexBox.items.getReference(0);
-	
 	setSize(100, 100);
 }
 
@@ -71,10 +69,8 @@ ColourSettingsPanel::~ColourSettingsPanel()
 
 void ColourSettingsPanel::resized()
 {
-	flexBox.items.set(0, 
-		colourSelectorFlex->withMinHeight(getHeight())
-							.withMinWidth(getHeight() * 1.62f)
-	);
+	getSectionFlexBox(0)->items.getReference(0).width = getHeight() * 1.62;
+	getSectionFlexBox(0)->items.getReference(0).height = getHeight();
 
 	SvkSettingsPanel::resized();
 }
@@ -140,7 +136,7 @@ void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 
 void ColourSettingsPanel::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if (source == colourSelector.get())
+	if (source == colourSelector)
 	{
 		virtualKeyboard->getProperties().set(
 			IDs::colorSelected,
@@ -160,6 +156,6 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 
 ColourSelector* ColourSettingsPanel::getColourSelector()
 {
-	return colourSelector.get();
+	return colourSelector;
 }
 
