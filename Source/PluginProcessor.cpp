@@ -25,8 +25,12 @@ SvkAudioProcessor::SvkAudioProcessor() :
 #endif
     svkUndo(new UndoManager()),
     svkCmdMgr(new ApplicationCommandManager()),
-    svkValueTree(*this, svkUndo.get(), IDs::svkParentNode, createParameters())
+    svkValueTree(*this, svkUndo.get())//, IDs::svkParentNode, createParameters())
 {
+	// Temporary
+	svkValueTree.state = ValueTree(IDs::svkParentNode);
+
+
 	pluginState.reset(new SvkPluginState(svkValueTree));
 }
 
@@ -163,7 +167,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 	//presetRecall.removeChild(presetRecall.getChildWithName(IDs::pluginStateNode), nullptr); // uncomment this line to test new instantiation
 
 	//svkValueTree.replaceState(presetRecall);	
-	recordParamIDs();
+	//recordParamIDs();
 	pluginState->recallState(presetRecall, true);
 }
 
@@ -184,10 +188,10 @@ SvkPluginState* SvkAudioProcessor::getPluginState()
 	return pluginState.get();
 }
 
-const Array<String>& SvkAudioProcessor::getParamIDs() const
-{
-    return paramIDs;
-}
+//const Array<String>& SvkAudioProcessor::getParamIDs() const
+//{
+//    return paramIDs;
+//}
 
 //==============================================================================
 // This creates new instances of the plugin..
@@ -198,73 +202,73 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 
-void SvkAudioProcessor::recordParamIDs()
-{
-	for (auto param : getParameters())
-	{
-		paramIDs.add(dynamic_cast<AudioProcessorParameterWithID*>(param)->paramID);
-	}
-	DBG("Parameters are initialized");
-	DBGArray(paramIDs);
-}
-
-AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
-{    
-	std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
-	
-	//paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
- //   
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
- //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeOn.toString(), "MPE On", false));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
-
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneOn.toString(), "Retune On", false));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneAuto.toString(), "Retune Auto", false));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
-    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
-
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::periodShiftModeSize.toString(), "Shift By Mode Size", 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::transposeAmt.toString(), "Transpose", -127, 127, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
-    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
-    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
-    
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
-    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
-    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
-    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
-    
-
-    return {paramsInit.begin(), paramsInit.end()};
-}
+//void SvkAudioProcessor::recordParamIDs()
+//{
+//	for (auto param : getParameters())
+//	{
+//		paramIDs.add(dynamic_cast<AudioProcessorParameterWithID*>(param)->paramID);
+//	}
+//	DBG("Parameters are initialized");
+//	DBGArray(paramIDs);
+//}
+//
+//AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
+//{    
+//	std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
+//	
+//	//paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
+// //   
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
+//    
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
+//    
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeOn.toString(), "MPE On", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
+//
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneOn.toString(), "Retune On", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneAuto.toString(), "Retune Auto", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
+//
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::periodShiftModeSize.toString(), "Shift By Mode Size", 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::transposeAmt.toString(), "Transpose", -127, 127, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
+//    
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
+//    
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
+//    
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
+//    
+//
+//    return {paramsInit.begin(), paramsInit.end()};
+//}
