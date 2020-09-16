@@ -39,8 +39,7 @@ public:
 
 private:
 
-	std::unique_ptr<ColourSelector> colourSelector;
-	FlexItem* colourSelectorFlex;
+	ColourSelector* colourSelector;
 
 	const int paintTypeRadioGroup = 100;
 

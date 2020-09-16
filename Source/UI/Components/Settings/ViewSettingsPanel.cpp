@@ -11,7 +11,7 @@
 #include "ViewSettingsPanel.h"
 
 ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel(pluginStateIn,
+	: SvkSettingsPanel("ViewSettingsPanel", pluginStateIn, 1,
 		{
 			IDs::keyboardKeysStyle,
 			IDs::keyboardHighlightStyle,
@@ -23,7 +23,8 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
 			SvkControlProperties(ControlTypeNames::MenuControl, "Key Highlight Style", true),
 			SvkControlProperties(ControlTypeNames::SliderControl, "Key Proportion", true),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Show MIDI Note Numbers")
-		})
+		}
+	)
 {
 	layoutLabel = static_cast<LabelledComponent*>(controls[0]);
 	layoutLabel->setComponentSize(136, controlMinHeight);
@@ -62,7 +63,7 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
 
 	ratioLabel = static_cast<LabelledComponent*>(controls[2]);
 	ratioLabel->setComponentSize(225, controlMinHeight);
-	flexBox.items.set(2, flexBox.items[2].withMinWidth(ratioLabel->getWidth()));
+	flexSections.getReference(0).items.set(2,  flexSections[0].items[2].withMinWidth(ratioLabel->getWidth()));
 
 	keyRatioSlider = LabelledComponent::getComponentPointer<Slider>(ratioLabel);
 	keyRatioSlider->setRange(0.01, 1, 0.01);

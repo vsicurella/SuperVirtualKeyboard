@@ -14,6 +14,10 @@
 #include "../LabelledComponent.h"
 #include "../VirtualKeyboard/KeyboardComponent.h"
 
+#define defaultSectionFlexBox FlexBox(FlexBox::Direction::column, FlexBox::Wrap::wrap, FlexBox::AlignContent::spaceBetween, FlexBox::AlignItems::center, FlexBox::JustifyContent::spaceAround)
+#define defaultSectionFlexItem FlexItem(250, 24).withFlex(1.0f).withMargin(FlexItem::Margin(10, 5, 10, 5))
+#define defaultSectionAsFlexItem FlexItem(100, 100).withFlex(1.0f);
+
 class SvkSettingsPanel : public Component,
 	protected Slider::Listener,
 	protected Button::Listener,
@@ -28,7 +32,8 @@ public:
 		SliderControl = 0,
 		ToggleControl,
 		MenuControl,
-		DirectoryControl
+		DirectoryControl,
+		GenericControl
 	};
 
 	struct SvkControlProperties
@@ -36,31 +41,60 @@ public:
 		int controlType;
 		String controlName;
 		bool controlLabelled;
+		int columnNum;
 		var defaultValue;
 		var minValue;
 		var maxValue;
 		var increment;
 
 		SvkControlProperties(
-			int typeIn = 1, String nameIn = "", bool labelled = false,
+			int typeIn = 1, String nameIn = "", bool labelled = false, int colNumIn = 0,
 			var defaultIn = var(), var minIn = 0, var maxIn = 1, var incrementIn = 1
 		) : 
-			controlType(typeIn), controlName(nameIn), controlLabelled(labelled), 
+			controlType(typeIn), controlName(nameIn), controlLabelled(labelled), columnNum(colNumIn),
 			defaultValue(defaultIn), minValue(minIn), maxValue(maxIn), increment(incrementIn)
 		{};
 	};
 
 public:
 
-	SvkSettingsPanel(SvkPluginState* pluginStateIn, Array<Identifier> controlIdsIn, Array<SvkControlProperties> controlTypesIn)
-		: pluginState(pluginStateIn), controlIdentifiers(controlIdsIn), controlTypes(controlTypesIn)
+	SvkSettingsPanel(
+		String                       panelName,
+		SvkPluginState* pluginStateIn,
+		int                          numSectionsIn,
+		Array<Identifier>            controlIdsIn,
+		Array<SvkControlProperties>  controlTypesIn,
+		FlexBox                      flexParentStyle = FlexBox(),
+		Array<FlexBox>               sectionBoxStyle = Array<FlexBox>(),
+		Array<FlexItem>              sectionItemsStyle = Array<FlexItem>()
+	) :
+		pluginState(pluginStateIn),
+		numSections(numSectionsIn),
+		controlIdentifiers(controlIdsIn),
+		controlTypes(controlTypesIn)
 	{
-		flexBox = FlexBox(
-			FlexBox::Direction::column,
-			FlexBox::Wrap::wrap,
-			FlexBox::AlignContent::flexStart,
-			FlexBox::AlignItems::flexStart,
-			FlexBox::JustifyContent::center);
+		setName(panelName);
+
+		flexParent = flexParentStyle;
+		flexParent.items.resize(numSections);
+		FlexItem sectionDefault = defaultSectionAsFlexItem;
+		flexParent.items.fill(sectionDefault);
+		
+		// Combine given and default FlexBox styles
+		flexSections.addArray(sectionBoxStyle);
+		while (flexSections.size() < numSections)
+			flexSections.add(defaultSectionFlexBox);
+
+		// Combine given and default FlexItem styles
+		sectionsDefaultFlexItems.addArray(sectionItemsStyle);
+		while (sectionsDefaultFlexItems.size() < numSections)
+			sectionsDefaultFlexItems.add(defaultSectionFlexItem);
+
+		// Associate section flexboxes with parent FlexItems
+		for (int i = 0; i < numSectionsIn; i++)
+		{
+			flexParent.items.getReference(i).associatedFlexBox = &flexSections.getReference(i);
+		}
 
 		setupControls();
 	}
@@ -72,7 +106,7 @@ public:
 
 	void resized() override
 	{
-		flexBox.performLayout(getLocalBounds());
+		flexParent.performLayout(getLocalBounds());
 	}
 
 	virtual void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
@@ -90,6 +124,40 @@ public:
 
 	virtual void directoryChanged(DirectoryBrowserComponent*, File) override {};
 
+protected:
+
+	FlexBox* getSectionFlexBox(int sectionNum)
+	{
+		return flexParent.items.getReference(jmin(sectionNum, numSections - 1)).associatedFlexBox;
+	}
+
+	FlexItem* getControlFlexItem(int controlNum)
+	{
+		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].columnNum);
+		for (int i = 0; i < sectionBox->items.size(); i++)
+		{
+			FlexItem* item = &sectionBox->items.getReference(i);
+			if (item->associatedComponent == controls[controlNum])
+				return item;
+		}
+
+		return nullptr;
+	}
+
+	bool setControlFlexItem(int controlNum, FlexItem flexItemIn)
+	{
+		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].columnNum);
+		for (int i = 0; i < sectionBox->items.size(); i++)
+		{
+			if (sectionBox->items.getReference(i).associatedComponent == controls[controlNum])
+			{
+				sectionBox->items.set(i, flexItemIn);
+				return true;
+			}
+		}
+		return false;
+	}
+
 private:
 
 	void setupControls()
@@ -103,9 +171,12 @@ private:
 
 			Component* control = nullptr;
 
-
 			switch (properties.controlType)
 			{
+			case ControlTypeNames::SliderControl:
+				control = new Slider(properties.controlName);
+				break;
+
 			case ControlTypeNames::ToggleControl:
 				control = new ToggleButton(properties.controlName);
 				break;
@@ -119,7 +190,7 @@ private:
 				break;
 
 			default:
-				control = new Slider(properties.controlName);
+				control = new Component(properties.controlName);
 			}
 
 			if (control)
@@ -130,11 +201,13 @@ private:
 				}
 
 				controls.add(control);
-				flexBox.items.add(FlexItem(*control)
-					.withMinWidth(controlMinWidth)
-					.withMinHeight(controlMinHeight)
-					.withMargin(controlMargin)
-					.withFlex(controlFlex));
+
+				int sectionNum = jmin(properties.columnNum, numSections - 1);
+				FlexBox& section = flexSections.getReference(sectionNum);
+				FlexItem item = sectionsDefaultFlexItems[sectionNum];
+				item.associatedComponent = control;
+
+				section.items.add(item);
 				addAndMakeVisible(control);
 				idToControl.set(id, control);
 			}
@@ -145,10 +218,15 @@ protected:
 	
 	SvkPluginState* pluginState;
 
+	int numSections;
+
 	Array<Identifier> controlIdentifiers;
 	Array<SvkControlProperties> controlTypes;
 
-	FlexBox flexBox;
+	Array<FlexBox> flexSections;
+	FlexBox flexParent;
+
+	Array<FlexItem> sectionsDefaultFlexItems;
 
 	OwnedArray<Component> controls;
 	HashMap<Component*, Label*> controlLabels;
