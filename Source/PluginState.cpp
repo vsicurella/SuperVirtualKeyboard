@@ -13,7 +13,7 @@
 SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     : svkTree(svkTreeIn)
 {
-    pluginStateNode = ValueTree(IDs::pluginStateNode);
+    pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
 	pluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 
 	// TODO: Factory default settings, use a function call to load user settings
@@ -93,7 +93,9 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr) = presetNode;
+
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
+	
 	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
 	pianoNode = svkPreset->getKeyboardNode();
@@ -473,7 +475,7 @@ void SvkPluginState::commitStateNode()
 	{
 		midiSettingsNode.removeChild(midiSettingsNode.getChild(0), nullptr);
 	}
-   
+
 	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
 	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
 
