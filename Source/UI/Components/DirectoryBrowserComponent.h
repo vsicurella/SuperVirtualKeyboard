@@ -30,6 +30,7 @@ public:
 
 		openButton.reset(new TextButton(dialogBoxTitle + "Button", "Choose directory for " + dialogBoxTitle));
 		openButton->setButtonText("...");
+		openButton->setConnectedEdges(Button::ConnectedEdgeFlags::ConnectedOnLeft);
 		addAndMakeVisible(openButton.get());
 		openButton->addListener(this);
 	}
@@ -44,7 +45,7 @@ public:
 	void resized() override
 	{
 		openButton->setSize(getHeight(), getHeight());
-		openButton->setTopRightPosition(getWidth(), 0);
+		openButton->setTopRightPosition(getWidth() - 1, 0);
 		editor->setBounds(0, 0, getWidth() - getHeight(), getHeight());
 	}
 
