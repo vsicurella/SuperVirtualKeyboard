@@ -75,10 +75,10 @@ public:
 
 private:
 
-	void recordParamIDs();
-    
-    AudioProcessorValueTreeState::ParameterLayout createParameters();
-    Array<String> paramIDs;
+    //void recordParamIDs();
+    //
+    //AudioProcessorValueTreeState::ParameterLayout createParameters();
+    //Array<String> paramIDs;
 
 	std::unique_ptr<SvkPluginState> pluginState;
     
