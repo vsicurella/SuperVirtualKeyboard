@@ -1045,6 +1045,11 @@ void Keyboard::highlightKeys(Array<int> keyNumsIn, Colour colorIn, int blinkRate
 
 //===============================================================================================
 
+Array<Colour>* Keyboard::getKeyIndividualColours()
+{
+	return &keyColorsIndividual;
+}
+
 Colour Keyboard::getKeyColor(int keyNumIn)
 {
 	Colour c;
@@ -1065,7 +1070,12 @@ Colour Keyboard::getKeyColor(int keyNumIn)
   return c;
 }
 
-Colour Keyboard::getKeyOrderColor(int orderIn)
+Array<Colour>* Keyboard::getKeyLayerColours()
+{
+	return &keyColorsOrders;
+}
+
+Colour Keyboard::getKeyLayerColor(int orderIn)
 {
 	Colour c;
 
@@ -1076,6 +1086,11 @@ Colour Keyboard::getKeyOrderColor(int orderIn)
 		c = colorsDefaultOrders[orderIn];
 
 	return c;
+}
+
+Array<Colour>* Keyboard::getKeyDegreeColours()
+{
+	return &keyColorsDegrees;
 }
 
 Colour Keyboard::getKeyDegreeColor(int degIn)
@@ -1159,6 +1174,26 @@ void Keyboard::resetKeyColors()
 	keyColorsIndividual.fill(Colour());
 
 	updateKeyColors();
+}
+
+//===============================================================================================
+
+void Keyboard::setKeyDegreeColor(int scaleDegreeIn, Colour colourIn)
+{
+	int degree = totalModulus(scaleDegreeIn, mode->getScaleSize());
+	keyColorsDegrees.set(degree, colourIn);
+}
+
+void Keyboard::setKeyLayerColor(int layerNumIn, Colour colourIn)
+{
+	int layer = totalModulus(layerNumIn, mode->getMaxStep());
+	keyColorsOrders.set(layer, colourIn);
+}
+
+void Keyboard::setKeyColor(int keyNumIn, Colour colourIn)
+{
+	int keyNum = totalModulus(keyNumIn, keys.size());
+	keyColorsIndividual.set(keyNum, colourIn);
 }
 
 //===============================================================================================
