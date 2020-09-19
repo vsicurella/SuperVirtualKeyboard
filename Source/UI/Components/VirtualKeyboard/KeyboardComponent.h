@@ -392,6 +392,11 @@ namespace VirtualKeyboard
 		*/
 		Colour getKeyDegreeColor(int degIn);
 
+		/*
+			Returns a pointer to the note on colors by midi channel
+		*/
+		Array<Colour>* getKeyNoteOnColours();
+
 		//===============================================================================================
 
 		/*
@@ -558,6 +563,7 @@ namespace VirtualKeyboard
 		Array<Colour> keyColorsOrders;
 		Array<Colour> keyColorsDegrees;
 		Array<Colour> keyColorsIndividual;
+		Array<Colour> keyOnColorsByChannel;
         
         Mode* mode;
 		Mode modeDefault = Mode(STD_TUNING_MODE_NODE, true);
