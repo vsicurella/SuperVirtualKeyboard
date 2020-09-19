@@ -88,7 +88,9 @@ private:
 private:
 
 	FocussedColourSelector* colourSelector;
-	ColourLibraryComponent* colourLibrary;
+	
+	ColourLibraryComponent* keyColourLibrary;
+	ColourLibraryComponent* noteOnColourLibrary;
 
 	const int paintTypeRadioGroup = 100;
 

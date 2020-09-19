@@ -11,14 +11,15 @@
 #include "ColourSettingsPanel.h"
 
 ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
-	: SvkSettingsPanel("ColourSettingsPanel", stateIn, 3,
+	: SvkSettingsPanel("ColourSettingsPanel", stateIn, 4,
 		{
 			IDs::pianoKeyColor,
 			IDs::pianoKeyColorsDegree,
 			IDs::pianoKeyColorsLayer,
 			IDs::pianoKeyColorsIndividual,
 			IDs::pianoKeyColorReset,
-			Identifier("Swatch")
+			Identifier("KeyColourLibrary"),
+			Identifier("NoteOnColourLibrary")
 		},
 		{
 			SvkControlProperties(ControlTypeNames::GenericControl, "Color Selector"),
@@ -26,7 +27,8 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Layer (hold Shift)", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Individual Key (hold Ctrl)", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 1),
-			SvkControlProperties(ControlTypeNames::GenericControl, "Color Library", false, 2)
+			SvkControlProperties(ControlTypeNames::GenericControl, "Key Colors", false, 2),
+			SvkControlProperties(ControlTypeNames::GenericControl, "Note On Colors", false, 3)
 		},
 		FlexBox(), {}, { FlexItem() }
 	)
@@ -120,7 +122,7 @@ void ColourSettingsPanel::mouseDown(const MouseEvent& event)
 
 		// TODO: better messaging for VirtualKeyboard changes
 		virtualKeyboard->updateKeyColors(false);
-		colourLibrary->refreshSwatches();
+		keyColourLibrary->refreshSwatches();
 	}
 
 	else if (colourSelector->isMouseOver() || event.eventComponent->getParentComponent() == colourSelector)
@@ -153,8 +155,8 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 		init = virtualKeyboard->getKeyLayerColor(0);
 	colourSelector->setCurrentColour(init, dontSendNotification);
 
-	// fill swatches
-	colourLibrary = new ColourLibraryComponent(
+	// fill key color swatches
+	keyColourLibrary = new ColourLibraryComponent(
 		{ "Key Layer Colors:",
 			"Scale Degree Colors:",
 			"Individual Key Colors:" },
@@ -163,12 +165,19 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 		  virtualKeyboard->getKeyIndividualColours() }
 		, true, true
 	);
-	colourLibrary->setName("SVKColourLibrary");
-	colourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
-	controls.set(5, colourLibrary, true);
-	
-	addAndMakeVisible(colourLibrary);
-	getSectionFlexBox(2)->items.getReference(0).associatedComponent = colourLibrary;
+	keyColourLibrary->setName("KeyColourLibrary");
+	keyColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
+	controls.set(5, keyColourLibrary, true);
+	addAndMakeVisible(keyColourLibrary);
+	getSectionFlexBox(2)->items.getReference(0).associatedComponent = keyColourLibrary;
+
+	// fill note on color swatches
+	noteOnColourLibrary = new ColourLibraryComponent({ "Midi Channel Note On Colors:" }, { virtualKeyboard->getKeyNoteOnColours() }, true);
+	noteOnColourLibrary->setName("NoteOnColourLibrary");
+	noteOnColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
+	controls.set(6, noteOnColourLibrary, true);
+	addAndMakeVisible(noteOnColourLibrary);
+	getSectionFlexBox(3)->items.getReference(0).associatedComponent = noteOnColourLibrary;
 
 	// callback for setting color in keyboard
 	colourSelector->setFocusserCallback([&](Component* c, var dataIn) 
@@ -184,8 +193,8 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 
 void ColourSettingsPanel::refreshPanel()
 {
-	if (colourLibrary)
-		colourLibrary->refreshSwatches();
+	if (keyColourLibrary)
+		keyColourLibrary->refreshSwatches();
 }
 
 ColourSelector* ColourSettingsPanel::getColourSelector()
