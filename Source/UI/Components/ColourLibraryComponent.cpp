@@ -18,7 +18,6 @@ ColourLibraryComponent::ColourLibraryComponent(StringArray rowNamesIn, Array<Arr
 	for (auto rowName : rowNamesIn)
 	{
 		Label* label = new Label(rowName + "_Label", rowName);
-		//label->setColour(Label::ColourIds::outlineColourId, Colours::green);
 		rowLabels.add(label);
 		addAndMakeVisible(label);
 	}
@@ -71,15 +70,6 @@ void ColourLibraryComponent::setNewRows(Array<Array<Colour>*> arraysToControl)
 	setupFlex();
 }
 
-Label* ColourLibraryComponent::getNewOutliner()
-{
-	Random r;
-	Label* c = outlines.add(new Label());
-	c->setColour(Label::outlineColourId, Colour(r.nextFloat(), r.nextFloat(), r.nextFloat() / 3 + (2 / 3.0f), 1.0f));
-	addAndMakeVisible(c);
-	return c;
-}
-
 void ColourLibraryComponent::setupFlex()
 {
 	flexBox = FlexBox(
@@ -112,7 +102,6 @@ void ColourLibraryComponent::setupFlex()
 
 		FlexItem boxAsItem;
 		boxAsItem.associatedFlexBox = &rowBoxes.getReference(r);
-		//boxAsItem.associatedComponent = getNewOutliner();
 		boxAsItem.alignSelf = FlexItem::AlignSelf::stretch;
 		boxAsItem.margin = FlexItem::Margin(2, 0, 2, 8);
 		flexBox.items.add(boxAsItem);
