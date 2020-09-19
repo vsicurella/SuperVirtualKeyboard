@@ -397,7 +397,7 @@ namespace VirtualKeyboard
 		/*
 			Sets the display color of all the keys
 		*/
-		void updateKeyColors();
+		void updateKeyColors(bool writeToNode = true);
 
 		/*
 			Resets the color of all the keys in the given order to the current order color.

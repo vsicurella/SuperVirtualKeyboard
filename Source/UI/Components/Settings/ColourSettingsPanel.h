@@ -38,15 +38,7 @@ public:
 
 		PaintSwatch* swatch = dynamic_cast<PaintSwatch*>(componentPtr);
 		if (swatch)
-			setCurrentColour(swatch->getCurrentColour(), dontSendNotification);
-		else
-		{
-			VirtualKeyboard::Keyboard* svk = dynamic_cast<VirtualKeyboard::Keyboard*>(componentPtr);
-			if (svk)
-			{
-				svk->getProperties().set(IDs::colorSelected, getCurrentColour().toString());
-			}
-		}
+			setCurrentColour(swatch->getCurrentColour());
 	}
 
 
@@ -57,19 +49,13 @@ private:
 		FocusableComponent* focussed = dynamic_cast<FocusableComponent*>(currentFocus);
 
 		if (focussed)
-		{
 			focussed->performFocusFunction(getCurrentColour().toString());
-		}
-		else if (currentFocus)
-		{
-			currentFocus->getProperties().set(IDs::colorSelected, getCurrentColour().toString());
-		}
+		
+		focusserCallback(currentFocus, getCurrentColour().toString());
 	}
-
 };
 
-class ColourSettingsPanel : public SvkSettingsPanel,
-							public ChangeListener
+class ColourSettingsPanel : public SvkSettingsPanel
 {
 public:
 
@@ -89,9 +75,9 @@ public:
 
 	void mouseUp(const MouseEvent& event) override;
 
-	void changeListenerCallback(ChangeBroadcaster* source) override;
-
 	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
+
+	void refreshPanel() override;
 
 	ColourSelector* getColourSelector();
 

@@ -1106,7 +1106,7 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 	return c;
 }
 
-void Keyboard::updateKeyColors()
+void Keyboard::updateKeyColors(bool writeToNode)
 {
 	for (int i = 0; i < keys.size(); i++)
 	{
@@ -1114,47 +1114,50 @@ void Keyboard::updateKeyColors()
  		key->setDisplayColor(getKeyColor(i));
 	}
 
-	ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
-
-	ValueTree layersColorNode = ValueTree(IDs::pianoKeyColorsLayer);
-	for (int i = 0; i < keyColorsOrders.size(); i++)
+	if (writeToNode)
 	{
-		if (keyColorsOrders[i].isOpaque())
+		ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
+
+		ValueTree layersColorNode = ValueTree(IDs::pianoKeyColorsLayer);
+		for (int i = 0; i < keyColorsOrders.size(); i++)
 		{
-			ValueTree node(IDs::pianoKeyColor);
-			node.setProperty(IDs::pianoKeyColorsLayer, i, nullptr);
-			node.setProperty(IDs::pianoKeyColor, keyColorsOrders[i].toString(), nullptr);
-			layersColorNode.appendChild(node, nullptr);
+			if (keyColorsOrders[i].isOpaque())
+			{
+				ValueTree node(IDs::pianoKeyColor);
+				node.setProperty(IDs::pianoKeyColorsLayer, i, nullptr);
+				node.setProperty(IDs::pianoKeyColor, keyColorsOrders[i].toString(), nullptr);
+				layersColorNode.appendChild(node, nullptr);
+			}
 		}
-	}
-	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsLayer, nullptr).copyPropertiesAndChildrenFrom(layersColorNode, nullptr);
+		keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsLayer, nullptr).copyPropertiesAndChildrenFrom(layersColorNode, nullptr);
 
 
-	ValueTree degreesColorNode = ValueTree(IDs::pianoKeyColorsDegree);
-	for (int i = 0; i < keyColorsDegrees.size(); i++)
-	{
-		if (keyColorsDegrees[i].isOpaque())
+		ValueTree degreesColorNode = ValueTree(IDs::pianoKeyColorsDegree);
+		for (int i = 0; i < keyColorsDegrees.size(); i++)
 		{
-			ValueTree node(IDs::pianoKeyColor);
-			node.setProperty(IDs::pianoKeyColorsDegree, i, nullptr);
-			node.setProperty(IDs::pianoKeyColor, keyColorsDegrees[i].toString(), nullptr);
-			degreesColorNode.appendChild(node, nullptr);
+			if (keyColorsDegrees[i].isOpaque())
+			{
+				ValueTree node(IDs::pianoKeyColor);
+				node.setProperty(IDs::pianoKeyColorsDegree, i, nullptr);
+				node.setProperty(IDs::pianoKeyColor, keyColorsDegrees[i].toString(), nullptr);
+				degreesColorNode.appendChild(node, nullptr);
+			}
 		}
-	}
-	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsDegree, nullptr).copyPropertiesAndChildrenFrom(degreesColorNode, nullptr);
+		keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsDegree, nullptr).copyPropertiesAndChildrenFrom(degreesColorNode, nullptr);
 
-	ValueTree individualColorNode = ValueTree(IDs::pianoKeyColorsIndividual);
-	for (int i = 0; i < keyColorsIndividual.size(); i++)
-	{
-		if (keyColorsIndividual[i].isOpaque())
+		ValueTree individualColorNode = ValueTree(IDs::pianoKeyColorsIndividual);
+		for (int i = 0; i < keyColorsIndividual.size(); i++)
 		{
-			ValueTree node(IDs::pianoKeyColor);
-			node.setProperty(IDs::pianoKeyColorsIndividual, mode->getFixedDegree(i), nullptr);
-			node.setProperty(IDs::pianoKeyColor, keyColorsIndividual[i].toString(), nullptr);
-			individualColorNode.appendChild(node, nullptr);
+			if (keyColorsIndividual[i].isOpaque())
+			{
+				ValueTree node(IDs::pianoKeyColor);
+				node.setProperty(IDs::pianoKeyColorsIndividual, mode->getFixedDegree(i), nullptr);
+				node.setProperty(IDs::pianoKeyColor, keyColorsIndividual[i].toString(), nullptr);
+				individualColorNode.appendChild(node, nullptr);
+			}
 		}
+		keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsIndividual, nullptr).copyPropertiesAndChildrenFrom(individualColorNode, nullptr);
 	}
-	keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsIndividual, nullptr).copyPropertiesAndChildrenFrom(individualColorNode, nullptr);
 }
 
 void Keyboard::resetLayerColors()

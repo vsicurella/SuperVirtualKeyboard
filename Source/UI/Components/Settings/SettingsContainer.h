@@ -21,7 +21,7 @@
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent
+class SettingsContainer : public TabbedComponent, public SvkPluginState::Listener
 {
 public:
     
@@ -99,6 +99,15 @@ public:
 		{
 			if (keyboardPanels.contains(panelNames[i]))
 				panels[i]->setKeyboardPointer(keyboardPtrIn);
+		}
+	}
+
+	void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
+	{
+		for (auto p : panels)
+		{
+			if (p->getName() == "ColourSettingsPanel")
+				p->refreshPanel();
 		}
 	}
 

@@ -34,7 +34,6 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 	// Set up Color Selector and replace generic control
 	colourSelector = new FocussedColourSelector();
 	addAndMakeVisible(colourSelector);
-	colourSelector->addChangeListener(this);
 	controls.set(0, colourSelector, true);
 	getSectionFlexBox(0)->items.getReference(0).associatedComponent = colourSelector;
 
@@ -116,35 +115,33 @@ void ColourSettingsPanel::mouseDown(const MouseEvent& event)
 
 	// TODO: allow one click on virtual keyboard to set focus before painting?
 	if (event.eventComponent->getParentComponent() == virtualKeyboard)
+	{
 		colourSelector->setComponentToFocusOn(virtualKeyboard);
+
+		// TODO: better messaging for VirtualKeyboard changes
+		virtualKeyboard->updateKeyColors(false);
+		colourLibrary->refreshSwatches();
+	}
 
 	else if (colourSelector->isMouseOver() || event.eventComponent->getParentComponent() == colourSelector)
 		return;
 
 	else if (dynamic_cast<FocusableComponent*>(event.eventComponent))
+	{
 		colourSelector->setComponentToFocusOn(event.eventComponent);
 
+		// TODO: find out why this isn't being done in ColourSelector focusser callback
+		virtualKeyboard->getProperties().set(IDs::colorSelected, colourSelector->getCurrentColour().toString());
+	}
+	
 	else
 		colourSelector->setComponentToFocusOn(nullptr);
-
-	DBG("MOUSE DOWN ON: " + event.eventComponent->getName());
 }
 
 void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 {
 	if (!userClickedReset && resetColourToggle->getToggleState())
 		resetColourToggle->setToggleState(false, dontSendNotification);
-}
-
-void ColourSettingsPanel::changeListenerCallback(ChangeBroadcaster* source)
-{
-	if (source == colourSelector)
-	{
-		virtualKeyboard->getProperties().set(
-			IDs::colorSelected,
-			colourSelector->getCurrentColour().toString()
-		);
-	}
 }
 
 void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
@@ -157,20 +154,38 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 	colourSelector->setCurrentColour(init, dontSendNotification);
 
 	// fill swatches
-	controls.set(5, new ColourLibraryComponent(
+	colourLibrary = new ColourLibraryComponent(
 		{ "Key Layer Colors:",
 			"Scale Degree Colors:",
 			"Individual Key Colors:" },
 		{ virtualKeyboard->getKeyLayerColours(),
 		  virtualKeyboard->getKeyDegreeColours(),
 		  virtualKeyboard->getKeyIndividualColours() }
-		, true, true)
+		, true, true
 	);
-	controls[5]->setName("SVKColourLibrary");
-	addAndMakeVisible(controls[5]);
-	getSectionFlexBox(2)->items.getReference(0).associatedComponent = controls[5];
+	colourLibrary->setName("SVKColourLibrary");
+	colourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
+	controls.set(5, colourLibrary, true);
+	
+	addAndMakeVisible(colourLibrary);
+	getSectionFlexBox(2)->items.getReference(0).associatedComponent = colourLibrary;
 
+	// callback for setting color in keyboard
+	colourSelector->setFocusserCallback([&](Component* c, var dataIn) 
+	{ 
+		if (dynamic_cast<PaintSwatch*>(c))
+			virtualKeyboard->updateKeyColors(false);
+		else
+			virtualKeyboard->getProperties().set(IDs::colorSelected, dataIn); 
+	});
+	
 	virtualKeyboard->addMouseListener(this, true);
+}
+
+void ColourSettingsPanel::refreshPanel()
+{
+	if (colourLibrary)
+		colourLibrary->refreshSwatches();
 }
 
 ColourSelector* ColourSettingsPanel::getColourSelector()

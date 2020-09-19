@@ -159,6 +159,7 @@ void SvkPluginEditor::showSettingsDialog()
 		settingsPanel.reset(new SettingsContainer(pluginState));
 		settingsPanel->setKeyboardPointer(virtualKeyboard);
 		settingsPanel->addListener(this);
+		pluginState->addListener(settingsPanel.get());
 
 		settingsPanelOpen = true;
 		pluginEditorNode.setProperty(IDs::settingsOpen, true, nullptr);
@@ -176,6 +177,7 @@ void SvkPluginEditor::hideSettings()
 {
 	settingsPanel->removeListener(this);
 	settingsPanel->setVisible(false);
+	pluginState->removeListener(settingsPanel.get());
 	settingsPanel = nullptr;
 
 	settingsPanelOpen = false;
