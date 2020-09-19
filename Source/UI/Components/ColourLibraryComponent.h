@@ -100,8 +100,6 @@ private:
 
 	void setupFlex();
 
-	Label* getNewOutliner();
-
 private:
 
 	Array<Array<Colour>*> rowColours;
@@ -114,8 +112,6 @@ private:
 
 	bool showLabels;
 	bool onlyOpaque;
-
-	OwnedArray<Label> outlines;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourLibraryComponent)
 };
