@@ -124,7 +124,7 @@ struct SvkPluginState : public ChangeListener,
 
 	void commitModeInfo(bool sendChangeMessage = true);
 
-	// TODO: make it so it's not necessary to call this before saving
+	// TODO: make it so it's not necessary to call this before saving (?)
 	void commitStateNode();
 
 	static int isValidStateNode(ValueTree pluginStateNodeIn);
