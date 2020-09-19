@@ -114,6 +114,8 @@ public:
 		virtualKeyboard = keyboardPointer;
 	}
 
+	virtual void refreshPanel() {};
+
 	//=============================================================================================================
 
 	virtual void sliderValueChanged(Slider*) override {};
