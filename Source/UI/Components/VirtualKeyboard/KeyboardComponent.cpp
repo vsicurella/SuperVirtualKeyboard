@@ -128,6 +128,9 @@ void Keyboard::reset()
 	setKeySizeRatio(0.25f);
 	setKeyOrderSizeScalar(1);
 
+	keyOnColorsByChannel.resize(16);
+	keyOnColorsByChannel.fill(Colour());
+
 	mode = &modeDefault;
 	applyMode(mode);
 }
@@ -236,8 +239,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
 		if (key)
 		{
 			lastKeyOver = key->keyNumber;
-			//setMouseCursor(MouseCursor::CrosshairCursor);
-			getMouseCursor() = MouseCursor::CrosshairCursor;
+			setMouseCursor(MouseCursor::CrosshairCursor);
 		}
 		else
 		{
@@ -885,6 +887,15 @@ void Keyboard::applyMode(Mode* modeIn, bool resize)
 		);
 	}
 
+	keyOnColorsByChannel.fill(Colour());
+	for (auto noteOnColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsNoteOn))
+	{
+		keyOnColorsByChannel.set(
+			noteOnColor[IDs::pianoKeyColorsNoteOn],
+			Colour::fromString(noteOnColor[IDs::pianoKeyColor].toString())
+		);
+	}
+
 	updateKeyColors();
 
 	if (resize)
@@ -921,6 +932,9 @@ void Keyboard::displayKeyboardState(MidiKeyboardState* keyboardStateIn)
 
 void Keyboard::setUIMode(int uiModeIn)
 {
+	if (uiModeSelected == UIMode::editMode && uiModeIn != uiModeSelected)
+		updateKeyColors();
+
     uiModeSelected = uiModeIn;
 	pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
 	
@@ -1106,6 +1120,11 @@ Colour Keyboard::getKeyDegreeColor(int degIn)
 	return c;
 }
 
+Array<Colour>* Keyboard::getKeyNoteOnColours()
+{
+	return &keyOnColorsByChannel;
+}
+
 void Keyboard::updateKeyColors(bool writeToNode)
 {
 	for (int i = 0; i < keys.size(); i++)
@@ -1157,6 +1176,19 @@ void Keyboard::updateKeyColors(bool writeToNode)
 			}
 		}
 		keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsIndividual, nullptr).copyPropertiesAndChildrenFrom(individualColorNode, nullptr);
+
+		ValueTree keyOnColorNode = ValueTree(IDs::pianoKeyColorsNoteOn);
+		for (int i = 0; i < 16; i++)
+		{
+			if (keyOnColorsByChannel[i].isOpaque())
+			{
+				ValueTree node(IDs::pianoKeyColor);
+				node.setProperty(IDs::pianoKeyColorsNoteOn, i, nullptr);
+				node.setProperty(IDs::pianoKeyColor, keyOnColorsByChannel[i].toString(), nullptr);
+				keyOnColorNode.appendChild(node, nullptr);
+			}
+		}
+		keyColorsNode.getOrCreateChildWithName(IDs::pianoKeyColorsNoteOn, nullptr).copyPropertiesAndChildrenFrom(keyOnColorNode, nullptr);
 	}
 }
 
@@ -1430,26 +1462,24 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 {
     int keyTriggered = midiNote;
 
-    if (uiModeSelected == playMode)
-    {
-        Key* key = keys[keyTriggered];
-		key->exPressed = true;
-		key->exInputColor = Colour(powf((midiChannel - 1.0 / 16), 2) * 128, 0.667f, 0.667f, 1.0f);
-		key->isDirty = true;
-		hasDirtyKeys = true;
-    }
+    Key* key = keys[keyTriggered];
+	key->exPressed = true;
+
+	Colour keyOnColour = keyOnColorsByChannel[midiChannel];
+	if (!keyOnColour.isOpaque())
+		keyOnColour = key->color.contrasting(0.75f);
+
+	key->exInputColor = keyOnColour;
+	key->isDirty = true;
+	hasDirtyKeys = true;
+    
 }
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
 {
-    Key* key;
     int keyTriggered = midiNote;
-
-    if (uiModeSelected == playMode)
-    {
-        Key* key = keys[keyTriggered];
-		key->exPressed = false;
-		key->isDirty = true;
-		hasDirtyKeys = true;
-    }
+    Key* key = keys[keyTriggered];
+	key->exPressed = false;
+	key->isDirty = true;
+	hasDirtyKeys = true;
 }
