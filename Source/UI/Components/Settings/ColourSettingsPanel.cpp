@@ -17,24 +17,22 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 			IDs::pianoKeyColorsDegree,
 			IDs::pianoKeyColorsLayer,
 			IDs::pianoKeyColorsIndividual,
-			IDs::pianoKeyColorReset
+			IDs::pianoKeyColorReset,
+			Identifier("Swatch")
 		},
 		{
 			SvkControlProperties(ControlTypeNames::GenericControl, "Color Selector"),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Scale Degree", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Layer (hold Shift)", false, 1),
 			SvkControlProperties(ControlTypeNames::ToggleControl, "Paint by Individual Key (hold Ctrl)", false, 1),
-			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 1)
+			SvkControlProperties(ControlTypeNames::ToggleControl, "Reset Color to Default (Right-click)", false, 1),
+			SvkControlProperties(ControlTypeNames::GenericControl, "Color Library", false, 2)
 		},
 		FlexBox(), {}, { FlexItem() }
 	)
 {
 	// Set up Color Selector and replace generic control
-	colourSelector = new ColourSelector(
-		  ColourSelector::ColourSelectorOptions::showColourAtTop
-		+ ColourSelector::ColourSelectorOptions::editableColour
-		+ ColourSelector::ColourSelectorOptions::showColourspace
-	, 4, 0);
+	colourSelector = new FocussedColourSelector();
 	addAndMakeVisible(colourSelector);
 	colourSelector->addChangeListener(this);
 	controls.set(0, colourSelector, true);
@@ -55,6 +53,8 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 
 	resetColourToggle = static_cast<TextButton*>(controls[4]);
 	resetColourToggle->addListener(this);
+
+	addMouseListener(this, true);
 
 	setSize(100, 100);
 }
@@ -113,6 +113,21 @@ void ColourSettingsPanel::mouseDown(const MouseEvent& event)
 		resetColourToggle->setToggleState(true, dontSendNotification);
 		userClickedReset = false;
 	}
+
+	// TODO: allow one click on virtual keyboard to set focus before painting?
+	if (event.eventComponent->getParentComponent() == virtualKeyboard)
+		colourSelector->setComponentToFocusOn(virtualKeyboard);
+
+	else if (colourSelector->isMouseOver() || event.eventComponent->getParentComponent() == colourSelector)
+		return;
+
+	else if (dynamic_cast<FocusableComponent*>(event.eventComponent))
+		colourSelector->setComponentToFocusOn(event.eventComponent);
+
+	else
+		colourSelector->setComponentToFocusOn(nullptr);
+
+	DBG("MOUSE DOWN ON: " + event.eventComponent->getName());
 }
 
 void ColourSettingsPanel::mouseUp(const MouseEvent& event)
@@ -138,10 +153,22 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 
 	Colour init = Colour::fromString(virtualKeyboard->getProperties()[IDs::colorSelected].toString());
 	if (init.isTransparent())
-		init = virtualKeyboard->getKeyOrderColor(0);
+		init = virtualKeyboard->getKeyLayerColor(0);
 	colourSelector->setCurrentColour(init, dontSendNotification);
 
-	// TODO fill swatches
+	// fill swatches
+	controls.set(5, new ColourLibraryComponent(
+		{ "Key Layer Colors:",
+			"Scale Degree Colors:",
+			"Individual Key Colors:" },
+		{ virtualKeyboard->getKeyLayerColours(),
+		  virtualKeyboard->getKeyDegreeColours(),
+		  virtualKeyboard->getKeyIndividualColours() }
+		, true, true)
+	);
+	controls[5]->setName("SVKColourLibrary");
+	addAndMakeVisible(controls[5]);
+	getSectionFlexBox(2)->items.getReference(0).associatedComponent = controls[5];
 
 	virtualKeyboard->addMouseListener(this, true);
 }
