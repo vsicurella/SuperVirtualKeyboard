@@ -51,8 +51,8 @@ class FocussedComponent
 
 public:
 
-	FocussedComponent(Component* initialComponentToFocus = nullptr)
-		: currentFocus(initialComponentToFocus)
+	FocussedComponent(Component* initialComponentToFocus = nullptr, std::function<void(Component*, var)> focusserCallbackIn = {})
+		: currentFocus(initialComponentToFocus), focusserCallback(focusserCallbackIn)
 	{
 
 	}
@@ -68,15 +68,15 @@ public:
 		focusable = dynamic_cast<FocusableComponent*>(currentFocus);
 		if (focusable)
 			focusable->setNewFocusser(this);
-
-		if (currentFocus)
-			DBG("FOCUS SET TO: " + currentFocus->getName());
-		else
-			DBG("NO FOCUS");
 	}
 
+	void setFocusserCallback(std::function<void(Component*, var)> focusserCallbackIn)
+	{
+		focusserCallback = focusserCallbackIn;
+	}
 
 protected:
 
 	Component* currentFocus;
+	std::function<void(Component*, var)> focusserCallback;
 };
