@@ -22,8 +22,8 @@ class PaintSwatch : public Component, public FocusableComponent
 {
 public:
 
-	PaintSwatch(Colour initialColourIn, String swatchLabelIn = "", bool showLabelIn = false, std::function<void(var)> callback = {})
-		: currentColour(initialColourIn), swatchLabel(swatchLabelIn), showLabel(showLabelIn), FocusableComponent(nullptr, callback)
+	PaintSwatch(Array<Colour>& parentPaletteIn, int indexIn, String swatchLabelIn = "", bool showLabelIn = false, std::function<void(var)> callback = {})
+		: parentPalette(parentPaletteIn), index(indexIn), swatchLabel(swatchLabelIn), showLabel(showLabelIn), FocusableComponent(nullptr, callback)
 	{
 		setName("Swatch_" + swatchLabelIn);
 	};
@@ -32,9 +32,9 @@ public:
 
 	void paint(Graphics& g) override
 	{
-		g.fillAll(currentColour);
+		g.fillAll(getCurrentColour());
 
-		g.setColour(currentColour.contrasting());
+		g.setColour(getCurrentColour().contrasting());
 
 		if (showLabel)
 		{
@@ -60,18 +60,20 @@ public:
 
 	void performFocusFunction(var dataIn) override
 	{
-		currentColour = Colour::fromString(dataIn.toString());
+		parentPalette.set(index, Colour::fromString(dataIn.toString()));
 		repaint();
 	}
 
 	Colour getCurrentColour() const
 	{
-		return currentColour;
+		return parentPalette[index];
 	}
 
 private:
 
-	Colour currentColour;
+	Array<Colour>& parentPalette;
+	const int index;
+
 	String swatchLabel;
 
 	bool showLabel;
@@ -83,6 +85,17 @@ private:
 
 class ColourLibraryComponent : public juce::Component
 {
+
+public:
+
+	enum ColourIds
+	{
+		backgroundColourId		= 0x00010100,
+		rowBackgroundColourId	= 0x00010101,
+		outLineColourId			= 0x00010200,
+		rowOutlineColourId		= 0x00010201
+	};
+
 public:
 	ColourLibraryComponent(StringArray rowNamesIn, Array<Array<Colour>*> arraysToControl = {}, bool showLabelsIn = false, bool onlyOpaqueIn = false);
 	~ColourLibraryComponent() override;
@@ -96,11 +109,11 @@ public:
 
 	void setNewRows(Array<Array<Colour>*> arraysToControl);
 
+	void refreshSwatches();
+
 private:
 
 	void setupFlex();
-
-	Label* getNewOutliner();
 
 private:
 
@@ -114,8 +127,6 @@ private:
 
 	bool showLabels;
 	bool onlyOpaque;
-
-	OwnedArray<Label> outlines;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourLibraryComponent)
 };
