@@ -98,8 +98,14 @@
           <FILE id="nrWH1a" name="VirtualKeyboardKey.h" compile="0" resource="0"
                 file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.h"/>
         </GROUP>
+        <FILE id="Igtn8q" name="ColourLibraryComponent.cpp" compile="1" resource="0"
+              file="Source/UI/Components/ColourLibraryComponent.cpp"/>
+        <FILE id="WW9Jyf" name="ColourLibraryComponent.h" compile="0" resource="0"
+              file="Source/UI/Components/ColourLibraryComponent.h"/>
         <FILE id="V4qizf" name="DirectoryBrowserComponent.h" compile="0" resource="0"
               file="Source/UI/Components/DirectoryBrowserComponent.h"/>
+        <FILE id="zBGCOT" name="FocussedComponent.h" compile="0" resource="0"
+              file="Source/UI/Components/FocussedComponent.h"/>
         <FILE id="bA5eBo" name="LabelledComponent.h" compile="0" resource="0"
               file="Source/UI/Components/LabelledComponent.h"/>
         <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"

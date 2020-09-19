@@ -363,19 +363,36 @@ namespace VirtualKeyboard
         //===============================================================================================
         
 		/*
+			Returns a pointer to the individual key colors
+		*/
+		Array<Colour>* getKeyIndividualColours();
+
+		/*
 			Returns the color of the given key.
 		*/
         Colour getKeyColor(int keyNumIn);
 
 		/*
-			Returns the current key color of the given order.
+			Returns a pointer to the key layer colors
 		*/
-		Colour getKeyOrderColor(int orderIn);
+		Array<Colour>* getKeyLayerColours();
+
+		/*
+			Returns the current key layer of the given order.
+		*/
+		Colour getKeyLayerColor(int orderIn);
+
+		/*
+			Returns a pointer to the key scale degree colors
+		*/
+		Array<Colour>* getKeyDegreeColours();
 
 		/*
 			Returns the current key color of the given scale degree.
 		*/
 		Colour getKeyDegreeColor(int degIn);
+
+		//===============================================================================================
 
 		/*
 			Sets the display color of all the keys
@@ -396,6 +413,23 @@ namespace VirtualKeyboard
 			Reset all keys to the current colors of their orders.
 		*/
 		void resetKeyColors();
+
+		//===============================================================================================
+
+		/*
+			Sets the color of all keys of the given scale degree
+		*/
+		void setKeyDegreeColor(int scaleDegreeIn, Colour colourIn);
+
+		/*
+			Sets the color of all keys of the given layer
+		*/
+		void setKeyLayerColor(int layerNumIn, Colour colourIn);
+
+		/*
+			Sets the color of the given key
+		*/
+		void setKeyColor(int keyNumIn, Colour colourIn);
 
 		//===============================================================================================
 
