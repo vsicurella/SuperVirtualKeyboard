@@ -175,6 +175,7 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 	noteOnColourLibrary = new ColourLibraryComponent({ "Midi Channel Note On Colors:" }, { virtualKeyboard->getKeyNoteOnColours() }, true);
 	noteOnColourLibrary->setName("NoteOnColourLibrary");
 	noteOnColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
+	noteOnColourLibrary->forceSwatchColumns(8);
 	controls.set(6, noteOnColourLibrary, true);
 	addAndMakeVisible(noteOnColourLibrary);
 	getSectionFlexBox(3)->items.getReference(0).associatedComponent = noteOnColourLibrary;

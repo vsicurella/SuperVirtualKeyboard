@@ -111,6 +111,8 @@ public:
 
 	void refreshSwatches();
 
+	void forceSwatchColumns(int maxNumColumns);
+
 private:
 
 	void setupFlex();
@@ -127,6 +129,8 @@ private:
 
 	bool showLabels;
 	bool onlyOpaque;
+
+	int maxSwatchColumns = 0;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourLibraryComponent)
 };

@@ -60,7 +60,12 @@ void ColourLibraryComponent::resized()
 {	
 	for (int i = 0; i < flexBox.items.size(); i++)
 	{
-		flexBox.items.getReference(i).width = getWidth();
+		int maxWidth = getWidth();
+
+		if (maxSwatchColumns > 0)
+			maxWidth = 25 * maxSwatchColumns + 8; // default width plus margins
+
+		flexBox.items.getReference(i).width = maxWidth;
 		flexBox.items.getReference(i).height = 24;
 	}
 
@@ -118,6 +123,11 @@ void ColourLibraryComponent::refreshSwatches()
 	}
 
 	resized();
+}
+
+void ColourLibraryComponent::forceSwatchColumns(int maxNumColumns)
+{
+	maxSwatchColumns = maxNumColumns;
 }
 
 void ColourLibraryComponent::setupFlex()
