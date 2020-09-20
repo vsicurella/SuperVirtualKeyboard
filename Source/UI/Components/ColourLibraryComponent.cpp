@@ -125,9 +125,9 @@ void ColourLibraryComponent::setupFlex()
 	flexBox = FlexBox(
 		FlexBox::Direction::column,
 		FlexBox::Wrap::noWrap,
-		FlexBox::AlignContent::spaceAround,
+		FlexBox::AlignContent::flexStart,
 		FlexBox::AlignItems::stretch,
-		FlexBox::JustifyContent::spaceAround
+		FlexBox::JustifyContent::flexStart
 	);
 
 	rowBoxes.clear();
