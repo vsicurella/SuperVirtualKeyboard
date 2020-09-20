@@ -34,6 +34,12 @@ public:
 	{
 		g.fillAll(getCurrentColour());
 
+		if (getCurrentColour().isTransparent())
+		{
+			g.setColour(Colours::darkgrey.darker());
+			g.drawRect(getLocalBounds());
+		}
+
 		g.setColour(getCurrentColour().contrasting());
 
 		if (showLabel)
