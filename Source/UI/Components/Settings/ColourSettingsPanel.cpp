@@ -55,6 +55,8 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 	resetColourToggle = static_cast<TextButton*>(controls[4]);
 	resetColourToggle->addListener(this);
 
+	flexParent.items.getReference(numSections - 1).margin = FlexItem::Margin(0, 5, 0, 0);
+
 	addMouseListener(this, true);
 
 	setSize(100, 100);
