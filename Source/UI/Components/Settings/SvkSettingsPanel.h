@@ -15,7 +15,7 @@
 #include "../VirtualKeyboard/KeyboardComponent.h"
 
 #define defaultSectionFlexBox FlexBox(FlexBox::Direction::column, FlexBox::Wrap::wrap, FlexBox::AlignContent::stretch, FlexBox::AlignItems::flexStart, FlexBox::JustifyContent::spaceAround)
-#define defaultSectionFlexItem FlexItem(250, 24).withFlex(1.0f).withMargin(FlexItem::Margin(10, 5, 10, 5))
+#define defaultSectionFlexItem FlexItem(250, 24).withFlex(1.0f).withMargin(FlexItem::Margin(5, 5, 5, 5))
 #define defaultSectionAsFlexItem FlexItem(100, 100).withFlex(1.0f);
 
 class SvkSettingsPanel : public Component,
@@ -236,7 +236,7 @@ protected:
 
 	int controlMinWidth = 250;
 	int controlMinHeight = 24;
-	FlexItem::Margin controlMargin = FlexItem::Margin(10, 5, 10, 10);
+	FlexItem::Margin controlMargin = FlexItem::Margin(5, 5, 5, 5);
 	float controlFlex = 1.0f;
 
 	VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
