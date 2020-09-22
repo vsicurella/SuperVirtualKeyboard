@@ -316,6 +316,10 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 			setMidiChannel(midiSettings[IDs::keyboardMidiChannel]);
 		}
 
+		ValueTree keyboardSettings = presetNode.getChildWithName(IDs::pianoNode);
+		if (keyboardSettings.isValid())
+			keyboard->restoreNode(keyboardSettings);
+
 		ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
 		if (mapping.isValid())
 		{

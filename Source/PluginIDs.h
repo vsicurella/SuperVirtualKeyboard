@@ -101,7 +101,7 @@ static Identifier windowBoundsW("WindowW");
 static Identifier windowBoundsH("WindowH");
 static Identifier viewportPosition("ViewportPosition");
 static Identifier settingsOpen("SettingsOpen");
-static Identifier settingsTabNum("SettingsTabNum");
+static Identifier settingsTabName("SettingsTabName");
 
 // TODO: Refactor piano -> keyboard
 // Keyboard Component

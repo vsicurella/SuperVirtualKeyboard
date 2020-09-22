@@ -60,7 +60,7 @@ public:
 
 	SvkSettingsPanel(
 		String                       panelName,
-		SvkPluginState* pluginStateIn,
+		SvkPluginState*              pluginStateIn,
 		int                          numSectionsIn,
 		Array<Identifier>            controlIdsIn,
 		Array<SvkControlProperties>  controlTypesIn,
@@ -236,8 +236,6 @@ protected:
 
 	int controlMinWidth = 250;
 	int controlMinHeight = 24;
-	FlexItem::Margin controlMargin = FlexItem::Margin(5, 5, 5, 5);
-	float controlFlex = 1.0f;
 
 	VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
 };
