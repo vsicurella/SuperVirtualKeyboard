@@ -72,7 +72,7 @@ public:
 			? abletonUserLibrary.getChildFile(filename)
 			: File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(filename);
 
-		FileChooser chooser("Save Ableton Midi Map", intendedFile, ".mid");
+		FileChooser chooser("Save Ableton Midi Map", intendedFile, "*.mid");
 
 		if (chooser.browseForFileToSave(true))
 			return writeTo(chooser.getResult().getParentDirectory(), chooser.getResult().getFileName());
