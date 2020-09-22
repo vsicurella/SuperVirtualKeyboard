@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "..\Structures\Mode.h"
+#include "../Structures/Mode.h"
 
 static File abletonUserLibrary =
 #if JUCE_WINDOWS
