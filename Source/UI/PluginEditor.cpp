@@ -61,6 +61,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 		pluginEditorNode.setProperty(IDs::windowBoundsW, 1000, nullptr);
 		pluginEditorNode.setProperty(IDs::windowBoundsH, defaultHeight, nullptr);
 		pluginEditorNode.setProperty(IDs::viewportPosition, 250, nullptr);
+		pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
 	}
 
 	setSize(
@@ -75,6 +76,29 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	controlComponent->setViewPosition((int)pluginEditorNode[IDs::viewportPosition]);
 	controlComponent->resized(); // TODO: this is a fix - investigate
+
+	if (pluginEditorNode[IDs::settingsOpen])
+	{
+		// TODO: clean up
+
+		showSettingsDialog();
+
+		String tabName = pluginEditorNode[IDs::settingsTabName].toString();
+		int tabIndex = -1;
+
+		for (int i = 0; i < settingsPanel->getNumTabs(); i++)
+			if (settingsPanel->getTabNames()[i] == tabName)
+				tabIndex = i;
+
+		if (tabIndex >= 0)
+		{
+			settingsPanel->setCurrentTabIndex(tabIndex, false);
+		}
+		else
+		{
+			hideSettings();
+		}
+	}
 	
 #if (!JUCE_ANDROID && !JUCE_IOS)
 	startTimerHz(30);
@@ -405,6 +429,8 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
 		isColorEditing = false;
 		virtualKeyboard->setUIMode(UIMode::playMode);
 	}
+
+	pluginEditorNode.setProperty(IDs::settingsTabName, tabName, nullptr);
 }
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)

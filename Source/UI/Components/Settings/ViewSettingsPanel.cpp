@@ -70,7 +70,7 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
 	keyRatioSlider->addListener(this);
 
 	showNoteNumbers = static_cast<TextButton*>(controls[3]);
-	showNoteNumbers->setSize(Font().getStringWidth(showNoteNumbers->getButtonText()) + controlMargin.left, controlMinHeight);
+	showNoteNumbers->setSize(Font().getStringWidth(showNoteNumbers->getButtonText()) + 5, controlMinHeight);
 	showNoteNumbers->addListener(this);
 }
 
