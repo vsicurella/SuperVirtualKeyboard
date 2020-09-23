@@ -75,6 +75,7 @@ public:
 	ReferencedComboBox* getMode2Box();
 	void updateModeBoxMenus();
 
+	ImageButton* getSettingsButton();
 	TextButton* getModeInfoButton();
 
 	/*
