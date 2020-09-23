@@ -11,7 +11,10 @@
 #include "ViewSettingsPanel.h"
 
 ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("ViewSettingsPanel", pluginStateIn, 1,
+	: SvkSettingsPanel("ViewSettingsPanel", pluginStateIn,
+		{
+			"Keyboard settings"
+		},
 		{
 			IDs::keyboardKeysStyle,
 			IDs::keyboardHighlightStyle,

@@ -41,27 +41,27 @@ public:
 		int controlType;
 		String controlName;
 		bool controlLabelled;
-		int columnNum;
+		int sectionNum;
 		var defaultValue;
 		var minValue;
 		var maxValue;
 		var increment;
 
 		SvkControlProperties(
-			int typeIn = 1, String nameIn = "", bool labelled = false, int colNumIn = 0,
+			int typeIn = 1, String nameIn = "", bool labelled = false, int sectionNumIn = 0,
 			var defaultIn = var(), var minIn = 0, var maxIn = 1, var incrementIn = 1
 		) : 
-			controlType(typeIn), controlName(nameIn), controlLabelled(labelled), columnNum(colNumIn),
+			controlType(typeIn), controlName(nameIn), controlLabelled(labelled), sectionNum(sectionNumIn),
 			defaultValue(defaultIn), minValue(minIn), maxValue(maxIn), increment(incrementIn)
 		{};
 	};
 
 public:
-
+	
 	SvkSettingsPanel(
 		String                       panelName,
 		SvkPluginState*              pluginStateIn,
-		int                          numSectionsIn,
+		StringArray                  sectionNamesIn,
 		Array<Identifier>            controlIdsIn,
 		Array<SvkControlProperties>  controlTypesIn,
 		FlexBox                      flexParentStyle = FlexBox(),
@@ -69,17 +69,18 @@ public:
 		Array<FlexItem>              sectionItemsStyle = Array<FlexItem>()
 	) :
 		pluginState(pluginStateIn),
-		numSections(numSectionsIn),
+		sectionNames(sectionNamesIn),
 		controlIdentifiers(controlIdsIn),
-		controlTypes(controlTypesIn)
+		controlTypes(controlTypesIn),
+		flexParent(flexParentStyle)
 	{
 		setName(panelName);
+		numSections = sectionNames.size();
 
-		flexParent = flexParentStyle;
 		flexParent.items.resize(numSections);
 		FlexItem sectionDefault = defaultSectionAsFlexItem;
 		flexParent.items.fill(sectionDefault);
-		
+
 		// Combine given and default FlexBox styles
 		flexSections.addArray(sectionBoxStyle);
 		while (flexSections.size() < numSections)
@@ -90,18 +91,36 @@ public:
 		while (sectionsDefaultFlexItems.size() < numSections)
 			sectionsDefaultFlexItems.add(defaultSectionFlexItem);
 
-		// Associate section flexboxes with parent FlexItems
-		for (int i = 0; i < numSectionsIn; i++)
-		{
-			flexParent.items.getReference(i).associatedFlexBox = &flexSections.getReference(i);
-		}
-
+		setupSections();
 		setupControls();
 	}
 
 	virtual ~SvkSettingsPanel()
 	{
 
+	}
+
+	virtual void paint(Graphics& g) override
+	{
+		//g.fillAll(Colours::darkgrey);
+		//g.setColour(Colours::blueviolet);
+
+		//float x = 0;
+		//for (int i = 0; i < flexParent.items.size(); i++)
+		//{
+		//	FlexItem& item = flexParent.items.getReference(i);
+		//	Rectangle<float> rect = { x, 0, item.width, item.height };
+		//	x += item.width;
+
+		//	g.fillRoundedRectangle(rect.reduced(3, 3), 3.0f);
+		//}
+
+		g.setColour(Colour(0xff323e44).darker());
+
+		for (auto label : sectionHeaderLabels)
+		{
+			g.fillRoundedRectangle(label->getBounds().reduced(2.0f, 0).toFloat(), 5.0f);
+		}
 	}
 
 	void resized() override
@@ -135,7 +154,7 @@ protected:
 
 	FlexItem* getControlFlexItem(int controlNum)
 	{
-		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].columnNum);
+		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].sectionNum);
 		for (int i = 0; i < sectionBox->items.size(); i++)
 		{
 			FlexItem* item = &sectionBox->items.getReference(i);
@@ -148,7 +167,7 @@ protected:
 
 	bool setControlFlexItem(int controlNum, FlexItem flexItemIn)
 	{
-		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].columnNum);
+		FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].sectionNum);
 		for (int i = 0; i < sectionBox->items.size(); i++)
 		{
 			if (sectionBox->items.getReference(i).associatedComponent == controls[controlNum])
@@ -161,6 +180,25 @@ protected:
 	}
 
 private:
+
+	void setupSections()
+	{
+		// Associate section flexboxes with parent FlexItems and add section headers
+		for (int i = 0; i < numSections; i++)
+		{
+			FlexBox& section = flexSections.getReference(i);
+			flexParent.items.getReference(i).associatedFlexBox = &section;
+
+			String header = sectionNames[i];
+			if (header.length() > 0)
+			{
+				Label* l = sectionHeaderLabels.add(new Label(getName() + "_Header" + String(i), header));
+
+				addAndMakeVisible(l);
+				section.items.add(FlexItem(225, 24, *l));
+			}
+		}
+	}
 
 	void setupControls()
 	{
@@ -204,7 +242,7 @@ private:
 
 				controls.add(control);
 
-				int sectionNum = jmin(properties.columnNum, numSections - 1);
+				int sectionNum = jmin(properties.sectionNum, numSections - 1);
 				FlexBox& section = flexSections.getReference(sectionNum);
 				FlexItem item = sectionsDefaultFlexItems[sectionNum];
 				item.associatedComponent = control;
@@ -220,11 +258,13 @@ protected:
 	
 	SvkPluginState* pluginState;
 
+	StringArray sectionNames;
 	int numSections;
 
 	Array<Identifier> controlIdentifiers;
 	Array<SvkControlProperties> controlTypes;
 
+	OwnedArray<Label> sectionHeaderLabels;
 	Array<FlexBox> flexSections;
 	FlexBox flexParent;
 

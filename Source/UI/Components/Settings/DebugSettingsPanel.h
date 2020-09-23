@@ -21,7 +21,7 @@ public:
 	~DebugSettingsPanel();
 
 
-	void paint(Graphics& g) override;
+	//void paint(Graphics& g) override;
 	//void resized() override;
 
 	void timerCallback() override;

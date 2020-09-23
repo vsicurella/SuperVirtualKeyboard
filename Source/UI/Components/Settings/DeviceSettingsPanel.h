@@ -19,9 +19,7 @@ public:
     
     DeviceSettingsPanel(SvkPluginState*);
     ~DeviceSettingsPanel();
-    
-    
-    void paint(Graphics& g) override;
+
     void resized() override;
 
 	void visibilityChanged() override;

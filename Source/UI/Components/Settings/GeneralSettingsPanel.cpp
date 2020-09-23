@@ -11,7 +11,7 @@
 #include "GeneralSettingsPanel.h"
 
 GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("GeneralSettingsPanel", pluginStateIn, 1,
+	: SvkSettingsPanel("GeneralSettingsPanel", pluginStateIn, { "File Directories" },
 		{
 			IDs::presetDirectory,
 			IDs::modeDirectory,
@@ -26,9 +26,9 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 		{ FlexBox(
 			FlexBox::Direction::column,
 			FlexBox::Wrap::wrap,
-			FlexBox::AlignContent::spaceBetween,
+			FlexBox::AlignContent::flexStart,
 			FlexBox::AlignItems::center,
-			FlexBox::JustifyContent::spaceAround
+			FlexBox::JustifyContent::flexStart
 		)}
 	)
 {
@@ -40,21 +40,21 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 		item.minWidth = 500;
 	}
 
-	presetLabel = static_cast<LabelledComponent*>(controls[0]);
+	presetLabel = static_cast<LabelledComponent*>(idToControl[IDs::presetDirectory]);
 	presetLabel->setComponentSize(320, 24);
 
 	presetDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(presetLabel);
 	presetDirectoryBrowser->setText(pluginState->getPluginSettings()->getPresetPath());
 	presetDirectoryBrowser->addListener(this);
 
-	modeLabel = static_cast<LabelledComponent*>(controls[1]);
+	modeLabel = static_cast<LabelledComponent*>(idToControl[IDs::modeDirectory]);
 	modeLabel->setComponentSize(320, 24);
 
 	modeDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(modeLabel);
 	modeDirectoryBrowser->setText(pluginState->getPluginSettings()->getModePath());
 	modeDirectoryBrowser->addListener(this);
 
-	settingsLabel = static_cast<LabelledComponent*>(controls[2]);
+	settingsLabel = static_cast<LabelledComponent*>(idToControl[IDs::settingsDirectory]);
 	settingsLabel->setComponentSize(320, 24);
 
 	settingsDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(settingsLabel);

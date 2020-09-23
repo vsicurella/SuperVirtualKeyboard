@@ -67,7 +67,7 @@ public:
 			addTab(panelNames[i], tabColour, panels[i], true);
 		}
 
-        setCurrentTabIndex(0, false);
+		setCurrentTabIndex(getTabNames().indexOf(pluginState->pluginEditorNode[IDs::settingsTabName].toString()), false);
         setSize(100, 100);
     }
 
@@ -148,9 +148,9 @@ private:
 		, "Device"
 		, "View"
 		, "Colors"
-#if JUCE_DEBUG
-		, "Debug"
-#endif
+//#if JUCE_DEBUG
+//		, "Debug"
+//#endif
 	};
 
 	StringArray keyboardPanels = { "View", "Colors", "Debug" };
