@@ -79,25 +79,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 	if (pluginEditorNode[IDs::settingsOpen])
 	{
-		// TODO: clean up
-
 		showSettingsDialog();
-
-		String tabName = pluginEditorNode[IDs::settingsTabName].toString();
-		int tabIndex = -1;
-
-		for (int i = 0; i < settingsPanel->getNumTabs(); i++)
-			if (settingsPanel->getTabNames()[i] == tabName)
-				tabIndex = i;
-
-		if (tabIndex >= 0)
-		{
-			settingsPanel->setCurrentTabIndex(tabIndex, false);
-		}
-		else
-		{
-			hideSettings();
-		}
+		controlComponent->getSettingsButton()->setToggleState(true, dontSendNotification);
 	}
 	
 #if (!JUCE_ANDROID && !JUCE_IOS)

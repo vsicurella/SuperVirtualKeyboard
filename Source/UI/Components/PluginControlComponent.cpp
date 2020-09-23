@@ -302,6 +302,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 	if (presetNodeIn.hasType(IDs::presetNode) && (float)presetNodeIn[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
 	{
 		presetNode = presetNodeIn;
+
 		ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
 		if (properties.isValid())
 		{
@@ -621,6 +622,11 @@ ReferencedComboBox* PluginControlComponent::getMode2Box()
 void PluginControlComponent::updateModeBoxMenus()
 {
 
+}
+
+ImageButton* PluginControlComponent::getSettingsButton()
+{
+	return settingsButton.get();
 }
 
 TextButton* PluginControlComponent::getModeInfoButton()
