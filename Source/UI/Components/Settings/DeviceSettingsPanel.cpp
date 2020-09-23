@@ -11,7 +11,7 @@
 #include "DeviceSettingsPanel.h"
 
 DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("DeviceSettingsPanel", pluginStateIn, 1,
+	: SvkSettingsPanel("DeviceSettingsPanel", pluginStateIn, { "MIDI Input & Output" },
 		{ 
 			IDs::midiInputName,
 			IDs::midiOutputName 
@@ -24,12 +24,12 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 {
 	FlexBox& col1 = flexSections.getReference(0);
 
-	inputBoxLabelled = static_cast<LabelledComponent*>(col1.items[0].associatedComponent);
+	inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiInputName]);
 	inputBoxLabelled->setComponentSize(320, 24);
 	inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
 	inputBox->addListener(this);
 
-	outputBoxLabelled = static_cast<LabelledComponent*>(col1.items[1].associatedComponent);
+	outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiOutputName]);
 	outputBoxLabelled->setComponentSize(320, 24);
 	outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
 	outputBox->addListener(this);
@@ -43,11 +43,6 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 
 DeviceSettingsPanel::~DeviceSettingsPanel()
 {
-}
-
-void DeviceSettingsPanel::paint(Graphics& g)
-{
-	SvkSettingsPanel::paint(g);
 }
 
 void DeviceSettingsPanel::resized()

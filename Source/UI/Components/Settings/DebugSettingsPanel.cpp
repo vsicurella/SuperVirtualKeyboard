@@ -11,7 +11,7 @@
 #include "DebugSettingsPanel.h"
 
 DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("DebugSettingsPanel", pluginState, 1, {}, {}),
+	: SvkSettingsPanel("DebugSettingsPanel", pluginState, { "" }, {}, {}),
 	  pluginState(pluginStateIn)
 {
     setSize(100, 100);
@@ -68,18 +68,18 @@ DebugSettingsPanel::~DebugSettingsPanel()
 //    }
 //}
 //
-void DebugSettingsPanel::paint(Graphics& g)
-{
-    g.setColour(Colours::palegreen);
-    g.fillAll();
-    
-    if (controlIdentifiers.size() == 0)
-    {
-        g.setColour(Colours::black);
-        g.drawText("No parameters", getWidth()/2, getHeight()/2,
-                   getWidth(), getHeight(), Justification::centred);
-    }
-}
+//void DebugSettingsPanel::paint(Graphics& g)
+//{
+//    g.setColour(Colours::palegreen);
+//    g.fillAll();
+//    
+//    if (controlIdentifiers.size() == 0)
+//    {
+//        g.setColour(Colours::black);
+//        g.drawText("No parameters", getWidth()/2, getHeight()/2,
+//                   getWidth(), getHeight(), Justification::centred);
+//    }
+//}
 
 //
 //void DebugSettingsPanel::sliderValueChanged(Slider *slider)

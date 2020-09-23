@@ -11,7 +11,13 @@
 #include "ColourSettingsPanel.h"
 
 ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
-	: SvkSettingsPanel("ColourSettingsPanel", stateIn, 4,
+	: SvkSettingsPanel("ColourSettingsPanel", stateIn,
+		{
+			"",
+			"Choose settings then click keys to paint:",
+			"Select a box to adjust the color:",
+			""
+		},
 		{
 			IDs::pianoKeyColor,
 			IDs::pianoKeyColorsDegree,
@@ -39,20 +45,20 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
 	controls.set(0, colourSelector, true);
 	getSectionFlexBox(0)->items.getReference(0).associatedComponent = colourSelector;
 
-	degreePaintButton = static_cast<TextButton*>(controls[1]);
+	degreePaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsDegree]);
 	degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	degreePaintButton->setToggleState(true, dontSendNotification);
 	degreePaintButton->addListener(this);
 
-	layerPaintButton = static_cast<TextButton*>(controls[2]);
+	layerPaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsLayer]);
 	layerPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	layerPaintButton->addListener(this);
 
-	keyPaintButton = static_cast<TextButton*>(controls[3]);
+	keyPaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsIndividual]);
 	keyPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
 	keyPaintButton->addListener(this);
 
-	resetColourToggle = static_cast<TextButton*>(controls[4]);
+	resetColourToggle = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorReset]);
 	resetColourToggle->addListener(this);
 
 	flexParent.items.getReference(numSections - 1).margin = FlexItem::Margin(0, 5, 0, 0);
@@ -171,7 +177,7 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
 	keyColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
 	controls.set(5, keyColourLibrary, true);
 	addAndMakeVisible(keyColourLibrary);
-	getSectionFlexBox(2)->items.getReference(0).associatedComponent = keyColourLibrary;
+	getSectionFlexBox(2)->items.getReference(1).associatedComponent = keyColourLibrary;
 
 	// fill note on color swatches
 	noteOnColourLibrary = new ColourLibraryComponent({ "Midi Channel Note On Colors:" }, { virtualKeyboard->getKeyNoteOnColours() }, true);
