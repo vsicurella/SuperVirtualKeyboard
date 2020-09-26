@@ -57,10 +57,10 @@
                 file="Source/UI/Components/Settings/DebugSettingsPanel.h"/>
           <FILE id="pVHdR9" name="SvkSettingsPanel.h" compile="0" resource="0"
                 file="Source/UI/Components/Settings/SvkSettingsPanel.h"/>
-          <FILE id="KEkYN4" name="DeviceSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/DeviceSettingsPanel.cpp"/>
-          <FILE id="sinhC5" name="DeviceSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/DeviceSettingsPanel.h"/>
+          <FILE id="KEkYN4" name="MidiSettingsPanel.cpp" compile="1" resource="0"
+                file="Source/UI/Components/Settings/MidiSettingsPanel.cpp"/>
+          <FILE id="sinhC5" name="MidiSettingsPanel.h" compile="0" resource="0"
+                file="Source/UI/Components/Settings/MidiSettingsPanel.h"/>
           <FILE id="RbrLvj" name="GeneralSettingsPanel.cpp" compile="1" resource="0"
                 file="Source/UI/Components/Settings/GeneralSettingsPanel.cpp"/>
           <FILE id="TKlTxI" name="GeneralSettingsPanel.h" compile="0" resource="0"

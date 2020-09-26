@@ -1,16 +1,16 @@
 	/*
   ==============================================================================
 
-    DeviceSettingsPanel.cpp
+    MidiSettingsPanel.cpp
     Created: 13 Nov 2019 7:09:59pm
     Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
 
-#include "DeviceSettingsPanel.h"
+#include "MidiSettingsPanel.h"
 
-DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
+MidiSettingsPanel::MidiSettingsPanel(SvkPluginState* pluginStateIn)
 	: SvkSettingsPanel("MidiSettingsPanel", pluginStateIn, 
 		{ 
 			"Filters",
@@ -92,11 +92,11 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 	}
 }
 
-DeviceSettingsPanel::~DeviceSettingsPanel()
+MidiSettingsPanel::~MidiSettingsPanel()
 {
 }
 
-void DeviceSettingsPanel::visibilityChanged()
+void MidiSettingsPanel::visibilityChanged()
 {
 	if (isVisible() && JUCEApplication::isStandaloneApp())
 	{
@@ -109,7 +109,7 @@ void DeviceSettingsPanel::visibilityChanged()
 	}
 }
 
-void DeviceSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
+void MidiSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
 {
 	if (sliderThatChanged == periodShiftSlider)
 	{
@@ -127,7 +127,7 @@ void DeviceSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
 	}
 }
 
-void DeviceSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
+void MidiSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
 {
 	// Midi Input Changed
 	if (inputBox == comboBoxThatChanged)
@@ -146,12 +146,12 @@ void DeviceSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
 	}
 }
 
-void DeviceSettingsPanel::timerCallback()
+void MidiSettingsPanel::timerCallback()
 {
 	refreshDevices();
 }
 
-void DeviceSettingsPanel::refreshDevices()
+void MidiSettingsPanel::refreshDevices()
 {
 	Array<MidiDeviceInfo> inputDevices = MidiInput::getAvailableDevices();
 
