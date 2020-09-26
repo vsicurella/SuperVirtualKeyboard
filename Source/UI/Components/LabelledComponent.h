@@ -65,6 +65,9 @@ public:
 		addAndMakeVisible(label.get());
 
 		setLabelSize(font.getStringWidth(label->getText()) + 8, 24);
+
+		// Default Size
+		component->setSize(225, 24);
 	}
 
 	~LabelledComponent()
