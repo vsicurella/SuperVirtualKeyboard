@@ -22,24 +22,9 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginState* pluginStateIn)
 			SvkControlProperties(ControlTypeNames::DirectoryControl, "Mode Directory", true),
 			SvkControlProperties(ControlTypeNames::DirectoryControl, "Settings Directory", true)
 		},
-		FlexBox(),
-		{ FlexBox(
-			FlexBox::Direction::column,
-			FlexBox::Wrap::wrap,
-			FlexBox::AlignContent::flexStart,
-			FlexBox::AlignItems::center,
-			FlexBox::JustifyContent::flexStart
-		)}
+		FlexBox(), {}
 	)
 {
-	FlexBox& col1 = flexSections.getReference(0);
-	for (int i = 0; i < col1.items.size(); i++)
-	{
-		FlexItem& item = col1.items.getReference(i);
-		item.maxHeight = 24;
-		item.minWidth = 500;
-	}
-
 	presetLabel = static_cast<LabelledComponent*>(idToControl[IDs::presetDirectory]);
 	presetLabel->setComponentSize(320, 24);
 
