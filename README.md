@@ -2,6 +2,8 @@
 
 LATEST VERSION: Alpha 2020-10-?? (v0.03)
 
+![SuperVirtualKeyboard Preview](/Resources/SVK-SuperPyth22-Preview.png)
+
 ## SUMMARY:
 
 Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore different keyboard layouts with the intention of making microtonal scales easier to digest and compose with.
