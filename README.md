@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2020-08-?? (v0.03)
+LATEST VERSION: Alpha 2020-10-?? (v0.03)
 
 ## SUMMARY:
 
@@ -40,22 +40,23 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
    * I can add support for old presets upon request
    * The new preset structure includes versioning which make backwards-compatibility more feasible
 1. Improved GUI
-1. Reintroduced key color features
-1. Adjacent key placement style
-1. Fixed period shifting and transposition
+1. New Settings menu
+   * Reintroduced key color features
+   * Adjacent key placement style
+   * Fixed period shifting and transposition
+   * MIDI Device selection for standalone app
 
 ### To do:
 * Add manual mapping
-* Add input/output MIDI device configuration to allow for standalone app
 * Allow piano keys to be triggered by computer keyboard keys
 * Add note names
 * Add tuning capability (??)
 * Add preset tags and improve preset browsing and management
-* Customize key sizes and positions
+* Advanced key shape customization
 * Change keyboard orientation
 * Graphics shading & other niceties
 * Different methods of scale creating
-* I have more grandiose ideas too...
+* More...
 
 ### Known Bugs:
  - Window resizing is bad funky

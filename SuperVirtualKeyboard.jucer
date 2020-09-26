@@ -7,149 +7,152 @@
               pluginAUMainType="'aumi'" version="0.03" displaySplashScreen="1"
               jucerFormatVersion="1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
-    <FILE id="jXtU8j" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
-    <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
-      <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
-      <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"
-            file="Source/Midi/MidiProcessor.cpp"/>
-    </GROUP>
-    <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
-      <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
-            file="Source/Resources/FactoryModes.txt"/>
-    </GROUP>
-    <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
-      <FILE id="tTU60E" name="AbletonMidiWriter.h" compile="0" resource="0"
-            file="Source/File IO/AbletonMidiWriter.h"/>
-      <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
-            file="Source/File IO/ReaperWriter.cpp"/>
-      <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
-    </GROUP>
-    <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
-      <FILE id="Nrr3qL" name="OwnedHashMap.h" compile="1" resource="0" file="Source/Structures/OwnedHashMap.h"/>
-      <FILE id="YBCQwi" name="MappingHelper.cpp" compile="1" resource="0"
-            file="Source/Structures/MappingHelper.cpp"/>
-      <FILE id="DZVjmF" name="MappingHelper.h" compile="0" resource="0" file="Source/Structures/MappingHelper.h"/>
-      <FILE id="x6boMo" name="ModeMapper.cpp" compile="1" resource="0" file="Source/Structures/ModeMapper.cpp"/>
-      <FILE id="kIMFVq" name="ModeMapper.h" compile="0" resource="0" file="Source/Structures/ModeMapper.h"/>
-      <FILE id="vATes6" name="NoteMap.cpp" compile="1" resource="0" file="Source/Structures/NoteMap.cpp"/>
-      <FILE id="uK2AIM" name="NoteMap.h" compile="0" resource="0" file="Source/Structures/NoteMap.h"/>
-      <FILE id="VyoYfT" name="FractionalGrid.cpp" compile="1" resource="0"
-            file="Source/Structures/FractionalGrid.cpp"/>
-      <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"
-            file="Source/Structures/FractionalGrid.h"/>
-      <FILE id="doFNva" name="Mode.cpp" compile="1" resource="0" file="Source/Structures/Mode.cpp"/>
-      <FILE id="ZNc2fR" name="Mode.h" compile="0" resource="0" file="Source/Structures/Mode.h"/>
-      <FILE id="ScqT7w" name="Preset.cpp" compile="1" resource="0" file="Source/Structures/Preset.cpp"/>
-      <FILE id="nGJjJ7" name="Preset.h" compile="0" resource="0" file="Source/Structures/Preset.h"/>
-      <FILE id="uMBTI9" name="MidiFilter.h" compile="0" resource="0" file="Source/Structures/MidiFilter.h"/>
-      <FILE id="DYjSKl" name="MidiFilter.cpp" compile="1" resource="0" file="Source/Structures/MidiFilter.cpp"/>
-    </GROUP>
-    <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
-      <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">
-        <GROUP id="{27BD5BE9-AE8C-2637-CC5B-9D29EED4280E}" name="Settings">
-          <FILE id="AeAfD0" name="ColourSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/ColourSettingsPanel.cpp"/>
-          <FILE id="fNQNUU" name="ColourSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/ColourSettingsPanel.h"/>
-          <FILE id="WAuZHP" name="DebugSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/DebugSettingsPanel.cpp"/>
-          <FILE id="WbGfKu" name="DebugSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/DebugSettingsPanel.h"/>
-          <FILE id="pVHdR9" name="SvkSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/SvkSettingsPanel.h"/>
-          <FILE id="KEkYN4" name="MidiSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/MidiSettingsPanel.cpp"/>
-          <FILE id="sinhC5" name="MidiSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/MidiSettingsPanel.h"/>
-          <FILE id="RbrLvj" name="GeneralSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/GeneralSettingsPanel.cpp"/>
-          <FILE id="TKlTxI" name="GeneralSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/GeneralSettingsPanel.h"/>
-          <FILE id="MN6Ieh" name="ViewSettingsPanel.cpp" compile="1" resource="0"
-                file="Source/UI/Components/Settings/ViewSettingsPanel.cpp"/>
-          <FILE id="picLqI" name="ViewSettingsPanel.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/ViewSettingsPanel.h"/>
-          <FILE id="ov612C" name="SettingsContainer.h" compile="0" resource="0"
-                file="Source/UI/Components/Settings/SettingsContainer.h"/>
-        </GROUP>
-        <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
-          <FILE id="zI44G5" name="KeyboardComponent.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.cpp"/>
-          <FILE id="kxFSq5" name="KeyboardComponent.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.h"/>
-          <FILE id="mtt2tt" name="KeyboardController.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardController.cpp"/>
-          <FILE id="EzMc1u" name="KeyboardController.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardController.h"/>
-          <FILE id="YGl0dL" name="KeyboardViewport.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.cpp"/>
-          <FILE id="Ig80c3" name="KeyboardViewport.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.h"/>
-          <FILE id="dM2sHw" name="VirtualKeyboardGraphics.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.cpp"/>
-          <FILE id="nUaAvH" name="VirtualKeyboardGraphics.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.h"/>
-          <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
-          <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.h"/>
-          <FILE id="iTruVv" name="VirtualKeyboardKey.cpp" compile="1" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.cpp"/>
-          <FILE id="nrWH1a" name="VirtualKeyboardKey.h" compile="0" resource="0"
-                file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.h"/>
-        </GROUP>
-        <FILE id="Igtn8q" name="ColourLibraryComponent.cpp" compile="1" resource="0"
-              file="Source/UI/Components/ColourLibraryComponent.cpp"/>
-        <FILE id="WW9Jyf" name="ColourLibraryComponent.h" compile="0" resource="0"
-              file="Source/UI/Components/ColourLibraryComponent.h"/>
-        <FILE id="V4qizf" name="DirectoryBrowserComponent.h" compile="0" resource="0"
-              file="Source/UI/Components/DirectoryBrowserComponent.h"/>
-        <FILE id="zBGCOT" name="FocussedComponent.h" compile="0" resource="0"
-              file="Source/UI/Components/FocussedComponent.h"/>
-        <FILE id="bA5eBo" name="LabelledComponent.h" compile="0" resource="0"
-              file="Source/UI/Components/LabelledComponent.h"/>
-        <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
-              file="Source/UI/Components/PluginControlComponent.cpp"/>
-        <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"
-              file="Source/UI/Components/PluginControlComponent.h"/>
-        <FILE id="gtGOgZ" name="ReferencedComboBox.cpp" compile="1" resource="0"
-              file="Source/UI/Components/ReferencedComboBox.cpp"/>
-        <FILE id="el2G9f" name="ReferencedComboBox.h" compile="0" resource="0"
-              file="Source/UI/Components/ReferencedComboBox.h"/>
+    <GROUP id="{E6193C1C-4830-9051-F8B2-795EEC7393A3}" name="Source">
+      <FILE id="jXtU8j" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
+      <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
+        <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
+        <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"
+              file="Source/Midi/MidiProcessor.cpp"/>
       </GROUP>
-      <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
-        <FILE id="KNufAG" name="MapByOrderDialog.cpp" compile="1" resource="0"
-              file="Source/UI/Dialogs/MapByOrderDialog.cpp"/>
-        <FILE id="Pt2NrT" name="MapByOrderDialog.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/MapByOrderDialog.h"/>
-        <FILE id="eRcvHJ" name="ModeInfoDialog.cpp" compile="1" resource="0"
-              file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
-        <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
-              file="Source/UI/Dialogs/ModeInfoDialog.h"/>
+      <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
+        <FILE id="F9wuSY" name="FactoryModes.txt" compile="0" resource="1"
+              file="Source/Resources/FactoryModes.txt"/>
       </GROUP>
-      <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/UI/PluginEditor.cpp"/>
-      <FILE id="gGW61u" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
-      <FILE id="cry3qn" name="VectorResources.h" compile="0" resource="0"
-            file="Source/UI/VectorResources.h"/>
+      <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
+        <FILE id="tTU60E" name="AbletonMidiWriter.h" compile="0" resource="0"
+              file="Source/File IO/AbletonMidiWriter.h"/>
+        <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
+              file="Source/File IO/ReaperWriter.cpp"/>
+        <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
+      </GROUP>
+      <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
+        <FILE id="Nrr3qL" name="OwnedHashMap.h" compile="1" resource="0" file="Source/Structures/OwnedHashMap.h"/>
+        <FILE id="YBCQwi" name="MappingHelper.cpp" compile="1" resource="0"
+              file="Source/Structures/MappingHelper.cpp"/>
+        <FILE id="DZVjmF" name="MappingHelper.h" compile="0" resource="0" file="Source/Structures/MappingHelper.h"/>
+        <FILE id="x6boMo" name="ModeMapper.cpp" compile="1" resource="0" file="Source/Structures/ModeMapper.cpp"/>
+        <FILE id="kIMFVq" name="ModeMapper.h" compile="0" resource="0" file="Source/Structures/ModeMapper.h"/>
+        <FILE id="vATes6" name="NoteMap.cpp" compile="1" resource="0" file="Source/Structures/NoteMap.cpp"/>
+        <FILE id="uK2AIM" name="NoteMap.h" compile="0" resource="0" file="Source/Structures/NoteMap.h"/>
+        <FILE id="VyoYfT" name="FractionalGrid.cpp" compile="1" resource="0"
+              file="Source/Structures/FractionalGrid.cpp"/>
+        <FILE id="fljtTQ" name="FractionalGrid.h" compile="0" resource="0"
+              file="Source/Structures/FractionalGrid.h"/>
+        <FILE id="doFNva" name="Mode.cpp" compile="1" resource="0" file="Source/Structures/Mode.cpp"/>
+        <FILE id="ZNc2fR" name="Mode.h" compile="0" resource="0" file="Source/Structures/Mode.h"/>
+        <FILE id="ScqT7w" name="Preset.cpp" compile="1" resource="0" file="Source/Structures/Preset.cpp"/>
+        <FILE id="nGJjJ7" name="Preset.h" compile="0" resource="0" file="Source/Structures/Preset.h"/>
+        <FILE id="uMBTI9" name="MidiFilter.h" compile="0" resource="0" file="Source/Structures/MidiFilter.h"/>
+        <FILE id="DYjSKl" name="MidiFilter.cpp" compile="1" resource="0" file="Source/Structures/MidiFilter.cpp"/>
+      </GROUP>
+      <GROUP id="{E30FAF37-2BCD-6C29-09AA-D5901B9BE7EA}" name="UI">
+        <GROUP id="{7A0AD078-ADB6-88A8-9B33-1BEDF45D5BE3}" name="Components">
+          <GROUP id="{27BD5BE9-AE8C-2637-CC5B-9D29EED4280E}" name="Settings">
+            <FILE id="AeAfD0" name="ColourSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/ColourSettingsPanel.cpp"/>
+            <FILE id="fNQNUU" name="ColourSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/ColourSettingsPanel.h"/>
+            <FILE id="WAuZHP" name="DebugSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/DebugSettingsPanel.cpp"/>
+            <FILE id="WbGfKu" name="DebugSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/DebugSettingsPanel.h"/>
+            <FILE id="pVHdR9" name="SvkSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/SvkSettingsPanel.h"/>
+            <FILE id="KEkYN4" name="MidiSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/MidiSettingsPanel.cpp"/>
+            <FILE id="sinhC5" name="MidiSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/MidiSettingsPanel.h"/>
+            <FILE id="RbrLvj" name="GeneralSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/GeneralSettingsPanel.cpp"/>
+            <FILE id="TKlTxI" name="GeneralSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/GeneralSettingsPanel.h"/>
+            <FILE id="MN6Ieh" name="ViewSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/ViewSettingsPanel.cpp"/>
+            <FILE id="picLqI" name="ViewSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/ViewSettingsPanel.h"/>
+            <FILE id="ov612C" name="SettingsContainer.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/SettingsContainer.h"/>
+          </GROUP>
+          <GROUP id="{4D7D80DF-F732-5ABB-BC6A-A7DFBE3682D7}" name="VirtualKeyboard">
+            <FILE id="zI44G5" name="KeyboardComponent.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.cpp"/>
+            <FILE id="kxFSq5" name="KeyboardComponent.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardComponent.h"/>
+            <FILE id="mtt2tt" name="KeyboardController.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardController.cpp"/>
+            <FILE id="EzMc1u" name="KeyboardController.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardController.h"/>
+            <FILE id="YGl0dL" name="KeyboardViewport.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.cpp"/>
+            <FILE id="Ig80c3" name="KeyboardViewport.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/KeyboardViewport.h"/>
+            <FILE id="dM2sHw" name="VirtualKeyboardGraphics.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.cpp"/>
+            <FILE id="nUaAvH" name="VirtualKeyboardGraphics.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGraphics.h"/>
+            <FILE id="oU1eBt" name="VirtualKeyboardGrid.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.cpp"/>
+            <FILE id="I4oGg0" name="VirtualKeyboardGrid.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardGrid.h"/>
+            <FILE id="iTruVv" name="VirtualKeyboardKey.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.cpp"/>
+            <FILE id="nrWH1a" name="VirtualKeyboardKey.h" compile="0" resource="0"
+                  file="Source/UI/Components/VirtualKeyboard/VirtualKeyboardKey.h"/>
+          </GROUP>
+          <FILE id="Igtn8q" name="ColourLibraryComponent.cpp" compile="1" resource="0"
+                file="Source/UI/Components/ColourLibraryComponent.cpp"/>
+          <FILE id="WW9Jyf" name="ColourLibraryComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/ColourLibraryComponent.h"/>
+          <FILE id="V4qizf" name="DirectoryBrowserComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/DirectoryBrowserComponent.h"/>
+          <FILE id="zBGCOT" name="FocussedComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/FocussedComponent.h"/>
+          <FILE id="bA5eBo" name="LabelledComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/LabelledComponent.h"/>
+          <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
+                file="Source/UI/Components/PluginControlComponent.cpp"/>
+          <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"
+                file="Source/UI/Components/PluginControlComponent.h"/>
+          <FILE id="gtGOgZ" name="ReferencedComboBox.cpp" compile="1" resource="0"
+                file="Source/UI/Components/ReferencedComboBox.cpp"/>
+          <FILE id="el2G9f" name="ReferencedComboBox.h" compile="0" resource="0"
+                file="Source/UI/Components/ReferencedComboBox.h"/>
+        </GROUP>
+        <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
+          <FILE id="KNufAG" name="MapByOrderDialog.cpp" compile="1" resource="0"
+                file="Source/UI/Dialogs/MapByOrderDialog.cpp"/>
+          <FILE id="Pt2NrT" name="MapByOrderDialog.h" compile="0" resource="0"
+                file="Source/UI/Dialogs/MapByOrderDialog.h"/>
+          <FILE id="eRcvHJ" name="ModeInfoDialog.cpp" compile="1" resource="0"
+                file="Source/UI/Dialogs/ModeInfoDialog.cpp"/>
+          <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
+                file="Source/UI/Dialogs/ModeInfoDialog.h"/>
+        </GROUP>
+        <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
+              file="Source/UI/PluginEditor.cpp"/>
+        <FILE id="gGW61u" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
+        <FILE id="cry3qn" name="VectorResources.h" compile="0" resource="0"
+              file="Source/UI/VectorResources.h"/>
+      </GROUP>
+      <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
+            file="Source/CommonFunctions.h"/>
+      <FILE id="qf8oNW" name="PluginIDs.h" compile="1" resource="0" file="Source/PluginIDs.h"/>
+      <FILE id="iiiGEu" name="PluginModes.h" compile="0" resource="0" file="Source/PluginModes.h"/>
+      <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
+      <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
+      <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="RXVf6v" name="PluginSettings.cpp" compile="1" resource="0"
+            file="Source/PluginSettings.cpp"/>
+      <FILE id="a1oozu" name="PluginSettings.h" compile="0" resource="0"
+            file="Source/PluginSettings.h"/>
+      <FILE id="go0rYg" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
+      <FILE id="CD8Pzj" name="PresetManager.cpp" compile="1" resource="0"
+            file="Source/PresetManager.cpp"/>
     </GROUP>
-    <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
-          file="Source/CommonFunctions.h"/>
-    <FILE id="qf8oNW" name="PluginIDs.h" compile="1" resource="0" file="Source/PluginIDs.h"/>
-    <FILE id="iiiGEu" name="PluginModes.h" compile="0" resource="0" file="Source/PluginModes.h"/>
-    <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
-    <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
-    <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"
-          file="Source/PluginProcessor.cpp"/>
-    <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
-          file="Source/PluginProcessor.h"/>
-    <FILE id="RXVf6v" name="PluginSettings.cpp" compile="1" resource="0"
-          file="Source/PluginSettings.cpp"/>
-    <FILE id="a1oozu" name="PluginSettings.h" compile="0" resource="0"
-          file="Source/PluginSettings.h"/>
-    <FILE id="go0rYg" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
-    <FILE id="CD8Pzj" name="PresetManager.cpp" compile="1" resource="0"
-          file="Source/PresetManager.cpp"/>
+    <FILE id="uIhRsv" name="README.md" compile="0" resource="1" file="README.md"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
