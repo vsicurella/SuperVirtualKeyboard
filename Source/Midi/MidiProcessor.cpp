@@ -441,17 +441,15 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 	numInputMsgs = 0;
 
     // Process external input
-    auto inputEvents = MidiBuffer::Iterator(midiMessages);
-    MidiMessage msg;
-    int smpl;
-    int midiNote;
-	int inputSize = 0;
-
 	MidiBuffer combinedMessages;
+	MidiMessage msg;
+	int midiNote;
 	
 	// Add external input into queue
-    while (inputEvents.getNextEvent(msg, smpl))
+    for (auto msgData : midiMessages)
     {
+		msg = msgData.getMessage();
+
 		if (msg.isNoteOnOrOff())
 		{
 			midiNote = msg.getNoteNumber();
@@ -472,14 +470,14 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 			remappedKeyboardState->processNextMidiEvent(msg);
 		}
 
-		combinedMessages.addEvent(msg, smpl);
-		inputSize++;
+		combinedMessages.addEvent(msg, msgData.samplePosition);
     }
 
 	// Output Filtering on all MIDI events
-	auto allMidiEvents = MidiBuffer::Iterator(svkBuffer);
-	while (allMidiEvents.getNextEvent(msg, smpl))
+	for (auto msgData : svkBuffer)
 	{
+		msg = msgData.getMessage();
+
 		// Process transpositions
 		if (msg.isNoteOnOrOff())
 		{
@@ -496,7 +494,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 			msg.setNoteNumber(midiNote);
 		}
 
-		combinedMessages.addEvent(msg, inputSize + smpl);
+		combinedMessages.addEvent(msg, msgData.samplePosition);
 	}
 
 	svkBuffer.clear();
