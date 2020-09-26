@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    DeviceSettingsPanel.h
+    MidiSettingsPanel.h
     Created: 13 Nov 2019 7:09:59pm
     Author:  Vincenzo Sicurella
 
@@ -12,13 +12,13 @@
 
 #include "SvkSettingsPanel.h"
 
-class DeviceSettingsPanel : public SvkSettingsPanel, public Timer
+class MidiSettingsPanel : public SvkSettingsPanel, public Timer
 {
     
 public:
     
-    DeviceSettingsPanel(SvkPluginState*);
-    ~DeviceSettingsPanel();
+    MidiSettingsPanel(SvkPluginState*);
+    ~MidiSettingsPanel();
 
 	void visibilityChanged() override;
 
@@ -49,5 +49,5 @@ private:
 	SvkMidiProcessor* midiProcessor;
 
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeviceSettingsPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiSettingsPanel)
 };

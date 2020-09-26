@@ -12,7 +12,7 @@
 #include "../../../PluginState.h"
 
 #include "GeneralSettingsPanel.h"
-#include "DeviceSettingsPanel.h"
+#include "MidiSettingsPanel.h"
 #include "ViewSettingsPanel.h"
 #include "ColourSettingsPanel.h"
 //#include "ControlSettingsPanel.h"
@@ -46,7 +46,7 @@ public:
 				panels.add(new GeneralSettingsPanel(pluginState));
 
 			else if (panelName == "Midi")
-				panels.add(new DeviceSettingsPanel(pluginState));
+				panels.add(new MidiSettingsPanel(pluginState));
 
 			else if (panelName == "View")
 				panels.add(new ViewSettingsPanel(pluginState));
