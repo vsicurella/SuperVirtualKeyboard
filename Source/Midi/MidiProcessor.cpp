@@ -90,7 +90,10 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 		midiSettingsNode = midiSettingsNodeIn;
       
 		periodShift = midiSettingsNode[IDs::periodShift];
+		transposeAmt = midiSettingsNode[IDs::transposeAmt];
 		midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
+		// Note transposition is updated when new mode is applied
+
 
 		// TODO: check if devices exist, give a name to imply if it doesn't
 		if (JUCEApplication::isStandaloneApp)
@@ -267,6 +270,13 @@ void SvkMidiProcessor::setPeriodShift(int periodsToShift)
 {
 	periodShift = periodsToShift;
 	midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
+	updateNoteTransposition();
+}
+
+void SvkMidiProcessor::setTransposeAmt(int transposeAmtIn)
+{
+	transposeAmt = transposeAmtIn;
+	midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
 	updateNoteTransposition();
 }
 

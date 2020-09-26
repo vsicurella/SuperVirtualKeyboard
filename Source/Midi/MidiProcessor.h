@@ -88,6 +88,11 @@ public:
 	void setPeriodShift(int periodsToShift);
 
 	/*
+		Sets the value to transpose all notes by
+	*/
+	void setTransposeAmt(int transposeAmtIn);
+
+	/*
 		The MIDI channel for mouse-based virtual keyboard interaction
 	*/
 	void setMidiChannelOut(int virtualKeyboardMidiChannelOut);
