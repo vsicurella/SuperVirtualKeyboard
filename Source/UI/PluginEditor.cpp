@@ -492,8 +492,6 @@ void SvkPluginEditor::getAllCommands(Array<CommandID>& c)
         IDs::CommandIDs::showMapOrderEdit,
 		IDs::CommandIDs::applyMapping,
 		IDs::CommandIDs::beginColorEditing,
-		IDs::CommandIDs::setPeriodShift,
-		IDs::CommandIDs::setMidiChannelOut
 	};
 
 	c.addArray(commands);
@@ -569,12 +567,12 @@ void SvkPluginEditor::getCommandInfo(CommandID commandID, ApplicationCommandInfo
 	case IDs::CommandIDs::beginColorEditing:
 		result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Keyboard", 0);
 		break;
-	case IDs::CommandIDs::setPeriodShift:
-		result.setInfo("Shift by Mode 2 Period", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
-		break;
-	case IDs::CommandIDs::setMidiChannelOut:
-		result.setInfo("Set MIDI Channel Out", "Set the outgoing MIDI Notes to the selected MIDI Channel.", "Midi", 0);
-		break;
+	//case IDs::CommandIDs::setPeriodShift:
+	//	result.setInfo("Shift by Mode 2 Period", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
+	//	break;
+	//case IDs::CommandIDs::setMidiChannelOut:
+	//	result.setInfo("Set MIDI Channel Out", "Set the outgoing MIDI Notes to the selected MIDI Channel.", "Midi", 0);
+	//	break;
 	//case IDs::CommandIDs::showMidiNoteNumbers:
 	//	result.setInfo("Show Midi Note Numbers", "Shows incoming MIDI notes on Mode 1 and outgoing MIDI Notes on Mode 2.", "Keyboard", 0);
 	//	break;
@@ -686,16 +684,6 @@ bool SvkPluginEditor::perform(const InvocationInfo &info)
 		case IDs::CommandIDs::beginColorEditing:
 		{
 			beginColorEditing();
-			break;
-		}
-		case IDs::CommandIDs::setPeriodShift:
-		{
-			pluginState->getMidiProcessor()->setPeriodShift(controlComponent->getPeriodShift());
-			break;
-		}
-		case IDs::CommandIDs::setMidiChannelOut:
-		{
-			pluginState->getMidiProcessor()->setMidiChannelOut(controlComponent->getMidiChannel());
 			break;
 		}
         default:
