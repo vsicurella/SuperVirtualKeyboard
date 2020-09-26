@@ -22,6 +22,8 @@ public:
 
 	void visibilityChanged() override;
 
+	void sliderValueChanged(Slider* sliderThatChanged) override;
+
 	void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
 
 	void timerCallback() override;
@@ -43,6 +45,8 @@ private:
 
 	Array<MidiDeviceInfo> availableIns;
 	Array<MidiDeviceInfo> availableOuts;
+
+	SvkMidiProcessor* midiProcessor;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DeviceSettingsPanel)

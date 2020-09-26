@@ -46,20 +46,28 @@ DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
 		idToLabelledControl.set(id, static_cast<LabelledComponent*>(idToControl[id]));
 	}
 
+	midiProcessor = pluginState->getMidiProcessor();
+
 	idToLabelledControl[IDs::periodShift]->setComponentSize(100, 24);
 	periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::periodShift]);
 	periodShiftSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
 	periodShiftSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
+	periodShiftSlider->setValue(midiProcessor->getPeriodShift());
+	periodShiftSlider->addListener(this);
 
 	idToLabelledControl[IDs::transposeAmt]->setComponentSize(100, 24);
 	transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::transposeAmt]);
 	transposeSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
 	transposeSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
+	transposeSlider->setValue(midiProcessor->getTransposeAmt());
+	transposeSlider->addListener(this);
 
 	idToLabelledControl[IDs::keyboardMidiChannel]->setComponentSize(100, 24);
 	midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::keyboardMidiChannel]);
 	midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
 	midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
+	midiChannelSlider->setValue(midiProcessor->getMidiChannelOut());
+	midiChannelSlider->addListener(this);
 
 	// Setup device settings if on standalone version, or hide
 	if (JUCEApplication::isStandaloneApp())
@@ -98,6 +106,24 @@ void DeviceSettingsPanel::visibilityChanged()
 	else
 	{
 		stopTimer();
+	}
+}
+
+void DeviceSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
+{
+	if (sliderThatChanged == periodShiftSlider)
+	{
+		midiProcessor->setPeriodShift(sliderThatChanged->getValue());
+	}
+
+	else if (sliderThatChanged == transposeSlider)
+	{
+		midiProcessor->setTransposeAmt(sliderThatChanged->getValue());
+	}
+
+	else if (sliderThatChanged == periodShiftSlider)
+	{
+		midiProcessor->setMidiChannelOut(sliderThatChanged->getValue());
 	}
 }
 
