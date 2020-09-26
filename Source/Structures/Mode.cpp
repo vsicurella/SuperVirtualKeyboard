@@ -247,7 +247,7 @@ void Mode::updateProperties()
 	orders = repeatArray(ordersDefault, 128, offset);
     modeDegrees = ordersToModalDegrees(orders);
     scaleDegrees = generateScaleDegrees(scaleSize, offset);
-	mosClass = reverseArray(intervalAmounts(steps)).removeAllInstancesOf(0);
+	mosClass = intervalAmounts(steps);
     keyboardOrdersSizes = intervalAmounts(orders);
 	stepsOfOrders = repeatIndicies(foldOrdersToSteps(orders));
 }
@@ -755,20 +755,30 @@ Array<int> Mode::generateScaleDegrees(int scaleSize, int offset)
 
 Array<int> Mode::intervalAmounts(Array<int> stepsIn)
 {
-	Array<int> intervals;
-	int step;
+	HashMap<int, int> intervalCount;
+	Array<int> stepTypes;
 
-	for (int i = 0; i < stepsIn.size(); i++)
+	for (auto step : stepsIn)
 	{
-		step = stepsIn[i];
-
-		if (intervals.size() < step)
-			intervals.resize(step);
-
-		intervals.set(step, intervals[step] + 1);
+		if (intervalCount.contains(step))
+			intervalCount.set(step, intervalCount[step] + 1);
+		else
+		{
+			intervalCount.set(step, 1);
+			stepTypes.add(step);
+		}
 	}
 
-	return intervals;
+	stepTypes.sort();
+
+	Array<int> intervalAmountsOut;
+
+	for (int i = stepTypes.size() - 1; i >= 0; i--)
+	{
+		intervalAmountsOut.add(intervalCount[stepTypes[i]]);
+	}
+
+	return intervalAmountsOut;
 }
 
 Array<int> Mode::sumArray(Array<int> stepsIn, int offsetIn, bool includePeriod)
