@@ -83,13 +83,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     modeInfoButton->setButtonText (TRANS("i"));
     modeInfoButton->addListener (this);
 
-    periodShiftSld.reset (new Slider ("Period Shift Slider"));
-    addAndMakeVisible (periodShiftSld.get());
-    periodShiftSld->setRange (-10, 10, 1);
-    periodShiftSld->setSliderStyle (Slider::IncDecButtons);
-    periodShiftSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
-    periodShiftSld->addListener (this);
-
     mode1ViewBtn.reset (new ToggleButton ("Mode1 View Button"));
     addAndMakeVisible (mode1ViewBtn.get());
     mode1ViewBtn->setButtonText (String());
@@ -131,31 +124,6 @@ PluginControlComponent::PluginControlComponent (AudioProcessorValueTreeState& pr
     mapStyleBox->addItem (TRANS("Scale To Mode"), 2);
     mapStyleBox->addItem (TRANS("By Orders"), 3);
     mapStyleBox->addListener (this);
-
-    midiChannelSld.reset (new Slider ("Midi Channel Slider"));
-    addAndMakeVisible (midiChannelSld.get());
-    midiChannelSld->setRange (1, 16, 1);
-    midiChannelSld->setSliderStyle (Slider::IncDecButtons);
-    midiChannelSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
-    midiChannelSld->addListener (this);
-
-    midiChannelLbl.reset (new Label ("Midi Channel Label",
-                                     TRANS("MIDI Channel:")));
-    addAndMakeVisible (midiChannelLbl.get());
-    midiChannelLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    midiChannelLbl->setJustificationType (Justification::centredLeft);
-    midiChannelLbl->setEditable (false, false, false);
-    midiChannelLbl->setColour (TextEditor::textColourId, Colours::black);
-    midiChannelLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    periodShiftLbl.reset (new Label ("Period Shift Label",
-                                     TRANS("Period Shift:")));
-    addAndMakeVisible (periodShiftLbl.get());
-    periodShiftLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    periodShiftLbl->setJustificationType (Justification::centredLeft);
-    periodShiftLbl->setEditable (false, false, false);
-    periodShiftLbl->setColour (TextEditor::textColourId, Colours::black);
-    periodShiftLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     mapStyleLbl.reset (new Label ("Mapping Style Label",
                                   TRANS("Mapping Style:")));
@@ -275,15 +243,11 @@ PluginControlComponent::~PluginControlComponent()
     mode2RootSld = nullptr;
     scaleEntryBtn = nullptr;
     modeInfoButton = nullptr;
-    periodShiftSld = nullptr;
     mode1ViewBtn = nullptr;
     mode2ViewBtn = nullptr;
     mode1RootLbl = nullptr;
     mode2RootLbl = nullptr;
     mapStyleBox = nullptr;
-    midiChannelSld = nullptr;
-    midiChannelLbl = nullptr;
-    periodShiftLbl = nullptr;
     mapStyleLbl = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
@@ -308,13 +272,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 		{
 			setMode2View((int)properties[IDs::modeSelectorViewed]);
 			setMappingMode(properties[IDs::mappingMode]);
-		}
-
-		ValueTree midiSettings = presetNode.getChildWithName(IDs::midiSettingsNode);
-		if (midiSettings.isValid())
-		{
-			setPeriodShift(midiSettings[IDs::periodShift]);
-			setMidiChannel(midiSettings[IDs::keyboardMidiChannel]);
 		}
 
 		ValueTree keyboardSettings = presetNode.getChildWithName(IDs::pianoNode);
@@ -428,17 +385,10 @@ void PluginControlComponent::resized()
 
 	mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
 	mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
-
-	int bottomBarY = getHeight() - barHeight - gap;
-
-	periodShiftLbl->setBounds(gap, bottomBarY, 88, barHeight);
-	periodShiftSld->setBounds(periodShiftLbl->getRight(), bottomBarY, 88, barHeight);
-	midiChannelLbl->setBounds(periodShiftSld->getRight() + gap, bottomBarY, 96, barHeight);
-	midiChannelSld->setBounds(midiChannelLbl->getRight(), bottomBarY, 86, barHeight);
-
+	
 	float scrollPosition = (float)getProperties()[IDs::viewportPosition] / keyboard->getWidth();
 	
-	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(bottomBarY - keyboardY - gap, 1));
+	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(getHeight() - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(getHeight() / 28.0f);
 	
 	int height = keyboardViewport->getMaximumVisibleHeight();
@@ -479,14 +429,6 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
 		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMode2RootNote, true);
 		mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
-    }
-    else if (sliderThatWasMoved == periodShiftSld.get())
-    {
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setPeriodShift, true);
-    }
-    else if (sliderThatWasMoved == midiChannelSld.get())
-    {
-		appCmdMgr->invokeDirectly(IDs::CommandIDs::setMidiChannelOut, true);
     }
 }
 
@@ -575,8 +517,6 @@ void PluginControlComponent::connectToProcessor()
 {
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::mappingMode.toString(), *mapModeBox.get()));
     comboBoxAttachments.add(new ComboBoxAttachment(processorTree, IDs::modeMappingStyle.toString(), *mapStyleBox.get()));
-    sliderAttachments.add(new SliderAttachment(processorTree, IDs::periodShift.toString(), *periodShiftSld.get()));
-    sliderAttachments.add(new SliderAttachment(processorTree, IDs::keyboardMidiChannel.toString(), *midiChannelSld.get()));
 }
 
 VirtualKeyboard::Keyboard* PluginControlComponent::getKeyboard()
@@ -781,24 +721,4 @@ void PluginControlComponent::setMode2Root(int rootIn, NotificationType notify)
 {
 	mode2RootSld->setValue(rootIn, notify);
 	mode2RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
-}
-
-int PluginControlComponent::getPeriodShift()
-{
-	return periodShiftSld->getValue();
-
-}
-void PluginControlComponent::setPeriodShift(int periodsIn, NotificationType notify)
-{
-	periodShiftSld->setValue(periodsIn);
-}
-
-int PluginControlComponent::getMidiChannel()
-{
-	return midiChannelSld->getValue();
-}
-
-void PluginControlComponent::setMidiChannel(int channelIn, NotificationType notify)
-{
-	midiChannelSld->setValue(channelIn, notify);
 }

@@ -122,12 +122,6 @@ public:
 	int getMode2Root();
 	void setMode2Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	int getPeriodShift();
-	void setPeriodShift(int periodsIn, NotificationType notify = NotificationType::dontSendNotification);
-
-	int getMidiChannel();
-	void setMidiChannel(int channelIn, NotificationType notify = NotificationType::dontSendNotification);
-
 private:
     AudioProcessorValueTreeState& processorTree;
 	ApplicationCommandManager* appCmdMgr;
@@ -162,15 +156,11 @@ private:
     std::unique_ptr<Slider> mode2RootSld;
     std::unique_ptr<TextButton> scaleEntryBtn;
     std::unique_ptr<TextButton> modeInfoButton;
-    std::unique_ptr<Slider> periodShiftSld;
     std::unique_ptr<ToggleButton> mode1ViewBtn;
     std::unique_ptr<ToggleButton> mode2ViewBtn;
     std::unique_ptr<Label> mode1RootLbl;
     std::unique_ptr<Label> mode2RootLbl;
     std::unique_ptr<ComboBox> mapStyleBox;
-    std::unique_ptr<Slider> midiChannelSld;
-    std::unique_ptr<Label> midiChannelLbl;
-    std::unique_ptr<Label> periodShiftLbl;
     std::unique_ptr<Label> mapStyleLbl;
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
