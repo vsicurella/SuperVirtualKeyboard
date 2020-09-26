@@ -209,12 +209,16 @@ private:
 			Identifier id = controlIdentifiers[i];
 			SvkControlProperties properties = controlTypes[i];
 
+			Slider* slider = nullptr;
 			Component* control = nullptr;
 
 			switch (properties.controlType)
 			{
 			case ControlTypeNames::SliderControl:
-				control = new Slider(properties.controlName);
+				slider = new Slider(properties.controlName);
+				slider->setRange(properties.minValue, properties.maxValue, properties.increment);
+				slider->setValue(properties.defaultValue, dontSendNotification);
+				control = slider;
 				break;
 
 			case ControlTypeNames::ToggleControl:
