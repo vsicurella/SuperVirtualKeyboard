@@ -40,16 +40,12 @@ public:
         //view->setScrollBarsShown(true, false);
         //addAndMakeVisible(view.get());
 
-		// Ability to change input and output device, only for Standalone version
-		if (!JUCEApplicationBase::isStandaloneApp())
-			panelNames.remove(1);
-
 		for (auto panelName : panelNames)
 		{
 			if (panelName == "General")
 				panels.add(new GeneralSettingsPanel(pluginState));
 
-			else if (panelName == "Device")
+			else if (panelName == "Midi")
 				panels.add(new DeviceSettingsPanel(pluginState));
 
 			else if (panelName == "View")
@@ -145,7 +141,7 @@ private:
 	StringArray panelNames =
 	{
 		"General"
-		, "Device"
+		, "Midi"
 		, "View"
 		, "Colors"
 //#if JUCE_DEBUG

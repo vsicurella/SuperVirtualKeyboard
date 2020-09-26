@@ -11,48 +11,86 @@
 #include "DeviceSettingsPanel.h"
 
 DeviceSettingsPanel::DeviceSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("DeviceSettingsPanel", pluginStateIn, { "MIDI Input & Output" },
+	: SvkSettingsPanel("MidiSettingsPanel", pluginStateIn, 
 		{ 
+			"Filters",
+			"Devices"
+		},
+		{ 
+			IDs::periodShift,
+			IDs::transposeAmt,
+			IDs::keyboardMidiChannel,
 			IDs::midiInputName,
 			IDs::midiOutputName 
 		},
 		{ 
-			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Input Device", true),
-			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Output Device", true)
+			SvkControlProperties(ControlTypeNames::SliderControl, "Period Shift", true, 0, 0, -10, 10),
+			SvkControlProperties(ControlTypeNames::SliderControl, "Transpose", true, 0, 0, -128, 128),
+			SvkControlProperties(ControlTypeNames::SliderControl, "MIDI Channel Out", true, 0, 1, 1, 16),
+			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Input Device", true, 1),
+			SvkControlProperties(ControlTypeNames::MenuControl, "Midi Output Device", true, 1)
 		}
 	)
 {
-	FlexBox& col1 = flexSections.getReference(0);
+	Array<Identifier> labelledControlIDs =
+	{
+		IDs::periodShift,
+		IDs::transposeAmt,
+		IDs::keyboardMidiChannel,
+		IDs::midiInputName,
+		IDs::midiOutputName
+	};
 
-	inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiInputName]);
-	inputBoxLabelled->setComponentSize(320, 24);
-	inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
-	inputBox->addListener(this);
+	for (auto id : labelledControlIDs)
+	{
+		idToLabelledControl.set(id, static_cast<LabelledComponent*>(idToControl[id]));
+	}
 
-	outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiOutputName]);
-	outputBoxLabelled->setComponentSize(320, 24);
-	outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
-	outputBox->addListener(this);
+	idToLabelledControl[IDs::periodShift]->setComponentSize(100, 24);
+	periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::periodShift]);
+	periodShiftSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	periodShiftSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
 
-	FlexItem& itemIn = col1.items.getReference(0);
-	itemIn = itemIn.withMaxHeight(48).withMinWidth(inputBoxLabelled->getWidth());
+	idToLabelledControl[IDs::transposeAmt]->setComponentSize(100, 24);
+	transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::transposeAmt]);
+	transposeSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	transposeSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
 
-	FlexItem& itemOut = col1.items.getReference(1);
-	itemOut = itemOut.withMaxHeight(48).withMinWidth(outputBoxLabelled->getWidth());
+	idToLabelledControl[IDs::keyboardMidiChannel]->setComponentSize(100, 24);
+	midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::keyboardMidiChannel]);
+	midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
+	midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
+
+	// Setup device settings if on standalone version, or hide
+	if (JUCEApplication::isStandaloneApp())
+	{
+		inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiInputName]);
+		inputBoxLabelled->setComponentSize(320, 24);
+		inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
+		inputBox->addListener(this);
+
+		outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiOutputName]);
+		outputBoxLabelled->setComponentSize(320, 24);
+		outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
+		outputBox->addListener(this);
+	}
+	else
+	{
+		controls.removeObject(idToControl[IDs::midiInputName], true);
+		controls.removeObject(idToControl[IDs::midiOutputName], true);
+
+		sectionHeaderLabels.remove(1);
+		flexParent.items.remove(1);
+	}
 }
 
 DeviceSettingsPanel::~DeviceSettingsPanel()
 {
 }
 
-void DeviceSettingsPanel::resized()
-{
-	SvkSettingsPanel::resized();
-}
-
 void DeviceSettingsPanel::visibilityChanged()
 {
-	if (isVisible())
+	if (isVisible() && JUCEApplication::isStandaloneApp())
 	{
 		refreshDevices();
 		startTimer(1000);

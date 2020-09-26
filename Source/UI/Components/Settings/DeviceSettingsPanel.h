@@ -20,8 +20,6 @@ public:
     DeviceSettingsPanel(SvkPluginState*);
     ~DeviceSettingsPanel();
 
-    void resized() override;
-
 	void visibilityChanged() override;
 
 	void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
@@ -31,11 +29,17 @@ public:
 	void refreshDevices();
     
 private:
+
+	HashMap<Identifier, LabelledComponent*, IDasStringHash> idToLabelledControl;
     
 	LabelledComponent* inputBoxLabelled;
 	LabelledComponent* outputBoxLabelled;
 	ComboBox* inputBox;
 	ComboBox* outputBox;
+
+	Slider* periodShiftSlider;
+	Slider* transposeSlider;
+	Slider* midiChannelSlider;
 
 	Array<MidiDeviceInfo> availableIns;
 	Array<MidiDeviceInfo> availableOuts;
