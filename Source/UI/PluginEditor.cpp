@@ -95,6 +95,12 @@ SvkPluginEditor::~SvkPluginEditor()
 	//	processor.svkValueTree.removeParameterListener(paramID, this);
 	//}
 
+	if (settingsPanelOpen)
+	{
+		pluginState->removeListener(settingsPanel.get());
+		settingsPanel = nullptr;
+	}
+
 	virtualKeyboard->removeListener(pluginState->getMidiProcessor());
     pluginState->removeListener(this);
 

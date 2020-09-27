@@ -63,7 +63,13 @@ public:
 			addTab(panelNames[i], tabColour, panels[i], true);
 		}
 
-		setCurrentTabIndex(getTabNames().indexOf(pluginState->pluginEditorNode[IDs::settingsTabName].toString()), false);
+		int setToTab = 0;
+		String lastTab = pluginState->pluginEditorNode[IDs::settingsTabName].toString();
+		DBG("Last tab: " + lastTab);
+		if (lastTab.length() > 0)
+			setToTab = getTabNames().indexOf(lastTab);
+
+		setCurrentTabIndex(setToTab, false);
         setSize(100, 100);
     }
 
