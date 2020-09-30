@@ -445,7 +445,7 @@ void SvkPluginState::commitModeInfo(bool sendChangeMessage)
 		DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
 	}
 
-	presetManager->setSlotToMode(modeSelectorViewedNum, presetManager->getModeCustom()->modeNode);
+	presetManager->setSlotToMode(modeSelectorViewedNum, modeViewed->modeNode);
 	
 	onModeUpdate(sendChangeMessage, sendChangeMessage);
 
