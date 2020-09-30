@@ -70,6 +70,8 @@ private:
     Mode* modeOriginal;
     Mode modeWorking;
     ValueTree modeNode;
+
+	int lastRotateAmt = 0;
     //[/UserVariables]
 
     //==============================================================================

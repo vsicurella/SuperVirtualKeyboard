@@ -183,7 +183,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     rotateSld->setBounds (216, 40, 96, 24);
 
     modeRotateLbl.reset (new Label ("Mode Rotate Label",
-                                    TRANS("Rotate Mode:")));
+                                    TRANS("Shift Mode:")));
     addAndMakeVisible (modeRotateLbl.get());
     modeRotateLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     modeRotateLbl->setJustificationType (Justification::centredLeft);
@@ -371,9 +371,11 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         //[UserSliderCode_rotateSld] -- add your slider handling code here..
-        String modeRotatedSteps = modeWorking.getStepsString(sliderThatWasMoved->getValue());
-		modeNode.setProperty(IDs::stepString, modeRotatedSteps, nullptr);
-		stepsBox->setText(modeRotatedSteps);
+        modeWorking.rotate(lastRotateAmt - sliderThatWasMoved->getValue());
+		lastRotateAmt = sliderThatWasMoved->getValue();
+
+		modeNode.setProperty(IDs::stepString, modeWorking.getStepsString(), nullptr);
+		stepsBox->setText(modeWorking.getStepsString());
         //[/UserSliderCode_rotateSld]
     }
 

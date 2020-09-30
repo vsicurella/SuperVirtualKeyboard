@@ -285,11 +285,20 @@ void Mode::setRootNote(int rootNoteIn)
 void Mode::rotate(int rotateAmt)
 {
     int amt = totalModulus(rotateAmt, modeSize);
-    
-    for (int i = 0; i < amt; i++)
-        steps.move(0, steps.size());
-    
+
+	Array<int> newSteps;
+	for (int i = 0; i < steps.size(); i++)
+		newSteps.add(steps[(amt + i) % steps.size()]);
+
+	steps = newSteps;
     stepsString = intArrayToString(steps);
+
+	ValueTree degreeColors = modeNode.getChildWithName(IDs::pianoKeyColorsNode).getChildWithName(IDs::pianoKeyColorsDegree);
+	for (auto degreeNode : degreeColors)
+	{
+		int newDeg = totalModulus((int)degreeNode[IDs::pianoKeyColorsDegree] - rotateAmt, scaleSize);
+		degreeNode.setProperty(IDs::pianoKeyColorsDegree, newDeg, nullptr);
+	}
     
     updateProperties();
 }
