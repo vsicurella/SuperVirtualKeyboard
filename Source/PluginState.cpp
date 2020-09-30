@@ -18,15 +18,12 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 
 	// TODO: Factory default settings, use a function call to load user settings
 	pluginSettings.reset(new SvkPluginSettings());
-	pluginSettingsNode = pluginSettings->getSettingsNode();
 
-	presetManager.reset(new SvkPresetManager(pluginSettingsNode));
-	modeLibraryNode = presetManager->modeLibraryNode;
+	presetManager.reset(new SvkPresetManager(pluginSettings->getSettingsNode()));
 	presetManager->addChangeListener(this);
 
 	// TODO: Factory default MIDI settings
 	midiProcessor.reset(new SvkMidiProcessor(svkTree));
-	midiSettingsNode = midiProcessor->midiSettingsNode;
 
 	buildFactoryDefaultState();
 	buildUserDefaultState();
@@ -94,16 +91,14 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
 
+	pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
 	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
+	
 	
 	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
-	pianoNode = svkPreset->getKeyboardNode();
-	pluginEditorNode = pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr);
-
 	modeMapper.reset(new ModeMapper(svkPreset->getMappingsNode()));
-	midiSettingsNode = svkPreset->getMidiSettingsNode();
-	midiProcessor->restoreFromNode(midiSettingsNode);
+	midiProcessor->restoreFromNode(svkPreset->getMidiSettingsNode());
 	midiProcessor->setMidiMaps(svkPreset->getMappingsNode());
 
 	onModeUpdate(!sendChange, !sendChange);
@@ -306,7 +301,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 	{
 		if (mapModeSelectionIn == 3) // Manual Mapping
 		{
-			ValueTree midiMaps = midiSettingsNode.getChildWithName(IDs::midiMapNode);
+			ValueTree midiMaps = midiProcessor->midiSettingsNode.getChildWithName(IDs::midiMapNode);
 			midiProcessor->setMidiMaps(midiMaps);
 		}
 
@@ -460,8 +455,9 @@ void SvkPluginState::commitStateNode()
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
 
+	pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
 	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
-	presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pianoNode, nullptr);
+	presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(IDs::pianoNode), nullptr);
 
 	onModeUpdate();
 
@@ -469,16 +465,15 @@ void SvkPluginState::commitStateNode()
 	midiProcessor->updateNode();
 	if (getMappingMode() > 2)
 	{
-		midiSettingsNode.addChild(midiProcessor->midiMapNode, -1, nullptr);
+		midiProcessor->midiSettingsNode.addChild(midiProcessor->midiMapNode, -1, nullptr);
 	}
-	else if (midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
+	else if (midiProcessor->midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
 	{
-		midiSettingsNode.removeChild(midiSettingsNode.getChild(0), nullptr);
+		midiProcessor->midiSettingsNode.removeChild(midiProcessor->midiSettingsNode.getChild(0), nullptr);
 	}
 
-	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiSettingsNode, nullptr);
-	svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
-
+	pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiSettingsNode, nullptr);
+	
 	DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
 
 	presetEdited = false;
@@ -578,7 +573,7 @@ void SvkPluginState::buildFactoryDefaultState()
 
 void SvkPluginState::buildUserDefaultState()
 {
-	ValueTree defaultSettings = pluginSettingsNode.getChildWithName(IDs::presetNode);
+	ValueTree defaultSettings = pluginSettings->getSettingsNode().getChildWithName(IDs::presetNode);
 	
 	// TODO: connect to actual user default settings
 

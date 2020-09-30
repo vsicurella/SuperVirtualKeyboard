@@ -64,7 +64,7 @@ public:
 		}
 
 		int setToTab = 0;
-		String lastTab = pluginState->pluginEditorNode[IDs::settingsTabName].toString();
+		String lastTab = pluginState->pluginStateNode.getChildWithName(IDs::pluginEditorNode)[IDs::settingsTabName].toString();
 		DBG("Last tab: " + lastTab);
 		if (lastTab.length() > 0)
 			setToTab = getTabNames().indexOf(lastTab);
