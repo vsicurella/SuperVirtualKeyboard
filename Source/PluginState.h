@@ -26,11 +26,10 @@ struct SvkPluginState : public ChangeListener,
 {
     AudioProcessorValueTreeState& svkTree;
 	ValueTree pluginStateNode;
-	ValueTree pluginSettingsNode;
-	ValueTree midiSettingsNode;
-	ValueTree modeLibraryNode;
-	ValueTree pluginEditorNode;
-	ValueTree pianoNode;
+	//ValueTree pluginSettingsNode;
+	//ValueTree midiSettingsNode;
+	//ValueTree modeLibraryNode;
+	//ValueTree pianoNode;
     
     SvkPluginState(AudioProcessorValueTreeState&);
 	~SvkPluginState() {}
