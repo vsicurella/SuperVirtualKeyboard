@@ -90,7 +90,8 @@ public:
 	void setRootNote(int rootNoteIn);
     
 	/*
-		Rotates the mode to the amount of given steps
+		Rotates the scale by moving the index of the first interval
+		by the rotation amount given.
 	*/
     void rotate(int rotateAmt);
     
