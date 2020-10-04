@@ -11,8 +11,8 @@
 #include "DebugSettingsPanel.h"
 
 DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
-	: SvkSettingsPanel("DebugSettingsPanel", pluginState, { "" }, {}, {}),
-	  pluginState(pluginStateIn)
+    : SvkSettingsPanel("DebugSettingsPanel", pluginState, { "" }, {}, {}),
+      pluginState(pluginStateIn)
 {
     setSize(100, 100);
 }

@@ -20,33 +20,33 @@ public:
     MidiSettingsPanel(SvkPluginState*);
     ~MidiSettingsPanel();
 
-	void visibilityChanged() override;
+    void visibilityChanged() override;
 
-	void sliderValueChanged(Slider* sliderThatChanged) override;
+    void sliderValueChanged(Slider* sliderThatChanged) override;
 
-	void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
+    void comboBoxChanged(ComboBox* comboBoxThatChanged) override;
 
-	void timerCallback() override;
+    void timerCallback() override;
 
-	void refreshDevices();
+    void refreshDevices();
     
 private:
 
-	HashMap<Identifier, LabelledComponent*, IDasStringHash> idToLabelledControl;
+    HashMap<Identifier, LabelledComponent*, IDasStringHash> idToLabelledControl;
     
-	LabelledComponent* inputBoxLabelled;
-	LabelledComponent* outputBoxLabelled;
-	ComboBox* inputBox;
-	ComboBox* outputBox;
+    LabelledComponent* inputBoxLabelled;
+    LabelledComponent* outputBoxLabelled;
+    ComboBox* inputBox;
+    ComboBox* outputBox;
 
-	Slider* periodShiftSlider;
-	Slider* transposeSlider;
-	Slider* midiChannelSlider;
+    Slider* periodShiftSlider;
+    Slider* transposeSlider;
+    Slider* midiChannelSlider;
 
-	Array<MidiDeviceInfo> availableIns;
-	Array<MidiDeviceInfo> availableOuts;
+    Array<MidiDeviceInfo> availableIns;
+    Array<MidiDeviceInfo> availableOuts;
 
-	SvkMidiProcessor* midiProcessor;
+    SvkMidiProcessor* midiProcessor;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiSettingsPanel)

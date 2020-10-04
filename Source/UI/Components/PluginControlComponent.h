@@ -43,113 +43,113 @@ public:
 
     ~PluginControlComponent();
 
-	//==============================================================================
+    //==============================================================================
 
-	void paint(Graphics& g) override;
-	void resized() override;
+    void paint(Graphics& g) override;
+    void resized() override;
 
-	void mouseDown(const MouseEvent& e) override;
+    void mouseDown(const MouseEvent& e) override;
 
-	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
-	void sliderValueChanged(Slider* sliderThatWasMoved) override;
-	void buttonClicked(Button* buttonThatWasClicked) override;
+    void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged(Slider* sliderThatWasMoved) override;
+    void buttonClicked(Button* buttonThatWasClicked) override;
 
-	void textEditorTextChanged(TextEditor& textEditor) override {};
-	void textEditorEscapeKeyPressed(TextEditor& textEditor) override {};
-	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-	void textEditorFocusLost(TextEditor& textEditor) override {};
+    void textEditorTextChanged(TextEditor& textEditor) override {};
+    void textEditorEscapeKeyPressed(TextEditor& textEditor) override {};
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override {};
 
-	void scrollBarMoved(ScrollBar* bar, double newRangeStart) override;
+    void scrollBarMoved(ScrollBar* bar, double newRangeStart) override;
 
-	void changeListenerCallback(ChangeBroadcaster* source) override;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
 
-	void timerCallback() override;
-
-	//==============================================================================
-
-	void presetLoaded(ValueTree presetNodeIn) override;
-
-	void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
-
-	void inputMappingChanged(NoteMap* inputNoteMap) override;
-
-	void customModeChanged(Mode* newCustomMode) override;
-
-	void modeInfoChanged(Mode* modeEdited) override;
-
-	void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
+    void timerCallback() override;
 
     //==============================================================================
 
-	String getScaleEntryText();
-	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
+    void presetLoaded(ValueTree presetNodeIn) override;
 
-	VirtualKeyboard::Keyboard* getKeyboard();
+    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
-	TextEditor* getScaleTextEditor();
-	Viewport* getViewport();
-	ComboBox* getMappingStyleBox();
+    void inputMappingChanged(NoteMap* inputNoteMap) override;
 
-	ReferencedComboBox* getMode1Box();
-	ReferencedComboBox* getMode2Box();
-	void updateModeBoxMenus();
+    void customModeChanged(Mode* newCustomMode) override;
 
-	ImageButton* getSettingsButton();
-	TextButton* getModeInfoButton();
+    void modeInfoChanged(Mode* modeEdited) override;
 
-	//==============================================================================
+    void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
 
-	/*
-		Sets controls to plugin state
-	*/
-	void loadPresetNode(ValueTree presetNodeIn);
+    //==============================================================================
 
-	/*
-		Updates UI to the new mode
-	*/
-	void onModeViewedChange(Mode* modeViewed);
+    String getScaleEntryText();
+    void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	/*
-		Sets the X position of the viewport
-	*/
-	void setViewPosition(int xIn);
+    VirtualKeyboard::Keyboard* getKeyboard();
 
-	int getModeSelectorViewed();
+    TextEditor* getScaleTextEditor();
+    Viewport* getViewport();
+    ComboBox* getMappingStyleBox();
 
-	void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
+    ReferencedComboBox* getMode1Box();
+    ReferencedComboBox* getMode2Box();
+    void updateModeBoxMenus();
 
-	void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
+    ImageButton* getSettingsButton();
+    TextButton* getModeInfoButton();
 
-	void setMode1Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
+    //==============================================================================
 
-	void setMode2Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
+    /*
+        Sets controls to plugin state
+    */
+    void loadPresetNode(ValueTree presetNodeIn);
 
-	void submitCustomScale();
+    /*
+        Updates UI to the new mode
+    */
+    void onModeViewedChange(Mode* modeViewed);
 
-	void showModeInfo();
+    /*
+        Sets the X position of the viewport
+    */
+    void setViewPosition(int xIn);
 
-	void showMapOrderEditDialog();
+    int getModeSelectorViewed();
 
-	void showSettingsDialog();
+    void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
 
-	void hideSettings();
+    void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	void beginColorEditing();
+    void setMode1Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	//==============================================================================
+    void setMode2Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	bool browseForModeToOpen();
+    void submitCustomScale();
 
-	bool browseForPresetToOpen();
+    void showModeInfo();
 
-	bool exportModeViewedForReaper();
+    void showMapOrderEditDialog();
 
-	bool exportModeViewedForAbleton();
+    void showSettingsDialog();
+
+    void hideSettings();
+
+    void beginColorEditing();
+
+    //==============================================================================
+
+    bool browseForModeToOpen();
+
+    bool browseForPresetToOpen();
+
+    bool exportModeViewedForReaper();
+
+    bool exportModeViewedForAbleton();
 
 private:
 
-	SvkPluginState* pluginState;
-	SvkPresetManager* presetManager;
+    SvkPluginState* pluginState;
+    SvkPresetManager* presetManager;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;
@@ -159,20 +159,20 @@ private:
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
 
-	std::unique_ptr<SettingsContainer> settingsContainer;
+    std::unique_ptr<SettingsContainer> settingsContainer;
 
-	ModeInfoDialog* modeInfo;
-	MapByOrderDialog* mapByOrderDialog;
+    ModeInfoDialog* modeInfo;
+    MapByOrderDialog* mapByOrderDialog;
 
     TextFilterIntOrSpace txtFilter;
 
-	bool settingsPanelOpen = false;
-	bool isColorEditing = false;
+    bool settingsPanelOpen = false;
+    bool isColorEditing = false;
     bool inMappingMode = false;
 
-	int defaultHeight = 210;
-	int barHeight = 24;
-	int gap = 8;
+    int defaultHeight = 210;
+    int barHeight = 24;
+    int gap = 8;
 
     //==============================================================================
     std::unique_ptr<TextEditor> scaleTextBox;
@@ -191,7 +191,7 @@ private:
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
-	std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
+    std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;
     std::unique_ptr<ImageButton> openButton;

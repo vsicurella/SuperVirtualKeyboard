@@ -19,35 +19,35 @@ namespace VirtualKeyboard
 {
     class KeyboardPositioner
     {
-		Component* parent;
-		
-		int numModeKeys;
-		int keyGap = 0;
-		int keyPlacement = 1;
-		float baseWidthRatio = 0.8f;
-		float baseHeightRatio = 0.55f;
+        Component* parent;
+        
+        int numModeKeys;
+        int keyGap = 0;
+        int keyPlacement = 1;
+        float baseWidthRatio = 0.8f;
+        float baseHeightRatio = 0.55f;
 
-		float keyWidth = 0;
+        float keyWidth = 0;
         
     public:
 
-		KeyboardPositioner(Component* parentIn, int numModeKeysIn = 128);
+        KeyboardPositioner(Component* parentIn, int numModeKeysIn = 128);
         ~KeyboardPositioner() {};
 
-		void parentResized();
+        void parentResized();
 
-		float getKeyWidth() const;
+        float getKeyWidth() const;
 
-		int getKeyGap() const;
+        int getKeyGap() const;
 
-		void setNumModeKeys(int numKeysIn);
+        void setNumModeKeys(int numKeysIn);
 
-		void setKeyGap(int keyGapIn);
+        void setKeyGap(int keyGapIn);
         
-		void setKeyPlacement(int keyPlacementTypeIn);
+        void setKeyPlacement(int keyPlacementTypeIn);
 
-		void setLayerKeysWidthRatio(float widthRatioIn);
-		void setLayerKeysHeightRatio(float widthRatioIn);
+        void setLayerKeysWidthRatio(float widthRatioIn);
+        void setLayerKeysHeightRatio(float widthRatioIn);
 
         void resizeKey(Key& key);
         void placeKey(Key& key);

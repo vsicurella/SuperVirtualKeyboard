@@ -16,20 +16,20 @@ class DebugSettingsPanel : public SvkSettingsPanel, public Timer
 
 public:
 
-	DebugSettingsPanel(SvkPluginState*);
+    DebugSettingsPanel(SvkPluginState*);
 
-	~DebugSettingsPanel();
+    ~DebugSettingsPanel();
 
 
-	//void paint(Graphics& g) override;
-	//void resized() override;
+    //void paint(Graphics& g) override;
+    //void resized() override;
 
-	void timerCallback() override;
+    void timerCallback() override;
 
 private:
 
-	SvkPluginState* pluginState;
+    SvkPluginState* pluginState;
 
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DebugSettingsPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(DebugSettingsPanel)
 };

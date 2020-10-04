@@ -28,7 +28,7 @@ public:
 
     void commitMode();
 
-	void textEditorTextChanged(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed(TextEditor& textEditor) override {};
     void textEditorReturnKeyPressed(TextEditor& textEditor) override {};
     void textEditorFocusLost(TextEditor& textEditor) override {};
@@ -44,7 +44,7 @@ private:
     Mode modeWorking;
     ValueTree modeNode;
 
-	int lastRotateAmt = 0;
+    int lastRotateAmt = 0;
 
     //==============================================================================
     std::unique_ptr<TextEditor> familyBox;

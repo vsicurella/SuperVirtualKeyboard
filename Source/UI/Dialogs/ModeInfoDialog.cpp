@@ -215,19 +215,19 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
     rotateSld->setIncDecButtonsMode(Slider::IncDecButtonMode::incDecButtonsDraggable_Horizontal);
 
-	familyBox->addListener(this);
+    familyBox->addListener(this);
 
     stepsBox->setText(modeWorking.getStepsString());
     familyBox->setText(modeWorking.getFamily());
 
     nameBox->setText(modeWorking.getName());
-	nameBox->setEnabled(false);
+    nameBox->setEnabled(false);
 
-	defaultNameBtn->setClickingTogglesState(true);
+    defaultNameBtn->setClickingTogglesState(true);
     if (modeWorking.getName() != modeWorking.getDescription())
         defaultNameBtn->setToggleState(false, sendNotification);
 
-	scaleSizeReadout->setText(String(modeWorking.getScaleSize()), dontSendNotification);
+    scaleSizeReadout->setText(String(modeWorking.getScaleSize()), dontSendNotification);
     modeSizeReadout->setText(String(modeWorking.getModeSize()), dontSendNotification);
 
     intervalSizeReadout->setText(arrayToString(modeWorking.getIntervalSizeCount()), dontSendNotification);
@@ -244,7 +244,7 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
 ModeInfoDialog::~ModeInfoDialog()
 {
-	removeAllChangeListeners();
+    removeAllChangeListeners();
 
     familyBox = nullptr;
     stepsBox = nullptr;
@@ -277,27 +277,27 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == defaultNameBtn.get())
     {
-		if (defaultNameBtn->getToggleState())
-		{
-			nameBox->setEnabled(false);
+        if (defaultNameBtn->getToggleState())
+        {
+            nameBox->setEnabled(false);
             modeWorking.setFamily(familyBox->getText());
             modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
             nameBox->setText(modeWorking.getDescription());
-		}
-		else
-		{
-			nameBox->setEnabled(true);
-		}
+        }
+        else
+        {
+            nameBox->setEnabled(true);
+        }
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
-		commitMode();
-		sendChangeMessage();
-		getParentComponent()->exitModalState(0);
+        commitMode();
+        sendChangeMessage();
+        getParentComponent()->exitModalState(0);
     }
     else if (buttonThatWasClicked == closeButton.get())
     {
-		getParentComponent()->exitModalState(0);
+        getParentComponent()->exitModalState(0);
     }
 }
 
@@ -306,31 +306,31 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == rotateSld.get())
     {
         modeWorking.rotate(lastRotateAmt - sliderThatWasMoved->getValue());
-		lastRotateAmt = sliderThatWasMoved->getValue();
+        lastRotateAmt = sliderThatWasMoved->getValue();
 
-		modeNode.setProperty(IDs::stepString, modeWorking.getStepsString(), nullptr);
-		stepsBox->setText(modeWorking.getStepsString());
+        modeNode.setProperty(IDs::stepString, modeWorking.getStepsString(), nullptr);
+        stepsBox->setText(modeWorking.getStepsString());
     }
 }
 
 void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
 {
-	if (textEditor.getName() == familyBox->getName())
-	{
-		if (defaultNameBtn->getToggleState())
-		{
-			modeWorking.setFamily(familyBox->getText());
-			nameBox->setText(modeWorking.getDescription());
-		}
-	}
+    if (textEditor.getName() == familyBox->getName())
+    {
+        if (defaultNameBtn->getToggleState())
+        {
+            modeWorking.setFamily(familyBox->getText());
+            nameBox->setText(modeWorking.getDescription());
+        }
+    }
 
 }
 
 void ModeInfoDialog::commitMode()
 {
-	modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
-	modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
-	modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
+    modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
+    modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
+    modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
 
-	modeOriginal->restoreNode(modeNode);
+    modeOriginal->restoreNode(modeNode);
 }

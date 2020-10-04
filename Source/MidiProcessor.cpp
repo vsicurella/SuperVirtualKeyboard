@@ -15,7 +15,7 @@ SvkMidiProcessor::SvkMidiProcessor()
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
 
-	midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+    midiSettingsNode.addChild(midiMapNode, -1, nullptr);
            
     midiInputFilter = std::make_unique<MidiFilter>();
     midiOutputFilter = std::make_unique<MidiFilter>();
@@ -71,14 +71,14 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         // Root note
         rootMidiNote = midiSettingsNode.getProperty(IDs::rootMidiNote);
         
-		// Set Note Maps
-		if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
-		{
-			midiMapNode = ValueTree(IDs::midiMapNode);
-			midiSettingsNode.addChild(midiMapNode, -1, nullptr);
-		}
+        // Set Note Maps
+        if (!midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
+        {
+            midiMapNode = ValueTree(IDs::midiMapNode);
+            midiSettingsNode.addChild(midiMapNode, -1, nullptr);
+        }
 
-		setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
+        setMidiMaps(midiSettingsNode.getChildWithName(IDs::midiMapNode));
 
         return true;
     }
@@ -196,22 +196,22 @@ int SvkMidiProcessor::getTimbreTrackingMode() const
 
 NoteMap* SvkMidiProcessor::getInputNoteMap()
 {
-	return midiInputFilter->getNoteMap();
+    return midiInputFilter->getNoteMap();
 }
 
 NoteMap* SvkMidiProcessor::getOutputNoteMap()
 {
-	return midiOutputFilter->getNoteMap();
+    return midiOutputFilter->getNoteMap();
 }
 
 MidiFilter* SvkMidiProcessor::getMidiInputFilter()
 {
-	return midiInputFilter.get();
+    return midiInputFilter.get();
 }
 
 MidiFilter* SvkMidiProcessor::getMidiOutputFilter()
 {
-	return midiOutputFilter.get();
+    return midiOutputFilter.get();
 }
 
 int SvkMidiProcessor::getInputNote(int midiNoteIn)
@@ -266,21 +266,21 @@ String SvkMidiProcessor::setMidiOutput(String deviceID)
 
 void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
 {
-	modeViewed = modeViewedIn;
+    modeViewed = modeViewedIn;
 }
 
 void SvkMidiProcessor::setMode1(Mode* mode1In)
 {
-	mode1 = mode1In;
+    mode1 = mode1In;
 }
 
 void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
-	mode2 = mode2In;
+    mode2 = mode2In;
 }
 
 void SvkMidiProcessor::setRootNote(int rootNoteIn)
-{	
+{    
     midiSettingsNode.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
     rootMidiNote = rootNoteIn;
 }
@@ -293,7 +293,7 @@ void SvkMidiProcessor::setPeriodShift(int shiftIn)
 
 void SvkMidiProcessor::periodUsesModeSize(bool useModeSizeIn)
 {
-	useModePeriod = useModeSizeIn;
+    useModePeriod = useModeSizeIn;
 }
 
 void SvkMidiProcessor::setMidiChannelOut(int channelOut)
@@ -394,46 +394,46 @@ void SvkMidiProcessor::setMidiMaps(ValueTree midiMapIn)
 
 void SvkMidiProcessor::setMidiInputMap(Array<int> mapIn, bool updateNode)
 {
-	midiInputFilter->setNoteMap(mapIn);
+    midiInputFilter->setNoteMap(mapIn);
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
-		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
+        add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
+    }
 }
 
 void SvkMidiProcessor::setMidiInputMap(NoteMap mapIn, bool updateNode)
 {
-	midiInputFilter->setNoteMap(mapIn);
+    midiInputFilter->setNoteMap(mapIn);
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
-		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputMap), nullptr);
+        add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiInputMap, "Note");
+    }
 }
 
 void SvkMidiProcessor::setMidiOutputMap(Array<int> mapIn, bool updateNode)
 {
-	midiOutputFilter->setNoteMap(mapIn);
+    midiOutputFilter->setNoteMap(mapIn);
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputMap), nullptr);
-		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputMap), nullptr);
+        add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
+    }
 }
 
 void SvkMidiProcessor::setMidiOutputMap(NoteMap mapIn, bool updateNode)
 {
-	midiOutputFilter->setNoteMap(mapIn.getValues());
+    midiOutputFilter->setNoteMap(mapIn.getValues());
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputMap), nullptr);
-		add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputMap), nullptr);
+        add_array_to_node(midiMapNode, midiInputFilter->getNoteMap()->getValues(), IDs::midiOutputMap, "Note");
+    }
 }
 
 void SvkMidiProcessor::resetInputMap(bool updateNode)
@@ -450,16 +450,16 @@ void SvkMidiProcessor::mapInputNote(int noteIn, int noteOut, bool updateNode)
 {
     midiInputFilter->setNote(noteIn, noteOut);
 
-	if (updateNode)
-		set_value_in_array(midiMapNode, IDs::midiInputMap, noteIn, noteOut);
+    if (updateNode)
+        set_value_in_array(midiMapNode, IDs::midiInputMap, noteIn, noteOut);
 }
 
 void SvkMidiProcessor::mapOutputNode(int noteIn, int noteOut, bool updateNode)
 {
     midiOutputFilter->setNote(noteIn, noteOut);
 
-	if (updateNode)
-		set_value_in_array(midiMapNode, IDs::midiInputMap, noteIn, noteOut);
+    if (updateNode)
+        set_value_in_array(midiMapNode, IDs::midiInputMap, noteIn, noteOut);
 }
 
 //==============================================================================
@@ -485,12 +485,12 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
                         
             msg.setNoteNumber(midiNote);
             
-			if (midiNote >= 0 && midiNote < 128)
-			{
-				msg.setTimeStamp(++msgCount);
-				remappedKeyboardState->processNextMidiEvent(msg);
-				addMessageToQueue(msg);
-			}
+            if (midiNote >= 0 && midiNote < 128)
+            {
+                msg.setTimeStamp(++msgCount);
+                remappedKeyboardState->processNextMidiEvent(msg);
+                addMessageToQueue(msg);
+            }
         }
     }
     
@@ -506,9 +506,9 @@ void SvkMidiProcessor::processMidi(MidiBuffer& midiMessages)
         auto midiEventOut = MidiBuffer::Iterator(midiBuffer);
         while (midiEventOut.getNextEvent(msg, smpl))
         {
-			int midiNote = msg.getNoteNumber();
-			midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
-			midiNote += periodShift * mode2->getScaleSize();
+            int midiNote = msg.getNoteNumber();
+            midiNote = midiOutputFilter->getNoteRemapped(msg.getNoteNumber());
+            midiNote += periodShift * mode2->getScaleSize();
             msg.setNoteNumber(midiNote);
             msg.setTimeStamp(++msgCount);
             

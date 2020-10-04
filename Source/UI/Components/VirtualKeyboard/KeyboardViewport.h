@@ -13,25 +13,25 @@
 #include "../../../../JuceLibraryCode/JuceHeader.h"
 
 class KeyboardViewport : public Viewport,
-						 private Button::Listener
+                         private Button::Listener
 {
     int stepSmall = 0;
     int stepLarge = 0;
 
-	int buttonWidth = 16;
-	
+    int buttonWidth = 16;
+    
     int scrollingModeSelected = 1;
     int scrollingStyleSelected = 1;
     
-	std::unique_ptr<ImageButton> stepLeftSmall;
-	std::unique_ptr<ImageButton> stepLeftLarge;
-	std::unique_ptr<ImageButton> stepRightSmall;
-	std::unique_ptr<ImageButton> stepRightLarge;
+    std::unique_ptr<ImageButton> stepLeftSmall;
+    std::unique_ptr<ImageButton> stepLeftLarge;
+    std::unique_ptr<ImageButton> stepRightSmall;
+    std::unique_ptr<ImageButton> stepRightLarge;
 
-	// returns altitude
-	int drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness=1.0f);
+    // returns altitude
+    int drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness=1.0f);
 
-	void redrawButtons(int heightIn);
+    void redrawButtons(int heightIn);
     
 public:
     
@@ -39,16 +39,16 @@ public:
     
     int getStepSmall();
     int getStepLarge();
-	
-	int getButtonWidth();
-	bool isShowingButtons();
+    
+    int getButtonWidth();
+    bool isShowingButtons();
     
     void setStepSmall(int smallSizeIn);
     void setStepLarge(int largeSizeIn);
 
-	void setButtonWidth(int widthIn);
-	
-	void setScrollingMode(int modeIdIn);
+    void setButtonWidth(int widthIn);
+    
+    void setScrollingMode(int modeIdIn);
     void setScrollingStyle(int styleIdIn);
     
     void stepSmallForward();
@@ -58,7 +58,7 @@ public:
     
     void resized() override;
 
-	void buttonClicked(Button* button) override;
+    void buttonClicked(Button* button) override;
     
     enum ScrollingMode
     {

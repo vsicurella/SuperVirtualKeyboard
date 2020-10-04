@@ -17,93 +17,93 @@ class FocussedColourSelector : public FocussedComponent, public ColourSelector, 
 {
 public:
 
-	FocussedColourSelector(Component* componentToFocusOn = nullptr)
-		: FocussedComponent(componentToFocusOn), ColourSelector(
-			ColourSelector::ColourSelectorOptions::showColourAtTop
-			+ ColourSelector::ColourSelectorOptions::editableColour
-			+ ColourSelector::ColourSelectorOptions::showColourspace
-			, 4, 0)
-	{
-		setName("FocussedColourSelector");
+    FocussedColourSelector(Component* componentToFocusOn = nullptr)
+        : FocussedComponent(componentToFocusOn), ColourSelector(
+            ColourSelector::ColourSelectorOptions::showColourAtTop
+            + ColourSelector::ColourSelectorOptions::editableColour
+            + ColourSelector::ColourSelectorOptions::showColourspace
+            , 4, 0)
+    {
+        setName("FocussedColourSelector");
 
-		// Called when colour changes
-		addChangeListener(this);
-	};
+        // Called when colour changes
+        addChangeListener(this);
+    };
 
-	~FocussedColourSelector() {};
+    ~FocussedColourSelector() {};
 
-	void setComponentToFocusOn(Component* componentPtr) override
-	{
-		FocussedComponent::setComponentToFocusOn(componentPtr);
+    void setComponentToFocusOn(Component* componentPtr) override
+    {
+        FocussedComponent::setComponentToFocusOn(componentPtr);
 
-		PaintSwatch* swatch = dynamic_cast<PaintSwatch*>(componentPtr);
-		if (swatch)
-			setCurrentColour(swatch->getCurrentColour());
-	}
+        PaintSwatch* swatch = dynamic_cast<PaintSwatch*>(componentPtr);
+        if (swatch)
+            setCurrentColour(swatch->getCurrentColour());
+    }
 
 
 private:
 
-	void changeListenerCallback(ChangeBroadcaster* source) override
-	{
-		FocusableComponent* focussed = dynamic_cast<FocusableComponent*>(currentFocus);
+    void changeListenerCallback(ChangeBroadcaster* source) override
+    {
+        FocusableComponent* focussed = dynamic_cast<FocusableComponent*>(currentFocus);
 
-		if (focussed)
-			focussed->performFocusFunction(getCurrentColour().toString());
-		
-		focusserCallback(currentFocus, getCurrentColour().toString());
-	}
+        if (focussed)
+            focussed->performFocusFunction(getCurrentColour().toString());
+        
+        focusserCallback(currentFocus, getCurrentColour().toString());
+    }
 };
 
 class ColourSettingsPanel : public SvkSettingsPanel
 {
 public:
 
-	ColourSettingsPanel(SvkPluginState*);
+    ColourSettingsPanel(SvkPluginState*);
 
-	~ColourSettingsPanel() override;
+    ~ColourSettingsPanel() override;
 
-	void resized() override;
+    void resized() override;
 
-	void buttonClicked(Button*) override;
+    void buttonClicked(Button*) override;
 
-	void modifierKeysChanged(const ModifierKeys&) override;
+    void modifierKeysChanged(const ModifierKeys&) override;
 
-	void mouseMove(const MouseEvent& event) override;
+    void mouseMove(const MouseEvent& event) override;
 
-	void mouseDown(const MouseEvent& event) override;
+    void mouseDown(const MouseEvent& event) override;
 
-	void mouseUp(const MouseEvent& event) override;
+    void mouseUp(const MouseEvent& event) override;
 
-	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
+    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
 
-	void refreshPanel() override;
+    void refreshPanel() override;
 
-	ColourSelector* getColourSelector();
-
-private:
-
-	void checkModifiers(const ModifierKeys& keys);
+    ColourSelector* getColourSelector();
 
 private:
 
-	FocussedColourSelector* colourSelector;
-	
-	ColourLibraryComponent* keyColourLibrary;
-	ColourLibraryComponent* noteOnColourLibrary;
+    void checkModifiers(const ModifierKeys& keys);
 
-	const int paintTypeRadioGroup = 100;
+private:
 
-	TextButton* degreePaintButton;
-	TextButton* layerPaintButton;
-	TextButton* keyPaintButton;
+    FocussedColourSelector* colourSelector;
+    
+    ColourLibraryComponent* keyColourLibrary;
+    ColourLibraryComponent* noteOnColourLibrary;
 
-	TextButton* resetColourToggle;
-	bool userClickedReset = false;
+    const int paintTypeRadioGroup = 100;
 
-	bool ctrlHeld = false;
-	bool shiftHeld = false;
-	bool altOptionHeld = false;
+    TextButton* degreePaintButton;
+    TextButton* layerPaintButton;
+    TextButton* keyPaintButton;
+
+    TextButton* resetColourToggle;
+    bool userClickedReset = false;
+
+    bool ctrlHeld = false;
+    bool shiftHeld = false;
+    bool altOptionHeld = false;
 
 };
 

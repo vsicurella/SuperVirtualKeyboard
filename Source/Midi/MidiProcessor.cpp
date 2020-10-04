@@ -26,12 +26,12 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
 
-	startTime = Time::getMillisecondCounterHiRes();
+    startTime = Time::getMillisecondCounterHiRes();
 
-	// Create all-notes-off buffer
-	for (int i = 0; i < 128; i++)
-		for (int ch = 1; ch <= 16; ch++)
-			allNotesOffBuffer.addEvent(MidiMessage::noteOff(ch, i), ch * 16 + i);
+    // Create all-notes-off buffer
+    for (int i = 0; i < 128; i++)
+        for (int ch = 1; ch <= 16; ch++)
+            allNotesOffBuffer.addEvent(MidiMessage::noteOff(ch, i), ch * 16 + i);
 }
 
 SvkMidiProcessor::~SvkMidiProcessor()
@@ -41,21 +41,21 @@ SvkMidiProcessor::~SvkMidiProcessor()
 
 void SvkMidiProcessor::connectToParameters()
 {
-	Array<Identifier> params(
-		{
-			IDs::periodShift,
-			IDs::periodShiftModeSize,
-			IDs::transposeAmt,
-			IDs::keyboardMidiChannel,
-			IDs::mpeOn,
-			IDs::mappingMode
-		});
+    Array<Identifier> params(
+        {
+            IDs::periodShift,
+            IDs::periodShiftModeSize,
+            IDs::transposeAmt,
+            IDs::keyboardMidiChannel,
+            IDs::mpeOn,
+            IDs::mappingMode
+        });
 
-	for (auto param : params)
-	{
-		svkTree.addParameterListener(param, this);
-	}
-	DBG("MidiProcessor connected to parameters");
+    for (auto param : params)
+    {
+        svkTree.addParameterListener(param, this);
+    }
+    DBG("MidiProcessor connected to parameters");
 }
 
 void SvkMidiProcessor::updateNode()
@@ -87,20 +87,20 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
 {
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
-		midiSettingsNode = midiSettingsNodeIn;
+        midiSettingsNode = midiSettingsNodeIn;
       
-		periodShift = midiSettingsNode[IDs::periodShift];
-		transposeAmt = midiSettingsNode[IDs::transposeAmt];
-		midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
-		// Note transposition is updated when new mode is applied
+        periodShift = midiSettingsNode[IDs::periodShift];
+        transposeAmt = midiSettingsNode[IDs::transposeAmt];
+        midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
+        // Note transposition is updated when new mode is applied
 
 
-		// TODO: check if devices exist, give a name to imply if it doesn't
-		if (JUCEApplication::isStandaloneApp)
-		{
-			setMidiInput(midiSettingsNode[IDs::midiInputName]);
-			setMidiOutput(midiSettingsNode[IDs::midiOutputName]);
-		}
+        // TODO: check if devices exist, give a name to imply if it doesn't
+        if (JUCEApplication::isStandaloneApp)
+        {
+            setMidiInput(midiSettingsNode[IDs::midiInputName]);
+            setMidiOutput(midiSettingsNode[IDs::midiOutputName]);
+        }
 
         return true;
     }
@@ -167,22 +167,22 @@ bool SvkMidiProcessor::isRetuning() const
 
 NoteMap* SvkMidiProcessor::getInputNoteRemap()
 {
-	return midiInputRemap->getNoteMap();
+    return midiInputRemap->getNoteMap();
 }
 
 NoteMap* SvkMidiProcessor::getOutputNoteFilter()
 {
-	return midiOutputFilter->getNoteMap();
+    return midiOutputFilter->getNoteMap();
 }
 
 MidiFilter* SvkMidiProcessor::getInputRemapMidiFilter()
 {
-	return midiInputRemap.get();
+    return midiInputRemap.get();
 }
 
 MidiFilter* SvkMidiProcessor::getOutputMidiFilter()
 {
-	return midiOutputFilter.get();
+    return midiOutputFilter.get();
 }
 //
 //MPEInstrument* SvkMidiProcessor::getMPEInstrument()
@@ -204,20 +204,20 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(String deviceID)
 {
-	std::unique_ptr<MidiInput> inputToOpen = MidiInput::openDevice(deviceID, this);
+    std::unique_ptr<MidiInput> inputToOpen = MidiInput::openDevice(deviceID, this);
 
-	if (inputToOpen.get())
-	{
-		if (midiInput.get())
-			midiInput->stop();
+    if (inputToOpen.get())
+    {
+        if (midiInput.get())
+            midiInput->stop();
 
-		midiInput.swap(inputToOpen);
-		midiInput->start();
+        midiInput.swap(inputToOpen);
+        midiInput->start();
 
-		midiInputName = midiInput->getName();
+        midiInputName = midiInput->getName();
         inputSelected = deviceID;
         midiSettingsNode.setProperty(IDs::midiInputName, inputSelected, nullptr);
-		DBG("Successfully opened input " + midiInputName);
+        DBG("Successfully opened input " + midiInputName);
     }
     else
     {
@@ -230,16 +230,16 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
 
 String SvkMidiProcessor::setMidiOutput(String deviceID)
 {
-	std::unique_ptr<MidiOutput> outputToOpen = MidiOutput::openDevice(deviceID);
+    std::unique_ptr<MidiOutput> outputToOpen = MidiOutput::openDevice(deviceID);
 
-	if (outputToOpen.get())
-	{
-		midiOutput.swap(outputToOpen);
-		midiOutputName = midiOutput->getName();
-		outputSelected = deviceID;
-		midiSettingsNode.setProperty(IDs::midiOutputName, outputSelected, nullptr);
-		DBG("Successfully opened output " + midiOutputName);
-	}
+    if (outputToOpen.get())
+    {
+        midiOutput.swap(outputToOpen);
+        midiOutputName = midiOutput->getName();
+        outputSelected = deviceID;
+        midiSettingsNode.setProperty(IDs::midiOutputName, outputSelected, nullptr);
+        DBG("Successfully opened output " + midiOutputName);
+    }
     else
     {
         midiOutputName = "";
@@ -252,51 +252,51 @@ String SvkMidiProcessor::setMidiOutput(String deviceID)
 
 void SvkMidiProcessor::setModeViewed(Mode* modeViewedIn)
 {
-	modeViewed = modeViewedIn;
+    modeViewed = modeViewedIn;
 }
 
 void SvkMidiProcessor::setMode1(Mode* mode1In)
 {
-	mode1 = mode1In;
+    mode1 = mode1In;
 }
 
 void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
-	mode2 = mode2In;
-	updateNoteTransposition();
+    mode2 = mode2In;
+    updateNoteTransposition();
 }
 
 void SvkMidiProcessor::setPeriodShift(int periodsToShift)
 {
-	periodShift = periodsToShift;
-	midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
-	updateNoteTransposition();
+    periodShift = periodsToShift;
+    midiSettingsNode.setProperty(IDs::periodShift, periodShift, nullptr);
+    updateNoteTransposition();
 }
 
 void SvkMidiProcessor::setTransposeAmt(int transposeAmtIn)
 {
-	transposeAmt = transposeAmtIn;
-	midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
-	updateNoteTransposition();
+    transposeAmt = transposeAmtIn;
+    midiSettingsNode.setProperty(IDs::transposeAmt, transposeAmt, nullptr);
+    updateNoteTransposition();
 }
 
 void SvkMidiProcessor::setMidiChannelOut(int virtualKeyboardMidiChannelOut)
 {
-	midiChannelOut = virtualKeyboardMidiChannelOut;
-	midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
+    midiChannelOut = virtualKeyboardMidiChannelOut;
+    midiSettingsNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
 
-	// TODO: remove notes or better yet...use a note queue for the proper note off
+    // TODO: remove notes or better yet...use a note queue for the proper note off
 }
 
 void SvkMidiProcessor::updateNoteTransposition()
 {
-	currentNoteShift = transposeAmt;
-	if (periodShiftModeSize)
-		currentNoteShift += periodShift * mode2->getModeSize();
-	else
-		currentNoteShift += periodShift * mode2->getScaleSize();
+    currentNoteShift = transposeAmt;
+    if (periodShiftModeSize)
+        currentNoteShift += periodShift * mode2->getModeSize();
+    else
+        currentNoteShift += periodShift * mode2->getScaleSize();
 
-	// TODO: handle sustained notes
+    // TODO: handle sustained notes
 }
 
 void SvkMidiProcessor::setRetuneOn(bool retuneOn)
@@ -375,13 +375,13 @@ void SvkMidiProcessor::setInputRemap(Array<int> mapIn, bool updateNode)
 
 void SvkMidiProcessor::setInputRemap(NoteMap mapIn, bool updateNode)
 {
-	midiInputRemap->setNoteMap(mapIn);
+    midiInputRemap->setNoteMap(mapIn);
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
-		add_array_to_node(midiMapNode, midiInputRemap->getNoteMap()->getValues(), IDs::midiInputRemap, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
+        add_array_to_node(midiMapNode, midiInputRemap->getNoteMap()->getValues(), IDs::midiInputRemap, "Note");
+    }
 }
 
 void SvkMidiProcessor::setOutputFilter(Array<int> mapIn, bool updateNode)
@@ -391,13 +391,13 @@ void SvkMidiProcessor::setOutputFilter(Array<int> mapIn, bool updateNode)
 
 void SvkMidiProcessor::setOutputFilter(NoteMap mapIn, bool updateNode)
 {
-	midiOutputFilter->setNoteMap(mapIn.getValues());
+    midiOutputFilter->setNoteMap(mapIn.getValues());
 
-	if (updateNode)
-	{
-		midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputFilter), nullptr);
-		add_array_to_node(midiMapNode, midiInputRemap->getNoteMap()->getValues(), IDs::midiOutputFilter, "Note");
-	}
+    if (updateNode)
+    {
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputFilter), nullptr);
+        add_array_to_node(midiMapNode, midiInputRemap->getNoteMap()->getValues(), IDs::midiOutputFilter, "Note");
+    }
 }
 
 void SvkMidiProcessor::resetInputFilter(bool updateNode)
@@ -427,16 +427,16 @@ void SvkMidiProcessor::mapNoteForInputRemap(int noteIn, int noteOut, bool update
 {
     midiInputRemap->setNote(noteIn, noteOut);
 
-	if (updateNode)
-		set_value_in_array(midiMapNode, IDs::midiInputRemap, noteIn, noteOut);
+    if (updateNode)
+        set_value_in_array(midiMapNode, IDs::midiInputRemap, noteIn, noteOut);
 }
 
 void SvkMidiProcessor::mapNoteForOutputFilter(int noteIn, int noteOut, bool updateNode)
 {
     midiOutputFilter->setNote(noteIn, noteOut);
 
-	if (updateNode)
-		set_value_in_array(midiMapNode, IDs::midiOutputFilter, noteIn, noteOut);
+    if (updateNode)
+        set_value_in_array(midiMapNode, IDs::midiOutputFilter, noteIn, noteOut);
 }
 
 //==============================================================================
@@ -445,76 +445,76 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 {
     // TODO: handle note offs if period/transpose is changed before note offs
     
-	// Combine external inputs
-	midiMessages.addEvents(externalInputBuffer, 0, numInputMsgs, 0);
-	externalInputBuffer.clear();
-	numInputMsgs = 0;
+    // Combine external inputs
+    midiMessages.addEvents(externalInputBuffer, 0, numInputMsgs, 0);
+    externalInputBuffer.clear();
+    numInputMsgs = 0;
 
     // Process external input
-	MidiBuffer combinedMessages;
-	MidiMessage msg;
-	int midiNote;
-	
-	// Add external input into queue
+    MidiBuffer combinedMessages;
+    MidiMessage msg;
+    int midiNote;
+    
+    // Add external input into queue
     for (auto msgData : midiMessages)
     {
-		msg = msgData.getMessage();
+        msg = msgData.getMessage();
 
-		if (msg.isNoteOnOrOff())
-		{
-			midiNote = msg.getNoteNumber();
+        if (msg.isNoteOnOrOff())
+        {
+            midiNote = msg.getNoteNumber();
 
-			if (isInputFiltered)
-			{
-				midiNote = midiInputFilter->getNoteRemapped(midiNote);
-			}
+            if (isInputFiltered)
+            {
+                midiNote = midiInputFilter->getNoteRemapped(midiNote);
+            }
 
-			originalKeyboardState->processNextMidiEvent(msg);
+            originalKeyboardState->processNextMidiEvent(msg);
 
-			if (isInputRemapped)
-			{
-				midiNote = midiInputRemap->getNoteRemapped(midiNote);
-			}
+            if (isInputRemapped)
+            {
+                midiNote = midiInputRemap->getNoteRemapped(midiNote);
+            }
 
-			msg.setNoteNumber(midiNote);
-			remappedKeyboardState->processNextMidiEvent(msg);
-		}
+            msg.setNoteNumber(midiNote);
+            remappedKeyboardState->processNextMidiEvent(msg);
+        }
 
-		combinedMessages.addEvent(msg, msgData.samplePosition);
+        combinedMessages.addEvent(msg, msgData.samplePosition);
     }
 
-	// Output Filtering on all MIDI events
-	for (auto msgData : svkBuffer)
-	{
-		if (!msgData.numBytes)
-			continue;
+    // Output Filtering on all MIDI events
+    for (auto msgData : svkBuffer)
+    {
+        if (!msgData.numBytes)
+            continue;
 
-		msg = msgData.getMessage();
+        msg = msgData.getMessage();
 
-		// Process transpositions
-		if (msg.isNoteOnOrOff())
-		{
-			midiNote = msg.getNoteNumber() + currentNoteShift;
+        // Process transpositions
+        if (msg.isNoteOnOrOff())
+        {
+            midiNote = msg.getNoteNumber() + currentNoteShift;
 
-			if (isOutputFiltered)
-			{
-				midiNote = midiOutputFilter->getNoteRemapped(midiNote);
-			}
+            if (isOutputFiltered)
+            {
+                midiNote = midiOutputFilter->getNoteRemapped(midiNote);
+            }
 
-			if (midiNote < 0 || midiNote > 127)
-				continue;
+            if (midiNote < 0 || midiNote > 127)
+                continue;
 
-			msg.setNoteNumber(midiNote);
-		}
+            msg.setNoteNumber(midiNote);
+        }
 
-		combinedMessages.addEvent(msg, msgData.samplePosition);
-	}
+        combinedMessages.addEvent(msg, msgData.samplePosition);
+    }
 
-	svkBuffer.clear();
-	numSvkMsgs = 0;
+    svkBuffer.clear();
+    numSvkMsgs = 0;
 
-	midiMessages.swapWith(combinedMessages);
-	sendBufferToOutputs(midiMessages);
+    midiMessages.swapWith(combinedMessages);
+    sendBufferToOutputs(midiMessages);
 }
 
 void SvkMidiProcessor::sendMsgToOutputs(const MidiMessage& msg)
@@ -533,13 +533,13 @@ void SvkMidiProcessor::sendBufferToOutputs(const MidiBuffer& bufferToSend)
 
 void SvkMidiProcessor::allNotesOff()
 {
-	auto events = MidiBuffer::Iterator(allNotesOffBuffer);
-	MidiMessage msg;
-	int smplNum;
-	while (events.getNextEvent(msg, smplNum))
-	{
-		externalInputBuffer.addEvent(msg, numInputMsgs++);
-	}
+    auto events = MidiBuffer::Iterator(allNotesOffBuffer);
+    MidiMessage msg;
+    int smplNum;
+    while (events.getNextEvent(msg, smplNum))
+    {
+        externalInputBuffer.addEvent(msg, numInputMsgs++);
+    }
 }
 
 //==============================================================================
@@ -559,14 +559,14 @@ bool SvkMidiProcessor::isMidiPaused()
 
 void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
 {
-	if (paramID == IDs::mappingMode.toString())
-	{
-		isInputRemapped = newValue > 1;
-	}
+    if (paramID == IDs::mappingMode.toString())
+    {
+        isInputRemapped = newValue > 1;
+    }
     else if (paramID == IDs::periodShift.toString())
     {
         periodShift = newValue;
-		updateNoteTransposition();
+        updateNoteTransposition();
     }
     else if (paramID == IDs::periodShiftModeSize.toString())
     {
@@ -575,7 +575,7 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
     else if (paramID == IDs::transposeAmt.toString())
     {
         transposeAmt = newValue;
-		updateNoteTransposition();
+        updateNoteTransposition();
     }
     else if (paramID == IDs::keyboardMidiChannel.toString())
     {
@@ -593,19 +593,19 @@ void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
-	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
-	svkBuffer.addEvent(msg, numSvkMsgs++);
+    msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
+    svkBuffer.addEvent(msg, numSvkMsgs++);
 }
 
 void SvkMidiProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
     MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
-	msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
-	svkBuffer.addEvent(msg, numSvkMsgs++);
+    msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
+    svkBuffer.addEvent(msg, numSvkMsgs++);
 }
 
 void SvkMidiProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg)
 {
-	MidiMessage myMsg = MidiMessage(msg);
-	externalInputBuffer.addEvent(myMsg, numInputMsgs++);
+    MidiMessage myMsg = MidiMessage(msg);
+    externalInputBuffer.addEvent(myMsg, numInputMsgs++);
 }

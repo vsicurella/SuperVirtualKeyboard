@@ -13,31 +13,31 @@ Author:  Vincenzo
 
 class MidiFilter
 {
-	std::unique_ptr<NoteMap> midiNoteMapping;
-	Point<int> noteRange;
+    std::unique_ptr<NoteMap> midiNoteMapping;
+    Point<int> noteRange;
 
 public:
 
-	MidiFilter();
-	MidiFilter(Array<int> mapIn);
-	MidiFilter(NoteMap mapIn);
+    MidiFilter();
+    MidiFilter(Array<int> mapIn);
+    MidiFilter(NoteMap mapIn);
 
-	int getNoteRemapped(int midiNoteIn) const;
-	int getNoteMidi(int remappedNoteIn) const;
-	Array<int> getRemappedNotes();
+    int getNoteRemapped(int midiNoteIn) const;
+    int getNoteMidi(int remappedNoteIn) const;
+    Array<int> getRemappedNotes();
 
-	Point<int> getNoteRange() const;
-	NoteMap* getNoteMap();
+    Point<int> getNoteRange() const;
+    NoteMap* getNoteMap();
 
-	int setNote(int noteIn, int noteOut);
-	void setNoteRange(int lowestMidiNote, int highestMidiNote);
+    int setNote(int noteIn, int noteOut);
+    void setNoteRange(int lowestMidiNote, int highestMidiNote);
 
-	NoteMap* setNoteMap(Array<int> mapToCopy);
+    NoteMap* setNoteMap(Array<int> mapToCopy);
     NoteMap* setNoteMap(NoteMap mapToCopy);
 
-	int size() const;
+    int size() const;
 
-	String toString();
+    String toString();
 
-	static Array<int> getStandardMap();
+    static Array<int> getStandardMap();
 };

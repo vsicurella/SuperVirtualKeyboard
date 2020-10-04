@@ -12,26 +12,26 @@
 
 MidiFilter::MidiFilter()
 {
-	noteRange = Point<int>(-1, 127);
+    noteRange = Point<int>(-1, 127);
     midiNoteMapping = std::make_unique<NoteMap>(128, true);
 }
 
 MidiFilter::MidiFilter(Array<int> mapIn)
 {
-	noteRange = Point<int>(-1, 127);
-	setNoteMap(mapIn);
+    noteRange = Point<int>(-1, 127);
+    setNoteMap(mapIn);
 }
 
 MidiFilter::MidiFilter(NoteMap mapIn)
 {
-	noteRange = Point<int>(-1, 127);
-	setNoteMap(mapIn.getValues());
+    noteRange = Point<int>(-1, 127);
+    setNoteMap(mapIn.getValues());
 }
 
 NoteMap* MidiFilter::setNoteMap(Array<int> mapToCopy)
 {
     midiNoteMapping = std::make_unique<NoteMap>(mapToCopy);
-	return midiNoteMapping.get();
+    return midiNoteMapping.get();
 }
 
 NoteMap* MidiFilter::setNoteMap(NoteMap mapToCopy)
@@ -52,14 +52,14 @@ int MidiFilter::getNoteRemapped(int midiNoteIn) const
 
 int MidiFilter::getNoteMidi(int remappedNoteIn) const
 {
-	int remappedNote = jlimit(noteRange.x, noteRange.y, remappedNoteIn);
-	
-	int noteOut = -1;
+    int remappedNote = jlimit(noteRange.x, noteRange.y, remappedNoteIn);
+    
+    int noteOut = -1;
 
-	if (midiNoteMapping.get())
-		noteOut = midiNoteMapping->getKey(remappedNote);
+    if (midiNoteMapping.get())
+        noteOut = midiNoteMapping->getKey(remappedNote);
 
-	return jlimit(noteRange.x, noteRange.y, noteOut);
+    return jlimit(noteRange.x, noteRange.y, noteOut);
 }
 
 
@@ -83,33 +83,33 @@ void MidiFilter::setNoteRange(int lowestMidiNote, int highestMidiNote)
 
 NoteMap* MidiFilter::getNoteMap()
 {
-	return midiNoteMapping.get();
+    return midiNoteMapping.get();
 }
 
 Array<int> MidiFilter::getRemappedNotes()
 {
-	return midiNoteMapping->getValues();
+    return midiNoteMapping->getValues();
 }
 
 int MidiFilter::size() const
 {
-	int sizeOut = 0;
-	if (midiNoteMapping.get())
-		sizeOut = midiNoteMapping->getSize();
+    int sizeOut = 0;
+    if (midiNoteMapping.get())
+        sizeOut = midiNoteMapping->getSize();
 
-	return sizeOut;
+    return sizeOut;
 }
 
 String MidiFilter::toString()
 {
-	String out;
+    String out;
 
-	for (int i = 0; i < midiNoteMapping->getSize(); i++)
-	{
-		out << "Midi Note In " << i << " --> " << midiNoteMapping->getValue(i) << "\t Midi Note Out " << i << " <-- " << midiNoteMapping->getKey(i) << "\n";
-	}
+    for (int i = 0; i < midiNoteMapping->getSize(); i++)
+    {
+        out << "Midi Note In " << i << " --> " << midiNoteMapping->getValue(i) << "\t Midi Note Out " << i << " <-- " << midiNoteMapping->getKey(i) << "\n";
+    }
 
-	return out;
+    return out;
 }
 
 Array<int> MidiFilter::getStandardMap()

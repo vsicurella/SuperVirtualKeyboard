@@ -169,20 +169,20 @@ static Identifier keyNumberToEdit("KeyToDebug");
 
 static Array<Identifier> pianoSettings =
 {
-	pianoUIMode,
-	pianoWHRatio,
-	keyboardKeysStyle,
-	keyboardHighlightStyle,
-	pianoKeyShowNumber
+    pianoUIMode,
+    pianoWHRatio,
+    keyboardKeysStyle,
+    keyboardHighlightStyle,
+    pianoKeyShowNumber
 };
 
 static Array<Identifier> midiSettings =
 {
-	periodShift,
-	periodShiftModeSize,
-	transposeAmt,
-	keyboardMidiChannel,
-	rootMidiNote // default root note
+    periodShift,
+    periodShiftModeSize,
+    transposeAmt,
+    keyboardMidiChannel,
+    rootMidiNote // default root note
 };
 
 enum CommandIDs
@@ -236,9 +236,9 @@ enum CommandIDs
 
 enum SortType
 {
-	scaleSize = 0,
-	modeSize,
-	familyName,
-	user
+    scaleSize = 0,
+    modeSize,
+    familyName,
+    user
 };
 

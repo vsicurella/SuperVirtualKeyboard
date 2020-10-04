@@ -13,71 +13,71 @@
 
 namespace VirtualKeyboard
 {
-	enum UIMode
-	{
-		playMode = 0,
-		editMode,
-		mapMode
-	};
+    enum UIMode
+    {
+        playMode = 0,
+        editMode,
+        mapMode
+    };
 
-	enum Orientation
-	{
-		horizontal = 0,
-		verticalLeft,
-		verticalRight
-	};
+    enum Orientation
+    {
+        horizontal = 0,
+        verticalLeft,
+        verticalRight
+    };
 
-	enum HighlightStyle
-	{
-		full = 1,
-		inside,
-		outline,
-		circles,
-		squares
-	};
+    enum HighlightStyle
+    {
+        full = 1,
+        inside,
+        outline,
+        circles,
+        squares
+    };
 
-	enum VelocityStyle
-	{
-		linear = 1,
-		curved,
-		fixed
-	};
+    enum VelocityStyle
+    {
+        linear = 1,
+        curved,
+        fixed
+    };
 
-	enum ScrollingStyle
-	{
-		smooth = 1,
-		stepped
-	};
+    enum ScrollingStyle
+    {
+        smooth = 1,
+        stepped
+    };
 
-	enum KeyPlacementType
-	{
-		nestedRight = 1,
-		nestedCenter,
-		flat,
-		adjacent
-	};
+    enum KeyPlacementType
+    {
+        nestedRight = 1,
+        nestedCenter,
+        flat,
+        adjacent
+    };
 
-	enum KeyShapeFlags
-	{
-		Basic = 0x0001,
-		NotchPrevious = 0x0010,
-		NotchNext = 0x0100,
-		NotchCenter = 0x1000
-	};
+    enum KeyShapeFlags
+    {
+        Basic = 0x0001,
+        NotchPrevious = 0x0010,
+        NotchNext = 0x0100,
+        NotchCenter = 0x1000
+    };
 }
 
 enum MappingStyle
 {
-	ModeToMode = 1,
-	ModeToScale,
-	ModeByOrder
+    ModeToMode = 1,
+    ModeToScale,
+    ModeByOrder
 };
 
 enum PluginStateNodeStatus
 {
-	InvalidNode = 0,
-	CurrentVersion,
-	AlphaVersion,
+    InvalidNode = 0,
+    CurrentVersion,
+    AlphaVersion,
 
-	IsAPVTSNode = 0x1000
+    IsAPVTSNode = 0x1000
 };
