@@ -33,18 +33,6 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 	textFilterInt.reset(new TextFilterInt());
 
 	revertToSavedPreset(true, false);
-    
-	//for (auto child : svkTree.state)
-	//{
-	//	svkTree.addParameterListener(child["id"].toString(), this);
-	//}
-
-	//DBG("PluginState listening to parameters");
-	//midiProcessor->connectToParameters();
-
-	// TODO: set up default settings
- //   setModeSelectorViewed(1);
-	//updateModeViewed(false);
 }
 
 void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
@@ -83,6 +71,11 @@ void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSetting
 	DBG("Plugin State Node after recall:\n" + pluginStateNode.toXmlString());
 }
 
+ValueTree SvkPluginState::getPluginEditorNode() const
+{
+	return pluginStateNode.getChildWithName(IDs::pluginEditorNode);
+}
+
 void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
 {
 	presetEdited = false;
@@ -91,9 +84,19 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
 
-	pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
-	
+	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr)
+		           .copyPropertiesAndChildrenFrom(presetNode, nullptr);
+
+	for (auto child : svkTree.state)
+	{
+		if (child.hasType(IDs::pluginStateNode))
+		{
+			svkTree.state.removeChild(child, nullptr);
+			return;
+		}
+	}
+
+	svkTree.state.appendChild(pluginStateNode, nullptr);
 	
 	modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
