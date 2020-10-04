@@ -97,7 +97,7 @@ void ReaperWriter::setup_default_symbols()
 	}
 }
 
-bool ReaperWriter::write_file()
+bool ReaperWriter::write()
 {
     Array<int> modeOrders = mode->getOrders();
     Array<float> modeDegrees = Mode::ordersToModalDegrees(modeOrders);

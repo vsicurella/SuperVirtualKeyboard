@@ -39,6 +39,6 @@ public:
 	String get_symbol(int orderIndexIn);
     String get_path();
     
-    bool write_file();
+    bool write();
     
 };
