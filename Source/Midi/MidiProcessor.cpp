@@ -486,6 +486,9 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 	// Output Filtering on all MIDI events
 	for (auto msgData : svkBuffer)
 	{
+		if (!msgData.numBytes)
+			continue;
+
 		msg = msgData.getMessage();
 
 		// Process transpositions
