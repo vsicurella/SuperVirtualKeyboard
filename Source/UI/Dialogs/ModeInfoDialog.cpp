@@ -1,38 +1,18 @@
 /*
   ==============================================================================
 
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.4.5
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  ModeInfoDialog.cpp
+  Vincenzo Sicurella
 
   ==============================================================================
 */
 
-//[Headers] You can add your own extra header files here...
-//[/Headers]
-
 #include "ModeInfoDialog.h"
-
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
-//[/MiscUserDefs]
 
 //==============================================================================
 ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     : modeOriginal(modeIn), modeWorking(Mode(modeIn->modeNode)), modeNode(modeWorking.modeNode)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
     familyBox.reset (new TextEditor ("Family Box"));
     addAndMakeVisible (familyBox.get());
     familyBox->setMultiLine (false);
@@ -233,8 +213,6 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
 
     closeButton->setBounds (192, 488, 104, 24);
 
-
-    //[UserPreSize]
     rotateSld->setIncDecButtonsMode(Slider::IncDecButtonMode::incDecButtonsDraggable_Horizontal);
 
 	familyBox->addListener(this);
@@ -261,20 +239,12 @@ ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
     else
         rotateSld->setEnabled(false);
 
-    //[/UserPreSize]
-
     setSize (340, 525);
-
-
-    //[Constructor] You can add your own custom stuff here..
-    //[/Constructor]
 }
 
 ModeInfoDialog::~ModeInfoDialog()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
 	removeAllChangeListeners();
-    //[/Destructor_pre]
 
     familyBox = nullptr;
     stepsBox = nullptr;
@@ -295,42 +265,18 @@ ModeInfoDialog::~ModeInfoDialog()
     modeSizeReadout = nullptr;
     intervalSizeReadout = nullptr;
     closeButton = nullptr;
-
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
 //==============================================================================
 void ModeInfoDialog::paint (Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (Colour (0xff323e44));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
-}
-
-void ModeInfoDialog::resized()
-{
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
 void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
 {
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
     if (buttonThatWasClicked == defaultNameBtn.get())
     {
-        //[UserButtonCode_defaultNameBtn] -- add your button handler code here..
-
 		if (defaultNameBtn->getToggleState())
 		{
 			nameBox->setEnabled(false);
@@ -342,50 +288,30 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
 		{
 			nameBox->setEnabled(true);
 		}
-        //[/UserButtonCode_defaultNameBtn]
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
-        //[UserButtonCode_saveButton] -- add your button handler code here..
 		commitMode();
 		sendChangeMessage();
 		getParentComponent()->exitModalState(0);
-        //[/UserButtonCode_saveButton]
     }
     else if (buttonThatWasClicked == closeButton.get())
     {
-        //[UserButtonCode_closeButton] -- add your button handler code here..
 		getParentComponent()->exitModalState(0);
-        //[/UserButtonCode_closeButton]
     }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
 }
 
 void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
     if (sliderThatWasMoved == rotateSld.get())
     {
-        //[UserSliderCode_rotateSld] -- add your slider handling code here..
         modeWorking.rotate(lastRotateAmt - sliderThatWasMoved->getValue());
 		lastRotateAmt = sliderThatWasMoved->getValue();
 
 		modeNode.setProperty(IDs::stepString, modeWorking.getStepsString(), nullptr);
 		stepsBox->setText(modeWorking.getStepsString());
-        //[/UserSliderCode_rotateSld]
     }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
-
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
 {
@@ -400,22 +326,6 @@ void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
 
 }
 
-void ModeInfoDialog::textEditorEscapeKeyPressed(TextEditor& textEditor)
-{
-
-}
-
-void ModeInfoDialog::textEditorReturnKeyPressed(TextEditor& textEditor)
-{
-
-}
-
-void ModeInfoDialog::textEditorFocusLost(TextEditor& textEditor)
-{
-
-}
-
-
 void ModeInfoDialog::commitMode()
 {
 	modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
@@ -424,117 +334,3 @@ void ModeInfoDialog::commitMode()
 
 	modeOriginal->restoreNode(modeNode);
 }
-
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="ModeInfoDialog" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster, public TextEditor::Listener"
-                 constructorParams="Mode* modeIn" variableInitialisers="modeOriginal(modeIn), modeWorking(Mode(modeIn-&gt;modeNode)), modeNode(modeWorking.modeNode)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="340" initialHeight="525">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <TEXTEDITOR name="Family Box" id="23f020c7a9a4bed2" memberName="familyBox"
-              virtualName="" explicitFocusOrder="0" pos="8 168 192 24" initialText="Meantone"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
-  <TEXTEDITOR name="Steps Box" id="5f84971388b9cded" memberName="stepsBox"
-              virtualName="" explicitFocusOrder="0" pos="8 40 192 24" initialText="2 2 1 2 2 2 1"
-              multiline="0" retKeyStartsLine="0" readonly="1" scrollbars="1"
-              caret="0" popupmenu="1"/>
-  <TEXTEDITOR name="Info Box" id="9460b63ee92bad3f" memberName="infoBox" virtualName=""
-              explicitFocusOrder="0" pos="8 336 320 128" initialText="Ever hear of it?"
-              multiline="1" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
-  <LABEL name="Family Name Label" id="dc9e44984d2c580c" memberName="familyNameLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 136 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Temperament Family:&#10;" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Steps Label" id="a3e176f2e17e3ec6" memberName="stepsLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 8 56 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Steps:&#10;" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Interval Sizes Label" id="c08a12e462ae8cea" memberName="intervalSizesLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 272 95 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Interval Sizes:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Name Label" id="5c6262b1b505756a" memberName="nameLabel"
-         virtualName="" explicitFocusOrder="0" pos="9 73 96 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Mode Name:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Mode Size Label" id="bea6fdfc1faecf54" memberName="modeSizeLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 240 80 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Mode Size:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Scale Size Label" id="1f77fafbb9b74b81" memberName="scaleSizeLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 208 71 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Scale Size:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="Default Name Button" id="9d115fe17c7425f5" memberName="defaultNameBtn"
-                virtualName="" explicitFocusOrder="0" pos="217 105 111 24" buttonText="Use Default"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="1"/>
-  <LABEL name="Info Label" id="4618a6a917e67a95" memberName="infoLbl"
-         virtualName="" explicitFocusOrder="0" pos="8 304 40 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Info:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTEDITOR name="Name Box" id="fd47b34a29e0b3c1" memberName="nameBox" virtualName=""
-              explicitFocusOrder="0" pos="9 105 192 24" initialText="Meantone[7] 12"
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
-  <TEXTBUTTON name="Save Button" id="819ae7d5095491a2" memberName="saveButton"
-              virtualName="" explicitFocusOrder="0" pos="32 488 104 24" buttonText="Save"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="Rotate Slider" id="58e50eefb260dd55" memberName="rotateSld"
-          virtualName="" explicitFocusOrder="0" pos="216 40 96 24" min="-3.0"
-          max="4.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="48" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <LABEL name="Mode Rotate Label" id="8b18e2a5c9cac13c" memberName="modeRotateLbl"
-         virtualName="" explicitFocusOrder="0" pos="216 8 103 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Rotate Mode:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Scale Size Readout" id="cb7b314f9fff4ced" memberName="scaleSizeReadout"
-         virtualName="" explicitFocusOrder="0" pos="88 208 31 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="12&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Mode Size Readout" id="5986a0db41f5e2e7" memberName="modeSizeReadout"
-         virtualName="" explicitFocusOrder="0" pos="88 240 103 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="7" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="Interval Size Readout" id="28b3648b1d961b9" memberName="intervalSizeReadout"
-         virtualName="" explicitFocusOrder="0" pos="104 272 143 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="7, 5" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="closeButton" id="7fdae5390323aa2b" memberName="closeButton"
-              virtualName="" explicitFocusOrder="0" pos="192 488 104 24" buttonText="Close"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-
