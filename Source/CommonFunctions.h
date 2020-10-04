@@ -145,11 +145,11 @@ struct Pair
 	}
 };
 
-struct MidiPitch : Pair<int, int>
-{
-    MidiPitch(int midiNoteIn=-1, int pitchbendIn=0)
-    : Pair<int, int>(midiNoteIn, pitchbendIn) {}
-};
+//struct MidiPitch : Pair<int, int>
+//{
+//    MidiPitch(int midiNoteIn=-1, int pitchbendIn=0)
+//    : Pair<int, int>(midiNoteIn, pitchbendIn) {}
+//};
 
 class TextFilterIntOrSpace : public TextEditor::InputFilter
 {
@@ -191,65 +191,29 @@ class TextFilterInt : public TextEditor::InputFilter
 	}
 };
 
-static Point<int> pointFromString(Point<int>& p, String pointToStringIn)
-{
-	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
-	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	p = Point<int>(val1.getIntValue(), val2.getIntValue());
-	return p;
-}
-
-static Point<float> pointFromString(Point<float>& p, String pointToStringIn)
-{
-	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
-	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	p = Point<float>(val1.getFloatValue(), val2.getFloatValue());
-	return p;
-}
-
-static Point<double> pointFromString(Point<double>& p, String pointToStringIn)
-{
-	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
-	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
-	p = Point<double>(val1.getDoubleValue(), val2.getDoubleValue());
-	return p;
-}
-
-static ValueTree extractNode(ValueTree nodeOrigin, Identifier nodeType)
-{
-    ValueTree nodeOut;
-    
-    if (nodeOrigin.hasType(nodeType))
-        nodeOut = nodeOrigin;
-    else
-        nodeOut = nodeOrigin.getChildWithName(nodeType);
-        
-    return nodeOut;
-}
-
-static Array<ValueTree> extractNodes(ValueTree nodeOrigin, Identifier nodeType)
-{
-	Array<ValueTree> nodesOut;
-	ValueTree childNode;
-	
-	int numChildren = nodeOrigin.getNumChildren();
-	int level = 0;
-
-	while (level < numChildren)
-	{
-		childNode = nodeOrigin.getChild(level);
-
-		if (childNode.hasType(nodeType))
-			nodesOut.add(childNode);
-
-		else if (childNode.getNumChildren() > 0)
-			nodesOut.addArray(extractNodes(childNode, nodeType));
-
-		level++;
-	}
-
-	return nodesOut;
-}
+//static Point<int> pointFromString(Point<int>& p, String pointToStringIn)
+//{
+//	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
+//	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
+//	p = Point<int>(val1.getIntValue(), val2.getIntValue());
+//	return p;
+//}
+//
+//static Point<float> pointFromString(Point<float>& p, String pointToStringIn)
+//{
+//	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
+//	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
+//	p = Point<float>(val1.getFloatValue(), val2.getFloatValue());
+//	return p;
+//}
+//
+//static Point<double> pointFromString(Point<double>& p, String pointToStringIn)
+//{
+//	String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);
+//	String val2 = pointToStringIn.fromFirstOccurrenceOf(",", false, true);
+//	p = Point<double>(val1.getDoubleValue(), val2.getDoubleValue());
+//	return p;
+//}
 
 template <class T>
 static void add_array_to_node(ValueTree nodeIn, const Array<T>& arrayIn, Identifier arrayID, Identifier itemId)
@@ -281,125 +245,125 @@ static void get_array_from_node(const ValueTree nodeIn, Array<T>& arrayIn, Ident
 	}
 }
 
-/* Adds a Colour array reduced to nontrivial items to a node represented in a ValueTree structure */
+///* Adds a Colour array reduced to nontrivial items to a node represented in a ValueTree structure */
 
-static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId)
-{
-	ValueTree arrayTree = ValueTree(arrayID);
-	ValueTree item;
+//static void add_array_to_node(ValueTree nodeIn, const Array<Colour>& arrayIn, Identifier arrayID, Identifier itemId)
+//{
+//	ValueTree arrayTree = ValueTree(arrayID);
+//	ValueTree item;
+//
+//	for (int i = 0; i < arrayIn.size(); i++)
+//	{
+//		if (arrayIn[i].isOpaque())
+//		{
+//			item = ValueTree(itemId);
+//			item.setProperty("Key", i, nullptr);
+//			item.setProperty("Value", arrayIn[i].toString(), nullptr);
+//			arrayTree.addChild(item, i, nullptr);
+//		}
+//	}
+//
+//	nodeIn.addChild(arrayTree, -1, nullptr);
+//}
+//
+//static void add_array_as_property(ValueTree& nodeIn, const Array<Colour>& arrayIn, Identifier itemId)
+//{	
+//	String array = "";
+//
+//	for (int i = 0; i < arrayIn.size(); i++)
+//	{
+//		array += arrayIn[i].toString();
+//		array += '\n';
+//	}
+//
+//	nodeIn.setProperty(itemId, array, nullptr);
+//}
 
-	for (int i = 0; i < arrayIn.size(); i++)
-	{
-		if (arrayIn[i].isOpaque())
-		{
-			item = ValueTree(itemId);
-			item.setProperty("Key", i, nullptr);
-			item.setProperty("Value", arrayIn[i].toString(), nullptr);
-			arrayTree.addChild(item, i, nullptr);
-		}
-	}
+//static void get_array_from_node(const ValueTree& nodeIn, Array<Colour>& arrayIn, Identifier arrayID)
+//{
+//	String array = nodeIn[arrayID];
+//	String value = "";
+//	int charsRead = 0;
+//
+//	Colour c = Colours::transparentWhite;
+//
+//	while (charsRead < array.length())
+//	{
+//		value += array[charsRead];
+//
+//		if (charsRead + 1 < array.length())
+//		{
+//			if (array[charsRead + 1] == '\n')
+//				c = Colour::fromString(value);
+//		}
+//
+//		if (c != Colours::transparentWhite)
+//		{
+//			arrayIn.add(c);
+//			c = Colours::transparentWhite;
+//		}
+//	}
+//}
 
-	nodeIn.addChild(arrayTree, -1, nullptr);
-}
+///* Creates a Colour array from a node, and populates trivial and nontrivial keys */
 
-static void add_array_as_property(ValueTree& nodeIn, const Array<Colour>& arrayIn, Identifier itemId)
-{	
-	String array = "";
+//static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID, int arraySizeOut)
+//{
+//	ValueTree arrayNode;
+//	ValueTree item;
+//
+//	arrayIn.resize(arraySizeOut);
+//
+//	arrayNode = nodeIn.getChildWithName(arrayID);
+//
+//	for (int i = 0; i < arrayNode.getNumChildren(); i++)
+//	{
+//		item = arrayNode.getChild(i);
+//		arrayIn.set(item["Key"], Colour::fromString(item["Value"].toString()));
+//	}
+//}
 
-	for (int i = 0; i < arrayIn.size(); i++)
-	{
-		array += arrayIn[i].toString();
-		array += '\n';
-	}
+//template <class T>
+//static void add_array_to_node(ValueTree nodeIn, const Array<Point<T>>& arrayIn, Identifier arrayID, Identifier itemId)
+//{
+//	ValueTree arrayTree = ValueTree(arrayID);
+//	ValueTree item;
+//	for (int i = 0; i < arrayIn.size(); i++)
+//	{
+//		item = ValueTree(itemId);
+//		item.setProperty("Value", arrayIn[i].toString(), nullptr);
+//		arrayTree.addChild(item, i, nullptr);
+//	}
+//
+//	nodeIn.addChild(arrayTree, -1, nullptr);
+//}
 
-	nodeIn.setProperty(itemId, array, nullptr);
-}
-
-static void get_array_from_node(const ValueTree& nodeIn, Array<Colour>& arrayIn, Identifier arrayID)
-{
-	String array = nodeIn[arrayID];
-	String value = "";
-	int charsRead = 0;
-
-	Colour c = Colours::transparentWhite;
-
-	while (charsRead < array.length())
-	{
-		value += array[charsRead];
-
-		if (charsRead + 1 < array.length())
-		{
-			if (array[charsRead + 1] == '\n')
-				c = Colour::fromString(value);
-		}
-
-		if (c != Colours::transparentWhite)
-		{
-			arrayIn.add(c);
-			c = Colours::transparentWhite;
-		}
-	}
-}
-
-/* Creates a Colour array from a node, and populates trivial and nontrivial keys */
-
-static void get_array_from_node(const ValueTree nodeIn, Array<Colour>& arrayIn, Identifier arrayID, int arraySizeOut)
-{
-	ValueTree arrayNode;
-	ValueTree item;
-
-	arrayIn.resize(arraySizeOut);
-
-	arrayNode = nodeIn.getChildWithName(arrayID);
-
-	for (int i = 0; i < arrayNode.getNumChildren(); i++)
-	{
-		item = arrayNode.getChild(i);
-		arrayIn.set(item["Key"], Colour::fromString(item["Value"].toString()));
-	}
-}
-
-template <class T>
-static void add_array_to_node(ValueTree nodeIn, const Array<Point<T>>& arrayIn, Identifier arrayID, Identifier itemId)
-{
-	ValueTree arrayTree = ValueTree(arrayID);
-	ValueTree item;
-	for (int i = 0; i < arrayIn.size(); i++)
-	{
-		item = ValueTree(itemId);
-		item.setProperty("Value", arrayIn[i].toString(), nullptr);
-		arrayTree.addChild(item, i, nullptr);
-	}
-
-	nodeIn.addChild(arrayTree, -1, nullptr);
-}
-
-static void get_array_from_node(const ValueTree nodeIn, Array<Point<int>>& arrayIn, Identifier arrayID)
-{
-	ValueTree childArray = nodeIn.getChildWithName(arrayID);
-
-	if (childArray.isValid())
-		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value").toString()));
-}
-
-static void get_array_from_node(const ValueTree nodeIn, Array<Point<float>>& arrayIn, Identifier arrayID)
-{
-	ValueTree childArray = nodeIn.getChildWithName(arrayID);
-
-	if (childArray.isValid())
-		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
-}
-
-static void get_array_from_node(const ValueTree nodeIn, Array<Point<double>>& arrayIn, Identifier arrayID)
-{
-	ValueTree childArray = nodeIn.getChildWithName(arrayID);
-
-	if (childArray.isValid())
-		for (int i = 0; i < childArray.getNumChildren(); i++)
-			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
-}
+//static void get_array_from_node(const ValueTree nodeIn, Array<Point<int>>& arrayIn, Identifier arrayID)
+//{
+//	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+//
+//	if (childArray.isValid())
+//		for (int i = 0; i < childArray.getNumChildren(); i++)
+//			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value").toString()));
+//}
+//
+//static void get_array_from_node(const ValueTree nodeIn, Array<Point<float>>& arrayIn, Identifier arrayID)
+//{
+//	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+//
+//	if (childArray.isValid())
+//		for (int i = 0; i < childArray.getNumChildren(); i++)
+//			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
+//}
+//
+//static void get_array_from_node(const ValueTree nodeIn, Array<Point<double>>& arrayIn, Identifier arrayID)
+//{
+//	ValueTree childArray = nodeIn.getChildWithName(arrayID);
+//
+//	if (childArray.isValid())
+//		for (int i = 0; i < childArray.getNumChildren(); i++)
+//			arrayIn.add(pointFromString(arrayIn.getReference(0), childArray.getChild(i).getProperty("Value")));
+//}
 
 template <class T>
 static void set_value_in_array(ValueTree nodeIn, Identifier arrayID, int indexToChange, T valueToSet)
