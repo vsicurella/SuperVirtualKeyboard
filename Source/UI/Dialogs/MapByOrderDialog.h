@@ -61,12 +61,12 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 
-	ModeMapper* modeMapper;
+    ModeMapper* modeMapper;
     Mode* mode1;
     Mode* mode2;
 
-	int boxW = 10;
-	int boxH = 8;
+    int boxW = 10;
+    int boxH = 8;
 
     //[/UserVariables]
 

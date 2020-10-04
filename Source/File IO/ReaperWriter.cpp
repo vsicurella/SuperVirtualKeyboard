@@ -32,7 +32,7 @@ ReaperWriter::ReaperWriter(Mode* modeIn)
     chooser.browseForFileToSave(true);
     fileOut = chooser.getResult();
 
-	setup_default_symbols();
+    setup_default_symbols();
 }
 
 ReaperWriter::~ReaperWriter()
@@ -77,24 +77,24 @@ String ReaperWriter::get_path()
 
 void ReaperWriter::setup_default_symbols()
 {
-	orderSymbols.clear();
+    orderSymbols.clear();
 
-	CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
-	String symbol;
-	int orderMax = mode->getMaxStep();
-	int repeats = 11;
+    CharPointer_UTF8 block = CharPointer_UTF8("\xe2\x96\x88");
+    String symbol;
+    int orderMax = mode->getMaxStep();
+    int repeats = 11;
 
-	for (int i = 0; i < repeats; i++)
-	{
-		symbol = "";
+    for (int i = 0; i < repeats; i++)
+    {
+        symbol = "";
 
-		for (int o = 0; o < (repeats - i); o++)
-		{
-			symbol += *block;
-		}
+        for (int o = 0; o < (repeats - i); o++)
+        {
+            symbol += *block;
+        }
 
-		orderSymbols.add(symbol);
-	}
+        orderSymbols.add(symbol);
+    }
 }
 
 bool ReaperWriter::write()
@@ -105,43 +105,43 @@ bool ReaperWriter::write()
     if (!fileOut.getParentDirectory().exists())
         return false;
     
-	std::unique_ptr<FileOutputStream> outStream(fileOut.createOutputStream());
+    std::unique_ptr<FileOutputStream> outStream(fileOut.createOutputStream());
 
-	if (!outStream->openedOk())
-		return false;
+    if (!outStream->openedOk())
+        return false;
     
     outStream->setPosition(0);
     outStream->truncate();
 
-	// Header
-	outStream->writeText("# MIDI note / CC name map\n", false, false, nullptr);
+    // Header
+    outStream->writeText("# MIDI note / CC name map\n", false, false, nullptr);
 
     int scaleSize = mode->getScaleSize();
     int modeSize = mode->getModeSize();
     
-	int order;
-	int index;
+    int order;
+    int index;
     float degree;
     String noteName;
     
     for (int i = 0; i < 128; i++)
     {
-		index = 127 - i;
-		order = modeOrders[index];
+        index = 127 - i;
+        order = modeOrders[index];
         degree = modeDegrees[index];
         noteName = String(degree - ((int) degree / modeSize) * modeSize);
 
         outStream->writeText(String(index) + " ", false, false, nullptr);
 
-		if (order != 0)
-		{
-			outStream->writeText(orderSymbols[order-1], false, false, nullptr);
-		}
+        if (order != 0)
+        {
+            outStream->writeText(orderSymbols[order-1], false, false, nullptr);
+        }
         
         outStream->writeText(" " + noteName, false, false, nullptr);
         outStream->write("\n", 1);
     }
 
-	outStream->flush();
-	return true;
+    outStream->flush();
+    return true;
 }

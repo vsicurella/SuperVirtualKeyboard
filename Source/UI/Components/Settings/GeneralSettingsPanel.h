@@ -20,17 +20,17 @@ public:
     GeneralSettingsPanel(SvkPluginState*);
     ~GeneralSettingsPanel() override;
     
-	void directoryChanged(DirectoryBrowserComponent*, File) override;
+    void directoryChanged(DirectoryBrowserComponent*, File) override;
     
 private:
 
-	LabelledComponent* presetLabel;
-	LabelledComponent* modeLabel;
-	LabelledComponent* settingsLabel;
+    LabelledComponent* presetLabel;
+    LabelledComponent* modeLabel;
+    LabelledComponent* settingsLabel;
 
-	DirectoryBrowserComponent* presetDirectoryBrowser;
-	DirectoryBrowserComponent* modeDirectoryBrowser;
-	DirectoryBrowserComponent* settingsDirectoryBrowser;
+    DirectoryBrowserComponent* presetDirectoryBrowser;
+    DirectoryBrowserComponent* modeDirectoryBrowser;
+    DirectoryBrowserComponent* settingsDirectoryBrowser;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralSettingsPanel)
 };

@@ -11,7 +11,7 @@
 #include "ReferencedComboBox.h"
 
 ReferencedComboBox::ReferencedComboBox(const String& nameIn, const PopupMenu* menuIn)
-	: ComboBox(nameIn), rootMenu(PopupMenu())
+    : ComboBox(nameIn), rootMenu(PopupMenu())
 {
     if (menuIn)
         setMenu(*menuIn);

@@ -17,12 +17,12 @@ class ReferencedComboBox : public ComboBox
 {
     PopupMenu rootMenu;
     
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ReferencedComboBox)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ReferencedComboBox)
 
 public:
 
     ReferencedComboBox(const String& nameIn={}, const PopupMenu* menuIn=nullptr);
-	~ReferencedComboBox();
+    ~ReferencedComboBox();
     
     void setMenu(const PopupMenu& menuIn);
     

@@ -17,32 +17,32 @@ class FocusableComponent
 {
 public:
 
-	FocusableComponent(FocussedComponent* focusserIn = nullptr, std::function<void(var)> callbackIn = {})
-		: currentFocusser(focusserIn)
-	{
+    FocusableComponent(FocussedComponent* focusserIn = nullptr, std::function<void(var)> callbackIn = {})
+        : currentFocusser(focusserIn)
+    {
 
-	}
+    }
 
-	virtual void setNewFocusser(FocussedComponent* newFocusserIn)
-	{
-		currentFocusser = newFocusserIn;
-	}
+    virtual void setNewFocusser(FocussedComponent* newFocusserIn)
+    {
+        currentFocusser = newFocusserIn;
+    }
 
-	bool isFocussedOn() const
-	{
-		return currentFocusser != nullptr;
-	}
+    bool isFocussedOn() const
+    {
+        return currentFocusser != nullptr;
+    }
 
-	virtual void performFocusFunction(var dataIn)
-	{
-		focusFunctionCallback(dataIn);
-	}
-	
+    virtual void performFocusFunction(var dataIn)
+    {
+        focusFunctionCallback(dataIn);
+    }
+    
 protected:
 
-	FocussedComponent* currentFocusser;
+    FocussedComponent* currentFocusser;
 
-	std::function<void(var)> focusFunctionCallback;
+    std::function<void(var)> focusFunctionCallback;
 
 };
 
@@ -51,32 +51,32 @@ class FocussedComponent
 
 public:
 
-	FocussedComponent(Component* initialComponentToFocus = nullptr, std::function<void(Component*, var)> focusserCallbackIn = {})
-		: currentFocus(initialComponentToFocus), focusserCallback(focusserCallbackIn)
-	{
+    FocussedComponent(Component* initialComponentToFocus = nullptr, std::function<void(Component*, var)> focusserCallbackIn = {})
+        : currentFocus(initialComponentToFocus), focusserCallback(focusserCallbackIn)
+    {
 
-	}
+    }
 
-	virtual void setComponentToFocusOn(Component* componentPtr)
-	{
-		FocusableComponent* focusable = dynamic_cast<FocusableComponent*>(currentFocus);
-		if (focusable)
-			focusable->setNewFocusser(nullptr);
+    virtual void setComponentToFocusOn(Component* componentPtr)
+    {
+        FocusableComponent* focusable = dynamic_cast<FocusableComponent*>(currentFocus);
+        if (focusable)
+            focusable->setNewFocusser(nullptr);
 
-		currentFocus = componentPtr;
+        currentFocus = componentPtr;
 
-		focusable = dynamic_cast<FocusableComponent*>(currentFocus);
-		if (focusable)
-			focusable->setNewFocusser(this);
-	}
+        focusable = dynamic_cast<FocusableComponent*>(currentFocus);
+        if (focusable)
+            focusable->setNewFocusser(this);
+    }
 
-	void setFocusserCallback(std::function<void(Component*, var)> focusserCallbackIn)
-	{
-		focusserCallback = focusserCallbackIn;
-	}
+    void setFocusserCallback(std::function<void(Component*, var)> focusserCallbackIn)
+    {
+        focusserCallback = focusserCallbackIn;
+    }
 
 protected:
 
-	Component* currentFocus;
-	std::function<void(Component*, var)> focusserCallback;
+    Component* currentFocus;
+    std::function<void(Component*, var)> focusserCallback;
 };

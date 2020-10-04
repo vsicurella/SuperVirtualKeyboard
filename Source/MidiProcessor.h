@@ -29,9 +29,9 @@ class SvkMidiProcessor : public MidiMessageCollector
     MidiBuffer midiBuffer;
     int msgCount = 0;
 
-	Mode* modeViewed;
-	Mode* mode1;
-	Mode* mode2;
+    Mode* modeViewed;
+    Mode* mode1;
+    Mode* mode2;
     
     float* midiChannelOut;
     float* periodShift;
@@ -92,11 +92,11 @@ public:
     int getTransposeAmt() const;
     int getMidiChannelOut() const;
 
-	NoteMap* getInputNoteMap();
-	NoteMap* getOutputNoteMap();
+    NoteMap* getInputNoteMap();
+    NoteMap* getOutputNoteMap();
 
-	MidiFilter* getMidiInputFilter();
-	MidiFilter* getMidiOutputFilter();
+    MidiFilter* getMidiInputFilter();
+    MidiFilter* getMidiOutputFilter();
 
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
@@ -117,15 +117,15 @@ public:
     String setMidiInput(String deviceID);
     String setMidiOutput(String deviceID);
 
-	void setModeViewed(Mode* modeViewedIn);
-	void setMode1(Mode* mode1In);
-	void setMode2(Mode* mode2In);
+    void setModeViewed(Mode* modeViewedIn);
+    void setMode1(Mode* mode1In);
+    void setMode2(Mode* mode2In);
     
     void setRootNote(int rootNoteIn);
     void setMidiChannelOut(int channelOut);
-	void setPeriodShift(int shiftIn);
+    void setPeriodShift(int shiftIn);
     void setTransposeAmt(int notesToTranspose);
-	void periodUsesModeSize(bool useMode);
+    void periodUsesModeSize(bool useMode);
     
     void setMPEOn(bool turnOnMPE);
     void setMPEThru(bool mpeOnThru);
@@ -144,9 +144,9 @@ public:
     void setMidiMaps(ValueTree midiMapIn);
     
     void setMidiInputMap(Array<int> mapIn, bool updateNode=true);
-	void setMidiInputMap(NoteMap mapIn, bool updateNode = true);
+    void setMidiInputMap(NoteMap mapIn, bool updateNode = true);
     void setMidiOutputMap(Array<int> mapIn, bool updateNode = true);
-	void setMidiOutputMap(NoteMap mapIn, bool updateNode = true);
+    void setMidiOutputMap(NoteMap mapIn, bool updateNode = true);
     
     void mapInputNote(int noteIn, int noteOut, bool updateNode = true);
     void mapOutputNode(int noteIn, int noteOut, bool updateNode = true);
@@ -160,7 +160,7 @@ public:
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
     
-	// Listen to UI input from VirtualKeyboard
+    // Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;

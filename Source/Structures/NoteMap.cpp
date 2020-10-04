@@ -17,28 +17,28 @@ NoteMap::NoteMap()
 
 NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 {
-	size = sizeIn;
+    size = sizeIn;
 
     keys.clear();
     values.clear();
 
-	nullVal = nullValIn;
-	int defaultVal = nullVal;
+    nullVal = nullValIn;
+    int defaultVal = nullVal;
 
-	for (int i = 0; i < size; i++)
-	{
-		if (useIdentity)
-			defaultVal = i;
+    for (int i = 0; i < size; i++)
+    {
+        if (useIdentity)
+            defaultVal = i;
 
-		keys.add(defaultVal);
-		values.add(defaultVal);
-	}
+        keys.add(defaultVal);
+        values.add(defaultVal);
+    }
 }
 
 NoteMap::NoteMap(Array<int> valuesIn, int nullValIn)
 {
-	nullVal = nullValIn;
-	setValues(valuesIn);
+    nullVal = nullValIn;
+    setValues(valuesIn);
 }
 
 NoteMap::NoteMap(const NoteMap& mapToCopy)
@@ -59,7 +59,7 @@ NoteMap::NoteMap(const NoteMap& mapToCopy)
 
 void NoteMap::setValue(int keyNum, int valIn)
 {
-	int oldVal = values.getUnchecked(keyNum);
+    int oldVal = values.getUnchecked(keyNum);
     
     if (oldVal >= 0)
         keys.set(oldVal, nullVal);
@@ -72,7 +72,7 @@ void NoteMap::setValue(int keyNum, int valIn)
 
 void NoteMap::setValues(Array<int> valuesIn)
 {
-	size = valuesIn.size();
+    size = valuesIn.size();
 
     values.clear();
     keys.clear();
@@ -80,26 +80,26 @@ void NoteMap::setValues(Array<int> valuesIn)
     values.resize(size);
     keys.resize(size);
 
-	for (int i = 0; i < size; i++)
-	{
+    for (int i = 0; i < size; i++)
+    {
         setValue(i, valuesIn[i]);
     }
 }
 
 int* NoteMap::setNullVal(int nullValIn)
 {
-	nullVal = nullValIn;
-	return &nullVal;
+    nullVal = nullValIn;
+    return &nullVal;
 }
 
 int NoteMap::getSize()
 {
-	return size;
+    return size;
 }
 
 int NoteMap::getKey(int valIn)
 {
-	return keys.getUnchecked(valIn);
+    return keys.getUnchecked(valIn);
 }
 int NoteMap::getValue(int keyNum)
 {
@@ -108,17 +108,17 @@ int NoteMap::getValue(int keyNum)
 
 const Array<int>& NoteMap::getKeys() const
 {
-	return keys;
+    return keys;
 }
 
 const Array<int>& NoteMap::getValues() const
 {
-	return values;
+    return values;
 }
 
 int NoteMap::getNullVal()
 {
-	return nullVal;
+    return nullVal;
 }
 
 String NoteMap::toString()

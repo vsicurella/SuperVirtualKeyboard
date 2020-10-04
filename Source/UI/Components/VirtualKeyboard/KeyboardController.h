@@ -5,7 +5,7 @@
     Created: 1 Sep 2019 8:22:03pm
     Author:  Vincenzo
 
-	Will be used for higher level keyboard controlling.
+    Will be used for higher level keyboard controlling.
 
   ==============================================================================
 */
@@ -19,60 +19,60 @@
 namespace VirtualKeyboard
 {
 
-	class SvkController : public MidiKeyboardStateListener
-	{
-	public:
+    class SvkController : public MidiKeyboardStateListener
+    {
+    public:
 
-		SvkController(Keyboard* keyboardIn);
-		~SvkController();
+        SvkController(Keyboard* keyboardIn);
+        ~SvkController();
 
-		ValueTree getNode();
-		void restoreNode(ValueTree nodeIn);
+        ValueTree getNode();
+        void restoreNode(ValueTree nodeIn);
 
-		Keyboard* getKeyboard();
-		 
-		void setInputSource(MidiKeyboardState* sourceIn);
-		void setInputFilteredSource(MidiKeyboardState* sourceIn);
-
-
-		// Keyboard Actions
-		void triggerNoteOn(int midiChannel, int midiNote, float velocity);
-		void triggerNoteOff(int midiChannel, int midiNote);
-		void allNotesOff();
-
-		// Interfacing
-		void setMidiChannelOut(int midiChannelOutIn);
-		void setNoteColor(int midiNoteIn, Colour colorIn);
-		void setDegreeColor(int degreeIn, Colour colorIn);
-		void setChannelTriggeredColor(int midiChannelIn, Colour colorIn);
+        Keyboard* getKeyboard();
+         
+        void setInputSource(MidiKeyboardState* sourceIn);
+        void setInputFilteredSource(MidiKeyboardState* sourceIn);
 
 
+        // Keyboard Actions
+        void triggerNoteOn(int midiChannel, int midiNote, float velocity);
+        void triggerNoteOff(int midiChannel, int midiNote);
+        void allNotesOff();
 
-		void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
-		void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
+        // Interfacing
+        void setMidiChannelOut(int midiChannelOutIn);
+        void setNoteColor(int midiNoteIn, Colour colorIn);
+        void setDegreeColor(int degreeIn, Colour colorIn);
+        void setChannelTriggeredColor(int midiChannelIn, Colour colorIn);
 
 
-	private:
 
-		Keyboard* keyboard;
+        void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
+        void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity) override;
 
-		MidiKeyboardState* input;
-		MidiKeyboardState* inputFiltered;
 
-		Array<Key> keyProperties;
-		ValueTree keyNodes;
+    private:
 
-		bool showNoteNumbers = false;
-		bool showNoteNames = false;
-		bool showInput = true;
-		bool showInputFiltered = false;
+        Keyboard* keyboard;
 
-		Array<Colour> colorsDegrees;
+        MidiKeyboardState* input;
+        MidiKeyboardState* inputFiltered;
 
-		Array<Point<int>> offsetsByOrder;
-		Array<Point<int>> offsetsByDegree;
+        Array<Key> keyProperties;
+        ValueTree keyNodes;
 
-		Array<Point<float>> ratiosByOrder;
-		Array<Point<float>> ratiosByDegree;
-	};
+        bool showNoteNumbers = false;
+        bool showNoteNames = false;
+        bool showInput = true;
+        bool showInputFiltered = false;
+
+        Array<Colour> colorsDegrees;
+
+        Array<Point<int>> offsetsByOrder;
+        Array<Point<int>> offsetsByDegree;
+
+        Array<Point<float>> ratiosByOrder;
+        Array<Point<float>> ratiosByDegree;
+    };
 };

@@ -26,15 +26,15 @@ SvkAudioProcessor::SvkAudioProcessor() :
     svkUndo(new UndoManager()),
     svkValueTree(*this, svkUndo.get())//, IDs::svkParentNode, createParameters())
 {
-	// Temporary
-	svkValueTree.state = ValueTree(IDs::svkParentNode);
+    // Temporary
+    svkValueTree.state = ValueTree(IDs::svkParentNode);
 
-	pluginState.reset(new SvkPluginState(svkValueTree));
+    pluginState.reset(new SvkPluginState(svkValueTree));
 }
 
 SvkAudioProcessor::~SvkAudioProcessor()
 {
-	
+    
 }
 
 //==============================================================================
@@ -107,13 +107,13 @@ void SvkAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 void SvkAudioProcessor::releaseResources()
 {
-	pluginState->getMidiProcessor()->allNotesOff();
+    pluginState->getMidiProcessor()->allNotesOff();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool SvkAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-	// No audio inputs or outputs needed
+    // No audio inputs or outputs needed
     ignoreUnused (layouts);
     return true;
 }
@@ -132,7 +132,7 @@ void SvkAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& mi
 //==============================================================================
 bool SvkAudioProcessor::hasEditor() const
 {
-	return true; // (change this to false if you choose to not supply an editor)
+    return true; // (change this to false if you choose to not supply an editor)
 }
 
 AudioProcessorEditor* SvkAudioProcessor::createEditor()
@@ -146,10 +146,10 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
-	
-	MemoryOutputStream memOut(destData, true);
+    
+    MemoryOutputStream memOut(destData, true);
     pluginState->commitStateNode();
-	svkValueTree.state.writeToStream(memOut);
+    svkValueTree.state.writeToStream(memOut);
     DBG("Saving Plugin State node to internal memory:" + svkValueTree.state.toXmlString());
 }
 
@@ -157,16 +157,16 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
-	
-	MemoryInputStream memIn(data, sizeInBytes, false);
+    
+    MemoryInputStream memIn(data, sizeInBytes, false);
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
-	DBG("Found this in memory:\n" + presetRecall.toXmlString());
+    DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
-	//presetRecall.removeChild(presetRecall.getChildWithName(IDs::pluginStateNode), nullptr); // uncomment this line to test new instantiation
+    //presetRecall.removeChild(presetRecall.getChildWithName(IDs::pluginStateNode), nullptr); // uncomment this line to test new instantiation
 
-	//svkValueTree.replaceState(presetRecall);	
-	//recordParamIDs();
-	pluginState->recallState(presetRecall, true);
+    //svkValueTree.replaceState(presetRecall);    
+    //recordParamIDs();
+    pluginState->recallState(presetRecall, true);
 }
 
 //==============================================================================
@@ -178,7 +178,7 @@ UndoManager* SvkAudioProcessor::getUndoManager()
 
 SvkPluginState* SvkAudioProcessor::getPluginState()
 {
-	return pluginState.get();
+    return pluginState.get();
 }
 
 //const Array<String>& SvkAudioProcessor::getParamIDs() const
@@ -197,19 +197,19 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //void SvkAudioProcessor::recordParamIDs()
 //{
-//	for (auto param : getParameters())
-//	{
-//		paramIDs.add(dynamic_cast<AudioProcessorParameterWithID*>(param)->paramID);
-//	}
-//	DBG("Parameters are initialized");
-//	DBGArray(paramIDs);
+//    for (auto param : getParameters())
+//    {
+//        paramIDs.add(dynamic_cast<AudioProcessorParameterWithID*>(param)->paramID);
+//    }
+//    DBG("Parameters are initialized");
+//    DBGArray(paramIDs);
 //}
 //
 //AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
 //{    
-//	std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
-//	
-//	//paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
+//    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
+//    
+//    //paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
 // //   
 // //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
 // //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));

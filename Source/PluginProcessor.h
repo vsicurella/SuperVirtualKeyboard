@@ -42,8 +42,8 @@ public:
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
-	AudioProcessorEditor* createEditor() override;
-	bool hasEditor() const override;
+    AudioProcessorEditor* createEditor() override;
+    bool hasEditor() const override;
 
     //==============================================================================
     const String getName() const override;
@@ -64,13 +64,13 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	//==============================================================================
+    //==============================================================================
     UndoManager* getUndoManager();
     //ApplicationCommandManager* getAppCmdMgr();
-	SvkPluginState* getPluginState();
+    SvkPluginState* getPluginState();
     //const Array<String>& getParamIDs() const;
     
-	//==============================================================================
+    //==============================================================================
 
 private:
 
@@ -79,7 +79,7 @@ private:
     //AudioProcessorValueTreeState::ParameterLayout createParameters();
     //Array<String> paramIDs;
 
-	std::unique_ptr<SvkPluginState> pluginState;
+    std::unique_ptr<SvkPluginState> pluginState;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkAudioProcessor)
 };

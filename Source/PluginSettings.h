@@ -17,23 +17,23 @@
 
 class SvkPluginSettings
 {
-	const String appFolderName = "SuperVirtualKeyboard";
-	const String settingsFileName = "SuperVirtualKeyboard.svksettings";
+    const String appFolderName = "SuperVirtualKeyboard";
+    const String settingsFileName = "SuperVirtualKeyboard.svksettings";
     const String presetSubDirectory = "Presets";
     const String modeSubDirectory = "Modes";
 
-	File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
-	File factoryDefaultPresetLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(presetSubDirectory);
+    File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
+    File factoryDefaultPresetLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(presetSubDirectory);
     File factoryDefaultModeLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(modeSubDirectory);
 
-	File currentSettingsLocation;
-	File currentPresetLocation;
+    File currentSettingsLocation;
+    File currentPresetLocation;
     File currentModeLocation;
 
-	ValueTree pluginSettingsNode;
-	
-	bool createPresetFolder = true;
-	bool saveFactoryModes = false;
+    ValueTree pluginSettingsNode;
+    
+    bool createPresetFolder = true;
+    bool saveFactoryModes = false;
     
     bool resetDirectories = false;
     
@@ -41,26 +41,26 @@ class SvkPluginSettings
 
 public:
 
-	SvkPluginSettings();
-	~SvkPluginSettings();
+    SvkPluginSettings();
+    ~SvkPluginSettings();
 
-	ValueTree getSettingsNode();
+    ValueTree getSettingsNode();
 
-	bool updateNode(bool writeSettings=false);
-	bool restoreNode(ValueTree pluginSettingsNodeIn);
+    bool updateNode(bool writeSettings=false);
+    bool restoreNode(ValueTree pluginSettingsNodeIn);
 
-	String getSettingsPath();
-	String getPresetPath();
+    String getSettingsPath();
+    String getPresetPath();
     String getModePath();
 
-	bool getCreatePresetFolder();
-	bool getSaveFactoryModes();
+    bool getCreatePresetFolder();
+    bool getSaveFactoryModes();
     
     void setPresetDirectory(File presetDirectoryIn);
     void setModeDirectory(File modeDirectoryIn);
     void setSettingsDirectory(File settingsDirectoryIn);
 
-	void setCreatePresetFolder(bool shouldCreateFolder);
-	void setSaveFactoryPresets(bool shouldSavePresets);
+    void setCreatePresetFolder(bool shouldCreateFolder);
+    void setSaveFactoryPresets(bool shouldSavePresets);
 
 };

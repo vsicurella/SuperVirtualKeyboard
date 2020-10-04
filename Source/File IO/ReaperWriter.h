@@ -20,9 +20,9 @@ class ReaperWriter
     Array<String> orderSymbols;
  
     File filePath;
-	File fileOut;
+    File fileOut;
 
-	void setup_default_symbols();
+    void setup_default_symbols();
     
 public:
     
@@ -36,7 +36,7 @@ public:
     String ask_for_location();
     
     Array<String> get_symbols();
-	String get_symbol(int orderIndexIn);
+    String get_symbol(int orderIndexIn);
     String get_path();
     
     bool write();

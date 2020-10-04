@@ -16,18 +16,18 @@ class FractionalGrid
 {
 protected:
 
-	// Parameters
-	float columns;
-	float rows;
+    // Parameters
+    float columns;
+    float rows;
 
-	Rectangle<int> bounds;
+    Rectangle<int> bounds;
 
-	// Properties
-	double colFraction;
-	double rowFraction;
+    // Properties
+    double colFraction;
+    double rowFraction;
 
-	float colSize;
-	float rowSize;
+    float colSize;
+    float rowSize;
     
     int columnGap = 1;
     int rowGap = 1;
@@ -45,13 +45,13 @@ public:
 
     Rectangle<int> setBounds(Rectangle<int> rectIn);
 
-	Rectangle<int> getBounds();
+    Rectangle<int> getBounds();
 
-	void scaleToColumnWidth(float columnWidthIn);
+    void scaleToColumnWidth(float columnWidthIn);
 
-	void scaleToRowHeight(float rowHeightIn);
+    void scaleToRowHeight(float rowHeightIn);
 
-	void scaleToProportion(float proportion, float factor);
+    void scaleToProportion(float proportion, float factor);
     
     float getColumns();
     
@@ -69,6 +69,6 @@ public:
     
     void setRowGap(int rowGapIn);
 
-	/* WARNING: mutates Component's position*/
+    /* WARNING: mutates Component's position*/
     Point<int> place_component(Component* item, int col, int row);
 };

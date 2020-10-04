@@ -27,55 +27,55 @@ public:
     
     SettingsContainer(SvkPluginState* pluginStateIn)
     : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
-		pluginState(pluginStateIn)
+        pluginState(pluginStateIn)
     {
-		tabColour = Colour(0xff323e44);
-		backgroundColour = tabColour.darker();
-		textColour = tabColour.contrasting();
+        tabColour = Colour(0xff323e44);
+        backgroundColour = tabColour.darker();
+        textColour = tabColour.contrasting();
 
-		setColour(backgroundColourId, backgroundColour);
+        setColour(backgroundColourId, backgroundColour);
 
         //view.reset(new Viewport("SettingsViewport"));
         //view->setScrollOnDragEnabled(true);
         //view->setScrollBarsShown(true, false);
         //addAndMakeVisible(view.get());
 
-		for (auto panelName : panelNames)
-		{
-			if (panelName == "General")
-				panels.add(new GeneralSettingsPanel(pluginState));
+        for (auto panelName : panelNames)
+        {
+            if (panelName == "General")
+                panels.add(new GeneralSettingsPanel(pluginState));
 
-			else if (panelName == "Midi")
-				panels.add(new MidiSettingsPanel(pluginState));
+            else if (panelName == "Midi")
+                panels.add(new MidiSettingsPanel(pluginState));
 
-			else if (panelName == "View")
-				panels.add(new ViewSettingsPanel(pluginState));
+            else if (panelName == "View")
+                panels.add(new ViewSettingsPanel(pluginState));
 
-			else if (panelName == "Colors")
-				panels.add(new ColourSettingsPanel(pluginState));
+            else if (panelName == "Colors")
+                panels.add(new ColourSettingsPanel(pluginState));
 
-			else if (panelName == "Debug")
-				panels.add(new DebugSettingsPanel(pluginState));
-		}
+            else if (panelName == "Debug")
+                panels.add(new DebugSettingsPanel(pluginState));
+        }
 
-		for (int i = 0; i < panels.size(); i++)
-		{
-			addTab(panelNames[i], tabColour, panels[i], true);
-		}
+        for (int i = 0; i < panels.size(); i++)
+        {
+            addTab(panelNames[i], tabColour, panels[i], true);
+        }
 
-		int setToTab = 0;
-		String lastTab = pluginState->pluginStateNode.getChildWithName(IDs::pluginEditorNode)[IDs::settingsTabName].toString();
-		DBG("Last tab: " + lastTab);
-		if (lastTab.length() > 0)
-			setToTab = getTabNames().indexOf(lastTab);
+        int setToTab = 0;
+        String lastTab = pluginState->pluginStateNode.getChildWithName(IDs::pluginEditorNode)[IDs::settingsTabName].toString();
+        DBG("Last tab: " + lastTab);
+        if (lastTab.length() > 0)
+            setToTab = getTabNames().indexOf(lastTab);
 
-		setCurrentTabIndex(setToTab, false);
+        setCurrentTabIndex(setToTab, false);
         setSize(100, 100);
     }
 
     ~SettingsContainer()
     {
-		view = nullptr;
+        view = nullptr;
     }
     
     SvkSettingsPanel* getComponentViewed()
@@ -86,76 +86,76 @@ public:
     void currentTabChanged (int newCurrentTabIndex, const String &newCurrentTabName) override
     {
         componentViewed = panels.getUnchecked(newCurrentTabIndex);
-		componentViewed->resized();
+        componentViewed->resized();
 
-		listeners.call(&SettingsContainer::Listener::settingsTabChanged, 
-			newCurrentTabIndex, 
-			newCurrentTabName, 
-			componentViewed
-		);
+        listeners.call(&SettingsContainer::Listener::settingsTabChanged, 
+            newCurrentTabIndex, 
+            newCurrentTabName, 
+            componentViewed
+        );
     }
 
-	void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPtrIn)
-	{
-		for (int i = 0; i < panelNames.size(); i++)
-		{
-			if (keyboardPanels.contains(panelNames[i]))
-				panels[i]->setKeyboardPointer(keyboardPtrIn);
-		}
-	}
+    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPtrIn)
+    {
+        for (int i = 0; i < panelNames.size(); i++)
+        {
+            if (keyboardPanels.contains(panelNames[i]))
+                panels[i]->setKeyboardPointer(keyboardPtrIn);
+        }
+    }
 
-	void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
-	{
-		for (auto p : panels)
-		{
-			if (p->getName() == "ColourSettingsPanel")
-				p->refreshPanel();
-		}
-	}
+    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
+    {
+        for (auto p : panels)
+        {
+            if (p->getName() == "ColourSettingsPanel")
+                p->refreshPanel();
+        }
+    }
 
 public:
 
-	class Listener
-	{
-	public:
-		virtual void settingsTabChanged(int newTabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) = 0;
-	};
+    class Listener
+    {
+    public:
+        virtual void settingsTabChanged(int newTabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) = 0;
+    };
 
-	void addListener(SettingsContainer::Listener* listenerIn) { listeners.add(listenerIn); }
+    void addListener(SettingsContainer::Listener* listenerIn) { listeners.add(listenerIn); }
 
-	void removeListener(SettingsContainer::Listener* listenerIn) { listeners.remove(listenerIn); }
+    void removeListener(SettingsContainer::Listener* listenerIn) { listeners.remove(listenerIn); }
 
 protected:
 
-	ListenerList<Listener> listeners;
+    ListenerList<Listener> listeners;
 
 private:
 
-	SvkPluginState* pluginState;
+    SvkPluginState* pluginState;
 
-	Array<SvkSettingsPanel*> panels;
-	std::unique_ptr<Viewport> view;
+    Array<SvkSettingsPanel*> panels;
+    std::unique_ptr<Viewport> view;
 
-	SvkSettingsPanel* componentViewed = nullptr;
+    SvkSettingsPanel* componentViewed = nullptr;
 
-	int defaultControlHeight = 50;
+    int defaultControlHeight = 50;
 
-	Colour backgroundColour;
-	Colour tabColour;
-	Colour textColour;
+    Colour backgroundColour;
+    Colour tabColour;
+    Colour textColour;
 
-	StringArray panelNames =
-	{
-		"General"
-		, "Midi"
-		, "View"
-		, "Colors"
+    StringArray panelNames =
+    {
+        "General"
+        , "Midi"
+        , "View"
+        , "Colors"
 //#if JUCE_DEBUG
-//		, "Debug"
+//        , "Debug"
 //#endif
-	};
+    };
 
-	StringArray keyboardPanels = { "View", "Colors", "Debug" };
+    StringArray keyboardPanels = { "View", "Colors", "Debug" };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContainer)
 };

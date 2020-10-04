@@ -1,9 +1,9 @@
 /*
   ==============================================================================
 
-	PluginControlComponent.cpp
-	Created: 8 Jul 2019
-	Author:  Vincenzo Sicurella
+    PluginControlComponent.cpp
+    Created: 8 Jul 2019
+    Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
@@ -11,10 +11,10 @@
 #include "PluginControlComponent.h"
 
 PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
-	: pluginState(pluginStateIn)
+    : pluginState(pluginStateIn)
 {
-	pluginState->addListener(this);
-	presetManager = pluginState->getPresetManager();
+    pluginState->addListener(this);
+    presetManager = pluginState->getPresetManager();
 
     scaleTextBox.reset (new TextEditor ("Scale Text Box"));
     addAndMakeVisible (scaleTextBox.get());
@@ -138,14 +138,14 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
-	keyboard.reset(new VirtualKeyboard::Keyboard());
-	keyboard->addListener(pluginState->getMidiProcessor());
+    keyboard.reset(new VirtualKeyboard::Keyboard());
+    keyboard->addListener(pluginState->getMidiProcessor());
 
     keyboardViewport.reset (new Viewport("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
-	keyboardViewport->setViewedComponent(keyboard.get(), false);
-	keyboardViewport->getHorizontalScrollBar().addListener(this);
+    keyboardViewport->setViewedComponent(keyboard.get(), false);
+    keyboardViewport->getHorizontalScrollBar().addListener(this);
 
     saveButton.reset (new ImageButton ("Save Button"));
     addAndMakeVisible (saveButton.get());
@@ -155,7 +155,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-	saveButton->setSize(28, 28);
+    saveButton->setSize(28, 28);
 
     openButton.reset (new ImageButton ("Open Button"));
     addAndMakeVisible (openButton.get());
@@ -165,7 +165,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-	openButton->setSize(28, 28);
+    openButton->setSize(28, 28);
 
     settingsButton.reset (new ImageButton ("Settings Button"));
     addAndMakeVisible (settingsButton.get());
@@ -175,7 +175,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000),
                                Image(), 1.000f, Colour (0x00000000));
-	settingsButton->setSize(28, 28);
+    settingsButton->setSize(28, 28);
 
     saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
     openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
@@ -185,51 +185,51 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
 
     mapOrderEditBtn->setVisible(true);
 
-	scaleTextBox->addListener(this);
+    scaleTextBox->addListener(this);
 
     scaleTextBox->setInputFilter(&txtFilter, false);
 
     //keyboardViewport->setScrollingMode(3);
 
-	// allows for implementing mouseDown() to update the menus
-	mode1Box->setInterceptsMouseClicks(false, false);
-	mode2Box->setInterceptsMouseClicks(false, false);
+    // allows for implementing mouseDown() to update the menus
+    mode1Box->setInterceptsMouseClicks(false, false);
+    mode2Box->setInterceptsMouseClicks(false, false);
 
 
     saveMenu.reset(new PopupMenu());
-	saveMenu->addItem("Save Mode", true, false, [&]() { pluginState->saveModeViewedToFile(); });
-	saveMenu->addItem("Save Preset", true, false, [&]() { pluginState->savePresetToFile(); });
-	saveMenu->addItem("Export for Reaper Note Names", true, false, [&]() { exportModeViewedForReaper(); });
-	saveMenu->addItem("Export for Ableton Folding", true, false, [&]() { exportModeViewedForAbleton(); });
+    saveMenu->addItem("Save Mode", true, false, [&]() { pluginState->saveModeViewedToFile(); });
+    saveMenu->addItem("Save Preset", true, false, [&]() { pluginState->savePresetToFile(); });
+    saveMenu->addItem("Export for Reaper Note Names", true, false, [&]() { exportModeViewedForReaper(); });
+    saveMenu->addItem("Export for Ableton Folding", true, false, [&]() { exportModeViewedForAbleton(); });
 
     loadMenu.reset(new PopupMenu());
-	loadMenu->addItem("Load Mode", true, false, [&]() { browseForModeToOpen(); });
-	loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
+    loadMenu->addItem("Load Mode", true, false, [&]() { browseForModeToOpen(); });
+    loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
 
 
-	ValueTree pluginWindowNode = pluginState->getPluginEditorNode();
-	int recallWidth = pluginWindowNode[IDs::windowBoundsW];
-	int recallHeight = pluginWindowNode[IDs::windowBoundsH];
+    ValueTree pluginWindowNode = pluginState->getPluginEditorNode();
+    int recallWidth = pluginWindowNode[IDs::windowBoundsW];
+    int recallHeight = pluginWindowNode[IDs::windowBoundsH];
 
-	setSize(
-		recallWidth > 0 ? recallWidth : 1000,
-		recallHeight > 0 ? recallHeight : defaultHeight
-	);
+    setSize(
+        recallWidth > 0 ? recallWidth : 1000,
+        recallHeight > 0 ? recallHeight : defaultHeight
+    );
 
-	keyboardViewport->setViewPosition(pluginWindowNode[IDs::viewportPosition], 0);
+    keyboardViewport->setViewPosition(pluginWindowNode[IDs::viewportPosition], 0);
 
     settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
-	settingsButton->setClickingTogglesState(true);
+    settingsButton->setClickingTogglesState(true);
 
-	// DISABLED BECAUSE NOT IMPLEMENTED
+    // DISABLED BECAUSE NOT IMPLEMENTED
     mapModeBox->setItemEnabled(3, false);
 
-	loadPresetNode(pluginState->getPresetNode());
+    loadPresetNode(pluginState->getPresetNode());
 
-	// Update keyboard to show external midi input
+    // Update keyboard to show external midi input
 #if (!JUCE_ANDROID && !JUCE_IOS)
-	startTimerHz(30);
+    startTimerHz(30);
 #endif
 }
 
@@ -237,11 +237,11 @@ PluginControlComponent::~PluginControlComponent()
 {
     pluginState->removeListener(this);
 
-	if (settingsPanelOpen)
-	{
-		pluginState->removeListener(settingsContainer.get());
-		settingsContainer = nullptr;
-	}
+    if (settingsPanelOpen)
+    {
+        pluginState->removeListener(settingsContainer.get());
+        settingsContainer = nullptr;
+    }
 
     scaleTextBox = nullptr;
     mode1Box = nullptr;
@@ -259,7 +259,7 @@ PluginControlComponent::~PluginControlComponent()
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
-	keyboard = nullptr;
+    keyboard = nullptr;
     keyboardViewport = nullptr;
     saveButton = nullptr;
     openButton = nullptr;
@@ -270,61 +270,61 @@ PluginControlComponent::~PluginControlComponent()
 
 void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 {
-	if (presetNodeIn.hasType(IDs::presetNode) && (float)presetNodeIn[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
-	{
-		ValueTree presetNode = presetNodeIn;
+    if (presetNodeIn.hasType(IDs::presetNode) && (float)presetNodeIn[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+    {
+        ValueTree presetNode = presetNodeIn;
 
-		ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
-		if (properties.isValid())
-		{
-			setMappingMode(properties[IDs::mappingMode]);
-			mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
-		}
+        ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
+        if (properties.isValid())
+        {
+            setMappingMode(properties[IDs::mappingMode]);
+            mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
+        }
 
-		ValueTree keyboardSettings = presetNode.getChildWithName(IDs::pianoNode);
-		if (keyboardSettings.isValid())
-			keyboard->restoreNode(keyboardSettings);
+        ValueTree keyboardSettings = presetNode.getChildWithName(IDs::pianoNode);
+        if (keyboardSettings.isValid())
+            keyboard->restoreNode(keyboardSettings);
 
-		ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
-		if (mapping.isValid())
-		{
-			setMappingStyleId(mapping[IDs::modeMappingStyle]);
-		}
+        ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
+        if (mapping.isValid())
+        {
+            setMappingStyleId(mapping[IDs::modeMappingStyle]);
+        }
 
-		ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
-		if (modeSelectors.isValid())
-		{
-			for (int num = 0; num < modeSelectors.getNumChildren(); num++)
-			{
-				ValueTree selector = modeSelectors.getChild(num);
-				Mode* mode = presetManager->getModeBySelector(num);
+        ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
+        if (modeSelectors.isValid())
+        {
+            for (int num = 0; num < modeSelectors.getNumChildren(); num++)
+            {
+                ValueTree selector = modeSelectors.getChild(num);
+                Mode* mode = presetManager->getModeBySelector(num);
 
-				// TODO: generalize
-				if (num == 0)
-				{
-					mode1RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
+                // TODO: generalize
+                if (num == 0)
+                {
+                    mode1RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
                     mode1Box->setText(mode->getName(), dontSendNotification);
-				}
-				else if (num == 1)
-				{
-					mode2RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
-					mode2Box->setText(mode->getName(), dontSendNotification);
-				}
+                }
+                else if (num == 1)
+                {
+                    mode2RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
+                    mode2Box->setText(mode->getName(), dontSendNotification);
+                }
 
-				if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
-				{
-					onModeViewedChange(mode);
-				}
-			}
-		}
-	}
+                if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
+                {
+                    onModeViewedChange(mode);
+                }
+            }
+        }
+    }
 }
 
 void PluginControlComponent::onModeViewedChange(Mode* modeViewed)
 {
-	setScaleEntryText(modeViewed->getStepsString());
-	keyboard->applyMode(modeViewed, true);
-	resized();
+    setScaleEntryText(modeViewed->getStepsString());
+    keyboard->applyMode(modeViewed, true);
+    resized();
 }
 
 void PluginControlComponent::paint (Graphics& g)
@@ -341,7 +341,7 @@ void PluginControlComponent::paint (Graphics& g)
 
 void PluginControlComponent::resized()
 {
-	int basicHeight = getHeight();
+    int basicHeight = getHeight();
 
     if (settingsPanelOpen)
     {
@@ -350,109 +350,109 @@ void PluginControlComponent::resized()
         settingsContainer->resized();
     }
 
-	scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
-	scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
-	
-	scaleEntryBtn->setBounds(scaleTextBox->getRight() + 8, scaleTextBox->getY(), 31, 24);
-	modeInfoButton->setBounds(scaleTextBox->getX() - 32, scaleTextBox->getY(), 24, 24);
+    scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
+    scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
+    
+    scaleEntryBtn->setBounds(scaleTextBox->getRight() + 8, scaleTextBox->getY(), 31, 24);
+    modeInfoButton->setBounds(scaleTextBox->getX() - 32, scaleTextBox->getY(), 24, 24);
 
-	saveButton->setSize(barHeight, barHeight);
-	saveButton->setTopLeftPosition(gap, scaleTextBox->getY());
+    saveButton->setSize(barHeight, barHeight);
+    saveButton->setTopLeftPosition(gap, scaleTextBox->getY());
 
-	openButton->setSize(barHeight, barHeight);
-	openButton->setTopLeftPosition(saveButton->getRight() + gap, saveButton->getY());
+    openButton->setSize(barHeight, barHeight);
+    openButton->setTopLeftPosition(saveButton->getRight() + gap, saveButton->getY());
 
-	settingsButton->setSize(barHeight, barHeight);
-	settingsButton->setTopLeftPosition(openButton->getRight() + gap, saveButton->getY());
+    settingsButton->setSize(barHeight, barHeight);
+    settingsButton->setTopLeftPosition(openButton->getRight() + gap, saveButton->getY());
 
-	mapModeBox->setTopLeftPosition(settingsButton->getRight() + gap, gap);
-	mapModeBox->setSize(jmin(proportionOfWidth(0.15f), modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
+    mapModeBox->setTopLeftPosition(settingsButton->getRight() + gap, gap);
+    mapModeBox->setSize(jmin(proportionOfWidth(0.15f), modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
 
-	mode1ViewBtn->setBounds(getWidth() - 32, gap, 32, barHeight);
-	mode2ViewBtn->setBounds(getWidth() - 32, mode1ViewBtn->getBottom() + gap, 32, barHeight);
+    mode1ViewBtn->setBounds(getWidth() - 32, gap, 32, barHeight);
+    mode2ViewBtn->setBounds(getWidth() - 32, mode1ViewBtn->getBottom() + gap, 32, barHeight);
 
-	int keyboardY = barHeight + gap * 2;
+    int keyboardY = barHeight + gap * 2;
 
     if (inMappingMode)
     {
-		mode1Box->setSize(proportionOfWidth(0.15f), barHeight);
-		mode1Box->setTopLeftPosition(mode1ViewBtn->getX() - mode1Box->getWidth() - gap / 2, gap);
+        mode1Box->setSize(proportionOfWidth(0.15f), barHeight);
+        mode1Box->setTopLeftPosition(mode1ViewBtn->getX() - mode1Box->getWidth() - gap / 2, gap);
 
-		mode2Box->setSize(proportionOfWidth(0.15f), barHeight);
-		mode2Box->setTopLeftPosition(mode1Box->getX(), mode2ViewBtn->getY());
+        mode2Box->setSize(proportionOfWidth(0.15f), barHeight);
+        mode2Box->setTopLeftPosition(mode1Box->getX(), mode2ViewBtn->getY());
 
-		mapStyleLbl->setTopLeftPosition(gap / 2, scaleTextBox->getBottom() + gap);
-		mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
-		mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapModeBox->getWidth(), barHeight);
+        mapStyleLbl->setTopLeftPosition(gap / 2, scaleTextBox->getBottom() + gap);
+        mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
+        mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapModeBox->getWidth(), barHeight);
 
-		mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
-		mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
+        mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
+        mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
 
-		keyboardY = (keyboardY * 2) - gap;
+        keyboardY = (keyboardY * 2) - gap;
     }
     else
     {
-		mode2Box->setSize(proportionOfWidth(0.15f) + mode2ViewBtn->getWidth(), barHeight);
-		mode2Box->setTopLeftPosition(getWidth() - mode2Box->getWidth() - gap, gap);
+        mode2Box->setSize(proportionOfWidth(0.15f) + mode2ViewBtn->getWidth(), barHeight);
+        mode2Box->setTopLeftPosition(getWidth() - mode2Box->getWidth() - gap, gap);
     }
 
-	mode1RootSld->setBounds(mode1Box->getX() - 80 - gap, mode1Box->getY(), 80, barHeight);
-	mode2RootSld->setBounds(mode2Box->getX() - 80 - gap, mode2Box->getY(), 80, barHeight);
+    mode1RootSld->setBounds(mode1Box->getX() - 80 - gap, mode1Box->getY(), 80, barHeight);
+    mode2RootSld->setBounds(mode2Box->getX() - 80 - gap, mode2Box->getY(), 80, barHeight);
 
-	mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
-	mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
-	
-	float scrollPosition = (float)pluginState->getPluginEditorNode()[IDs::viewportPosition] / keyboard->getWidth();
-	
-	keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(basicHeight - keyboardY - gap, 1));
+    mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
+    mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
+    
+    float scrollPosition = (float)pluginState->getPluginEditorNode()[IDs::viewportPosition] / keyboard->getWidth();
+    
+    keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(basicHeight - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(basicHeight / 28.0f);
-	
-	int height = keyboardViewport->getMaximumVisibleHeight();
-	keyboard->setBounds(0, 0, keyboard->getPianoWidth(height), height);
-	keyboardViewport->setViewPosition(keyboard->getWidth() * scrollPosition, 0);
+    
+    int height = keyboardViewport->getMaximumVisibleHeight();
+    keyboard->setBounds(0, 0, keyboard->getPianoWidth(height), height);
+    keyboardViewport->setViewPosition(keyboard->getWidth() * scrollPosition, 0);
 
-	pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr);
-	pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsH, basicHeight, nullptr);
+    pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr);
+    pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsH, basicHeight, nullptr);
 }
 
 void PluginControlComponent::mouseDown(const MouseEvent& e)
 {
-	if (mode1Box->getBounds().contains(e.getPosition()))
-	{
-		String display = mode1Box->getText();
-		presetManager->requestModeMenu(mode1Box->getRootMenu());
-		mode1Box->setText(display, dontSendNotification);
-		mode1Box->showPopup();
-	}
+    if (mode1Box->getBounds().contains(e.getPosition()))
+    {
+        String display = mode1Box->getText();
+        presetManager->requestModeMenu(mode1Box->getRootMenu());
+        mode1Box->setText(display, dontSendNotification);
+        mode1Box->showPopup();
+    }
 
-	if (mode2Box->getBounds().contains(e.getPosition()))
-	{
-		String display = mode2Box->getText();
-		presetManager->requestModeMenu(mode2Box->getRootMenu());
-		mode2Box->setText(display, dontSendNotification);
-		mode2Box->showPopup();
-	}
+    if (mode2Box->getBounds().contains(e.getPosition()))
+    {
+        String display = mode2Box->getText();
+        presetManager->requestModeMenu(mode2Box->getRootMenu());
+        mode2Box->setText(display, dontSendNotification);
+        mode2Box->showPopup();
+    }
 }
 
 void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     if (comboBoxThatHasChanged == mode1Box.get())
     {
-		pluginState->handleModeSelection(0, mode1Box->getSelectedId());
+        pluginState->handleModeSelection(0, mode1Box->getSelectedId());
     }
     else if (comboBoxThatHasChanged == mode2Box.get())
     {
-		pluginState->handleModeSelection(1, mode2Box->getSelectedId());
+        pluginState->handleModeSelection(1, mode2Box->getSelectedId());
     }
-	else if (comboBoxThatHasChanged == mapModeBox.get())
-	{
-		pluginState->setMapMode(mapModeBox->getSelectedId());
-		setMappingMode(mapModeBox->getSelectedId());
-	}
+    else if (comboBoxThatHasChanged == mapModeBox.get())
+    {
+        pluginState->setMapMode(mapModeBox->getSelectedId());
+        setMappingMode(mapModeBox->getSelectedId());
+    }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-		pluginState->setMapStyle(mapStyleBox->getSelectedId());
-		setMappingStyleId(mapStyleBox->getSelectedId());
+        pluginState->setMapStyle(mapStyleBox->getSelectedId());
+        setMappingStyleId(mapStyleBox->getSelectedId());
     }
 }
 
@@ -460,13 +460,13 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     if (sliderThatWasMoved == mode1RootSld.get())
     {
-		pluginState->setModeSelectorRoot(0, mode1RootSld->getValue());
-		mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
+        pluginState->setModeSelectorRoot(0, mode1RootSld->getValue());
+        mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
     }
     else if (sliderThatWasMoved == mode2RootSld.get())
     {
-		pluginState->setModeSelectorRoot(1, mode2RootSld->getValue());
-		mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
+        pluginState->setModeSelectorRoot(1, mode2RootSld->getValue());
+        mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
     }
 }
 
@@ -474,24 +474,24 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == scaleEntryBtn.get())
     {
-		submitCustomScale();
+        submitCustomScale();
     }
     else if (buttonThatWasClicked == modeInfoButton.get())
     {
-		showModeInfo();
+        showModeInfo();
     }
     else if (buttonThatWasClicked == mode1ViewBtn.get() || buttonThatWasClicked == mode2ViewBtn.get())
     {
-		pluginState->setModeSelectorViewed(mode2ViewBtn->getToggleState());
-		scaleTextBox->setText(pluginState->getModeViewed()->getStepsString(), false);
+        pluginState->setModeSelectorViewed(mode2ViewBtn->getToggleState());
+        scaleTextBox->setText(pluginState->getModeViewed()->getStepsString(), false);
     }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
-		showMapOrderEditDialog();
+        showMapOrderEditDialog();
     }
     else if (buttonThatWasClicked == mapApplyBtn.get())
     {
-		pluginState->doMapping();
+        pluginState->doMapping();
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
@@ -503,112 +503,112 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == settingsButton.get())
     {
-		showSettingsDialog();
+        showSettingsDialog();
     }
 }
 
 void PluginControlComponent::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-	submitCustomScale();
+    submitCustomScale();
 }
 
 void PluginControlComponent::scrollBarMoved(ScrollBar* bar, double newRangeStart)
 {
-	pluginState->getPluginEditorNode().setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
+    pluginState->getPluginEditorNode().setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
 }
 
 void PluginControlComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
-	// Mode Info Changed
-	if (source == modeInfo)
-	{
-		pluginState->commitModeInfo();
-		onModeViewedChange(pluginState->getModeViewed());
-	}
+    // Mode Info Changed
+    if (source == modeInfo)
+    {
+        pluginState->commitModeInfo();
+        onModeViewedChange(pluginState->getModeViewed());
+    }
 }
 
 void PluginControlComponent::timerCallback()
 {
-	keyboard->repaint();
+    keyboard->repaint();
 }
 
 //==============================================================================
 
 void PluginControlComponent::presetLoaded(ValueTree presetNodeIn)
 {
-	loadPresetNode(presetNodeIn);
+    loadPresetNode(presetNodeIn);
 }
 
 void PluginControlComponent::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
 {
-	MidiKeyboardState* displayState = selectorNumber == 0
-		? pluginState->getMidiProcessor()->getOriginalKeyboardState()
-		: pluginState->getMidiProcessor()->getRemappedKeyboardState();
+    MidiKeyboardState* displayState = selectorNumber == 0
+        ? pluginState->getMidiProcessor()->getOriginalKeyboardState()
+        : pluginState->getMidiProcessor()->getRemappedKeyboardState();
 
-	keyboard->displayKeyboardState(displayState);
-	onModeViewedChange(modeIn);
+    keyboard->displayKeyboardState(displayState);
+    onModeViewedChange(modeIn);
 }
 
 void PluginControlComponent::inputMappingChanged(NoteMap* inputNoteMap)
 {
-	keyboard->setInputNoteMap(inputNoteMap);
+    keyboard->setInputNoteMap(inputNoteMap);
 }
 
 void PluginControlComponent::customModeChanged(Mode* newCustomMode)
 {
-	// This is a hack and should be handled better
+    // This is a hack and should be handled better
 
-	String customModeName = newCustomMode->getName();
+    String customModeName = newCustomMode->getName();
 
-	if (getModeSelectorViewed() == 1)
-		mode2Box->setText(customModeName, dontSendNotification);
-	else
-		mode1Box->setText(customModeName, dontSendNotification);
+    if (getModeSelectorViewed() == 1)
+        mode2Box->setText(customModeName, dontSendNotification);
+    else
+        mode1Box->setText(customModeName, dontSendNotification);
 
 }
 
 void PluginControlComponent::modeInfoChanged(Mode* modeEdited)
 {
-	if (getModeSelectorViewed() == 1)
-		mode2Box->setText(modeEdited->getName(), dontSendNotification);
-	else
-		mode1Box->setText(modeEdited->getName(), dontSendNotification);
+    if (getModeSelectorViewed() == 1)
+        mode2Box->setText(modeEdited->getName(), dontSendNotification);
+    else
+        mode1Box->setText(modeEdited->getName(), dontSendNotification);
 }
 
 void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo)
 {
-	DBG("Settings changed to " + tabName + ", tab: " + String(tabIndex));
+    DBG("Settings changed to " + tabName + ", tab: " + String(tabIndex));
 
-	if (panelChangedTo->getName() == "ColourSettingsPanel")
-	{
-		// TODO clean up
-		beginColorEditing();
-	}
+    if (panelChangedTo->getName() == "ColourSettingsPanel")
+    {
+        // TODO clean up
+        beginColorEditing();
+    }
 
-	else if (isColorEditing)
-	{
-		isColorEditing = false;
-		keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
-	}
+    else if (isColorEditing)
+    {
+        isColorEditing = false;
+        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+    }
 
-	pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
+    pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
 }
 
 //==============================================================================
 
 VirtualKeyboard::Keyboard* PluginControlComponent::getKeyboard()
 {
-	return keyboard.get();
+    return keyboard.get();
 }
 
 Viewport* PluginControlComponent::getViewport()
 {
-	return  keyboardViewport.get();
+    return  keyboardViewport.get();
 }
 
 TextEditor* PluginControlComponent::getScaleTextEditor()
 {
-	return scaleTextBox.get();
+    return scaleTextBox.get();
 }
 
 ComboBox* PluginControlComponent::getMappingStyleBox()
@@ -618,22 +618,22 @@ ComboBox* PluginControlComponent::getMappingStyleBox()
 
 String PluginControlComponent::getScaleEntryText()
 {
-	return scaleTextBox->getText();
+    return scaleTextBox->getText();
 }
 
 void PluginControlComponent::setScaleEntryText(String textIn, NotificationType notify)
 {
-	scaleTextBox->setText(textIn, notify == sendNotification);
+    scaleTextBox->setText(textIn, notify == sendNotification);
 }
 
 ReferencedComboBox* PluginControlComponent::getMode1Box()
 {
-	return mode1Box.get();
+    return mode1Box.get();
 }
 
 ReferencedComboBox* PluginControlComponent::getMode2Box()
 {
-	return mode2Box.get();
+    return mode2Box.get();
 }
 
 void PluginControlComponent::updateModeBoxMenus()
@@ -643,46 +643,46 @@ void PluginControlComponent::updateModeBoxMenus()
 
 ImageButton* PluginControlComponent::getSettingsButton()
 {
-	return settingsButton.get();
+    return settingsButton.get();
 }
 
 TextButton* PluginControlComponent::getModeInfoButton()
 {
-	return modeInfoButton.get();
+    return modeInfoButton.get();
 }
 
 void PluginControlComponent::setViewPosition(int xIn)
 {
-	keyboardViewport->setViewPosition(xIn, 0);
-	getProperties().set(IDs::viewportPosition, xIn);
+    keyboardViewport->setViewPosition(xIn, 0);
+    getProperties().set(IDs::viewportPosition, xIn);
 }
 
 int PluginControlComponent::getModeSelectorViewed()
 {
-	return mode2ViewBtn->getToggleState();
+    return mode2ViewBtn->getToggleState();
 }
 
 void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType notify)
 {
-	mapModeBox->setSelectedId(mappingModeId, notify);
+    mapModeBox->setSelectedId(mappingModeId, notify);
     inMappingMode = mappingModeId > 1;
 
-	Array<Component*> mappingComponents = {
-		mapStyleLbl.get(),
-		mapStyleBox.get(),
-		mapOrderEditBtn.get(),
-		mode1RootLbl.get(),
-		mode1RootSld.get(),
-		mode1Box.get(),
-		mode1ViewBtn.get(),
-		mode2ViewBtn.get()
-	};
-	
-	for (auto c : mappingComponents)
-	{
-		c->setVisible(inMappingMode);
-		c->setEnabled(inMappingMode);
-	}
+    Array<Component*> mappingComponents = {
+        mapStyleLbl.get(),
+        mapStyleBox.get(),
+        mapOrderEditBtn.get(),
+        mode1RootLbl.get(),
+        mode1RootSld.get(),
+        mode1Box.get(),
+        mode1ViewBtn.get(),
+        mode2ViewBtn.get()
+    };
+    
+    for (auto c : mappingComponents)
+    {
+        c->setVisible(inMappingMode);
+        c->setEnabled(inMappingMode);
+    }
 
     if (mappingModeId == 3 || mapStyleBox->getSelectedId() == 3)
     {
@@ -703,7 +703,7 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
 
 void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify)
 {
-	mapStyleBox->setSelectedId(idIn, notify);
+    mapStyleBox->setSelectedId(idIn, notify);
 
     if (inMappingMode && (idIn == 3 || mapModeBox->getSelectedId() == 3))
     {
@@ -719,114 +719,114 @@ void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify
 
 void PluginControlComponent::submitCustomScale()
 {
-	pluginState->setModeCustom(scaleTextBox->getText());
+    pluginState->setModeCustom(scaleTextBox->getText());
 }
 
 void PluginControlComponent::showModeInfo()
 {
-	modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
-	modeInfo->addChangeListener(this);
-	CallOutBox::launchAsynchronously(modeInfo, scaleTextBox->getScreenBounds(), nullptr);
+    modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
+    modeInfo->addChangeListener(this);
+    CallOutBox::launchAsynchronously(modeInfo, scaleTextBox->getScreenBounds(), nullptr);
 }
 
 void PluginControlComponent::showMapOrderEditDialog()
 {
-	mapByOrderDialog = new MapByOrderDialog(pluginState->getModeMapper(), pluginState->getMode1(), pluginState->getMode2());
-	CallOutBox::launchAsynchronously(mapByOrderDialog, mapStyleBox->getScreenBounds(), nullptr);
+    mapByOrderDialog = new MapByOrderDialog(pluginState->getModeMapper(), pluginState->getMode1(), pluginState->getMode2());
+    CallOutBox::launchAsynchronously(mapByOrderDialog, mapStyleBox->getScreenBounds(), nullptr);
 }
 
 
 void PluginControlComponent::showSettingsDialog()
 {
-	if (!settingsPanelOpen)
-	{
-		settingsContainer.reset(new SettingsContainer(pluginState));
-		settingsContainer->setKeyboardPointer(keyboard.get());
-		settingsContainer->addListener(this);
-		pluginState->addListener(settingsContainer.get());
+    if (!settingsPanelOpen)
+    {
+        settingsContainer.reset(new SettingsContainer(pluginState));
+        settingsContainer->setKeyboardPointer(keyboard.get());
+        settingsContainer->addListener(this);
+        pluginState->addListener(settingsContainer.get());
 
-		settingsPanelOpen = true;
-		pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
-		DBG("SETTINGS OPEN: " + pluginState->getPluginEditorNode().toXmlString());
+        settingsPanelOpen = true;
+        pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
+        DBG("SETTINGS OPEN: " + pluginState->getPluginEditorNode().toXmlString());
         settingsButton->setToggleState(true, dontSendNotification);
 
-		addAndMakeVisible(settingsContainer.get());
-		getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
-	}
-	else
-	{
-		hideSettings();
-	}
+        addAndMakeVisible(settingsContainer.get());
+        getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
+    }
+    else
+    {
+        hideSettings();
+    }
 }
 
 void PluginControlComponent::hideSettings()
 {
-	settingsContainer->removeListener(this);
-	settingsContainer->setVisible(false);
-	pluginState->removeListener(settingsContainer.get());
-	settingsContainer = nullptr;
+    settingsContainer->removeListener(this);
+    settingsContainer->setVisible(false);
+    pluginState->removeListener(settingsContainer.get());
+    settingsContainer = nullptr;
 
-	settingsPanelOpen = false;
-	pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
+    settingsPanelOpen = false;
+    pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
 
-	// TODO clean up
-	if (isColorEditing)
-	{
-		isColorEditing = false;
-		keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
-	}
+    // TODO clean up
+    if (isColorEditing)
+    {
+        isColorEditing = false;
+        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+    }
 
-	getParentComponent()->setSize(getWidth(), getHeight() - defaultHeight);
+    getParentComponent()->setSize(getWidth(), getHeight() - defaultHeight);
 }
 
 void PluginControlComponent::beginColorEditing()
 {
-	keyboard->setUIMode(VirtualKeyboard::UIMode::editMode);
-	isColorEditing = true;
+    keyboard->setUIMode(VirtualKeyboard::UIMode::editMode);
+    isColorEditing = true;
 }
 
 
 void PluginControlComponent::setMode1Root(int rootIn, NotificationType notify)
 {
-	mode1RootSld->setValue(rootIn, notify);
-	mode1RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
+    mode1RootSld->setValue(rootIn, notify);
+    mode1RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
 }
 
 void PluginControlComponent::setMode2Root(int rootIn, NotificationType notify)
 {
-	mode2RootSld->setValue(rootIn, notify);
-	mode2RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
+    mode2RootSld->setValue(rootIn, notify);
+    mode2RootLbl->setText(MidiMessage::getMidiNoteName(rootIn, true, true, 4), dontSendNotification);
 }
 
 bool PluginControlComponent::browseForModeToOpen()
 {
-	ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginState->getPluginSettings()->getModePath());
+    ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginState->getPluginSettings()->getModePath());
 
-	if (Mode::isValidMode(modeNode))
-	{
-		presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
-		onModeViewedChange(pluginState->getModeViewed());
-		return true;
-	}
+    if (Mode::isValidMode(modeNode))
+    {
+        presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
+        onModeViewedChange(pluginState->getModeViewed());
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 bool PluginControlComponent::browseForPresetToOpen()
 {
-	ValueTree presetLoaded = presetManager->presetFromFile(pluginState->getPluginSettings()->getPresetPath());
-	loadPresetNode(presetLoaded);
-	return true;
+    ValueTree presetLoaded = presetManager->presetFromFile(pluginState->getPluginSettings()->getPresetPath());
+    loadPresetNode(presetLoaded);
+    return true;
 }
 
 bool PluginControlComponent::exportModeViewedForReaper()
 {
-	ReaperWriter rpp = ReaperWriter(pluginState->getModeViewed());
-	return rpp.write();
+    ReaperWriter rpp = ReaperWriter(pluginState->getModeViewed());
+    return rpp.write();
 }
 
 bool PluginControlComponent::exportModeViewedForAbleton()
 {
-	AbletonMidiWriter amw(*pluginState->getModeViewed());
-	return amw.write();
+    AbletonMidiWriter amw(*pluginState->getModeViewed());
+    return amw.write();
 }

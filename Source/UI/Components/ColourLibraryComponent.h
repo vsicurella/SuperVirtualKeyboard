@@ -22,67 +22,67 @@ class PaintSwatch : public Component, public FocusableComponent
 {
 public:
 
-	PaintSwatch(Array<Colour>& parentPaletteIn, int indexIn, String swatchLabelIn = "", bool showLabelIn = false, std::function<void(var)> callback = {})
-		: parentPalette(parentPaletteIn), index(indexIn), swatchLabel(swatchLabelIn), showLabel(showLabelIn), FocusableComponent(nullptr, callback)
-	{
-		setName("Swatch_" + swatchLabelIn);
-	};
+    PaintSwatch(Array<Colour>& parentPaletteIn, int indexIn, String swatchLabelIn = "", bool showLabelIn = false, std::function<void(var)> callback = {})
+        : parentPalette(parentPaletteIn), index(indexIn), swatchLabel(swatchLabelIn), showLabel(showLabelIn), FocusableComponent(nullptr, callback)
+    {
+        setName("Swatch_" + swatchLabelIn);
+    };
 
-	~PaintSwatch() {};
+    ~PaintSwatch() {};
 
-	void paint(Graphics& g) override
-	{
-		g.fillAll(getCurrentColour());
+    void paint(Graphics& g) override
+    {
+        g.fillAll(getCurrentColour());
 
-		if (getCurrentColour().isTransparent())
-		{
-			g.setColour(Colours::darkgrey.darker());
-			g.drawRect(getLocalBounds());
-		}
+        if (getCurrentColour().isTransparent())
+        {
+            g.setColour(Colours::darkgrey.darker());
+            g.drawRect(getLocalBounds());
+        }
 
-		g.setColour(getCurrentColour().contrasting());
+        g.setColour(getCurrentColour().contrasting());
 
-		if (showLabel)
-		{
-			g.drawFittedText(swatchLabel, getLocalBounds(), Justification::centred, 1, 0.1f);
-		}
+        if (showLabel)
+        {
+            g.drawFittedText(swatchLabel, getLocalBounds(), Justification::centred, 1, 0.1f);
+        }
 
-		if (isFocussedOn())
-		{
-			g.drawRect(getLocalBounds(), 2.0f);
-		}
-	}
+        if (isFocussedOn())
+        {
+            g.drawRect(getLocalBounds(), 2.0f);
+        }
+    }
 
-	void setNewFocusser(FocussedComponent* focusserIn) override
-	{
-		FocusableComponent::setNewFocusser(focusserIn);
-		repaint();
-	}
+    void setNewFocusser(FocussedComponent* focusserIn) override
+    {
+        FocusableComponent::setNewFocusser(focusserIn);
+        repaint();
+    }
 
-	void setLabelText(String labelTextIn)
-	{
-		swatchLabel = labelTextIn;
-	}
+    void setLabelText(String labelTextIn)
+    {
+        swatchLabel = labelTextIn;
+    }
 
-	void performFocusFunction(var dataIn) override
-	{
-		parentPalette.set(index, Colour::fromString(dataIn.toString()));
-		repaint();
-	}
+    void performFocusFunction(var dataIn) override
+    {
+        parentPalette.set(index, Colour::fromString(dataIn.toString()));
+        repaint();
+    }
 
-	Colour getCurrentColour() const
-	{
-		return parentPalette[index];
-	}
+    Colour getCurrentColour() const
+    {
+        return parentPalette[index];
+    }
 
 private:
 
-	Array<Colour>& parentPalette;
-	const int index;
+    Array<Colour>& parentPalette;
+    const int index;
 
-	String swatchLabel;
+    String swatchLabel;
 
-	bool showLabel;
+    bool showLabel;
 };
 
 //==============================================================================
@@ -94,49 +94,49 @@ class ColourLibraryComponent : public juce::Component
 
 public:
 
-	enum ColourIds
-	{
-		backgroundColourId		= 0x00010100,
-		rowBackgroundColourId	= 0x00010101,
-		outLineColourId			= 0x00010200,
-		rowOutlineColourId		= 0x00010201
-	};
+    enum ColourIds
+    {
+        backgroundColourId        = 0x00010100,
+        rowBackgroundColourId    = 0x00010101,
+        outLineColourId            = 0x00010200,
+        rowOutlineColourId        = 0x00010201
+    };
 
 public:
-	ColourLibraryComponent(StringArray rowNamesIn, Array<Array<Colour>*> arraysToControl = {}, bool showLabelsIn = false, bool onlyOpaqueIn = false);
-	~ColourLibraryComponent() override;
+    ColourLibraryComponent(StringArray rowNamesIn, Array<Array<Colour>*> arraysToControl = {}, bool showLabelsIn = false, bool onlyOpaqueIn = false);
+    ~ColourLibraryComponent() override;
 
-	void paint(juce::Graphics&) override;
-	void resized() override;
+    void paint(juce::Graphics&) override;
+    void resized() override;
 
-	void showSwatchLabels(bool toShowLabels);
+    void showSwatchLabels(bool toShowLabels);
 
-	void onlyShowOpaque(bool onlyOpaque);
+    void onlyShowOpaque(bool onlyOpaque);
 
-	void setNewRows(Array<Array<Colour>*> arraysToControl);
+    void setNewRows(Array<Array<Colour>*> arraysToControl);
 
-	void refreshSwatches();
+    void refreshSwatches();
 
-	void forceSwatchColumns(int maxNumColumns);
-
-private:
-
-	void setupFlex();
+    void forceSwatchColumns(int maxNumColumns);
 
 private:
 
-	Array<Array<Colour>*> rowColours;
+    void setupFlex();
 
-	FlexBox flexBox;
-	Array<FlexBox> rowBoxes;
+private:
 
-	OwnedArray<Label> rowLabels;
-	OwnedArray<PaintSwatch> swatches;
+    Array<Array<Colour>*> rowColours;
 
-	bool showLabels;
-	bool onlyOpaque;
+    FlexBox flexBox;
+    Array<FlexBox> rowBoxes;
 
-	int maxSwatchColumns = 0;
+    OwnedArray<Label> rowLabels;
+    OwnedArray<PaintSwatch> swatches;
 
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourLibraryComponent)
+    bool showLabels;
+    bool onlyOpaque;
+
+    int maxSwatchColumns = 0;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ColourLibraryComponent)
 };

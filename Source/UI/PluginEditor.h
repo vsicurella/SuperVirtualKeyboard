@@ -21,17 +21,17 @@ public:
     SvkPluginEditor (SvkAudioProcessor&);
     ~SvkPluginEditor();
 
-	void paint (Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
     SvkAudioProcessor& processor;
-	SvkPluginState* pluginState;
+    SvkPluginState* pluginState;
     ValueTree pluginEditorNode;
 
-	std::unique_ptr<PluginControlComponent> controlComponent;
+    std::unique_ptr<PluginControlComponent> controlComponent;
 
-	TooltipWindow tooltip;
+    TooltipWindow tooltip;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };
