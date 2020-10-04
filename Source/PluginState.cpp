@@ -25,6 +25,8 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
 	// TODO: Factory default MIDI settings
 	midiProcessor.reset(new SvkMidiProcessor(svkTree));
 
+    modeMapper.reset(new ModeMapper());
+
 	buildFactoryDefaultState();
 	buildUserDefaultState();
 
@@ -84,15 +86,15 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
 	svkPreset = &presetManager->getPreset();
 	presetNode = svkPreset->getPresetNode();
 
-	pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr)
-		           .copyPropertiesAndChildrenFrom(presetNode, nullptr);
+    pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr)
+                   .copyPropertiesAndChildrenFrom(presetNode, nullptr);
 
 	for (auto child : svkTree.state)
 	{
 		if (child.hasType(IDs::pluginStateNode))
 		{
 			svkTree.state.removeChild(child, nullptr);
-			return;
+			break;
 		}
 	}
 

@@ -1,18 +1,9 @@
 /*
   ==============================================================================
 
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.4.5
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+    PluginControlComponent.h
+    Created: 8 Jul 2019
+    Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
@@ -21,46 +12,74 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-//#include "../SvkUiPanel.h"
-#include "../../PresetManager.h"
+#include "../../PluginState.h"
 #include "../VectorResources.h"
 #include "ReferencedComboBox.h"
 #include "VirtualKeyboard/KeyboardComponent.h"
 #include "VirtualKeyboard/KeyboardViewport.h"
 
-typedef AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
-typedef AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
-typedef AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+#include "Settings/SettingsContainer.h"
+
+#include "../Dialogs/ModeInfoDialog.h"
+#include "../Dialogs/MapByOrderDialog.h"
+
+#include "../../File IO/ReaperWriter.h"
+#include "../../File IO/AbletonMidiWriter.h"
 
 class PluginControlComponent  : public Component,
                                 public TextEditor::Listener,
                                 public ComboBox::Listener,
                                 public Slider::Listener,
-                                public Button::Listener
+                                public Button::Listener,
+                                public ScrollBar::Listener,
+                                public ChangeListener,
+                                private SvkPluginState::Listener,
+                                private SettingsContainer::Listener,
+                                private Timer
 {
 public:
     //==============================================================================
-    PluginControlComponent (AudioProcessorValueTreeState& processorTreeIn, ApplicationCommandManager* appCmdMgrIn, SvkPresetManager* presetManagerIn);
+    PluginControlComponent (SvkPluginState* pluginStateIn);
+
     ~PluginControlComponent();
 
 	//==============================================================================
 
 	void paint(Graphics& g) override;
 	void resized() override;
+
+	void mouseDown(const MouseEvent& e) override;
+
 	void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
 	void sliderValueChanged(Slider* sliderThatWasMoved) override;
 	void buttonClicked(Button* buttonThatWasClicked) override;
 
-	void textEditorTextChanged(TextEditor& textEditor) override;
-	void textEditorEscapeKeyPressed(TextEditor& textEditor) override;
+	void textEditorTextChanged(TextEditor& textEditor) override {};
+	void textEditorEscapeKeyPressed(TextEditor& textEditor) override {};
 	void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-	void textEditorFocusLost(TextEditor& textEditor) override;
+	void textEditorFocusLost(TextEditor& textEditor) override {};
 
-	void mouseDown(const MouseEvent& e) override;
+	void scrollBarMoved(ScrollBar* bar, double newRangeStart) override;
+
+	void changeListenerCallback(ChangeBroadcaster* source) override;
+
+	void timerCallback() override;
+
+	//==============================================================================
+
+	void presetLoaded(ValueTree presetNodeIn) override;
+
+	void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
+
+	void inputMappingChanged(NoteMap* inputNoteMap) override;
+
+	void customModeChanged(Mode* newCustomMode) override;
+
+	void modeInfoChanged(Mode* modeEdited) override;
+
+	void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
 
     //==============================================================================
-
-    void connectToProcessor();
 
 	String getScaleEntryText();
 	void setScaleEntryText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
@@ -78,8 +97,10 @@ public:
 	ImageButton* getSettingsButton();
 	TextButton* getModeInfoButton();
 
+	//==============================================================================
+
 	/*
-		Sets controls to preset settings
+		Sets controls to plugin state
 	*/
 	void loadPresetNode(ValueTree presetNodeIn);
 
@@ -93,41 +114,42 @@ public:
 	*/
 	void setViewPosition(int xIn);
 
-	int getMode1BoxSelection();
-	int getMode2BoxSelection();
-
-	void setMode1BoxText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
-	void setMode2BoxText(String textIn, NotificationType notify = NotificationType::dontSendNotification);
-
-	void setMode1BoxId(int idIn, NotificationType notify=NotificationType::dontSendNotification);
-	void setMode2BoxId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
-
-	void setMode1View(bool isViewed, NotificationType notify = NotificationType::dontSendNotification);
-	bool getMode1View();
-
-	void setMode2View(bool isViewed, NotificationType notify = NotificationType::dontSendNotification);
-	bool getMode2View();
-
 	int getModeSelectorViewed();
 
-	int getMappingMode();
 	void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
 
-	int getMappingStyle();
 	void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	int getMode1Root();
 	void setMode1Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
-	int getMode2Root();
 	void setMode2Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
-private:
-    AudioProcessorValueTreeState& processorTree;
-	ApplicationCommandManager* appCmdMgr;
-    SvkPresetManager* presetManager;
+	void submitCustomScale();
 
-	ValueTree presetNode;
+	void showModeInfo();
+
+	void showMapOrderEditDialog();
+
+	void showSettingsDialog();
+
+	void hideSettings();
+
+	void beginColorEditing();
+
+	//==============================================================================
+
+	bool browseForModeToOpen();
+
+	bool browseForPresetToOpen();
+
+	bool exportModeViewedForReaper();
+
+	bool exportModeViewedForAbleton();
+
+private:
+
+	SvkPluginState* pluginState;
+	SvkPresetManager* presetManager;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;
@@ -137,14 +159,18 @@ private:
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
 
-    OwnedArray<ButtonAttachment> buttonAttachments;
-    OwnedArray<ComboBoxAttachment> comboBoxAttachments;
-    OwnedArray<SliderAttachment> sliderAttachments;
+	std::unique_ptr<SettingsContainer> settingsContainer;
+
+	ModeInfoDialog* modeInfo;
+	MapByOrderDialog* mapByOrderDialog;
 
     TextFilterIntOrSpace txtFilter;
 
+	bool settingsPanelOpen = false;
+	bool isColorEditing = false;
     bool inMappingMode = false;
 
+	int defaultHeight = 210;
 	int barHeight = 24;
 	int gap = 8;
 

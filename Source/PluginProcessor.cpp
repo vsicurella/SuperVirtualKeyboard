@@ -24,12 +24,10 @@ SvkAudioProcessor::SvkAudioProcessor() :
                        ),
 #endif
     svkUndo(new UndoManager()),
-    svkCmdMgr(new ApplicationCommandManager()),
     svkValueTree(*this, svkUndo.get())//, IDs::svkParentNode, createParameters())
 {
 	// Temporary
 	svkValueTree.state = ValueTree(IDs::svkParentNode);
-
 
 	pluginState.reset(new SvkPluginState(svkValueTree));
 }
@@ -176,11 +174,6 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 UndoManager* SvkAudioProcessor::getUndoManager()
 {
     return svkUndo.get();
-}
-
-ApplicationCommandManager* SvkAudioProcessor::getAppCmdMgr()
-{
-    return svkCmdMgr.get();
 }
 
 SvkPluginState* SvkAudioProcessor::getPluginState()

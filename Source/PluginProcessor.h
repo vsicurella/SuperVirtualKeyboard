@@ -29,7 +29,6 @@ public:
     ~SvkAudioProcessor();
     
     std::unique_ptr<UndoManager> svkUndo;
-    std::unique_ptr<ApplicationCommandManager> svkCmdMgr;
     AudioProcessorValueTreeState svkValueTree;
     
     //==============================================================================
@@ -67,9 +66,9 @@ public:
 
 	//==============================================================================
     UndoManager* getUndoManager();
-    ApplicationCommandManager* getAppCmdMgr();
+    //ApplicationCommandManager* getAppCmdMgr();
 	SvkPluginState* getPluginState();
-    const Array<String>& getParamIDs() const;
+    //const Array<String>& getParamIDs() const;
     
 	//==============================================================================
 
