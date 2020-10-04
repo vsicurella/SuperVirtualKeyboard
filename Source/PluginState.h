@@ -21,9 +21,10 @@
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
 
-struct SvkPluginState : public ChangeListener,
+class SvkPluginState : public ChangeListener,
                         private AudioProcessorValueTreeState::Listener
 {
+public:
     AudioProcessorValueTreeState& svkTree;
 	ValueTree pluginStateNode;
 	//ValueTree pluginSettingsNode;
@@ -33,8 +34,13 @@ struct SvkPluginState : public ChangeListener,
     
     SvkPluginState(AudioProcessorValueTreeState&);
 	~SvkPluginState() {}
+
+	//==============================================================================
+	// Data
     
     void recallState(ValueTree nodeIn, bool fallbackToDefaultSettings = false);
+
+	ValueTree getPluginEditorNode() const;
     
 	//==============================================================================
     // Object getters
