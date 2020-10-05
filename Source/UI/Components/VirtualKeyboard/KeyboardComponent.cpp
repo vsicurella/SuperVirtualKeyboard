@@ -64,6 +64,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
         showNoteNumbers = pianoNode[IDs::pianoKeysShowNoteNumbers];
         orientationSelected = pianoNode[IDs::keyboardOrientation];
         keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
+        highlightSelected = pianoNode[IDs::keyboardHighlightStyle];
         lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
         keySizeRatio = (float) pianoNode[IDs::pianoWHRatio];
 
@@ -144,6 +145,7 @@ void Keyboard::initializeKeys(int size)
         Key* key = keys.add(new Key(i));
         addAndMakeVisible(key); 
         key->showNoteNumber = showNoteNumbers; // hacky ?
+        key->highlightStyleId = highlightSelected;
     }
 
     keyColorsIndividual.resize(keys.size());
@@ -967,6 +969,12 @@ void Keyboard::setHighlightStyle(int styleIn)
 {
     highlightSelected = styleIn;
     pianoNode.setProperty(IDs::keyboardHighlightStyle, highlightSelected, nullptr);
+
+    for (auto key : keys)
+    {
+        key->highlightStyleId = highlightSelected;
+        key->repaint();
+    }
 }
 
 void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
