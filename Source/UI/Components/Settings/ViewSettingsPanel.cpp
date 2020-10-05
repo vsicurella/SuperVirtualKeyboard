@@ -59,11 +59,6 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
     keyHighlightBox->addItem(TRANS("Squares"), 5);
     keyHighlightBox->addListener(this);
 
-    keyHighlightBox->setItemEnabled(2, false);
-    keyHighlightBox->setItemEnabled(3, false);
-    keyHighlightBox->setItemEnabled(4, false);
-    keyHighlightBox->setItemEnabled(5, false);
-
     ratioLabel = static_cast<LabelledComponent*>(controls[2]);
     ratioLabel->setComponentSize(225, controlMinHeight);
     flexSections.getReference(0).items.getReference(2).minWidth = ratioLabel->getWidth();

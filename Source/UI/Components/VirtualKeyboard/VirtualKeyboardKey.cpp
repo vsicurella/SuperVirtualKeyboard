@@ -106,28 +106,59 @@ Colour Key::getDisplayColor() const
 
 void Key::paint(Graphics& g)
 {
+    g.fillAll(color);
+
     Colour colorToUse = color;
-    float contrast = 0;
 
-    if (isMouseOver())
+    if (isClicked || isMouseOver() || exPressed)
     {
-        contrast = 0.25f;
-    }
-    if (isClicked)
-    {
-        contrast = 0.66f;
-    }
-    else if (exPressed)
-    {
-        colorToUse = exInputColor;
-    }
+        float contrast = 0;
+        if (isClicked)
+            contrast = 0.7f;
+        else if (isMouseOver())
+            contrast = 0.25f;
+        
+        colorToUse = color.contrasting(contrast);
 
-    g.setColour(colorToUse.contrasting(contrast));
-    g.fillRect(getLocalBounds());
+        if (colorToUse.getPerceivedBrightness() < 0.6667f)
+            g.setColour(colorToUse.contrasting(0.333f));
+        
+        g.setColour(colorToUse);
+
+        // Full or Inside
+        if (highlightStyleId < 3)
+        {
+            Rectangle<int> bounds = getLocalBounds();
+
+            if (highlightStyleId == 2)
+                bounds.reduce(5, 5);
+
+            g.fillRect(bounds);
+        }
+        
+        // Border
+        else if (highlightStyleId == 3)
+            g.drawRect(getLocalBounds(), 7.0f);
+
+        else
+        {
+            float margin = 7;
+            float boundsWidth = getWidth() - margin * 2;
+            Rectangle<float> shapeBounds = { margin, getHeight() - margin - boundsWidth, boundsWidth, boundsWidth };
+
+            // Circle
+            if (highlightStyleId == 4)
+                g.fillEllipse(shapeBounds);
+            
+            // Square
+            else
+                g.fillRect(shapeBounds);
+        }
+    }
 
     if (order == 0)
     {
-        if (colorToUse.getBrightness() < 0.6667f)
+        if (colorToUse.getPerceivedBrightness() < 0.6667f)
             g.setColour(colorToUse.contrasting(0.333f));
 
         else
