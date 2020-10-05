@@ -28,7 +28,6 @@ public:
     ValueTree midiSettingsNode;
     ValueTree midiMapNode;
     
-    void connectToParameters();
     void updateNode();
     bool restoreFromNode(ValueTree midiSettingsNodeIn);
     
@@ -41,7 +40,6 @@ public:
     MidiKeyboardState* getOriginalKeyboardState();
     MidiKeyboardState* getRemappedKeyboardState();
     
-    int getRootNote() const;
     int getPeriodShift() const;
     int getTransposeAmt() const;
     int getMidiChannelOut() const;
@@ -102,8 +100,8 @@ public:
     */
     void updateNoteTransposition();
 
-    void setVoiceLimit(int maxVoicesIn);
-    void setRetuneOn(bool retuneOn);
+    //void setVoiceLimit(int maxVoicesIn);
+    //void setRetuneOn(bool retuneOn);
 
     void mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode = true);
     void mapNoteForInputRemap(int noteIn, int noteOut, bool updateNode = true);

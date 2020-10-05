@@ -39,25 +39,6 @@ SvkMidiProcessor::~SvkMidiProcessor()
     
 }
 
-void SvkMidiProcessor::connectToParameters()
-{
-    Array<Identifier> params(
-        {
-            IDs::periodShift,
-            IDs::periodShiftModeSize,
-            IDs::transposeAmt,
-            IDs::keyboardMidiChannel,
-            IDs::mpeOn,
-            IDs::mappingMode
-        });
-
-    for (auto param : params)
-    {
-        svkTree.addParameterListener(param, this);
-    }
-    DBG("MidiProcessor connected to parameters");
-}
-
 void SvkMidiProcessor::updateNode()
 {
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
@@ -299,10 +280,10 @@ void SvkMidiProcessor::updateNoteTransposition()
     // TODO: handle sustained notes
 }
 
-void SvkMidiProcessor::setRetuneOn(bool retuneOn)
-{
-    doRetuning = retuneOn;
-}
+//void SvkMidiProcessor::setRetuneOn(bool retuneOn)
+//{
+//    doRetuning = retuneOn;
+//}
 
 void SvkMidiProcessor::setInputToFilter(bool doRemap)
 {
