@@ -17,6 +17,7 @@
 #include "ReferencedComboBox.h"
 #include "VirtualKeyboard/KeyboardComponent.h"
 #include "VirtualKeyboard/KeyboardViewport.h"
+#include "../../Structures/MappingHelper.h"
 
 #include "Settings/SettingsContainer.h"
 
@@ -35,6 +36,7 @@ class PluginControlComponent  : public Component,
                                 public ChangeListener,
                                 private SvkPluginState::Listener,
                                 private SettingsContainer::Listener,
+                                private MappingHelper::Listener,
                                 private Timer
 {
 public:
@@ -78,6 +80,10 @@ public:
     void modeInfoChanged(Mode* modeEdited) override;
 
     void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
+
+    void keyMappingStatusChanged(int keyNumber, bool preparedToMap) override;
+
+    void keyMapConfirmed(int keyNumber, int midiNote) override;
 
     //==============================================================================
 
@@ -159,10 +165,14 @@ private:
     std::unique_ptr<PopupMenu> loadMenu;
     std::unique_ptr<PopupMenu> exportMenu;
 
+    std::unique_ptr<MappingHelper> mappingHelper;
+
     std::unique_ptr<SettingsContainer> settingsContainer;
 
     ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
+
+    Array<Component*> mappingComponents;
 
     TextFilterIntOrSpace txtFilter;
 
@@ -191,6 +201,9 @@ private:
     std::unique_ptr<TextButton> mapOrderEditBtn;
     std::unique_ptr<ComboBox> mapModeBox;
     std::unique_ptr<TextButton> mapApplyBtn;
+    std::unique_ptr<Label> mapManualTip;
+    std::unique_ptr<Label> mapManualStatus;
+    std::unique_ptr<Button> mapManualRepeatButton;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;

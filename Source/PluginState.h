@@ -21,8 +21,8 @@
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
 
-class SvkPluginState : public ChangeListener,
-                        private AudioProcessorValueTreeState::Listener
+class SvkPluginState : public ChangeListener
+                        //private AudioProcessorValueTreeState::Listener
 {
 public:
     AudioProcessorValueTreeState& svkTree;
@@ -40,10 +40,16 @@ public:
     
     void recallState(ValueTree nodeIn, bool fallbackToDefaultSettings = false);
 
-    ValueTree getPluginEditorNode() const;
+    // TODO: make it so it's not necessary to call this before saving (?)
+    void commitStateNode();
+
+    static int isValidStateNode(ValueTree pluginStateNodeIn);
+
     
     //==============================================================================
     // Object getters
+
+    ValueTree getPluginEditorNode() const;
     
     SvkPresetManager* getPresetManager();
     SvkMidiProcessor* getMidiProcessor();
@@ -65,17 +71,17 @@ public:
     //==============================================================================
     // Parameter Getters
 
-    float getParameterValue(Identifier paramId);
-    float getParameterMin(Identifier paramId);
-    float getParameterMax(Identifier paramId);
-    float getParameterDefaultValue(Identifier paramId);
+    //float getParameterValue(Identifier paramId);
+    //float getParameterMin(Identifier paramId);
+    //float getParameterMax(Identifier paramId);
+    //float getParameterDefaultValue(Identifier paramId);
 
     int getNumModesLoaded() const;
     int getModeSelectorViewed() const;
     int getModeViewedSlotNumber() const;
 
     int getMappingMode() const;
-    int getMappingStyle() const;
+    int getAutoMappingStyle() const;
     bool isAutoMapping() const;
 
     //bool isAutoRetuning();
@@ -91,7 +97,7 @@ public:
     void setParameterValue(Identifier paramIdIn, float valueIn);
 
     void setMapMode(int mapModeSelectionIn);
-    void setMapStyle(int mapStyleIn);
+    void setAutoMapStyle(int mapStyleIn);
 
     void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
 
@@ -106,8 +112,8 @@ public:
     void setModeSelectorViewed(int modeViewedIn);
     void handleModeSelection(int modeBoxNum, int idIn);
 
-    void setMidiInputMap(NoteMap noteMapIn);
-    void setMidiOutputMap(NoteMap noteMapIn);
+    void setMidiInputMap(NoteMap noteMapIn, bool updateNode, bool sendChangeMessage = true);
+    void setMidiOutputMap(NoteMap noteMapIn, bool updateNode);
     
     void setModeCustom(String stepsIn, bool sendChangeMessage = true);
 
@@ -116,8 +122,8 @@ public:
     void setMapOrderOffset1(int offsetIn);
     void setMapOrderOffset2(int offsetIn);
 
-    void doMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage = true);
-    void doMapping(bool sendChangeMessage = true);
+    void doAutoMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage = true);
+    void doAutoMapping(bool sendChangeMessage = true);
 
     void revertToSavedPreset(bool fallbackToDefaultSettings = false, bool sendChange = true);
 
@@ -129,14 +135,9 @@ public:
 
     void commitModeInfo(bool sendChangeMessage = true);
 
-    // TODO: make it so it's not necessary to call this before saving (?)
-    void commitStateNode();
-
-    static int isValidStateNode(ValueTree pluginStateNodeIn);
-
     //==============================================================================
 
-    void parameterChanged(const String& paramID, float newValue) override;
+    //void parameterChanged(const String& paramID, float newValue) override;
 
     void changeListenerCallback(ChangeBroadcaster* source) override;
 

@@ -27,7 +27,7 @@ ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
 
     mappingNode = modeMappingNodeIn;
     
-    mappingStyle = mappingNode[IDs::modeMappingStyle];
+    mappingStyle = mappingNode[IDs::autoMappingStyle];
 
     mapByOrderNum1 = mappingNode[IDs::mode1OrderMapping];
     mapByOrderNum2 = mappingNode[IDs::mode2OrderMapping];
@@ -64,7 +64,7 @@ int ModeMapper::getMode2OrderOffset() const
 void ModeMapper::setMappingStyle(int mapTypeIn)
 {
     mappingStyle = mapTypeIn;
-    mappingNode.setProperty(IDs::modeMappingStyle, mapTypeIn, nullptr);
+    mappingNode.setProperty(IDs::autoMappingStyle, mapTypeIn, nullptr);
 }
 
 void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
@@ -119,7 +119,7 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, in
     else
         setMappingStyle(mapStyleIn);
 
-    mappingNode.setProperty(IDs::modeMappingStyle, mappingStyle, nullptr);
+    mappingNode.setProperty(IDs::autoMappingStyle, mappingStyle, nullptr);
     
     switch (mappingStyle)
     {

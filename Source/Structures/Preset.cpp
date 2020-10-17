@@ -370,7 +370,7 @@ SvkPreset SvkPreset::getDefaultPreset()
     pianoNode.setProperty(IDs::keyboardHighlightStyle, 1, nullptr);
     
     ValueTree mappingMode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::midiMapNode, nullptr);
-    mappingMode.setProperty(IDs::modeMappingStyle, 1, nullptr);
+    mappingMode.setProperty(IDs::autoMappingStyle, 1, nullptr);
 
     ValueTree customMode = defaultPreset.parentNode.getOrCreateChildWithName(IDs::modeCustomNode, nullptr);
     customMode.appendChild(Mode::createNode("1"), nullptr);

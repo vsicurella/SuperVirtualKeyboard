@@ -16,13 +16,6 @@
 
 class NoteMap
 {
-    int size;
-
-    Array<int> keys; // Midi Note In, Key Number Out
-    Array<int> values; // Key Number In, Midi Note Out
-
-    int nullVal;
-
 public:
     
     NoteMap();
@@ -45,6 +38,18 @@ public:
     const Array<int>& getValues() const;
 
     int getNullVal();
+
+    bool operator==(const NoteMap& mapToCompare) const { return values == mapToCompare.values; }
+    bool operator!=(const NoteMap& mapToCompare) const { return values != mapToCompare.values; }
     
     String toString();
+
+private:
+
+    int size;
+
+    Array<int> keys; // Midi Note In, Key Number Out
+    Array<int> values; // Key Number In, Midi Note Out
+
+    int nullVal;
 };

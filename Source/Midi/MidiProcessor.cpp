@@ -15,6 +15,7 @@ SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
+    midiDeviceNode = ValueTree(IDs::midiDeviceSettingsNode);
     
     midiInputFilter.reset(new MidiFilter());
     midiInputRemap.reset(new MidiFilter());
@@ -39,7 +40,9 @@ SvkMidiProcessor::~SvkMidiProcessor()
     
 }
 
-void SvkMidiProcessor::updateNode()
+//==============================================================================
+
+void SvkMidiProcessor::updateNodes()
 {
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
     //midiSettingsNode.setProperty(IDs::mpeZone, 0 /*do something here*/, nullptr);
@@ -51,20 +54,26 @@ void SvkMidiProcessor::updateNode()
     //midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
     //midiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, mpeTuningPreserveMidiNote, nullptr);
     
-    Array<int> inputFilter = midiInputFilter->getRemappedNotes();
+    NoteMap standardNoteMap;
+
+    NoteMap* inputFilter = midiInputFilter->getNoteMap();
     midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputFilter), nullptr);
-    add_array_to_node(midiMapNode, inputFilter, IDs::midiInputFilter, "Note");
+    if (*inputFilter != standardNoteMap)
+        add_array_to_node(midiMapNode, inputFilter->getValues(), IDs::midiInputFilter, "Note");
     
-    Array<int> inputRemap = midiInputRemap->getRemappedNotes();
+    NoteMap* inputRemap = midiInputRemap->getNoteMap();
     midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
-    add_array_to_node(midiMapNode, inputRemap, IDs::midiInputRemap, "Note");
+    if (*inputRemap != standardNoteMap)
+        add_array_to_node(midiMapNode, inputRemap->getValues(), IDs::midiInputRemap, "Note");
     
-    Array<int> outputFilter = midiOutputFilter->getRemappedNotes();
+    NoteMap* outputFilter = midiOutputFilter->getNoteMap();
     midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputFilter), nullptr);
-    add_array_to_node(midiMapNode, outputFilter, IDs::midiOutputFilter, "Note");
+    if (*outputFilter != standardNoteMap)
+        add_array_to_node(midiMapNode, outputFilter->getValues(), IDs::midiOutputFilter, "Note");
 }
 
-bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
+
+bool SvkMidiProcessor::restoreSettingsNode(ValueTree midiSettingsNodeIn)
 {
     if (midiSettingsNodeIn.hasType(IDs::midiSettingsNode))
     {
@@ -75,17 +84,65 @@ bool SvkMidiProcessor::restoreFromNode(ValueTree midiSettingsNodeIn)
         midiChannelOut = jlimit(1, 16, (int) midiSettingsNode[IDs::keyboardMidiChannel]);
         // Note transposition is updated when new mode is applied
 
-
-        // TODO: check if devices exist, give a name to imply if it doesn't
-        if (JUCEApplication::isStandaloneApp)
-        {
-            setMidiInput(midiSettingsNode[IDs::midiInputName]);
-            setMidiOutput(midiSettingsNode[IDs::midiOutputName]);
-        }
-
         return true;
     }
     
+    return false;
+}
+
+bool SvkMidiProcessor::restoreMappingNode(ValueTree midiMapIn)
+{
+    bool loadedMap = false;
+
+    if (midiMapIn.hasType(IDs::midiMapNode))
+    {
+        midiMapNode = midiMapIn;
+
+        Array<int> map;
+
+        //get_array_from_node(midiMapIn, map, IDs::midiInputFilter);
+        //
+        //if (map.size() > 0)
+        //    setInputFilter(map);
+        //else
+        //    resetInputFilter();
+        //
+        //map.clear();
+        get_array_from_node(midiMapIn, map, IDs::midiInputRemap);
+
+        if (map.size() > 0)
+        {
+            setInputRemap(map);
+            loadedMap = true;
+        }
+        else
+            resetInputMap();
+
+        //map.clear();
+        //get_array_from_node(midiMapIn, map, IDs::midiOutputFilter);
+        //
+        //if (map.size() > 0)
+        //    setOutputFilter(map);
+        //else
+        //    resetOutputFilter();
+    }
+
+    return loadedMap;
+}
+
+bool SvkMidiProcessor::restoreDevicesNode(ValueTree midiDevicesNodeIn)
+{
+    // TODO: check if devices exist, give a name to imply if it doesn't
+    if (JUCEApplication::isStandaloneApp && midiDevicesNodeIn.hasType(IDs::midiDeviceSettingsNode))
+    {
+        midiDeviceNode = midiDevicesNodeIn;
+
+        setMidiInput(midiDeviceNode[IDs::midiInputName]);
+        setMidiOutput(midiDeviceNode[IDs::midiOutputName]);
+
+        return true;
+    }
+
     return false;
 }
 
@@ -197,7 +254,7 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
 
         midiInputName = midiInput->getName();
         inputSelected = deviceID;
-        midiSettingsNode.setProperty(IDs::midiInputName, inputSelected, nullptr);
+        midiDeviceNode.setProperty(IDs::midiInputName, inputSelected, nullptr);
         DBG("Successfully opened input " + midiInputName);
     }
     else
@@ -218,7 +275,7 @@ String SvkMidiProcessor::setMidiOutput(String deviceID)
         midiOutput.swap(outputToOpen);
         midiOutputName = midiOutput->getName();
         outputSelected = deviceID;
-        midiSettingsNode.setProperty(IDs::midiOutputName, outputSelected, nullptr);
+        midiDeviceNode.setProperty(IDs::midiOutputName, outputSelected, nullptr);
         DBG("Successfully opened output " + midiOutputName);
     }
     else
@@ -300,39 +357,6 @@ void SvkMidiProcessor::setOutputToFilter(bool doFilter)
     isOutputFiltered = doFilter;
 }
 
-void SvkMidiProcessor::setMidiMaps(ValueTree midiMapIn)
-{
-    if (midiMapIn.hasType(IDs::midiMapNode))
-    {
-        Array<int> map;
-        
-        get_array_from_node(midiMapIn, map, IDs::midiInputFilter);
-        
-        if (map.size() > 0)
-            setInputFilter(map);
-        else
-            resetInputFilter();
-        
-        map.clear();
-        get_array_from_node(midiMapIn, map, IDs::midiInputRemap);
-        
-        if (map.size() > 0)
-            setInputRemap(map);
-        else
-            resetInputMap();
-        
-        map.clear();
-        get_array_from_node(midiMapIn, map, IDs::midiOutputFilter);
-        
-        if (map.size() > 0)
-            setOutputFilter(map);
-        else
-            resetOutputFilter();
-        
-        midiMapNode.copyPropertiesAndChildrenFrom(midiMapIn, nullptr);
-    }
-}
-
 void SvkMidiProcessor::setInputFilter(Array<int> mapIn, bool updateNode)
 {
     setInputFilter(NoteMap(mapIn));
@@ -396,28 +420,9 @@ void SvkMidiProcessor::resetOutputFilter(bool updateNode)
     setOutputFilter(NoteMap(), updateNode);
 }
 
-void SvkMidiProcessor::mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode)
+void SvkMidiProcessor::setMappingHelper(MappingHelper* helperIn)
 {
-    midiInputFilter->setNote(noteIn, noteOut);
-    
-    if (updateNode)
-        set_value_in_array(midiMapNode, IDs::midiInputFilter, noteIn, noteOut);
-}
-
-void SvkMidiProcessor::mapNoteForInputRemap(int noteIn, int noteOut, bool updateNode)
-{
-    midiInputRemap->setNote(noteIn, noteOut);
-
-    if (updateNode)
-        set_value_in_array(midiMapNode, IDs::midiInputRemap, noteIn, noteOut);
-}
-
-void SvkMidiProcessor::mapNoteForOutputFilter(int noteIn, int noteOut, bool updateNode)
-{
-    midiOutputFilter->setNote(noteIn, noteOut);
-
-    if (updateNode)
-        set_value_in_array(midiMapNode, IDs::midiOutputFilter, noteIn, noteOut);
+    mappingHelper = helperIn;
 }
 
 //==============================================================================
@@ -444,6 +449,17 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         if (msg.isNoteOnOrOff())
         {
             midiNote = msg.getNoteNumber();
+
+            if ((int)midiMapNode[IDs::mappingMode] == 3 && midiMapNode[IDs::manualMappingEditOn])
+            {
+                if (mappingHelper->isWaitingForKeyInput())
+                {
+                    MessageManagerLock lock;
+                    mappingHelper->mapKeysToMidiNotes(midiNote, false);
+                    originalKeyboardState->processNextMidiEvent(msg);
+                    continue;
+                }
+            }
 
             if (isInputFiltered)
             {

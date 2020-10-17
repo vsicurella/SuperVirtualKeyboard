@@ -18,6 +18,7 @@
 #include "../../../PluginIDs.h"
 #include "../../../Midi/MidiProcessor.h"
 #include "../../../Structures/Mode.h"
+#include "../../../Structures/MappingHelper.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
 #include "KeyboardViewport.h"
@@ -342,23 +343,14 @@ namespace VirtualKeyboard
         //===============================================================================================
 
         /*
-            Flags a key to get mapped to the next Midi Note triggered
+            Adds a reference to a mapping helper for manual mapping
         */
-        void selectKeyToMap(Key* keyIn, bool mapAllPeriods=false);
-        
-        /*
-            Hightlights the given key. If a transparent color is given, it uses the default hightlight color.
-            If a blink rate above 0 is given, the key will alternate between default and highlight color every 
-            given number of milliseconds.
-        */
-        void highlightKey(int keyNumberIn, Colour colorIn=Colours::transparentBlack, int blinkRateMs = 0);
+        void setMappingHelper(MappingHelper*);
 
         /*
-            Hightlights the given keys. If a transparent color is given, it uses the default hightlight colors.
-            If a blink rate above 0 is given, the keys will alternate between default and highlight color every
-            given number of milliseconds.
+            Hightlights the given key, or removes highlight if false is passed in.
         */
-        void highlightKeys(Array<int> keyNumsIn, Colour colorIn = Colours::transparentBlack, int blinkRateMs = 0);
+        void highlightKey(int keyNumberIn, bool highlightOn = true);
 
         //===============================================================================================
         
@@ -531,10 +523,11 @@ namespace VirtualKeyboard
         bool hasDirtyKeys = true;
         
         MidiBuffer buffer;
-        Array<Key*> keysPause;
-        Array<Key*> keysToMap;
+
+        MappingHelper* mappingHelper;
+        Array<Key*> highlightedKeys;
         
-        Array<Path> keyboardKeysPath;
+        //Array<Path> keyboardKeysPath;
 
         // Parameters
         int uiModeSelected = 0;
