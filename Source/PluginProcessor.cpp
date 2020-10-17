@@ -219,7 +219,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 // //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
 //    
 //    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeMappingStyle.toString(), "Mapping Style", 1, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::autoMappingStyle.toString(), "Mapping Style", 1, 3, 1));
 //    
 //    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeOn.toString(), "MPE On", false));
 //    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));

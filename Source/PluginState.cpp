@@ -103,13 +103,84 @@ void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool se
     modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
     modeMapper.reset(new ModeMapper(svkPreset->getMappingsNode()));
-    midiProcessor->restoreFromNode(svkPreset->getMidiSettingsNode());
-    midiProcessor->setMidiMaps(svkPreset->getMappingsNode());
+    // TODO: fallbacks
+    midiProcessor->restoreSettingsNode(svkPreset->getMidiSettingsNode());
+    midiProcessor->restoreMappingNode(svkPreset->getMappingsNode());
+    midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr));
 
     onModeUpdate(!sendChange, !sendChange);
 
     if (sendChange)
         listeners.call(&Listener::presetLoaded, presetNode);
+}
+
+void SvkPluginState::commitStateNode()
+{
+    // TODO: make it so it's not necessary to call this before saving (?)
+
+    midiProcessor->updateNodes();
+
+    presetManager->commitPreset();
+    svkPreset = &presetManager->getPreset();
+    presetNode = svkPreset->getPresetNode();
+
+    pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
+    pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
+    presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(IDs::pianoNode), nullptr);
+
+    onModeUpdate();
+
+    pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiDeviceNode, nullptr);
+
+    DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
+
+    presetEdited = false;
+}
+
+int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
+{
+    int status = 0; // TODO: determine status codes
+
+    // Determine if it's a SVK state node or a APVTS node
+    ValueTree stateNode;
+
+    if (pluginStateNodeIn.hasType(IDs::svkParentNode))
+    {
+        status = PluginStateNodeStatus::IsAPVTSNode;
+
+        stateNode = pluginStateNodeIn.getChildWithName(IDs::pluginStateNode);
+
+        if (!stateNode.isValid())
+        {
+            // Check if it's an alpha preset
+            stateNode = pluginStateNodeIn.getChildWithName(IDs::alphaPluginStateNode);
+        }
+    }
+
+    else if (pluginStateNodeIn.hasType(IDs::pluginStateNode))
+    {
+        stateNode = pluginStateNodeIn;
+    }
+
+    if (stateNode.isValid())
+    {
+        // Determine if it's the current preset version or not
+        if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+        {
+            status += PluginStateNodeStatus::CurrentVersion;
+        }
+        else // Can add more conditions for certain versions if necessary
+        {
+            status += PluginStateNodeStatus::AlphaVersion;
+        }
+
+        if (status == 1)
+        {
+            // TODO: Various validity checks
+        }
+    }
+
+    return status;
 }
 
 //==============================================================================
@@ -176,47 +247,47 @@ Mode* SvkPluginState::getModeCustom()
 
 //==============================================================================
 
-float SvkPluginState::getParameterValue(Identifier paramId)
-{
-    RangedAudioParameter* param = svkTree.getParameter(paramId);
-    
-    if (param)
-    {
-        return param->convertFrom0to1(param->getValue());
-    }
-    
-    return 0.0f;
-}
-
-float SvkPluginState::getParameterMin(Identifier paramId)
-{
-    RangedAudioParameter* param = svkTree.getParameter(paramId);
-
-    if (param)
-        return param->convertFrom0to1(0.0f);
-
-    return 0.0f;
-}
-
-float SvkPluginState::getParameterMax(Identifier paramId)
-{
-    RangedAudioParameter* param = svkTree.getParameter(paramId);
-
-    if (param)
-        return param->convertFrom0to1(1.0f);
-
-    return 0.0f;
-}
-
-float SvkPluginState::getParameterDefaultValue(Identifier paramId)
-{
-    RangedAudioParameter* param = svkTree.getParameter(paramId);
-
-    if (param)
-        return param->convertFrom0to1(param->getDefaultValue());
-
-    return 0.0f;
-}
+//float SvkPluginState::getParameterValue(Identifier paramId)
+//{
+//    RangedAudioParameter* param = svkTree.getParameter(paramId);
+//    
+//    if (param)
+//    {
+//        return param->convertFrom0to1(param->getValue());
+//    }
+//    
+//    return 0.0f;
+//}
+//
+//float SvkPluginState::getParameterMin(Identifier paramId)
+//{
+//    RangedAudioParameter* param = svkTree.getParameter(paramId);
+//
+//    if (param)
+//        return param->convertFrom0to1(0.0f);
+//
+//    return 0.0f;
+//}
+//
+//float SvkPluginState::getParameterMax(Identifier paramId)
+//{
+//    RangedAudioParameter* param = svkTree.getParameter(paramId);
+//
+//    if (param)
+//        return param->convertFrom0to1(1.0f);
+//
+//    return 0.0f;
+//}
+//
+//float SvkPluginState::getParameterDefaultValue(Identifier paramId)
+//{
+//    RangedAudioParameter* param = svkTree.getParameter(paramId);
+//
+//    if (param)
+//        return param->convertFrom0to1(param->getDefaultValue());
+//
+//    return 0.0f;
+//}
 
 int SvkPluginState::getNumModesLoaded() const
 {
@@ -235,12 +306,12 @@ int SvkPluginState::getModeViewedSlotNumber() const
 
 int SvkPluginState::getMappingMode() const
 {
-    return presetNode.getChildWithName(IDs::presetProperties)[IDs::mappingMode];
+    return presetNode.getChildWithName(IDs::midiMapNode)[IDs::mappingMode];
 }
 
-int SvkPluginState::getMappingStyle() const
+int SvkPluginState::getAutoMappingStyle() const
 {
-    return presetNode.getChildWithName(IDs::midiMapNode)[IDs::modeMappingStyle];
+    return presetNode.getChildWithName(IDs::midiMapNode)[IDs::autoMappingStyle];
 }
 
 bool SvkPluginState::isAutoMapping() const
@@ -296,24 +367,27 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    presetNode.getChildWithName(IDs::presetProperties).setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
+    ValueTree mappingNode = presetNode.getChildWithName(IDs::midiMapNode);
+    mappingNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
     DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
     
     if (mapModeSelectionIn == 2) // Auto Mapping
-        doMapping();
+        doAutoMapping();
     
     else
     {
         if (mapModeSelectionIn == 3) // Manual Mapping
         {
-            ValueTree midiMaps = midiProcessor->midiSettingsNode.getChildWithName(IDs::midiMapNode);
-            midiProcessor->setMidiMaps(midiMaps);
+            midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
+
+            // TODO: control state with button
+            mappingNode.setProperty(IDs::manualMappingEditOn, 1, nullptr);
         }
 
         else // Mapping Off
         {
-            midiProcessor->setInputRemap(NoteMap());
-            midiProcessor->setOutputFilter(NoteMap());
+            midiProcessor->setInputRemap(NoteMap(), false);
+            midiProcessor->setOutputFilter(NoteMap(), false);
             setModeSelectorViewed(1);
         }
 
@@ -321,14 +395,14 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
     }
 }
 
-void SvkPluginState::setMapStyle(int mapStyleIn)
+void SvkPluginState::setAutoMapStyle(int mapStyleIn)
 {
     modeMapper->setMappingStyle(mapStyleIn);
-    presetNode.getChildWithName(IDs::midiMapNode).setProperty(IDs::modeMappingStyle, mapStyleIn, nullptr);
+    presetNode.getChildWithName(IDs::midiMapNode).setProperty(IDs::autoMappingStyle, mapStyleIn, nullptr);
     DBG("mapStyle index = " + String(mapStyleIn));
     if (isAutoMapping())
     {
-        doMapping();
+        doAutoMapping();
     }
 }
 
@@ -346,7 +420,7 @@ void SvkPluginState::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, 
         updateModeViewed();
 
     if (isAutoMapping())
-        doMapping();
+        doAutoMapping();
 }
 
 void SvkPluginState::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMappingChangeMessage)
@@ -357,19 +431,22 @@ void SvkPluginState::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMap
     updateModeViewed(sendMappingChangeMessage);
     
     if (isAutoMapping())
-        doMapping(sendMappingChangeMessage);
+        doAutoMapping(sendMappingChangeMessage);
 }
 
 //==============================================================================
 
-void SvkPluginState::setMidiInputMap(NoteMap noteMapIn)
+void SvkPluginState::setMidiInputMap(NoteMap noteMapIn, bool updateNode, bool sendChangeMessage)
 {
-    midiProcessor->setInputRemap(noteMapIn);
+    midiProcessor->setInputRemap(noteMapIn, updateNode);
+
+    if (sendChangeMessage)
+        listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
 }
 
-void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn)
+void SvkPluginState::setMidiOutputMap(NoteMap noteMapIn, bool updateNode)
 {
-    midiProcessor->setOutputFilter(noteMapIn);
+    midiProcessor->setOutputFilter(noteMapIn, updateNode);
 }
 
 void SvkPluginState::setModeCustom(String stepsIn, bool sendChangeMessage)
@@ -401,26 +478,26 @@ void SvkPluginState::setMapOrderOffset2(int offsetIn)
     modeMapper->setMode2OrderOffset(offsetIn);
 }
 
-void SvkPluginState::doMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage)
+void SvkPluginState::doAutoMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage)
 {
     NoteMap noteMap = modeMapper->map(*mode1, *mode2, *midiProcessor->getInputNoteRemap());
 
-    setMidiInputMap(noteMap);
+    setMidiInputMap(noteMap, false);
 
     if (sendChangeMessage)
         listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
 }
 
-void SvkPluginState::doMapping(bool sendChangeMessage)
+void SvkPluginState::doAutoMapping(bool sendChangeMessage)
 {
-    if (getMappingMode() > 1)
+    if (getMappingMode() == 2)
     {
         DBG("Applying new MIDI mapping");
-        doMapping(getMode1(), getMode2());
+        doAutoMapping(getMode1(), getMode2());
     }
     else
     {
-        midiProcessor->setInputRemap(NoteMap());
+        midiProcessor->setInputRemap(NoteMap(), false);
 
         if (sendChangeMessage)
             listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
@@ -451,83 +528,6 @@ void SvkPluginState::commitModeInfo(bool sendChangeMessage)
 
     if (sendChangeMessage)
         listeners.call(&Listener::modeInfoChanged, modeViewed);
-}
-
-void SvkPluginState::commitStateNode()
-{
-    // TODO: make it so it's not necessary to call this before saving
-    presetManager->commitPreset();
-    svkPreset = &presetManager->getPreset();
-    presetNode = svkPreset->getPresetNode();
-
-    pluginStateNode = svkTree.state.getOrCreateChildWithName(IDs::pluginStateNode, nullptr);
-    pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
-    presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(IDs::pianoNode), nullptr);
-
-    onModeUpdate();
-
-    // TODO: revise
-    midiProcessor->updateNode();
-    if (getMappingMode() > 2)
-    {
-        midiProcessor->midiSettingsNode.addChild(midiProcessor->midiMapNode, -1, nullptr);
-    }
-    else if (midiProcessor->midiSettingsNode.getChildWithName(IDs::midiMapNode).isValid())
-    {
-        midiProcessor->midiSettingsNode.removeChild(midiProcessor->midiSettingsNode.getChild(0), nullptr);
-    }
-
-    pluginStateNode.getOrCreateChildWithName(IDs::midiSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiSettingsNode, nullptr);
-    
-    DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
-
-    presetEdited = false;
-}
-
-int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
-{
-    int status = 0; // TODO: determine status codes
-
-    // Determine if it's a SVK state node or a APVTS node
-    ValueTree stateNode;
-
-    if (pluginStateNodeIn.hasType(IDs::svkParentNode))
-    {
-        status = PluginStateNodeStatus::IsAPVTSNode;
-
-        stateNode = pluginStateNodeIn.getChildWithName(IDs::pluginStateNode);
-        
-        if (!stateNode.isValid())
-        {
-            // Check if it's an alpha preset
-            stateNode = pluginStateNodeIn.getChildWithName(IDs::alphaPluginStateNode);
-        }
-    }
-
-    else if (pluginStateNodeIn.hasType(IDs::pluginStateNode))
-    {
-        stateNode = pluginStateNodeIn;
-    }
-
-    if (stateNode.isValid())
-    {
-        // Determine if it's the current preset version or not
-        if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
-        {
-            status += PluginStateNodeStatus::CurrentVersion;
-        }
-        else // Can add more conditions for certain versions if necessary
-        {
-            status += PluginStateNodeStatus::AlphaVersion;
-        }
-
-        if (status == 1)
-        {
-            // TODO: Various validity checks
-        }
-    }
-
-    return status;
 }
 
 bool SvkPluginState::savePresetToFile()
@@ -573,7 +573,6 @@ void SvkPluginState::buildFactoryDefaultState()
     factoryDefaultPluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
     factoryDefaultPluginStateNode.appendChild(pluginSettings->getSettingsNode().createCopy(), nullptr);
     factoryDefaultPluginStateNode.appendChild(presetManager->getPreset().getPresetNode(), nullptr);
-    factoryDefaultPluginStateNode.appendChild(mapper.getMappingNode(), nullptr);
 }
 
 void SvkPluginState::buildUserDefaultState()
@@ -588,17 +587,17 @@ void SvkPluginState::buildUserDefaultState()
 
 //==============================================================================
 
-void SvkPluginState::parameterChanged(const String& paramID, float newValue)
-{
-    if (paramID == IDs::mappingMode.toString())
-    {
-        setMapMode(newValue);
-    }
-    else if (paramID == IDs::modeMappingStyle.toString())
-    {
-        setMapStyle(newValue);
-    }
-}
+//void SvkPluginState::parameterChanged(const String& paramID, float newValue)
+//{
+//    if (paramID == IDs::mappingMode.toString())
+//    {
+//        setMapMode(newValue);
+//    }
+//    else if (paramID == IDs::autoMappingStyle.toString())
+//    {
+//        setAutoMapStyle(newValue);
+//    }
+//}
 
 void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
 {

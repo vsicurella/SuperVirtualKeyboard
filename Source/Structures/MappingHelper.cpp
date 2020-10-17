@@ -10,7 +10,8 @@
 
 #include "MappingHelper.h"
 
-MappingHelper::MappingHelper(SvkPluginState* pluginStateIn)
+MappingHelper::MappingHelper(NoteMap noteMapIn)
+    : noteMapping(noteMapIn)
 {
     virtualKeyToMap = -1;
     waitingForKeyInput = false;
@@ -20,6 +21,11 @@ MappingHelper::MappingHelper(SvkPluginState* pluginStateIn)
 MappingHelper::~MappingHelper()
 {
 
+}
+
+NoteMap MappingHelper::getCurrentNoteMapping() const
+{
+    return noteMapping;
 }
 
 bool MappingHelper::isWaitingForKeyInput()
@@ -45,25 +51,27 @@ void MappingHelper::prepareKeyToMap(int virtualKeyClicked, bool allPeriodsIn)
     virtualKeyToMap = virtualKeyClicked;
     allPeriods = allPeriodsIn;
     waitingForKeyInput = true;
+    listeners.call(&Listener::keyMappingStatusChanged, virtualKeyToMap, true);
 }
 
-void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods)
+void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods, Mode* modeFrom, Mode* modeTo)
 {
     if (waitingForKeyInput)
     {
-        if (allPeriods)
+        if (allPeriods && modeFrom != nullptr && modeTo != nullptr)
         {
-            Array<int> triggeredPeriods = getKeyInAllPeriods(midiNoteTriggered, pluginState->getMode1());
-            Array<int> virtualKeyPeriods = getKeyInAllPeriods(virtualKeyToMap, pluginState->getMode2());
+            Array<int> triggeredPeriods = getKeyInAllPeriods(midiNoteTriggered, modeFrom);
+            Array<int> virtualKeyPeriods = getKeyInAllPeriods(virtualKeyToMap, modeTo);
         }
         
         else
         {
-            pluginState->getMidiInputFilterMap()->setValue(midiNoteTriggered, virtualKeyToMap);
+            noteMapping.setValue(midiNoteTriggered, virtualKeyToMap);
         }
         
-        DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(pluginState->getMidiInputFilterMap()->getValue(midiNoteTriggered)));
+        DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(noteMapping.getValue(midiNoteTriggered)));
         waitingForKeyInput = false;
+        listeners.call(&Listener::keyMapConfirmed, virtualKeyToMap, midiNoteTriggered);
     }
 }
 

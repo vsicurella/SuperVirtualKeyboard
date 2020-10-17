@@ -43,27 +43,13 @@ static Identifier modeSelectorRootNote("ModeSelectorRootNote");
 // Midi Settings
 static Identifier midiDeviceSettingsNode("MidiDeviceSettings");
 static Identifier midiSettingsNode("MidiSettings");
-static Identifier midiMapNode("MidiMappings");
 static Identifier rootMidiNote("RootNote");
 static Identifier periodShift("PeriodShift");
 static Identifier periodShiftModeSize("PeriodShiftModeSize");
 static Identifier transposeAmt("TransposeAmt");
 static Identifier maxVoices("MaxVoices");
-static Identifier midiInputFilter("InputFilter");
-static Identifier midiInputRemap("InputMapping");
-static Identifier midiOutputFilter("OutputFilter");
 static Identifier midiInputName("InputDevice");
 static Identifier midiOutputName("OutputDevice");
-static Identifier midiMapInputCustom("CustomMidiInputMap");
-static Identifier midiMapOutputCustom("CustomMidiOutputMap");
-static Identifier modeMapFromRootNote("ModeMapFromRootNote");
-static Identifier modeMapFromPreset("ModeMapFromPreset");
-static Identifier mappingMode("MappingMode");
-static Identifier modeMappingStyle("ModeMappingType");
-static Identifier mode1OrderMapping("Mode1OrderMapping");
-static Identifier mode2OrderMapping("Mode2OrderMapping");
-static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
-static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
 
 // MPE Settings
 static Identifier mpeOn("MPEOn");
@@ -94,6 +80,23 @@ static Identifier modeInfo("Description");
 static Identifier modeName("ModeName");
 static Identifier factoryPreset("FactoryPreset");
 static Identifier libraryIndexOfMode("IndexOfMode");
+
+// Note Mapping
+static Identifier midiMapNode("MidiMappings");
+static Identifier midiInputFilter("InputFilter");
+static Identifier midiInputRemap("InputMapping");
+static Identifier midiOutputFilter("OutputFilter");
+static Identifier midiMapInputCustom("CustomMidiInputMap");
+static Identifier midiMapOutputCustom("CustomMidiOutputMap");
+static Identifier modeMapFromRootNote("ModeMapFromRootNote");
+static Identifier modeMapFromPreset("ModeMapFromPreset");
+static Identifier mappingMode("MappingMode");
+static Identifier autoMappingStyle("ModeMappingType");
+static Identifier manualMappingEditOn("ManualMappingEditOn");
+static Identifier mode1OrderMapping("Mode1OrderMapping");
+static Identifier mode2OrderMapping("Mode2OrderMapping");
+static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
+static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
 
 // Keyboard Window
 static Identifier pluginEditorNode("PluginWindow");

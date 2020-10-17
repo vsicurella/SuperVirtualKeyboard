@@ -15,6 +15,7 @@
 
 #include "../Structures/MidiFilter.h"
 #include "../Structures/Mode.h"
+#include "../Structures/MappingHelper.h"
 
 class SvkMidiProcessor : public MidiInputCallback,
                          public MidiKeyboardStateListener,
@@ -27,9 +28,12 @@ public:
     
     ValueTree midiSettingsNode;
     ValueTree midiMapNode;
+    ValueTree midiDeviceNode;
     
-    void updateNode();
-    bool restoreFromNode(ValueTree midiSettingsNodeIn);
+    void updateNodes();
+    bool restoreSettingsNode(ValueTree midiSettingsNodeIn);
+    bool restoreMappingNode(ValueTree midiMapIn);
+    bool restoreDevicesNode(ValueTree midiDevicesNodeIn);
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
@@ -70,8 +74,6 @@ public:
     void setInputToRemap(bool doRemap=true);
     void setOutputToFilter(bool doFilter=true);
     
-    void setMidiMaps(ValueTree midiMapIn);
-    
     void setInputFilter(Array<int> mapIn, bool updateNode=true);
     void setInputFilter(NoteMap mapIn, bool updateNode=true);
     void setInputRemap(Array<int> mapIn, bool updateNode=true);
@@ -103,9 +105,7 @@ public:
     //void setVoiceLimit(int maxVoicesIn);
     //void setRetuneOn(bool retuneOn);
 
-    void mapNoteForInputFilter(int noteIn, int noteOut, bool updateNode = true);
-    void mapNoteForInputRemap(int noteIn, int noteOut, bool updateNode = true);
-    void mapNoteForOutputFilter(int noteIn, int noteOut, bool updateNode = true);
+    void setMappingHelper(MappingHelper* helperIn);
     
     void resetInputFilter(bool updateNode=true);
     void resetInputMap(bool updateNode=true);
@@ -171,6 +171,8 @@ private:
     std::unique_ptr<MidiFilter> midiInputFilter;
     std::unique_ptr<MidiFilter> midiInputRemap;
     std::unique_ptr<MidiFilter> midiOutputFilter;
+
+    MappingHelper* mappingHelper;
 
     int mpePitchbendTrackingMode = 0;
     int mpePressureTrackingMode = 0;

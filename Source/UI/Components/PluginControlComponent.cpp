@@ -105,7 +105,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     mapStyleBox->addItem (TRANS("Mode To Mode"), 1);
     mapStyleBox->addItem (TRANS("Scale To Mode"), 2);
-    mapStyleBox->addItem (TRANS("By Orders"), 3);
+    mapStyleBox->addItem (TRANS("By Key Layers"), 3);
     mapStyleBox->addListener (this);
 
     mapStyleLbl.reset (new Label ("Mapping Style Label",
@@ -118,12 +118,12 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapStyleLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
-    addAndMakeVisible (mapOrderEditBtn.get());
+    addChildComponent(mapOrderEditBtn.get());
     mapOrderEditBtn->setButtonText (TRANS("Edit Mapping"));
     mapOrderEditBtn->addListener (this);
 
-    mapModeBox.reset (new ComboBox ("Mapping Node Box"));
-    addAndMakeVisible (mapModeBox.get());
+    mapModeBox.reset (new ComboBox ("Mapping Mode Box"));
+    addAndMakeVisible(mapModeBox.get());
     mapModeBox->setEditableText (false);
     mapModeBox->setJustificationType (Justification::centredLeft);
     mapModeBox->setTextWhenNothingSelected (TRANS("Mapping Off"));
@@ -133,10 +133,16 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapModeBox->addItem (TRANS("Manual Map"), 3);
     mapModeBox->addListener (this);
 
-    mapApplyBtn.reset (new TextButton ("new button"));
-    addAndMakeVisible (mapApplyBtn.get());
+    mapApplyBtn.reset (new TextButton ("Apply Layer Map Button"));
+    addChildComponent (mapApplyBtn.get());
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
+
+    mapManualTip.reset(new Label("Manual Mapping Tip", "Click the key to map, then trigger the MIDI note."));
+    addChildComponent(mapManualTip.get());
+
+    mapManualStatus.reset(new Label("Manual Mapping Status", "No key selected."));
+    addChildComponent(mapManualStatus.get());
 
     keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboard->addListener(pluginState->getMidiProcessor());
@@ -183,10 +189,8 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
     openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
-    mapOrderEditBtn->setVisible(true);
-
+    
     scaleTextBox->addListener(this);
-
     scaleTextBox->setInputFilter(&txtFilter, false);
 
     //keyboardViewport->setScrollingMode(3);
@@ -222,8 +226,17 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
     settingsButton->setClickingTogglesState(true);
 
-    // DISABLED BECAUSE NOT IMPLEMENTED
-    mapModeBox->setItemEnabled(3, false);
+    mappingComponents = 
+    {
+        mapStyleLbl.get(),
+        mapStyleBox.get(),
+        mapOrderEditBtn.get(),
+        mode1RootLbl.get(),
+        mode1RootSld.get(),
+        mode1Box.get(),
+        mode1ViewBtn.get(),
+        mode2ViewBtn.get()
+    };
 
     loadPresetNode(pluginState->getPresetNode());
 
@@ -256,6 +269,8 @@ PluginControlComponent::~PluginControlComponent()
     mode2RootLbl = nullptr;
     mapStyleBox = nullptr;
     mapStyleLbl = nullptr;
+    mapManualTip = nullptr;
+    mapManualStatus = nullptr;
     mapOrderEditBtn = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
@@ -277,7 +292,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
         if (properties.isValid())
         {
-            setMappingMode(properties[IDs::mappingMode]);
             mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
         }
 
@@ -288,7 +302,8 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
         if (mapping.isValid())
         {
-            setMappingStyleId(mapping[IDs::modeMappingStyle]);
+            setMappingMode(mapping[IDs::mappingMode]);
+            setMappingStyleId(mapping[IDs::autoMappingStyle]);
         }
 
         ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
@@ -385,6 +400,9 @@ void PluginControlComponent::resized()
         mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
         mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapModeBox->getWidth(), barHeight);
 
+        mapManualTip->setBounds(mapStyleLbl->getX(), mapStyleLbl->getY(), mapManualTip->getFont().getStringWidth(mapManualTip->getText()), barHeight);
+        mapManualStatus->setBounds(mapManualTip->getRight(), mapManualTip->getY(), mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, barHeight);
+
         mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
         mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
 
@@ -451,7 +469,7 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-        pluginState->setMapStyle(mapStyleBox->getSelectedId());
+        pluginState->setAutoMapStyle(mapStyleBox->getSelectedId());
         setMappingStyleId(mapStyleBox->getSelectedId());
     }
 }
@@ -491,7 +509,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == mapApplyBtn.get())
     {
-        pluginState->doMapping();
+        pluginState->doAutoMapping();
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
@@ -594,6 +612,27 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
     pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
 }
 
+void PluginControlComponent::keyMappingStatusChanged(int keyNumber, bool preparedToMap)
+{
+    if (preparedToMap)
+    {
+        mapManualStatus->setText("Waiting for input to map to key " + String(keyNumber), dontSendNotification);
+    }
+    else
+    {
+        mapManualStatus->setText("No key selected.", dontSendNotification);
+    }
+
+    mapManualStatus->setBounds(mapManualStatus->getBounds().withWidth(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8));
+}
+
+void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
+{
+    mapManualStatus->setText("Key " + String(keyNumber) + " mapped to Midi Note " + String(midiNote), dontSendNotification);
+    mapManualStatus->setBounds(mapManualStatus->getBounds().withWidth(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8));
+    pluginState->setMidiInputMap(mappingHelper->getCurrentNoteMapping(), true);
+}
+
 //==============================================================================
 
 VirtualKeyboard::Keyboard* PluginControlComponent::getKeyboard()
@@ -666,17 +705,6 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
 {
     mapModeBox->setSelectedId(mappingModeId, notify);
     inMappingMode = mappingModeId > 1;
-
-    Array<Component*> mappingComponents = {
-        mapStyleLbl.get(),
-        mapStyleBox.get(),
-        mapOrderEditBtn.get(),
-        mode1RootLbl.get(),
-        mode1RootSld.get(),
-        mode1Box.get(),
-        mode1ViewBtn.get(),
-        mode2ViewBtn.get()
-    };
     
     for (auto c : mappingComponents)
     {
@@ -684,19 +712,57 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
         c->setEnabled(inMappingMode);
     }
 
-    if (mappingModeId == 3 || mapStyleBox->getSelectedId() == 3)
+    if (inMappingMode)
     {
-        mapOrderEditBtn->setVisible(true);
-        mapApplyBtn->setVisible(true);
+        if (mappingModeId == 2 && mapStyleBox->getSelectedId() == 3)
+        {
+            mapOrderEditBtn->setVisible(true);
+            mapApplyBtn->setVisible(true);
+        }
+        else
+        {
+            mapOrderEditBtn->setVisible(false);
+            mapApplyBtn->setVisible(false);
+        }
+
+        mode2ViewBtn->setToggleState(true, sendNotification);
+    }
+
+    if (mappingModeId == 3)
+    {
+        mapStyleBox->setVisible(false);
+        mapStyleLbl->setVisible(false);
+
+        mapManualTip->setVisible(true);
+        mapManualStatus->setVisible(true);
+
+        mappingHelper.reset(new MappingHelper(*pluginState->getMidiInputFilterMap()));
+        mappingHelper->addListener(this);
+        DBG("UI: Listening to mapping helper");
+
+        keyboard->setUIMode(VirtualKeyboard::UIMode::mapMode);
+
+        // Selects the key to map a MIDI note to
+        keyboard->setMappingHelper(mappingHelper.get());
+
+        // Selects the MIDI note that maps to the selected key
+        pluginState->getMidiProcessor()->setMappingHelper(mappingHelper.get());
     }
     else
     {
-        mapOrderEditBtn->setVisible(false);
-        mapApplyBtn->setVisible(false);
-    }
+        mapManualTip->setVisible(false);
+        mapManualStatus->setVisible(false);
 
-    if (inMappingMode)
-        mode2ViewBtn->setToggleState(true, sendNotification);
+        // TODO: make sure this doesn't conflict with color editing
+        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+
+        if (mappingHelper)
+        {
+            mappingHelper->removeListener(this);
+            mappingHelper = nullptr;
+            DBG("UI: Mapping helper removed!");
+        }
+    }
 
     resized();
 }
@@ -705,7 +771,7 @@ void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify
 {
     mapStyleBox->setSelectedId(idIn, notify);
 
-    if (inMappingMode && (idIn == 3 || mapModeBox->getSelectedId() == 3))
+    if (idIn == 3 && mapModeBox->getSelectedId() == 2)
     {
         mapOrderEditBtn->setVisible(true);
         mapApplyBtn->setVisible(true);
@@ -734,7 +800,6 @@ void PluginControlComponent::showMapOrderEditDialog()
     mapByOrderDialog = new MapByOrderDialog(pluginState->getModeMapper(), pluginState->getMode1(), pluginState->getMode2());
     CallOutBox::launchAsynchronously(mapByOrderDialog, mapStyleBox->getScreenBounds(), nullptr);
 }
-
 
 void PluginControlComponent::showSettingsDialog()
 {

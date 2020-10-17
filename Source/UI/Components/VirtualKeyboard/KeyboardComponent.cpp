@@ -284,24 +284,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
                 // note off
                 lastKeyClicked = key->keyNumber;
                 triggerKey(key->keyNumber, false);
-
             }
-            //else if (pluginState->getMappingMode() == 3 && e.mods.isRightButtonDown() && pluginState->getModeSelectorViewed() == 1)
-            //{
-            //    if (mappingHelper->isWaitingForKeyInput())
-            //    {
-            //        //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-            //    }
-
-            //    bool allPeriods = true;  
-
-            //    if (e.mods.isCtrlDown())
-            //        allPeriods = false;
-
-            //    mappingHelper->prepareKeyToMap(key->keyNumber, false);
-            //    //virtualKeyboard->highlightKeyForMapping(key->keyNumber);
-            //    DBG("Preparing to map key: " + String(key->keyNumber));
-            //}
             else
             {
                 // need to implement a velocity class
@@ -313,22 +296,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
                 {
                     isolateLastNote();
                 }
-
-                //if (mappingHelper->isWaitingForKeyInput())
-                //{
-                //    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-                //    mappingHelper->cancelKeyMap();
-                //}
-
             }
-        }
-        else
-        {
-            //if (mappingHelper->isWaitingForKeyInput())
-            //{
-            //    //virtualKeyboard->highlightKeyForMapping(mappingHelper->getVirtualKeyToMap(), false);
-            //    mappingHelper->cancelKeyMap();
-            //}
         }
     }
     else if (uiModeSelected == UIMode::editMode)
@@ -377,6 +345,39 @@ void Keyboard::mouseDown(const MouseEvent& e)
             }
             
             updateKeyColors();
+        }
+    }
+    else if (uiModeSelected == UIMode::mapMode)
+    {
+        if (key) 
+        {
+            if (e.mods.isRightButtonDown())
+            {
+                if (mappingHelper->isWaitingForKeyInput())
+                {
+                    highlightKey(mappingHelper->getVirtualKeyToMap(), false);
+                }
+            }
+            else
+            {
+                bool allPeriods = true;  
+
+                if (e.mods.isCtrlDown())
+                    allPeriods = false;
+
+                mappingHelper->prepareKeyToMap(key->keyNumber, false);
+                highlightKey(key->keyNumber);
+
+                DBG("Preparing to map key: " + String(key->keyNumber));
+            }
+        }
+        else
+        {
+            if (mappingHelper->isWaitingForKeyInput())
+            {
+                highlightKey(mappingHelper->getVirtualKeyToMap(), false);
+                mappingHelper->cancelKeyMap();
+            }
         }
     }
 }
@@ -939,9 +940,7 @@ void Keyboard::setUIMode(int uiModeIn)
 
     uiModeSelected = uiModeIn;
     pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
-    
-    // Do stuff
-}
+ }
 
 void Keyboard::setOrientation(int orientationIn)
 {
@@ -1050,19 +1049,17 @@ void Keyboard::setInputNoteMap(NoteMap* noteMapIn)
 
 //===============================================================================================
 
-void Keyboard::selectKeyToMap(Key* keyIn, bool mapAllPeriods)
+void Keyboard::setMappingHelper(MappingHelper* mappingHelperIn)
 {
-    // do stuff
+    mappingHelper = mappingHelperIn;
 }
 
-void Keyboard::highlightKey(int keyNumberIn, Colour colorIn, int blinkRateMs)
+void Keyboard::highlightKey(int keyNumberIn, bool highlightOn)
 {
-    // do stuff
-}
-
-void Keyboard::highlightKeys(Array<int> keyNumsIn, Colour colorIn, int blinkRateMs)
-{
-    // do stuff
+    if (highlightOn)
+        highlightedKeys.add(keys[keyNumberIn]);
+    else
+        highlightedKeys.removeAllInstancesOf(keys[keyNumberIn]);
 }
 
 //===============================================================================================
@@ -1471,6 +1468,7 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
     int keyTriggered = midiNote;
 
     Key* key = keys[keyTriggered];
+
     key->exPressed = true;
 
     Colour keyOnColour = keyOnColorsByChannel[midiChannel];
