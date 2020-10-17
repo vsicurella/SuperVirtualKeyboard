@@ -180,6 +180,9 @@ private:
     bool isColorEditing = false;
     bool inMappingMode = false;
 
+    String noKeySelectedTrans = TRANS("No key selected.");
+    String waitingForTrans = TRANS("Waiting for input to map to key ");
+
     int defaultHeight = 210;
     int barHeight = 24;
     int gap = 8;
@@ -203,6 +206,7 @@ private:
     std::unique_ptr<TextButton> mapApplyBtn;
     std::unique_ptr<Label> mapManualTip;
     std::unique_ptr<Label> mapManualStatus;
+    std::unique_ptr<TextButton> mapManualCancel;
     std::unique_ptr<Button> mapManualRepeatButton;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<Viewport> keyboardViewport;
