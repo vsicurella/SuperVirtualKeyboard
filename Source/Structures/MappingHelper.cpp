@@ -77,8 +77,10 @@ void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods, M
 
 void MappingHelper::cancelKeyMap()
 {
-    virtualKeyToMap = -1;
     waitingForKeyInput = false;
+    listeners.call(&Listener::keyMappingStatusChanged, virtualKeyToMap, false);
+    virtualKeyToMap = -1;
+    DBG("Key map cancelled.");
 }
 
 

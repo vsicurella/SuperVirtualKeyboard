@@ -274,32 +274,9 @@ void Keyboard::mouseExit(const MouseEvent& e)
 void Keyboard::mouseDown(const MouseEvent& e)
 {
     Key* key = getKeyFromPositionMouseEvent(e);
+    bool triggerNote = false;
 
-    if (uiModeSelected == UIMode::playMode)
-    {
-        if (key)
-        {
-            if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->isClicked)
-            {
-                // note off
-                lastKeyClicked = key->keyNumber;
-                triggerKey(key->keyNumber, false);
-            }
-            else
-            {
-                // need to implement a velocity class
-                triggerKey(key->keyNumber);
-                lastKeyClicked = key->keyNumber;
-                keysByMouseTouch.set(e.source.getIndex(), key->keyNumber);
-
-                if (e.mods.isAltDown())
-                {
-                    isolateLastNote();
-                }
-            }
-        }
-    }
-    else if (uiModeSelected == UIMode::editMode)
+    if (uiModeSelected == UIMode::editMode)
     {
         if (key)
         {
@@ -307,10 +284,10 @@ void Keyboard::mouseDown(const MouseEvent& e)
             {
                 if (e.mods.isShiftDown())
                     keyColorsOrders.set(key->order, Colour());
-                
+
                 else if (e.mods.isCtrlDown())
                     keyColorsIndividual.set(key->keyNumber, Colour());
-                
+
                 else
                 {
                     if (keyColorsIndividual[key->keyNumber].isOpaque())
@@ -343,24 +320,17 @@ void Keyboard::mouseDown(const MouseEvent& e)
 
                 keyColorsDegrees.set(key->scaleDegree, Colour::fromString(getProperties()[IDs::colorSelected].toString()));
             }
-            
+
             updateKeyColors();
         }
     }
     else if (uiModeSelected == UIMode::mapMode)
     {
-        if (key) 
+        if (key)
         {
             if (e.mods.isRightButtonDown())
             {
-                if (mappingHelper->isWaitingForKeyInput())
-                {
-                    highlightKey(mappingHelper->getVirtualKeyToMap(), false);
-                }
-            }
-            else
-            {
-                bool allPeriods = true;  
+                bool allPeriods = true;
 
                 if (e.mods.isCtrlDown())
                     allPeriods = false;
@@ -370,13 +340,40 @@ void Keyboard::mouseDown(const MouseEvent& e)
 
                 DBG("Preparing to map key: " + String(key->keyNumber));
             }
-        }
-        else
-        {
-            if (mappingHelper->isWaitingForKeyInput())
+            else
             {
-                highlightKey(mappingHelper->getVirtualKeyToMap(), false);
-                mappingHelper->cancelKeyMap();
+                triggerNote = true;
+            }
+        }
+        
+        if (!key || !isMouseOver(true))
+        {
+            highlightKey(mappingHelper->getVirtualKeyToMap(), false);
+            mappingHelper->cancelKeyMap();
+        }
+    }
+
+    if (uiModeSelected == UIMode::playMode || triggerNote)
+    {
+        if (key)
+        {
+            if (e.mods.isShiftDown() && !e.mods.isAltDown() && key->isClicked)
+            {
+                // note off
+                lastKeyClicked = key->keyNumber;
+                triggerKey(key->keyNumber, false);
+            }
+            else
+            {
+                // need to implement a velocity class
+                triggerKey(key->keyNumber);
+                lastKeyClicked = key->keyNumber;
+                keysByMouseTouch.set(e.source.getIndex(), key->keyNumber);
+
+                if (e.mods.isAltDown())
+                {
+                    isolateLastNote();
+                }
             }
         }
     }
@@ -384,7 +381,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
 
 void Keyboard::mouseDrag(const MouseEvent& e)
 {
-    if (uiModeSelected == UIMode::playMode && !e.mods.isRightButtonDown())
+    if (uiModeSelected != UIMode::editMode && !e.mods.isRightButtonDown())
     {
         Key* key = getKeyFromPositionMouseEvent(e);
 
@@ -410,7 +407,7 @@ void Keyboard::mouseDrag(const MouseEvent& e)
 
 void Keyboard::mouseUp(const MouseEvent& e)
 {
-    if (uiModeSelected == UIMode::playMode)
+    if (uiModeSelected != UIMode::editMode)
     {
         int touchIndex = e.source.getIndex();
         int keyIndex = keysByMouseTouch[touchIndex];

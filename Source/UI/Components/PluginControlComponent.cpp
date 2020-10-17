@@ -138,11 +138,17 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
 
-    mapManualTip.reset(new Label("Manual Mapping Tip", "Click the key to map, then trigger the MIDI note."));
+    mapManualTip.reset(new Label("Manual Mapping Tip", TRANS("Right-click output key, then trigger input MIDI note.")));
     addChildComponent(mapManualTip.get());
 
-    mapManualStatus.reset(new Label("Manual Mapping Status", "No key selected."));
+    mapManualStatus.reset(new Label("Manual Mapping Status", noKeySelectedTrans));
     addChildComponent(mapManualStatus.get());
+
+    mapManualCancel.reset(new TextButton("Manual Mapping Cancel", TRANS("Cancel key mapping.")));
+    addChildComponent(mapManualCancel.get());
+    mapManualCancel->setButtonText(juce::CharPointer_UTF8("\xc3\x97"));
+    mapManualCancel->addListener(this);
+    mapManualCancel->setSize(barHeight * 0.75f, barHeight * 0.75f);
 
     keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboard->addListener(pluginState->getMidiProcessor());
@@ -272,6 +278,7 @@ PluginControlComponent::~PluginControlComponent()
     mapManualTip = nullptr;
     mapManualStatus = nullptr;
     mapOrderEditBtn = nullptr;
+    mapManualCancel = nullptr;
     mapModeBox = nullptr;
     mapApplyBtn = nullptr;
     keyboard = nullptr;
@@ -405,6 +412,7 @@ void PluginControlComponent::resized()
 
         mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
         mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
+        mapManualCancel->setTopLeftPosition(mapManualStatus->getRight() + 4, mapManualStatus->getY() + mapManualCancel->getHeight() / 4);
 
         keyboardY = (keyboardY * 2) - gap;
     }
@@ -523,6 +531,10 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         showSettingsDialog();
     }
+    else if (buttonThatWasClicked == mapManualCancel.get())
+    {
+        mappingHelper->cancelKeyMap();
+    }
 }
 
 void PluginControlComponent::textEditorReturnKeyPressed(TextEditor& textEditor)
@@ -616,11 +628,15 @@ void PluginControlComponent::keyMappingStatusChanged(int keyNumber, bool prepare
 {
     if (preparedToMap)
     {
-        mapManualStatus->setText("Waiting for input to map to key " + String(keyNumber), dontSendNotification);
+        mapManualStatus->setText(waitingForTrans + String(keyNumber), sendNotification);
+
+        resized();
+        mapManualCancel->setVisible(true);
     }
     else
     {
-        mapManualStatus->setText("No key selected.", dontSendNotification);
+        mapManualStatus->setText(noKeySelectedTrans, sendNotification);
+        mapManualCancel->setVisible(false);
     }
 
     mapManualStatus->setBounds(mapManualStatus->getBounds().withWidth(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8));
@@ -628,8 +644,8 @@ void PluginControlComponent::keyMappingStatusChanged(int keyNumber, bool prepare
 
 void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
 {
-    mapManualStatus->setText("Key " + String(keyNumber) + " mapped to Midi Note " + String(midiNote), dontSendNotification);
-    mapManualStatus->setBounds(mapManualStatus->getBounds().withWidth(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8));
+    mapManualStatus->setText("Key " + String(keyNumber) + " mapped to MIDI Note " + String(midiNote), sendNotification);
+    mapManualCancel->setVisible(false);
     pluginState->setMidiInputMap(mappingHelper->getCurrentNoteMapping(), true);
 }
 
@@ -738,7 +754,6 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
 
         mappingHelper.reset(new MappingHelper(*pluginState->getMidiInputFilterMap()));
         mappingHelper->addListener(this);
-        DBG("UI: Listening to mapping helper");
 
         keyboard->setUIMode(VirtualKeyboard::UIMode::mapMode);
 
@@ -752,6 +767,7 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
     {
         mapManualTip->setVisible(false);
         mapManualStatus->setVisible(false);
+        mapManualCancel->setVisible(false);
 
         // TODO: make sure this doesn't conflict with color editing
         keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
@@ -760,7 +776,7 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
         {
             mappingHelper->removeListener(this);
             mappingHelper = nullptr;
-            DBG("UI: Mapping helper removed!");
+            mapManualStatus->setText(noKeySelectedTrans, sendNotification);
         }
     }
 
