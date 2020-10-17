@@ -13,7 +13,7 @@
 #include "../../JuceLibraryCode/JuceHeader.h"
 #include "NoteMap.h"
 
-class MappingHelper : public MidiKeyboardStateListener
+class MappingHelper
 {
     
 public:
@@ -55,10 +55,6 @@ protected:
 private:
 
     NoteMap noteMapping;
-    
-    // Will receive the actual MIDI note and connect it to the Virtual Keys waiting to be mapped.
-    void handleNoteOn(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity) override;
-    void handleNoteOff(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity) override;
     
     int virtualKeyToMap = -1;
     bool allPeriods = false;

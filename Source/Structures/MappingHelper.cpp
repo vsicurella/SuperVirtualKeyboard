@@ -103,13 +103,3 @@ Array<int> MappingHelper::getKeyInAllPeriods(int keyNumber, Mode* modeToReferenc
     
     return keyNumsOut;
 }
-
-void MappingHelper::handleNoteOn(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity)
-{
-    mapKeysToMidiNotes(midiNoteNumber, allPeriods);
-}
-
-void MappingHelper::handleNoteOff(MidiKeyboardState *source, int midiChannel, int midiNoteNumber, float velocity)
-{
-
-}
