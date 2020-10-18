@@ -128,7 +128,7 @@ void SvkPluginState::commitStateNode()
     pluginStateNode.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(presetNode, nullptr);
     presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(IDs::pianoNode), nullptr);
 
-    onModeUpdate();
+    onModeUpdate(false, false);
 
     pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiDeviceNode, nullptr);
 

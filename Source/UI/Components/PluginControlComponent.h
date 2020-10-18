@@ -115,11 +115,6 @@ public:
     */
     void onModeViewedChange(Mode* modeViewed);
 
-    /*
-        Sets the X position of the viewport
-    */
-    void setViewPosition(int xIn);
-
     int getModeSelectorViewed();
 
     void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
@@ -171,6 +166,8 @@ private:
 
     std::unique_ptr<SettingsContainer> settingsContainer;
 
+    ScrollBar* viewportScrollBar;
+
     ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
 
@@ -201,6 +198,8 @@ private:
         "by Layer: Notes from a layer in Mode 1 are mapped to a layer in Mode 2."
     );
 
+    float centerKeyPos = 60.5f;
+
     int defaultHeight = 210;
     int barHeight = 24;
     int gap = 8;
@@ -228,7 +227,7 @@ private:
     std::unique_ptr<TextButton> mapManualResetBtn;
     std::unique_ptr<TextButton> mapCopyToManualBtn;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
-    std::unique_ptr<Viewport> keyboardViewport;
+    std::unique_ptr<KeyboardViewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;
     std::unique_ptr<ImageButton> openButton;
     std::unique_ptr<ImageButton> settingsButton;

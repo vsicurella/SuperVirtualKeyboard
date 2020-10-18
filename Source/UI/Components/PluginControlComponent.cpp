@@ -169,11 +169,12 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboard->addListener(pluginState->getMidiProcessor());
 
-    keyboardViewport.reset (new Viewport("Keyboard Viewport"));
+    keyboardViewport.reset (new KeyboardViewport("Keyboard Viewport"));
     addAndMakeVisible (keyboardViewport.get());
     keyboardViewport->setName ("Keyboard Viewport");
     keyboardViewport->setViewedComponent(keyboard.get(), false);
-    keyboardViewport->getHorizontalScrollBar().addListener(this);
+    
+    viewportScrollBar = &keyboardViewport->getHorizontalScrollBar();
 
     saveButton.reset (new ImageButton ("Save Button"));
     addAndMakeVisible (saveButton.get());
@@ -236,13 +237,12 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     ValueTree pluginWindowNode = pluginState->getPluginEditorNode();
     int recallWidth = pluginWindowNode[IDs::windowBoundsW];
     int recallHeight = pluginWindowNode[IDs::windowBoundsH];
+    centerKeyPos = pluginWindowNode[IDs::viewportPosition];
 
     setSize(
         recallWidth > 0 ? recallWidth : 1000,
         recallHeight > 0 ? recallHeight : defaultHeight
     );
-
-    keyboardViewport->setViewPosition(pluginWindowNode[IDs::viewportPosition], 0);
 
     settingsIcon.reset(new Image(Image::PixelFormat::RGB, settingsButton->getWidth(), settingsButton->getHeight(), true));
     settingsButton->setImages(true, true, true, *settingsIcon.get(), 0.0f, Colour(), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *settingsIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
@@ -262,6 +262,8 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     };
 
     loadPresetNode(pluginState->getPresetNode());
+
+    viewportScrollBar->addListener(this);
 
     // Update keyboard to show external midi input
 #if (!JUCE_ANDROID && !JUCE_IOS)
@@ -356,6 +358,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
                 }
             }
         }
+
     }
 }
 
@@ -459,14 +462,15 @@ void PluginControlComponent::resized()
     mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
     mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
     
-    float scrollPosition = (float)pluginState->getPluginEditorNode()[IDs::viewportPosition] / keyboard->getWidth();
-    
+    viewportScrollBar->removeListener(this);
+
     keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(basicHeight - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(basicHeight / 28.0f);
     
-    int height = keyboardViewport->getMaximumVisibleHeight();
-    keyboard->setBounds(0, 0, keyboard->getPianoWidth(height), height);
-    keyboardViewport->setViewPosition(keyboard->getWidth() * scrollPosition, 0);
+    keyboard->setBounds(0, 0, keyboard->getPianoWidth(keyboardViewport->getMaximumVisibleHeight()), keyboardViewport->getMaximumVisibleHeight());
+    keyboardViewport->centerOnKey((int)centerKeyPos);
+
+    viewportScrollBar->addListener(this);
 
     pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr);
     pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsH, basicHeight, nullptr);
@@ -585,7 +589,8 @@ void PluginControlComponent::textEditorReturnKeyPressed(TextEditor& textEditor)
 
 void PluginControlComponent::scrollBarMoved(ScrollBar* bar, double newRangeStart)
 {
-    pluginState->getPluginEditorNode().setProperty(IDs::viewportPosition, keyboardViewport->getViewPositionX(), nullptr);
+    centerKeyPos = keyboardViewport->getCenterKeyProportion();
+    pluginState->getPluginEditorNode().setProperty(IDs::viewportPosition, centerKeyPos, nullptr);
 }
 
 void PluginControlComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -607,6 +612,7 @@ void PluginControlComponent::timerCallback()
 
 void PluginControlComponent::presetLoaded(ValueTree presetNodeIn)
 {
+    DBG("UI LOADING PRESET");
     loadPresetNode(presetNodeIn);
 }
 
@@ -745,12 +751,6 @@ ImageButton* PluginControlComponent::getSettingsButton()
 TextButton* PluginControlComponent::getModeInfoButton()
 {
     return modeInfoButton.get();
-}
-
-void PluginControlComponent::setViewPosition(int xIn)
-{
-    keyboardViewport->setViewPosition(xIn, 0);
-    getProperties().set(IDs::viewportPosition, xIn);
 }
 
 int PluginControlComponent::getModeSelectorViewed()
