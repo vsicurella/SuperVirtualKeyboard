@@ -17,7 +17,10 @@ NoteMap::NoteMap()
 
 NoteMap::NoteMap(int sizeIn, bool useIdentity, int nullValIn)
 {
-    size = sizeIn;
+    if (sizeIn > 0)
+        size = sizeIn;
+    else
+        size = 128;
 
     keys.clear();
     values.clear();
@@ -41,6 +44,20 @@ NoteMap::NoteMap(Array<int> valuesIn, int nullValIn)
     setValues(valuesIn);
 }
 
+NoteMap::NoteMap(ValueTree noteMappingNode)
+    : NoteMap(noteMappingNode[IDs::mappingSize], true, -1)
+{
+    for (auto child : noteMappingNode)
+    {
+        if (child.hasType(IDs::noteMapNode))
+        {
+            int key = child[IDs::pianoKeyNumber];
+            if (key < size)
+                setValue(key, child[IDs::midiNoteNumber]);
+        }
+    }
+}
+
 NoteMap::NoteMap(const NoteMap& mapToCopy)
 {
     size = mapToCopy.size;
@@ -55,6 +72,25 @@ NoteMap::NoteMap(const NoteMap& mapToCopy)
         values.add(mapToCopy.values.getUnchecked(i));
     }
 
+}
+
+ValueTree NoteMap::getAsValueTree(Identifier parentNodeId) const
+{
+    ValueTree node(parentNodeId);
+    node.setProperty(IDs::mappingSize, size, nullptr);
+
+    for (int i = 0; i < size; i++)
+    {
+        if (values[i] != i)
+        {
+            ValueTree value(IDs::noteMapNode);
+            value.setProperty(IDs::pianoKeyNumber, i, nullptr);
+            value.setProperty(IDs::midiNoteNumber, values[i], nullptr);
+            node.appendChild(value, nullptr);
+        }
+    }
+
+    return node;
 }
 
 void NoteMap::setValue(int keyNum, int valIn)
