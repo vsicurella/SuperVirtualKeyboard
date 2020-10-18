@@ -351,11 +351,10 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 
                 if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
                 {
-                    onModeViewedChange(mode);
+                    modeViewedChanged(mode, num, 0 /*unused*/);
                 }
             }
         }
-
     }
 }
 
