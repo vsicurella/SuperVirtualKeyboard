@@ -141,6 +141,8 @@ public:
 
     void beginColorEditing();
 
+    void endColorEditing();
+
     void beginManualMapping();
 
     //==============================================================================
