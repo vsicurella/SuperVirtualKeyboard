@@ -21,8 +21,11 @@ public:
     NoteMap();
     NoteMap(int sizeIn, bool useIdentity, int nullValIn = -1);
     NoteMap(Array<int> valuesIn, int nullValIn = -1);
+    NoteMap(ValueTree noteMappingNode);
     NoteMap(const NoteMap& mapToCopy);
     ~NoteMap() {}
+
+    ValueTree getAsValueTree(Identifier parentNodeId) const;
     
     void setValue(int keyNum, int valIn);
     void setValues(Array<int> valuesIn);
