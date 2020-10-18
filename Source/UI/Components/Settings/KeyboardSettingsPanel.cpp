@@ -1,17 +1,17 @@
 /*
   ==============================================================================
 
-    ViewSettingsPanel.cpp
+    KeyboardSettingsPanel.cpp
     Created: 13 Nov 2019 7:09:31pm
     Author:  Vincenzo Sicurella
 
   ==============================================================================
 */
 
-#include "ViewSettingsPanel.h"
+#include "KeyboardSettingsPanel.h"
 
-ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel("ViewSettingsPanel", pluginStateIn,
+KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
+    : SvkSettingsPanel("KeyboardSettingsPanel", pluginStateIn,
         {
             "Keyboard settings"
         },
@@ -72,11 +72,11 @@ ViewSettingsPanel::ViewSettingsPanel(SvkPluginState* pluginStateIn)
     showNoteNumbers->addListener(this);
 }
 
-ViewSettingsPanel::~ViewSettingsPanel()
+KeyboardSettingsPanel::~KeyboardSettingsPanel()
 {
 }
 
-void ViewSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
+void KeyboardSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
 {
     if (virtualKeyboard)
     {
@@ -93,7 +93,7 @@ void ViewSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
     }
 }
 
-void ViewSettingsPanel::sliderValueChanged(Slider* sliderChanged)
+void KeyboardSettingsPanel::sliderValueChanged(Slider* sliderChanged)
 {
     if (virtualKeyboard)
     {
@@ -105,7 +105,7 @@ void ViewSettingsPanel::sliderValueChanged(Slider* sliderChanged)
     }
 }
 
-void ViewSettingsPanel::buttonClicked(Button* clickedButton)
+void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
 {
     if (virtualKeyboard)
     {
@@ -116,7 +116,7 @@ void ViewSettingsPanel::buttonClicked(Button* clickedButton)
     }
 }
 
-void ViewSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
 {
     virtualKeyboard = keyboardPointer;
 

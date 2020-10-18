@@ -70,10 +70,10 @@
                   file="Source/UI/Components/Settings/GeneralSettingsPanel.cpp"/>
             <FILE id="TKlTxI" name="GeneralSettingsPanel.h" compile="0" resource="0"
                   file="Source/UI/Components/Settings/GeneralSettingsPanel.h"/>
-            <FILE id="MN6Ieh" name="ViewSettingsPanel.cpp" compile="1" resource="0"
-                  file="Source/UI/Components/Settings/ViewSettingsPanel.cpp"/>
-            <FILE id="picLqI" name="ViewSettingsPanel.h" compile="0" resource="0"
-                  file="Source/UI/Components/Settings/ViewSettingsPanel.h"/>
+            <FILE id="MN6Ieh" name="KeyboardSettingsPanel.cpp" compile="1" resource="0"
+                  file="Source/UI/Components/Settings/KeyboardSettingsPanel.cpp"/>
+            <FILE id="picLqI" name="KeyboardSettingsPanel.h" compile="0" resource="0"
+                  file="Source/UI/Components/Settings/KeyboardSettingsPanel.h"/>
             <FILE id="ov612C" name="SettingsContainer.h" compile="0" resource="0"
                   file="Source/UI/Components/Settings/SettingsContainer.h"/>
           </GROUP>

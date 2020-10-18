@@ -1,7 +1,7 @@
 /*
   ==============================================================================
 
-    ViewSettingsPanel.h
+    KeyboardSettingsPanel.h
     Created: 13 Nov 2019 7:09:31pm
     Author:  Vincenzo Sicurella
 
@@ -12,13 +12,13 @@
 
 #include "SvkSettingsPanel.h"
 
-class ViewSettingsPanel : public SvkSettingsPanel
+class KeyboardSettingsPanel : public SvkSettingsPanel
 {
     
 public:
     
-    ViewSettingsPanel(SvkPluginState*);
-    ~ViewSettingsPanel();
+    KeyboardSettingsPanel(SvkPluginState*);
+    ~KeyboardSettingsPanel();
 
     void comboBoxChanged(ComboBox*) override;
     void sliderValueChanged(Slider*) override;
@@ -38,5 +38,5 @@ private:
 
     TextButton* showNoteNumbers;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ViewSettingsPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KeyboardSettingsPanel)
 };
