@@ -11,55 +11,44 @@
 #pragma once
 
 #include "../../../../JuceLibraryCode/JuceHeader.h"
+#include "KeyboardComponent.h"
+
+using namespace VirtualKeyboard;
 
 class KeyboardViewport : public Viewport,
-                         private Button::Listener
+    private Button::Listener
 {
-    int stepSmall = 0;
-    int stepLarge = 0;
-
-    int buttonWidth = 16;
-    
-    int scrollingModeSelected = 1;
-    int scrollingStyleSelected = 1;
-    
-    std::unique_ptr<ImageButton> stepLeftSmall;
-    std::unique_ptr<ImageButton> stepLeftLarge;
-    std::unique_ptr<ImageButton> stepRightSmall;
-    std::unique_ptr<ImageButton> stepRightLarge;
-
-    // returns altitude
-    int drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness=1.0f);
-
-    void redrawButtons(int heightIn);
-    
 public:
-    
-    KeyboardViewport(const String &nameIn=String(), int scrollingModeIn=1, int scrollingStyleIn=1);
-    
+
+    KeyboardViewport(const String& nameIn = String(), int scrollingModeIn = 1, int scrollingStyleIn = 1);
+
+    void viewedComponentChanged(Component* newComponent) override;
+
     int getStepSmall();
     int getStepLarge();
-    
+
     int getButtonWidth();
     bool isShowingButtons();
-    
-    void setStepSmall(int smallSizeIn);
-    void setStepLarge(int largeSizeIn);
+
+    float getCenterKeyProportion() const;
 
     void setButtonWidth(int widthIn);
-    
+
     void setScrollingMode(int modeIdIn);
     void setScrollingStyle(int styleIdIn);
-    
+
     void stepSmallForward();
     void stepSmallBackward();
     void stepLargeForward();
     void stepLargeBackward();
-    
+
+    void centerOnKey(int keyNumberIn);
+    void centerOnKey(float keyNumberProportionIn);
+
     void resized() override;
 
     void buttonClicked(Button* button) override;
-    
+
     enum ScrollingMode
     {
         NoScrolling = 0,
@@ -67,7 +56,7 @@ public:
         Stepped,
         SmoothWithButtons
     };
-    
+
     enum ScrollingStyle
     {
         Hidden = 0,
@@ -75,4 +64,28 @@ public:
         KeyboardView,
         Dots
     };
+
+private:
+
+    // returns altitude
+    int drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness = 1.0f);
+
+    void redrawButtons(int heightIn);
+
+private:
+
+    int stepSmall = 0;
+    int stepLarge = 0;
+
+    int buttonWidth = 16;
+
+    int scrollingModeSelected = 1;
+    int scrollingStyleSelected = 1;
+
+    std::unique_ptr<ImageButton> stepLeftSmall;
+    std::unique_ptr<ImageButton> stepLeftLarge;
+    std::unique_ptr<ImageButton> stepRightSmall;
+    std::unique_ptr<ImageButton> stepRightLarge;
+
+    Keyboard* keyboard;
 };

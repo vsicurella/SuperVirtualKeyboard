@@ -726,12 +726,6 @@ Key* Keyboard::getKeyFromPosition(Point<int> posIn)
     return keyOut;
 }
 
-Key* Keyboard::getKeyFromPositionRelative(Point<int> posIn)
-{
-    //TODO
-    return nullptr;
-}
-
 Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
 {    
     Point<int> ep = Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY());
@@ -744,9 +738,14 @@ float Keyboard::getKeyVelocity(Key* keyIn, Point<int> posIn)
     return velocityFixed;
 }
 
-int Keyboard::getMidiChannelOut()
+int Keyboard::getMidiChannelOut() const
 {
     return midiChannelOut;
+}
+
+int Keyboard::getModeSize() const
+{
+    return mode->getModeSize();
 }
 
 //===============================================================================================
