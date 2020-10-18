@@ -13,7 +13,7 @@
 
 #include "GeneralSettingsPanel.h"
 #include "MidiSettingsPanel.h"
-#include "ViewSettingsPanel.h"
+#include "KeyboardSettingsPanel.h"
 #include "ColourSettingsPanel.h"
 //#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
@@ -48,8 +48,8 @@ public:
             else if (panelName == "Midi")
                 panels.add(new MidiSettingsPanel(pluginState));
 
-            else if (panelName == "View")
-                panels.add(new ViewSettingsPanel(pluginState));
+            else if (panelName == "Keyboard")
+                panels.add(new KeyboardSettingsPanel(pluginState));
 
             else if (panelName == "Colors")
                 panels.add(new ColourSettingsPanel(pluginState));
@@ -141,14 +141,14 @@ private:
     {
         "General"
         , "Midi"
-        , "View"
+        , "Keyboard"
         , "Colors"
 //#if JUCE_DEBUG
 //        , "Debug"
 //#endif
     };
 
-    StringArray keyboardPanels = { "View", "Colors", "Debug" };
+    StringArray keyboardPanels = { "Keyboard", "Colors", "Debug" };
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsContainer)
 };
