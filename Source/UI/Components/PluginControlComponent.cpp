@@ -349,6 +349,8 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
                     mode2Box->setText(mode->getName(), dontSendNotification);
                 }
 
+                updateRootNoteLabels();
+
                 if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
                 {
                     modeViewedChanged(mode, num, 0 /*unused*/);
@@ -434,7 +436,7 @@ void PluginControlComponent::resized()
         else
             mapCopyToManualBtn->setTopLeftPosition(mapOrderEditBtn->getPosition());
 
-        mapManualCancel->setTopLeftPosition(mapManualStatus->getRight() + gap, mapManualStatus->getY() + mapManualCancel->getHeight() / 4);
+        mapManualCancel->setTopLeftPosition(mapManualStatus->getRight() + gap / 2, mapManualStatus->getY() + mapManualCancel->getHeight() / 4);
 
         if (mapModeBox->getSelectedId() == 3)
         {
@@ -520,12 +522,12 @@ void PluginControlComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == mode1RootSld.get())
     {
         pluginState->setModeSelectorRoot(0, mode1RootSld->getValue());
-        mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
+        updateRootNoteLabels();
     }
     else if (sliderThatWasMoved == mode2RootSld.get())
     {
         pluginState->setModeSelectorRoot(1, mode2RootSld->getValue());
-        mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
+        updateRootNoteLabels();
     }
 }
 
@@ -577,6 +579,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         pluginState->setMidiInputMap(NoteMap(), true);
         beginManualMapping();
+        keyMappingStatusChanged(-1, false);
     }
 }
 
@@ -674,8 +677,6 @@ void PluginControlComponent::keyMappingStatusChanged(int keyNumber, bool prepare
     if (preparedToMap)
     {
         mapManualStatus->setText(waitingForTrans + String(keyNumber), sendNotification);
-
-        resized();
         mapManualCancel->setVisible(true);
     }
     else
@@ -684,7 +685,8 @@ void PluginControlComponent::keyMappingStatusChanged(int keyNumber, bool prepare
         mapManualCancel->setVisible(false);
     }
 
-    mapManualStatus->setBounds(mapManualStatus->getBounds().withWidth(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8));
+    mapManualStatus->setSize(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, mapManualStatus->getHeight());
+    resized();
 }
 
 void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
@@ -830,6 +832,14 @@ void PluginControlComponent::submitCustomScale()
 {
     pluginState->setModeCustom(scaleTextBox->getText());
 }
+
+void PluginControlComponent::updateRootNoteLabels()
+{
+    mode1RootLbl->setText(MidiMessage::getMidiNoteName(mode1RootSld->getValue(), true, true, 4), dontSendNotification);
+    mode2RootLbl->setText(MidiMessage::getMidiNoteName(mode2RootSld->getValue(), true, true, 4), dontSendNotification);
+}
+
+//==============================================================================
 
 void PluginControlComponent::showModeInfo()
 {

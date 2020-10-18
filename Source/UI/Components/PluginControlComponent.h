@@ -127,6 +127,10 @@ public:
 
     void submitCustomScale();
 
+    void updateRootNoteLabels();
+
+    //==============================================================================
+
     void showModeInfo();
 
     void showMapOrderEditDialog();
