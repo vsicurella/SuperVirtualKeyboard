@@ -464,12 +464,13 @@ void PluginControlComponent::resized()
     
     viewportScrollBar->removeListener(this);
 
-    keyboardViewport->setBounds(gap, keyboardY, getWidth() - gap * 2, jmax(basicHeight - keyboardY - gap, 1));
+    int keyboardAreaWidth = getWidth() - gap * 2;
+    keyboardViewport->setBounds(gap, keyboardY, keyboardAreaWidth, jmax(basicHeight - keyboardY - gap, 1));
     keyboardViewport->setScrollBarThickness(basicHeight / 28.0f);
     
     keyboard->setBounds(0, 0, keyboard->getPianoWidth(keyboardViewport->getMaximumVisibleHeight()), keyboardViewport->getMaximumVisibleHeight());
-    keyboardViewport->centerOnKey((int)centerKeyPos);
 
+    keyboardViewport->centerOnKey((int)centerKeyPos);
     viewportScrollBar->addListener(this);
 
     pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr);
@@ -835,15 +836,15 @@ void PluginControlComponent::submitCustomScale()
 
 void PluginControlComponent::showModeInfo()
 {
-    modeInfo = new ModeInfoDialog(pluginState->getModeViewed());
+    modeInfo  = new ModeInfoDialog(pluginState->getModeViewed());
     modeInfo->addChangeListener(this);
-    CallOutBox::launchAsynchronously(modeInfo, scaleTextBox->getScreenBounds(), nullptr);
+    CallOutBox::launchAsynchronously(std::unique_ptr<Component>(modeInfo), scaleTextBox->getScreenBounds(), nullptr);
 }
 
 void PluginControlComponent::showMapOrderEditDialog()
 {
     mapByOrderDialog = new MapByOrderDialog(pluginState->getModeMapper(), pluginState->getMode1(), pluginState->getMode2());
-    CallOutBox::launchAsynchronously(mapByOrderDialog, mapStyleBox->getScreenBounds(), nullptr);
+    CallOutBox::launchAsynchronously(std::unique_ptr<Component>(mapByOrderDialog), mapStyleBox->getScreenBounds(), nullptr);
 }
 
 void PluginControlComponent::showSettingsDialog()
