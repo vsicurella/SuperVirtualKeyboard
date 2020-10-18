@@ -32,6 +32,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mode1Box->setJustificationType (Justification::centredLeft);
     mode1Box->setTextWhenNothingSelected (String());
     mode1Box->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    mode1Box->setTooltip(inputModeTooltip);
     mode1Box->addListener (this);
 
     mode2Box.reset (new ReferencedComboBox ("Mode2 Box"));
@@ -40,6 +41,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mode2Box->setJustificationType (Justification::centredLeft);
     mode2Box->setTextWhenNothingSelected (String());
     mode2Box->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    mode2Box->setTooltip(outputModeTooltip);
     mode2Box->addListener (this);
 
     mode1RootSld.reset (new Slider ("Mode1 Root Slider"));
@@ -106,6 +108,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapStyleBox->addItem (TRANS("Mode To Mode"), 1);
     mapStyleBox->addItem (TRANS("Scale To Mode"), 2);
     mapStyleBox->addItem (TRANS("By Key Layers"), 3);
+    mapStyleBox->setTooltip(mapStyleTooltip);
     mapStyleBox->addListener (this);
 
     mapStyleLbl.reset (new Label ("Mapping Style Label",
@@ -117,9 +120,9 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapStyleLbl->setColour (TextEditor::textColourId, Colours::black);
     mapStyleLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button"));
+    mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button", TRANS("Set layer mappings")));
     addChildComponent(mapOrderEditBtn.get());
-    mapOrderEditBtn->setButtonText (TRANS("Edit Mapping"));
+    mapOrderEditBtn->setButtonText (TRANS("Layers"));
     mapOrderEditBtn->addListener (this);
 
     mapModeBox.reset (new ComboBox ("Mapping Mode Box"));
@@ -131,12 +134,19 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     mapModeBox->addItem (TRANS("Mapping Off"), 1);
     mapModeBox->addItem (TRANS("Auto Map"), 2);
     mapModeBox->addItem (TRANS("Manual Map"), 3);
+    mapModeBox->setTooltip(mapModeTooltip);
     mapModeBox->addListener (this);
 
     mapApplyBtn.reset (new TextButton ("Apply Layer Map Button"));
     addChildComponent (mapApplyBtn.get());
     mapApplyBtn->setButtonText (TRANS("Apply"));
     mapApplyBtn->addListener (this);
+
+    mapCopyToManualBtn.reset(new TextButton("Copy Mapping to Manual Button", TRANS("Edit this mapping in Manual mode.")));
+    addChildComponent(mapCopyToManualBtn.get());
+    mapCopyToManualBtn->setButtonText(TRANS("Edit"));
+    mapCopyToManualBtn->setSize(40, barHeight);
+    mapCopyToManualBtn->addListener(this);
 
     mapManualTip.reset(new Label("Manual Mapping Tip", TRANS("Right-click output key, then trigger input MIDI note.")));
     addChildComponent(mapManualTip.get());
@@ -241,7 +251,8 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
         mode1RootSld.get(),
         mode1Box.get(),
         mode1ViewBtn.get(),
-        mode2ViewBtn.get()
+        mode2ViewBtn.get(),
+        mapCopyToManualBtn.get()
     };
 
     loadPresetNode(pluginState->getPresetNode());
@@ -410,9 +421,15 @@ void PluginControlComponent::resized()
         mapManualTip->setBounds(mapStyleLbl->getX(), mapStyleLbl->getY(), mapManualTip->getFont().getStringWidth(mapManualTip->getText()), barHeight);
         mapManualStatus->setBounds(mapManualTip->getRight(), mapManualTip->getY(), mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, barHeight);
 
-        mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 96, barHeight);
+        mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 55, barHeight);
         mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
-        mapManualCancel->setTopLeftPosition(mapManualStatus->getRight() + 4, mapManualStatus->getY() + mapManualCancel->getHeight() / 4);
+
+        if (mapApplyBtn->isVisible())
+            mapCopyToManualBtn->setTopLeftPosition(mapApplyBtn->getRight() + gap, mapApplyBtn->getY());
+        else
+            mapCopyToManualBtn->setTopLeftPosition(mapOrderEditBtn->getPosition());
+
+        mapManualCancel->setTopLeftPosition(mapManualStatus->getRight() + gap, mapManualStatus->getY() + mapManualCancel->getHeight() / 4);
 
         keyboardY = (keyboardY * 2) - gap;
     }
@@ -510,6 +527,11 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         pluginState->setModeSelectorViewed(mode2ViewBtn->getToggleState());
         scaleTextBox->setText(pluginState->getModeViewed()->getStepsString(), false);
+    }
+    else if (buttonThatWasClicked == mapCopyToManualBtn.get())
+    {
+        pluginState->setMidiInputMap(*pluginState->getMidiInputFilterMap(), true);
+        mapModeBox->setSelectedId(3, sendNotification);
     }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
@@ -748,6 +770,7 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
     {
         mapStyleBox->setVisible(false);
         mapStyleLbl->setVisible(false);
+        mapCopyToManualBtn->setVisible(false);
 
         mapManualTip->setVisible(true);
         mapManualStatus->setVisible(true);
@@ -797,6 +820,8 @@ void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify
         mapOrderEditBtn->setVisible(false);
         mapApplyBtn->setVisible(false);
     }
+
+    resized();
 }
 
 void PluginControlComponent::submitCustomScale()

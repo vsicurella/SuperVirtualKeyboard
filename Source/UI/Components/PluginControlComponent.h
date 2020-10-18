@@ -183,6 +183,22 @@ private:
     String noKeySelectedTrans = TRANS("No key selected.");
     String waitingForTrans = TRANS("Waiting for input to map to key ");
 
+    String inputModeTooltip = TRANS("The input scale that represents your physical keyboard or DAW piano roll.");
+    String outputModeTooltip = TRANS("The output scale that you want to play or reference.");
+
+    String mapModeTooltip = TRANS(
+        "Maps MIDI note input to notes in the selected scale (Mode 2).\n"
+        "Auto Map: automatically maps notes based on Mode 1 and Mode 2.\n"
+        "Manual: create a custom mapping by clicking notes on the virtual keyboard."
+    );
+
+    String mapStyleTooltip = TRANS(
+        "The way notes are mapped from the input to output.\n"
+        "Mode To Mode: natural notes from Mode 1 are mapped to natural Notes in Mode 2.\n"
+        "Scale To Mode: each note from Mode 1 is mapped to natural notes in Mode 2.\n"
+        "by Layer: Notes from a layer in Mode 1 are mapped to a layer in Mode 2."
+    );
+
     int defaultHeight = 210;
     int barHeight = 24;
     int gap = 8;
@@ -207,7 +223,7 @@ private:
     std::unique_ptr<Label> mapManualTip;
     std::unique_ptr<Label> mapManualStatus;
     std::unique_ptr<TextButton> mapManualCancel;
-    std::unique_ptr<Button> mapManualRepeatButton;
+    std::unique_ptr<TextButton> mapCopyToManualBtn;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<Viewport> keyboardViewport;
     std::unique_ptr<ImageButton> saveButton;

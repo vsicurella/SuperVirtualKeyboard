@@ -5,7 +5,7 @@
     Created: 6 Sep 2020 4:43:16pm
     Author:  Vincenzo
 
-    A container for a component that allows a label to be attached a certain way.
+    A container for a component that allows a offsetLabel to be attached a certain way.
 
   ==============================================================================
 */
@@ -88,7 +88,7 @@ public:
         //    float heightRatio = getHeight() / expectedHeight;
 
         //    componentReference.setSize(componentReference.getWidth() * widthRatio, componentReference.getHeight() * heightRatio);
-        //    label->setSize(label->getWidth() * widthRatio, label->getHeight() * heightRatio);
+        //    offsetLabel->setSize(offsetLabel->getWidth() * widthRatio, offsetLabel->getHeight() * heightRatio);
         //}
 
         int labelX = 0, labelY = 0, compX = 0, compY = 0;
