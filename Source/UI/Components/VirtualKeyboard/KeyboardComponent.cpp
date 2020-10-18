@@ -228,7 +228,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
 {
     Key* key = getKeyFromPositionMouseEvent(e);
 
-    if (uiModeSelected == UIMode::playMode)
+    if (uiModeSelected != UIMode::editMode)
     {
         if (key)
         {
@@ -236,7 +236,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
         }
     }
 
-    else if (uiModeSelected == UIMode::editMode)
+    else
     {
         if (key)
         {
@@ -252,7 +252,7 @@ void Keyboard::mouseMove(const MouseEvent& e)
 
 void Keyboard::mouseExit(const MouseEvent& e)
 {
-    if (uiModeSelected == UIMode::playMode)
+    if (uiModeSelected != UIMode::editMode)
     {
         int touchIndex = e.source.getIndex();
         if (keysByMouseTouch[touchIndex] > 0)
@@ -472,7 +472,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     if (KeyPress::isKeyCurrentlyDown(KeyPress::upKey) && !upHeld)
     {
         upHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             if (shiftHeld && keysOn.size() > 0)
             {
@@ -486,7 +486,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     if (KeyPress::isKeyCurrentlyDown(KeyPress::downKey) && !downHeld)
     {
         downHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             if (shiftHeld && keysOn.size() > 0)
             {
@@ -500,7 +500,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     if (KeyPress::isKeyCurrentlyDown(KeyPress::leftKey) && !leftHeld)
     {
         leftHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             if (shiftHeld && keysOn.size() > 0)
             {
@@ -513,7 +513,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     if (KeyPress::isKeyCurrentlyDown(KeyPress::rightKey) && !rightHeld)
     {
         rightHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             if (shiftHeld && keysOn.size() > 0)
             {
@@ -526,7 +526,7 @@ bool Keyboard::keyPressed(const KeyPress& key)
     if (KeyPress::isKeyCurrentlyDown(KeyPress::spaceKey) && !spaceHeld)
     {
         spaceHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             if (shiftHeld && keysOn.size() > 0)
             {
@@ -541,7 +541,6 @@ bool Keyboard::keyPressed(const KeyPress& key)
 
 void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 {
-
     if (!rightMouseHeld && modifiers.isRightButtonDown())
     {
         rightMouseHeld = true;
@@ -560,7 +559,7 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
     {
         shiftHeld = false;
 
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             isolateLastNote();
 
@@ -575,7 +574,7 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
     if (!altHeld && modifiers.isAltDown())
     {
         altHeld = true;
-        if (uiModeSelected == UIMode::playMode)
+        if (uiModeSelected != UIMode::editMode)
         {
             isolateLastNote();
             repaint();
