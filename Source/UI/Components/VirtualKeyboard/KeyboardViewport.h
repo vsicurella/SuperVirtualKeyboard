@@ -20,9 +20,11 @@ class KeyboardViewport : public Viewport,
 {
 public:
 
-    KeyboardViewport(const String& nameIn = String(), int scrollingModeIn = 1, int scrollingStyleIn = 1);
+    KeyboardViewport(VirtualKeyboard::Keyboard* keyboardIn, const String& nameIn = String(), int scrollingModeIn = 1, int scrollingStyleIn = 1);
 
-    void viewedComponentChanged(Component* newComponent) override;
+    void viewedComponentChanged(Component*) override;
+
+    void visibleAreaChanged(const Rectangle<int>&) override;
 
     int getStepSmall();
     int getStepLarge();
@@ -44,6 +46,8 @@ public:
 
     void centerOnKey(int keyNumberIn);
     void centerOnKey(float keyNumberProportionIn);
+
+    void resizeKeyboard();
 
     void resized() override;
 

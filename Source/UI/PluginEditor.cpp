@@ -45,7 +45,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         controlComponent->showSettingsDialog();
 
     setSize(controlComponent->getWidth(), controlComponent->getHeight());
-    setResizeLimits(750, 100, 10e4, 10e4);
+    setResizeLimits(defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
+    
+    pluginEditorNode.addListener(this);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -66,6 +68,23 @@ void SvkPluginEditor::resized()
 }
 
 //==============================================================================
+
+void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifier& property)
+{
+    if (parent == pluginEditorNode && property == IDs::windowBoundsH)
+    {
+        VirtualKeyboard::Keyboard* keyboard = controlComponent->getKeyboard();
+        Viewport* viewport = controlComponent->getViewport();
+
+        setResizeLimits(
+            defaultMinWidth,
+            getHeight() - keyboard->getHeight() + 100 + viewport->getScrollBarThickness() + 1,
+            controlComponent->getViewport()->getX() * 2 + keyboard->getWidth(),
+            defaultMaxHeight
+        );
+    }
+}
+
 
 // Would like to turn these command descriptions into tooltips...or something
 

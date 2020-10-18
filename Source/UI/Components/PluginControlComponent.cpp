@@ -169,11 +169,8 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboard->addListener(pluginState->getMidiProcessor());
 
-    keyboardViewport.reset (new KeyboardViewport("Keyboard Viewport"));
-    addAndMakeVisible (keyboardViewport.get());
-    keyboardViewport->setName ("Keyboard Viewport");
-    keyboardViewport->setViewedComponent(keyboard.get(), false);
-    
+    keyboardViewport.reset (new KeyboardViewport(keyboard.get(), "Keyboard Viewport"));
+    addAndMakeVisible (keyboardViewport.get());    
     viewportScrollBar = &keyboardViewport->getHorizontalScrollBar();
 
     saveButton.reset (new ImageButton ("Save Button"));
@@ -464,12 +461,13 @@ void PluginControlComponent::resized()
     
     viewportScrollBar->removeListener(this);
 
-    int keyboardAreaWidth = getWidth() - gap * 2;
-    keyboardViewport->setBounds(gap, keyboardY, keyboardAreaWidth, jmax(basicHeight - keyboardY - gap, 1));
-    keyboardViewport->setScrollBarThickness(basicHeight / 28.0f);
-    
-    keyboard->setBounds(0, 0, keyboard->getPianoWidth(keyboardViewport->getMaximumVisibleHeight()), keyboardViewport->getMaximumVisibleHeight());
+    int scrollBarThickness = basicHeight / 28;
+    int keyboardViewWidth = getWidth() - gap * 2;
+    int keyboardViewHeight = jmax(basicHeight - keyboardY - gap, 1);
 
+    keyboardViewport->setBounds(gap, keyboardY, keyboardViewWidth, keyboardViewHeight);
+    keyboardViewport->setScrollBarThickness(scrollBarThickness);
+    keyboardViewport->resizeKeyboard();
     keyboardViewport->centerOnKey((int)centerKeyPos);
     viewportScrollBar->addListener(this);
 
