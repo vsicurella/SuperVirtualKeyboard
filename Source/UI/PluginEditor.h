@@ -15,7 +15,7 @@
 #include "../PluginProcessor.h"
 #include "Components/PluginControlComponent.h"
 
-class SvkPluginEditor : public AudioProcessorEditor
+class SvkPluginEditor : public AudioProcessorEditor, protected ValueTree::Listener
 {
 public:
     SvkPluginEditor (SvkAudioProcessor&);
@@ -24,12 +24,22 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
+protected:
+
+    void valueTreePropertyChanged(ValueTree&, const Identifier&) override;
+
+
 private:
     SvkAudioProcessor& processor;
     SvkPluginState* pluginState;
     ValueTree pluginEditorNode;
 
     std::unique_ptr<PluginControlComponent> controlComponent;
+
+    int defaultMinWidth = 750;
+    int defaultMinHeight = 100;
+    int defaultMaxWidth = 10e4;
+    int defaultMaxHeight = 10e4;
 
     TooltipWindow tooltip;
 
