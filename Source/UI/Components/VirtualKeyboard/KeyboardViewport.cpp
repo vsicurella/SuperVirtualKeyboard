@@ -33,6 +33,11 @@ KeyboardViewport::KeyboardViewport(const String& nameIn, int scrollingModeIn, in
     setScrollingStyle(scrollingStyleIn);
 }
 
+void KeyboardViewport::viewedComponentChanged(Component* newComponent)
+{
+    keyboard = dynamic_cast<Keyboard*>(newComponent);
+}
+
 int KeyboardViewport::getStepSmall()
 {
     return stepSmall;
@@ -56,14 +61,17 @@ bool KeyboardViewport::isShowingButtons()
     return scrollingModeSelected > 1;
 }
 
-void KeyboardViewport::setStepSmall(int smallSizeIn)
+float KeyboardViewport::getCenterKeyProportion() const
 {
-    stepSmall = smallSizeIn;
-}
+    if (keyboard)
+    {
+        int center = getViewPositionX() + getMaximumVisibleWidth() / 2;
+        Key* key = keyboard->getKeyFromPosition({ center, 0 });
+        if (key)
+            return key->keyNumber + (center % key->getWidth()) / (float)key->getWidth();
+    }
 
-void KeyboardViewport::setStepLarge(int largeSizeIn)
-{
-    stepLarge = largeSizeIn;
+    return -1;
 }
 
 void KeyboardViewport::setButtonWidth(int widthIn)
@@ -115,6 +123,33 @@ void KeyboardViewport::stepLargeForward()
 void KeyboardViewport::stepLargeBackward()
 {
     Viewport::setViewPosition(getViewPositionX() - stepLarge, getViewPositionY());
+}
+
+void KeyboardViewport::centerOnKey(int keyNumberIn)
+{
+    if (keyboard)
+    {
+        Key* key = keyboard->getKey(keyNumberIn);
+        if (key)
+        {
+            int position = key->getBoundsInParent().getX() - getMaximumVisibleWidth() / 2;
+            Viewport::setViewPosition(position, getViewPositionY());
+        }
+    }
+}
+
+void KeyboardViewport::centerOnKey(float keyNumberProportionIn)
+{
+    if (keyboard)
+    {
+        Key* key = keyboard->getKey((int)keyNumberProportionIn);
+        if (key)
+        {
+            int proportion = (keyNumberProportionIn - (int)keyNumberProportionIn) * key->getWidth();
+            int position = key->getBoundsInParent().getX() + proportion - getMaximumVisibleWidth() / 2;
+            Viewport::setViewPosition(position, getViewPositionY());
+        }
+    }
 }
 
 int KeyboardViewport::drawAngleBracket(Graphics& g, bool isRightPointing, int sideLength, int xCenter, int yCenter, float thickness)
@@ -214,6 +249,12 @@ void KeyboardViewport::redrawButtons(int heightIn)
 void KeyboardViewport::resized()
 {
     Viewport::resized();
+
+    if (keyboard)
+    {
+        stepSmall = keyboard->getWidth() / keyboard->getKeysByOrder(0).size();
+        stepLarge = stepSmall * keyboard->getModeSize();
+    }
     
     // draw step buttons
     if (scrollingModeSelected > 1)
@@ -225,9 +266,6 @@ void KeyboardViewport::resized()
         stepRightSmall->setBounds(0, halfHeight, buttonWidth, halfHeight);
         stepLeftLarge->setBounds(getWidth() - buttonWidth, 0, buttonWidth, halfHeight);
         stepLeftSmall->setBounds(getWidth() - buttonWidth, halfHeight, buttonWidth, halfHeight);
-        
-        if (getViewedComponent())
-            getViewedComponent()->setTopLeftPosition(buttonWidth, 0);
     }
 }
 

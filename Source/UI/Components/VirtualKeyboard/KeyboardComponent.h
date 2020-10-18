@@ -21,7 +21,6 @@
 #include "../../../Structures/MappingHelper.h"
 #include "VirtualKeyboardKey.h"
 #include "VirtualKeyboardGrid.h"
-#include "KeyboardViewport.h"
 #include "VirtualKeyboardGraphics.h"
 
 #include <iostream>     
@@ -168,11 +167,6 @@ namespace VirtualKeyboard
             Returns the key which holds the given point relative to the top left corner of the component.
         */
         Key* getKeyFromPosition(Point<int> posIn);
-        
-        /*
-            Returns the key which holds the given point relative to the top left corner of the viewport.
-        */
-        Key* getKeyFromPositionRelative(Point<int> posIn);
 
         /*
             Returns the key which holds the given MouseEvent point relative to the top left corner of the component.
@@ -187,7 +181,12 @@ namespace VirtualKeyboard
         /*
             Returns the Midi Channel the keyboard is sending output on.
         */
-        int getMidiChannelOut();
+        int getMidiChannelOut() const;
+
+        /*
+            Returns the current mode size
+        */
+        int getModeSize() const;
         
         //===============================================================================================
 
@@ -586,6 +585,8 @@ namespace VirtualKeyboard
         int numOrder0Keys = 128;
         int pianoWidth;
         int minWindowHeight;
+
+        int modeSize;
 
         Array<Array<int>> keysOrder;
         Array<Array<int>> keysScaleDegree;
