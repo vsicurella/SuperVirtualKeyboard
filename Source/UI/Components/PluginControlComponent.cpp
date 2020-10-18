@@ -662,11 +662,9 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
         // TODO clean up
         beginColorEditing();
     }
-
     else if (isColorEditing)
     {
-        isColorEditing = false;
-        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+        endColorEditing();
     }
 
     pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
@@ -865,11 +863,18 @@ void PluginControlComponent::showSettingsDialog()
 
         settingsPanelOpen = true;
         pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
-        DBG("SETTINGS OPEN: " + pluginState->getPluginEditorNode().toXmlString());
         settingsButton->setToggleState(true, dontSendNotification);
 
         addAndMakeVisible(settingsContainer.get());
         getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
+        
+        int setToTab = 0;
+        String lastTab = pluginState->getPluginEditorNode()[IDs::settingsTabName].toString();
+        DBG("Last tab: " + lastTab);
+        if (lastTab.length() > 0)
+            setToTab = settingsContainer->getTabNames().indexOf(lastTab);
+
+        settingsContainer->setCurrentTabIndex(setToTab, false);
     }
     else
     {
@@ -887,12 +892,8 @@ void PluginControlComponent::hideSettings()
     settingsPanelOpen = false;
     pluginState->getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
 
-    // TODO clean up
     if (isColorEditing)
-    {
-        isColorEditing = false;
-        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
-    }
+        endColorEditing();
 
     getParentComponent()->setSize(getWidth(), getHeight() - defaultHeight);
 }
@@ -901,6 +902,29 @@ void PluginControlComponent::beginColorEditing()
 {
     keyboard->setUIMode(VirtualKeyboard::UIMode::editMode);
     isColorEditing = true;
+    
+    keyMappingStatusChanged(-1, false);
+    mapModeBox->setEnabled(false);
+    mapStyleBox->setEnabled(false);
+    mapManualResetBtn->setEnabled(false);
+    mapOrderEditBtn->setEnabled(false);
+    mapApplyBtn->setEnabled(false);
+    mapCopyToManualBtn->setEnabled(false);
+}
+
+void PluginControlComponent::endColorEditing()
+{
+    keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+    isColorEditing = false;
+
+    mapModeBox->setEnabled(true);
+    mapStyleBox->setEnabled(true);
+    mapManualResetBtn->setEnabled(true);
+    mapOrderEditBtn->setEnabled(true);
+    mapApplyBtn->setEnabled(true);
+    mapCopyToManualBtn->setEnabled(true);
+
+    setMappingMode(mapModeBox->getSelectedId());
 }
 
 void PluginControlComponent::beginManualMapping()
