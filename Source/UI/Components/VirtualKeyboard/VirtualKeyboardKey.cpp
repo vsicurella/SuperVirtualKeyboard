@@ -118,7 +118,10 @@ void Key::paint(Graphics& g)
         else if (isMouseOver())
             contrast = 0.25f;
         
-        colorToUse = color.contrasting(contrast);
+        if (exPressed)
+            colorToUse = exInputColor;
+        else
+            colorToUse = color.contrasting(contrast);
 
         if (colorToUse.getPerceivedBrightness() < 0.6667f)
             g.setColour(colorToUse.contrasting(0.333f));

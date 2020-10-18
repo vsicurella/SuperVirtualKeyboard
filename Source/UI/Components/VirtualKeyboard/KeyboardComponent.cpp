@@ -1473,8 +1473,8 @@ void Keyboard::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midi
 
     key->exInputColor = keyOnColour;
     key->isDirty = true;
+
     hasDirtyKeys = true;
-    
 }
 
 void Keyboard::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNote, float velocity)
