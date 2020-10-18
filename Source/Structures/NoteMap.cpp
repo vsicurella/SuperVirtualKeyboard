@@ -53,7 +53,7 @@ NoteMap::NoteMap(ValueTree noteMappingNode)
         {
             int key = child[IDs::pianoKeyNumber];
             if (key < size)
-                setValue(key, child[IDs::midiNoteNumber]);
+                setValue(key, child[IDs::mappingMidiNoteNumber]);
         }
     }
 }
@@ -85,7 +85,7 @@ ValueTree NoteMap::getAsValueTree(Identifier parentNodeId) const
         {
             ValueTree value(IDs::noteMapNode);
             value.setProperty(IDs::pianoKeyNumber, i, nullptr);
-            value.setProperty(IDs::midiNoteNumber, values[i], nullptr);
+            value.setProperty(IDs::mappingMidiNoteNumber, values[i], nullptr);
             node.appendChild(value, nullptr);
         }
     }
