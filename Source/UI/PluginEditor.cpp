@@ -33,7 +33,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         pluginEditorNode = ValueTree(IDs::pluginEditorNode);
         pluginEditorNode.setProperty(IDs::windowBoundsW, 1000, nullptr);
         pluginEditorNode.setProperty(IDs::windowBoundsH, 210, nullptr);
-        pluginEditorNode.setProperty(IDs::viewportPosition, 250, nullptr);
+        pluginEditorNode.setProperty(IDs::viewportPosition, 0.25f, nullptr);
         pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
         pluginState->pluginStateNode.appendChild(pluginEditorNode, nullptr);
     }
