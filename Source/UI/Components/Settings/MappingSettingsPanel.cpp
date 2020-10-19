@@ -14,14 +14,17 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
     : SvkSettingsPanel(
         "MappingSettings", pluginStateIn,
         {
-            "Current Mapping"
+            "Current Mapping",
+            ""
             //"Advanced Mapping"
         },
         {
-            IDs::noteMapNode
+            IDs::noteMapNode,
+            Identifier("Message")
         },
         {
-            SvkControlProperties(ControlTypeNames::GenericControl, "Current Mapping", false, 0)
+            SvkControlProperties(ControlTypeNames::GenericControl, "Current Mapping", false, 0),
+            SvkControlProperties(ControlTypeNames::GenericControl, "New features message", false, 1)
             //SvkControlProperties(ControlTypeNames::GenericControl, "Advanced Mapping Note", false, 1)
         }
     )
@@ -29,10 +32,13 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
     noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
     controls.set(0, noteMapEditor, true);
     addAndMakeVisible(noteMapEditor);
-
     noteMapEditor->addListener(this);
-
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
+
+    Label* msg = new Label("Message", "More mapping features on the way :)");
+    controls.set(1, msg, true);
+    addAndMakeVisible(msg);
+    getSectionFlexBox(1)->items.getReference(0).associatedComponent = msg;
 
     flexParent.items.getReference(0).maxWidth = 400;
 }
