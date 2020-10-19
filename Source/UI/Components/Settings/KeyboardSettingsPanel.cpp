@@ -25,7 +25,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
             SvkControlProperties(ControlTypeNames::MenuControl, "Key Layout Style", true),
             SvkControlProperties(ControlTypeNames::MenuControl, "Key Highlight Style", true),
             SvkControlProperties(ControlTypeNames::SliderControl, "Key Proportion", true),
-            SvkControlProperties(ControlTypeNames::ToggleControl, "Show MIDI Note Numbers")
+            SvkControlProperties(ControlTypeNames::ToggleControl, "Show Key Numbers")
         }
     )
 {
