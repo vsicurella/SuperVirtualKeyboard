@@ -9,11 +9,9 @@
 */
 
 #pragma once
+#include "MappingEditorBase.h"
 
-#include "../../JuceLibraryCode/JuceHeader.h"
-#include "NoteMap.h"
-
-class MappingHelper
+class MappingHelper : public MappingEditor
 {
     
 public:
@@ -21,36 +19,26 @@ public:
     MappingHelper(NoteMap mappingIn = NoteMap());
     ~MappingHelper();
 
-    NoteMap getCurrentNoteMapping() const;
-    
+    //================================================================
+
+    // MappingEditor implementation
+
+    NoteMap getCurrentNoteMapping() const override;
+
+    void mapMidiNoteToKey(int midiNoteIn, int keyNumberOut) override;
+
+    //================================================================
+
     bool isWaitingForKeyInput();
     int getVirtualKeyToMap();
     bool isMappingAllPeriods();
     
     void prepareKeyToMap(int virtualKeyClicked, bool allPeriodsIn);
-    void mapKeysToMidiNotes(int midiNoteTriggered, bool mapAllPeriods, Mode* modeFrom = nullptr, Mode* modeTo = nullptr);
+    void mapPreparedKeyToNote(int midiNoteTriggered, bool mapAllPeriods, Mode* modeFrom = nullptr, Mode* modeTo = nullptr);
     void cancelKeyMap();
+
     
     Array<int> getKeyInAllPeriods(int keyNumber, Mode* modeToReference);
-
-public:
-
-    class Listener
-    {
-    public:
-
-        virtual void keyMappingStatusChanged(int keyNumber, bool preparedToMap) = 0;
-
-        virtual void keyMapConfirmed(int keyNumber, int midiNote) = 0;
-    };
-
-    void addListener(Listener* listenerIn) { listeners.add(listenerIn); }
-
-    void removeListener(Listener* listenerIn) { listeners.remove(listenerIn); }
-
-protected:
-
-    ListenerList<Listener> listeners;
     
 private:
 

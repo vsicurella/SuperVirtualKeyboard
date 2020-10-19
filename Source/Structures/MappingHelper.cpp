@@ -23,10 +23,20 @@ MappingHelper::~MappingHelper()
 
 }
 
+//================================================================
+
 NoteMap MappingHelper::getCurrentNoteMapping() const
 {
     return noteMapping;
 }
+
+void MappingHelper::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
+{
+    noteMapping.setValue(midiNoteIn, keyNumberOut);
+    listeners.call(&Listener::mappingChanged, noteMapping);
+}
+
+//================================================================
 
 bool MappingHelper::isWaitingForKeyInput()
 {
@@ -54,7 +64,7 @@ void MappingHelper::prepareKeyToMap(int virtualKeyClicked, bool allPeriodsIn)
     listeners.call(&Listener::keyMappingStatusChanged, virtualKeyToMap, true);
 }
 
-void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods, Mode* modeFrom, Mode* modeTo)
+void MappingHelper::mapPreparedKeyToNote(int midiNoteTriggered, bool allPeriods, Mode* modeFrom, Mode* modeTo)
 {
     if (waitingForKeyInput)
     {
@@ -62,11 +72,13 @@ void MappingHelper::mapKeysToMidiNotes(int midiNoteTriggered, bool allPeriods, M
         {
             Array<int> triggeredPeriods = getKeyInAllPeriods(midiNoteTriggered, modeFrom);
             Array<int> virtualKeyPeriods = getKeyInAllPeriods(virtualKeyToMap, modeTo);
+
+            // TODO
         }
         
         else
         {
-            noteMapping.setValue(midiNoteTriggered, virtualKeyToMap);
+            mapMidiNoteToKey(midiNoteTriggered, virtualKeyToMap);
         }
         
         DBG("Midi Note " + String(midiNoteTriggered) + " is now mapped to " + String(noteMapping.getValue(midiNoteTriggered)));
@@ -82,7 +94,6 @@ void MappingHelper::cancelKeyMap()
     virtualKeyToMap = -1;
     DBG("Key map cancelled.");
 }
-
 
 Array<int> MappingHelper::getKeyInAllPeriods(int keyNumber, Mode* modeToReference)
 {
