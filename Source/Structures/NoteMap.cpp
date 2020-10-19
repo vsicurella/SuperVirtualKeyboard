@@ -51,9 +51,9 @@ NoteMap::NoteMap(ValueTree noteMappingNode)
     {
         if (child.hasType(IDs::noteMapNode))
         {
-            int key = child[IDs::pianoKeyNumber];
+            int key = child[IDs::mappingMidiNoteIn];
             if (key < size)
-                setValue(key, child[IDs::mappingMidiNoteNumber]);
+                setValue(key, child[IDs::pianoKeyNumber]);
         }
     }
 }
@@ -74,18 +74,18 @@ NoteMap::NoteMap(const NoteMap& mapToCopy)
 
 }
 
-ValueTree NoteMap::getAsValueTree(Identifier parentNodeId) const
+ValueTree NoteMap::getAsValueTree(Identifier parentNodeId, bool includeIdentities) const
 {
     ValueTree node(parentNodeId);
     node.setProperty(IDs::mappingSize, size, nullptr);
 
     for (int i = 0; i < size; i++)
     {
-        if (values[i] != i)
+        if (includeIdentities || values[i] != i)
         {
             ValueTree value(IDs::noteMapNode);
-            value.setProperty(IDs::pianoKeyNumber, i, nullptr);
-            value.setProperty(IDs::mappingMidiNoteNumber, values[i], nullptr);
+            value.setProperty(IDs::mappingMidiNoteIn, i, nullptr);
+            value.setProperty(IDs::pianoKeyNumber, values[i], nullptr);
             node.appendChild(value, nullptr);
         }
     }
