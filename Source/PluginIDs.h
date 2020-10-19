@@ -88,7 +88,7 @@ static Identifier midiInputRemap("InputMapping");
 static Identifier midiOutputFilter("OutputFilter");
 static Identifier noteMapNode("NoteMapping");
 static Identifier mappingSize("MappingSize");
-static Identifier mappingMidiNoteNumber("MidiNoteIn");
+static Identifier mappingMidiNoteIn("MidiNoteIn");
 static Identifier mappingMidiChannelIn("MidiChannelIn");
 static Identifier mappingMidiNoteOut("MidiNoteOut");
 static Identifier mappingMidiChannelOut("MidiChannelOut");
