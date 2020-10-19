@@ -5,8 +5,6 @@
     Created: 25 May 2019 10:34:43pm
     Author:  Vincenzo
 
-    May turn this into a template later.
-
   ==============================================================================
 */
 
@@ -25,7 +23,7 @@ public:
     NoteMap(const NoteMap& mapToCopy);
     ~NoteMap() {}
 
-    ValueTree getAsValueTree(Identifier parentNodeId) const;
+    ValueTree getAsValueTree(Identifier parentNodeId, bool includeIdentities = false) const;
     
     void setValue(int keyNum, int valIn);
     void setValues(Array<int> valuesIn);
