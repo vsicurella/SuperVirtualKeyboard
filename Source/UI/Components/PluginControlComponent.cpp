@@ -548,8 +548,9 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == mapCopyToManualBtn.get())
     {
-        pluginState->setMidiInputMap(*pluginState->getMidiInputFilterMap(), true);
-        mapModeBox->setSelectedId(3, sendNotification);
+        NoteMap autoMap = *pluginState->getMidiInputFilterMap();
+        mapModeBox->setSelectedId(3, sendNotificationSync);
+        mappingHelper->resetMapping(autoMap);
     }
     else if (buttonThatWasClicked == mapOrderEditBtn.get())
     {
@@ -577,8 +578,7 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == mapManualResetBtn.get())
     {
-        pluginState->setMidiInputMap(NoteMap(), true);
-        beginManualMapping();
+        mappingHelper->resetMapping();
         keyMappingStatusChanged(-1, false);
     }
 }
@@ -666,6 +666,13 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
     {
         endColorEditing();
     }
+    else if (tabName == "Mapping")
+    {
+        if (mapModeBox->getSelectedId() == 3)
+        {
+            static_cast<MappingSettingsPanel*>(panelChangedTo)->setEditorToListenTo(mappingHelper.get());
+        }
+    }
 
     pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
 }
@@ -691,7 +698,12 @@ void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
 {
     mapManualStatus->setText("Key " + String(keyNumber) + " mapped to MIDI Note " + String(midiNote), sendNotification);
     mapManualCancel->setVisible(false);
-    pluginState->setMidiInputMap(mappingHelper->getCurrentNoteMapping(), true);
+    resized();
+}
+
+void PluginControlComponent::mappingChanged(NoteMap& newMapping)
+{
+    pluginState->setMidiInputMap(newMapping, true);
 }
 
 //==============================================================================
@@ -874,7 +886,7 @@ void PluginControlComponent::showSettingsDialog()
         if (lastTab.length() > 0)
             setToTab = settingsContainer->getTabNames().indexOf(lastTab);
 
-        settingsContainer->setCurrentTabIndex(setToTab, false);
+        settingsContainer->setCurrentTabIndex(setToTab, true);
     }
     else
     {
@@ -953,6 +965,13 @@ void PluginControlComponent::beginManualMapping()
 
     // Selects the MIDI note that maps to the selected key
     pluginState->getMidiProcessor()->setMappingHelper(mappingHelper.get());
+
+    // Updates MappingSettingsPanel with changes
+    if (settingsContainer && settingsContainer->getCurrentTabName() == "Mapping")
+    {
+        static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())
+            ->setEditorToListenTo(mappingHelper.get());
+    }
 }
 
 void PluginControlComponent::setMode1Root(int rootIn, NotificationType notify)

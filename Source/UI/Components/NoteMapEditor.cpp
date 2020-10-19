@@ -11,7 +11,7 @@
 #include "NoteMapEditor.h"
 
 
-NoteMapEditor::NoteMapEditor(NoteMap* noteMapIn)
+NoteMapEditor::NoteMapEditor(NoteMap noteMapIn)
 {
     header = &table.getHeader();
     header->addColumn("Note In", ColumnType::MidiNoteIn,font.getStringWidth("128"), font.getStringWidth("Note In"));
@@ -25,7 +25,7 @@ NoteMapEditor::NoteMapEditor(NoteMap* noteMapIn)
 
     addAndMakeVisible(table);
 
-    setCurrentNoteMap(noteMapIn);
+    resetMapping(noteMapIn, false);
 }
 
 NoteMapEditor::~NoteMapEditor()
@@ -37,18 +37,6 @@ void NoteMapEditor::resized()
 {
     table.setBoundsInset(BorderSize<int>(1));
     header->resizeAllColumnsToFit(table.getWidth() - table.getVerticalScrollBar().getWidth());
-}
-
-void NoteMapEditor::setCurrentNoteMap(NoteMap* noteMapIn)
-{
-    currentNoteMap = noteMapIn;
-
-    if (currentNoteMap)
-        currentNoteMapNode = currentNoteMap->getAsValueTree(IDs::midiInputRemap);
-    else
-        currentNoteMapNode = ValueTree(IDs::midiInputRemap);
-
-    DBG("MAP EDITOR LOADED:" + currentNoteMapNode.toXmlString());
 }
 
 //=============================================================================
@@ -93,21 +81,19 @@ Component* NoteMapEditor::refreshComponentForCell(int rowNumber, int columnId, b
 
             case ColumnType::KeyNumber:
                 value = node[IDs::pianoKeyNumber];
-                
-                if ((int)value > 127)
-                    value = -1;
-
                 break;
 
             case ColumnType::MidiNoteOut:
                 // TODO: note out mapping implementation
                 value = node[IDs::pianoKeyNumber];
-
-                if ((int)value > 127)
-                    value = -1;
-
                 break;
             }
+
+            if ((int)value < 0)
+                value = "Too low";
+
+            else if ((int)value > 127)
+                value = "Too high";
 
             if (value.isVoid())
                 value = 0;
@@ -191,6 +177,35 @@ void NoteMapEditor::deleteKeyPressed(int lastRowSelected)
 void NoteMapEditor::returnKeyPressed(int lastRowSelected)
 {
 
+}
+
+//=============================================================================
+
+NoteMap NoteMapEditor::getCurrentNoteMapping() const
+{
+    return currentNoteMap;
+}
+
+void NoteMapEditor::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
+{
+    currentNoteMap.setValue(midiNoteIn, keyNumberOut);
+    table.updateContent();
+}
+
+void NoteMapEditor::resetMapping(NoteMap mappingIn, bool sendMessage)
+{
+    currentNoteMap = mappingIn;
+    currentNoteMapNode = currentNoteMap.getAsValueTree(IDs::midiInputRemap);
+    
+    if (sendMessage)
+        listeners.call(&MappingEditor::Listener::mappingChanged, currentNoteMap);
+
+    table.updateContent();
+}
+
+void NoteMapEditor::mappingChanged(NoteMap& newMapping)
+{
+    resetMapping(newMapping, false);
 }
 
 //=============================================================================

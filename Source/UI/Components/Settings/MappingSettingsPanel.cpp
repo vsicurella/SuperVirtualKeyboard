@@ -26,9 +26,11 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
         }
     )
 {
-    noteMapEditor = new NoteMapEditor(pluginState->getMidiInputFilterMap());
+    noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
     controls.set(0, noteMapEditor, true);
     addAndMakeVisible(noteMapEditor);
+
+    noteMapEditor->addListener(this);
 
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
 
@@ -37,7 +39,27 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
 
 MappingSettingsPanel::~MappingSettingsPanel()
 {
+}
 
+void MappingSettingsPanel::setEditorToListenTo(MappingEditor* mappingEditor)
+{
+    if (externalEditor)
+        externalEditor->removeListener(noteMapEditor);
+
+    externalEditor = mappingEditor;
+
+    externalEditor->addListener(noteMapEditor);
+}
+
+void MappingSettingsPanel::visibilityChanged()
+{
+    if (externalEditor)
+        externalEditor->removeListener(noteMapEditor);
+}
+
+void MappingSettingsPanel::mappingChanged(NoteMap& noteMapIn)
+{
+    pluginState->setMidiInputMap(noteMapIn, true, false);
 }
 
 void MappingSettingsPanel::buttonClicked(Button* button)

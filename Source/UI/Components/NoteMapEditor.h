@@ -12,7 +12,7 @@
 
 #pragma once
 #include <JuceHeader.h>
-#include "../../Structures/NoteMap.h"
+#include "../../Structures/MappingEditorBase.h"
 
 // Table Helpers
 
@@ -48,7 +48,12 @@ class TableLabel : public TableComponent, public Label {};
 class TableButton : public TableComponent, public TextButton {};
 class TableSlider : public TableComponent, public Slider {};
 
-class NoteMapEditor : public Component, public TableListBoxModel, private Button::Listener, private Label::Listener
+class NoteMapEditor : public Component, 
+                      public TableListBoxModel, 
+                      public MappingEditor,
+                      public MappingEditor::Listener,
+                      private Button::Listener, 
+                      private Label::Listener
 {
 public:
 
@@ -64,12 +69,10 @@ public:
 
 public:
 
-    NoteMapEditor(NoteMap* noteMapIn = nullptr);
+    NoteMapEditor(NoteMap noteMapIn);
     ~NoteMapEditor();
 
     void resized() override;
-
-    void setCurrentNoteMap(NoteMap*);
 
     //=============================================================================
 
@@ -93,6 +96,20 @@ public:
 
     //=============================================================================
 
+    // MappingEditor implementation
+
+    NoteMap getCurrentNoteMapping() const override;
+
+    void mapMidiNoteToKey(int midiNoteIn, int keyNumberOut) override;
+
+    void resetMapping(NoteMap mappingIn = NoteMap(), bool sendMessage = true) override;
+
+    // MappingEditor::Listener implementation
+
+    void mappingChanged(NoteMap& newMapping) override;
+
+    //=============================================================================
+
     // Label::Listener implementation
 
     void editorShown(Label*, TextEditor&) override;
@@ -105,7 +122,7 @@ public:
 
 private:
 
-    NoteMap* currentNoteMap;
+    NoteMap currentNoteMap;
     ValueTree currentNoteMapNode;
 
     Font font = Font(11, Font::plain);

@@ -85,6 +85,8 @@ public:
 
     void keyMapConfirmed(int keyNumber, int midiNote) override;
 
+    void mappingChanged(NoteMap&) override;
+
     //==============================================================================
 
     String getScaleEntryText();
