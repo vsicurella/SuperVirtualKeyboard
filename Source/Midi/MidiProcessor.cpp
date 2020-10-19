@@ -458,7 +458,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
                 if (mappingHelper->isWaitingForKeyInput())
                 {
                     MessageManagerLock lock;
-                    mappingHelper->mapKeysToMidiNotes(midiNote, false);
+                    mappingHelper->mapPreparedKeyToNote(midiNote, false);
                     originalKeyboardState->processNextMidiEvent(msg);
                     continue;
                 }
