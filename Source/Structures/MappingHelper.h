@@ -27,6 +27,8 @@ public:
 
     void mapMidiNoteToKey(int midiNoteIn, int keyNumberOut) override;
 
+    void resetMapping(NoteMap mappingIn = NoteMap(), bool sendMessage = true) override;
+
     //================================================================
 
     bool isWaitingForKeyInput();

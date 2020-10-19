@@ -36,6 +36,14 @@ void MappingHelper::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
     listeners.call(&Listener::mappingChanged, noteMapping);
 }
 
+void MappingHelper::resetMapping(NoteMap mappingIn, bool sendMessage)
+{
+    noteMapping = mappingIn;
+
+    if (sendMessage)
+        listeners.call(&Listener::mappingChanged, noteMapping);
+}
+
 //================================================================
 
 bool MappingHelper::isWaitingForKeyInput()

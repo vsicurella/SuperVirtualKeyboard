@@ -21,6 +21,8 @@ public:
 
     virtual void mapMidiNoteToKey(int midiNoteIn, int keyNumberOut) = 0;
 
+    virtual void resetMapping(NoteMap mappingIn, bool sendMessage) = 0;
+
 public:
 
     class Listener

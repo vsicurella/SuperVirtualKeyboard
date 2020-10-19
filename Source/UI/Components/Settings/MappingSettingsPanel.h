@@ -13,7 +13,7 @@
 #include "SvkSettingsPanel.h"
 #include "../NoteMapEditor.h"
 
-class MappingSettingsPanel : public SvkSettingsPanel
+class MappingSettingsPanel : public SvkSettingsPanel, public MappingEditor::Listener
 {
 public:
 
@@ -22,7 +22,16 @@ public:
 
     void buttonClicked(Button*) override;
 
+    void setEditorToListenTo(MappingEditor* mappingEditor);
+
+    void visibilityChanged() override;
+
+    //================================================================
+
+    void mappingChanged(NoteMap&) override;
+
 private:
 
+    MappingEditor* externalEditor = nullptr;
     NoteMapEditor* noteMapEditor;
 };
