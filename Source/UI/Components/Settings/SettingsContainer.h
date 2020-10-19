@@ -14,6 +14,7 @@
 #include "GeneralSettingsPanel.h"
 #include "MidiSettingsPanel.h"
 #include "KeyboardSettingsPanel.h"
+#include "MappingSettingsPanel.h"
 #include "ColourSettingsPanel.h"
 //#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
@@ -50,6 +51,9 @@ public:
 
             else if (panelName == "Keyboard")
                 panels.add(new KeyboardSettingsPanel(pluginState));
+
+            else if (panelName == "Mapping")
+                panels.add(new MappingSettingsPanel(pluginState));
 
             else if (panelName == "Colors")
                 panels.add(new ColourSettingsPanel(pluginState));
@@ -142,6 +146,7 @@ private:
         "General"
         , "Midi"
         , "Keyboard"
+        , "Mapping"
         , "Colors"
 //#if JUCE_DEBUG
 //        , "Debug"

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "SvkSettingsPanel.h"
+#include "../NoteMapEditor.h"
 
 class MappingSettingsPanel : public SvkSettingsPanel
 {
@@ -19,5 +20,9 @@ public:
     MappingSettingsPanel(SvkPluginState* pluginStateIn);
     ~MappingSettingsPanel();
 
+    void buttonClicked(Button*) override;
 
+private:
+
+    NoteMapEditor* noteMapEditor;
 };

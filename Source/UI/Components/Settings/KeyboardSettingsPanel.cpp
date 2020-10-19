@@ -72,10 +72,6 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
     showNoteNumbers->addListener(this);
 }
 
-KeyboardSettingsPanel::~KeyboardSettingsPanel()
-{
-}
-
 void KeyboardSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
 {
     if (virtualKeyboard)

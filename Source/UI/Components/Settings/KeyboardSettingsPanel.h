@@ -18,7 +18,6 @@ class KeyboardSettingsPanel : public SvkSettingsPanel
 public:
     
     KeyboardSettingsPanel(SvkPluginState*);
-    ~KeyboardSettingsPanel();
 
     void comboBoxChanged(ComboBox*) override;
     void sliderValueChanged(Slider*) override;
