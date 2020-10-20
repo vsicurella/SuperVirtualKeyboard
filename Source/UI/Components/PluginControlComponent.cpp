@@ -211,7 +211,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
 
     
     scaleTextBox->addListener(this);
-    scaleTextBox->setInputFilter(&txtFilter, false);
+    scaleTextBox->setInputRestrictions(0, " 0123456789");
 
     //keyboardViewport->setScrollingMode(3);
 
