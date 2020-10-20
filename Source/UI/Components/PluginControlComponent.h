@@ -186,6 +186,7 @@ private:
     bool settingsPanelOpen = false;
     bool isColorEditing = false;
     bool inMappingMode = false;
+    bool mappingSettingsOpen = false;
 
     String noKeySelectedTrans = TRANS("No key selected.");
     String waitingForTrans = TRANS("Waiting for input to map to key ");

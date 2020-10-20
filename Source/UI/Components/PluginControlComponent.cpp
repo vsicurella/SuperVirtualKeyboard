@@ -666,12 +666,25 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
     {
         endColorEditing();
     }
-    else if (tabName == "Mapping")
+    
+    if (tabName == "Mapping")
     {
+        mappingSettingsOpen = true;
+
+        MappingSettingsPanel* msp = static_cast<MappingSettingsPanel*>(panelChangedTo);
         if (mapModeBox->getSelectedId() == 3)
         {
-            static_cast<MappingSettingsPanel*>(panelChangedTo)->setEditorToListenTo(mappingHelper.get());
+            msp->setEditorToListenTo(mappingHelper.get());
         }
+
+        msp->listenToEditor(this);
+    }
+
+    else if (mappingSettingsOpen)
+    {
+        mappingSettingsOpen = false;
+
+        // MappingSettingsPanel removes listeners from NoteMapEditor
     }
 
     pluginState->getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
@@ -703,6 +716,7 @@ void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
 
 void PluginControlComponent::mappingChanged(NoteMap& newMapping)
 {
+    DBG("MAPPING CHANGED");
     pluginState->setMidiInputMap(newMapping, true);
 }
 
