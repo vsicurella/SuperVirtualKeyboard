@@ -189,24 +189,6 @@ void Key::paint(Graphics& g)
     isDirty = false;
 }
 
-
-void Key::resized()
-{
-    
-}
-
-void Key::mouseExit(const MouseEvent& e)
-{
-    //// is mouse outside of parent?
-    //bool hold = getParentComponent()->reallyContains(e.getEventRelativeTo(getParentComponent()).getPosition(), true);
-    //if (!e.mods.isShiftDown())
-    //{
-    //    isClicked = false;
-    //    repaint();
-    //}
-
-}
-
 void Key::setDisplayColor(Colour colorIn)
 {
     color = colorIn;

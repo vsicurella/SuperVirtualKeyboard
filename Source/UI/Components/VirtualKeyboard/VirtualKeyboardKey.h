@@ -39,9 +39,6 @@ namespace VirtualKeyboard
         void setPath(Path keyPathIn);
         
         void paint(juce::Graphics& g) override;
-        void resized() override;
-        
-        void mouseExit(const MouseEvent& e) override;
 
         ValueTree node;
 
