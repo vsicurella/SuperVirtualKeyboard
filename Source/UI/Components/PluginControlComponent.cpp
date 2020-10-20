@@ -829,6 +829,12 @@ void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType 
             mappingHelper = nullptr;
             mapManualStatus->setText(noKeySelectedTrans, sendNotification);
         }
+
+        // TODO: handle this in a Listener system
+        if (settingsContainer.get() && settingsContainer->getCurrentTabName() == "Mapping")
+        {
+            static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())->setNoteEditorEnabled(false);
+        }
     }
 
     resized();
@@ -983,8 +989,9 @@ void PluginControlComponent::beginManualMapping()
     // Updates MappingSettingsPanel with changes
     if (settingsContainer && settingsContainer->getCurrentTabName() == "Mapping")
     {
-        static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())
-            ->setEditorToListenTo(mappingHelper.get());
+        MappingSettingsPanel* msp = static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent());
+        msp->setEditorToListenTo(mappingHelper.get());
+        msp->setNoteEditorEnabled(true);
     }
 }
 

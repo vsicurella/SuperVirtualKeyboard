@@ -35,6 +35,9 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
     noteMapEditor->addListener(this);
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
 
+    if (pluginState->getMappingMode() != 3)
+        noteMapEditor->setEnabled(false);
+
     Label* msg = new Label("Message", "Currently, you can only edit the key number. More mapping features on the way! :)");
     controls.set(1, msg, true);
     addAndMakeVisible(msg);
@@ -45,21 +48,6 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
 
 MappingSettingsPanel::~MappingSettingsPanel()
 {
-}
-
-void MappingSettingsPanel::setEditorToListenTo(MappingEditor* mappingEditor)
-{
-    if (externalEditor)
-        externalEditor->removeListener(noteMapEditor);
-
-    externalEditor = mappingEditor;
-
-    externalEditor->addListener(noteMapEditor);
-}
-
-void MappingSettingsPanel::listenToEditor(MappingEditor::Listener* listenerIn)
-{
-    noteMapEditor->addListener(listenerIn);
 }
 
 void MappingSettingsPanel::visibilityChanged()
@@ -81,4 +69,24 @@ void MappingSettingsPanel::mappingChanged(NoteMap& noteMapIn)
 void MappingSettingsPanel::buttonClicked(Button* button)
 {
 
+}
+
+void MappingSettingsPanel::setEditorToListenTo(MappingEditor* mappingEditor)
+{
+    if (externalEditor)
+        externalEditor->removeListener(noteMapEditor);
+
+    externalEditor = mappingEditor;
+
+    externalEditor->addListener(noteMapEditor);
+}
+
+void MappingSettingsPanel::listenToEditor(MappingEditor::Listener* listenerIn)
+{
+    noteMapEditor->addListener(listenerIn);
+}
+
+void MappingSettingsPanel::setNoteEditorEnabled(bool doEnable)
+{
+    noteMapEditor->setEnabled(doEnable);
 }
