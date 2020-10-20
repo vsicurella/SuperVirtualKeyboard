@@ -30,10 +30,6 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     buildFactoryDefaultState();
     buildUserDefaultState();
 
-    // TODO: revise
-    textFilterIntOrSpace.reset(new TextFilterIntOrSpace());
-    textFilterInt.reset(new TextFilterInt());
-
     revertToSavedPreset(true, false);
 }
 

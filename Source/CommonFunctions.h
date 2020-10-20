@@ -151,46 +151,6 @@ struct Pair
 //    : Pair<int, int>(midiNoteIn, pitchbendIn) {}
 //};
 
-class TextFilterIntOrSpace : public TextEditor::InputFilter
-{
-    String filterNewText(TextEditor&, const String& newInput) override
-    {
-        String out;
-
-        for (int c = 0; c < newInput.length(); c++)
-        {
-            if (newInput[c] >= 48 && newInput[c] < 58)
-            {
-                out += newInput[c];
-                continue;
-            }
-
-            out += " ";
-        }
-
-        return out;
-    }
-};
-
-class TextFilterInt : public TextEditor::InputFilter
-{
-    String filterNewText(TextEditor&, const String& newInput) override
-    {
-        String out;
-
-        for (int c = 0; c < newInput.length(); c++)
-        {
-            if (newInput[c] == 45 || (newInput[c] >= 48 && newInput[c] < 58))
-            {
-                out += newInput[c];
-                continue;
-            }
-        }
-
-        return out;
-    }
-};
-
 //static Point<int> pointFromString(Point<int>& p, String pointToStringIn)
 //{
 //    String val1 = pointToStringIn.upToFirstOccurrenceOf(",", false, true);

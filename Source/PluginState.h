@@ -143,11 +143,6 @@ public:
 
     //==============================================================================
 
-    std::unique_ptr<TextFilterIntOrSpace> textFilterIntOrSpace;
-    std::unique_ptr<TextFilterInt> textFilterInt;
-
-    //==============================================================================
-
     class Listener
     {
     public:
