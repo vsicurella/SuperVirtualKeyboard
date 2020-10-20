@@ -13,6 +13,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "../../Structures/MappingEditorBase.h"
+#include "../../CommonFunctions.h"
 
 // Table Helpers
 
@@ -60,9 +61,9 @@ public:
     enum ColumnType
     {
         MidiNoteIn = 1,
-        MidiNoteOut,
-        KeyNumber,
         MidiChannelIn,
+        KeyNumber,
+        MidiNoteOut,
         MidiChannelOut,
         ToggleMapping
     };
@@ -120,6 +121,19 @@ public:
 
     void buttonClicked(Button*) override;
 
+    //=============================================================================
+
+    void addNewMapping();
+
+    // TODO: add midi note out & channel editing
+    void editMapping(int rowNumber, int keyNumOut, bool sendMappingChangedMessage = true);
+
+    void removeMapping(int rowNumber);
+
+private:
+
+    String getAlreadyMappedMessage(int noteIn, int keyNumOut);
+
 private:
 
     NoteMap currentNoteMap;
@@ -129,5 +143,11 @@ private:
     TableListBox table = { {}, this };
     TableHeaderComponent* header;
 
-    String newMappingTrans = TRANS("  Add new mapping");
+    String newMappingTrans = translate("  Add new mapping");
+    String belowThreshTrans = translate("Too low");
+    String aboveThreshTrans = translate("Too high");
+    String mappingErrorTrans = translate("Mapping Error");
+    String noneTrans = translate("None");
+    String deleteTrans = translate("Delete");
+    String okTrans = translate("Ok");
 };
