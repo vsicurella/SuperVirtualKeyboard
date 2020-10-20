@@ -134,18 +134,24 @@ void Key::paint(Graphics& g)
             Rectangle<int> bounds = getLocalBounds();
 
             if (highlightStyleId == 2)
-                bounds.reduce(5, 5);
+            {
+                int margin = sqrt(getWidth() * getHeight()) * 0.07;
+                bounds.reduce(margin, margin);
+            }
 
             g.fillRect(bounds);
         }
         
         // Border
         else if (highlightStyleId == 3)
-            g.drawRect(getLocalBounds(), 7.0f);
+        {
+            float margin = sqrt(getWidth() * getHeight()) * 0.07f;
+            g.drawRect(getLocalBounds(), margin);
+        }
 
         else
         {
-            float margin = 7;
+            float margin = sqrt(getWidth() * getHeight()) * 0.05f;
             float boundsWidth = getWidth() - margin * 2;
             Rectangle<float> shapeBounds = { margin, getHeight() - margin - boundsWidth, boundsWidth, boundsWidth };
 
