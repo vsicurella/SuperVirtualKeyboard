@@ -24,6 +24,8 @@ public:
 
     void setEditorToListenTo(MappingEditor* mappingEditor);
 
+    void listenToEditor(MappingEditor::Listener* listenerIn);
+
     void visibilityChanged() override;
 
     //================================================================

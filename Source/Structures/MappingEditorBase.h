@@ -40,6 +40,8 @@ public:
 
     void removeListener(Listener* listenerIn) { listeners.remove(listenerIn); }
 
+    void removeAllListeners() { listeners.clear(); }
+
 protected:
 
     ListenerList<Listener> listeners;
