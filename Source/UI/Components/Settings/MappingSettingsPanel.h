@@ -22,15 +22,19 @@ public:
 
     void buttonClicked(Button*) override;
 
-    void setEditorToListenTo(MappingEditor* mappingEditor);
-
-    void listenToEditor(MappingEditor::Listener* listenerIn);
-
     void visibilityChanged() override;
 
     //================================================================
 
     void mappingChanged(NoteMap&) override;
+
+    //================================================================
+
+    void setEditorToListenTo(MappingEditor* mappingEditor);
+
+    void listenToEditor(MappingEditor::Listener* listenerIn);
+
+    void setNoteEditorEnabled(bool doEnable);
 
 private:
 
