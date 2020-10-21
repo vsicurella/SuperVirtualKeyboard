@@ -432,7 +432,7 @@ namespace VirtualKeyboard
         /*
             Sets the proportion of the keys' width to height. Default is 0.25.
         */
-        void setKeySizeRatio(float keySizeRatioIn);
+        void setKeySizeRatio(float keySizeRatioIn, bool resizeSelf = true);
 
         /*
             Sets the width of the keys to a given size and conforms the keyboard to the current proportions.
