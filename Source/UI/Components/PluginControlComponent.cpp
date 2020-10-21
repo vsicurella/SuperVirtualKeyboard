@@ -485,7 +485,7 @@ void PluginControlComponent::resized()
 
 void PluginControlComponent::mouseDown(const MouseEvent& e)
 {
-    if (mode1Box->getBounds().contains(e.getPosition()))
+    if (mode1Box->isVisible() && mode1Box->getBounds().contains(e.getPosition()))
     {
         String display = mode1Box->getText();
         presetManager->requestModeMenu(mode1Box->getRootMenu());
@@ -493,7 +493,7 @@ void PluginControlComponent::mouseDown(const MouseEvent& e)
         mode1Box->showPopup();
     }
 
-    if (mode2Box->getBounds().contains(e.getPosition()))
+    if (mode2Box->isVisible() && mode2Box->getBounds().contains(e.getPosition()))
     {
         String display = mode2Box->getText();
         presetManager->requestModeMenu(mode2Box->getRootMenu());
