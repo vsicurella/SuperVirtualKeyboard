@@ -470,6 +470,13 @@ void PluginControlComponent::resized()
     keyboardViewport->setScrollBarThickness(scrollBarThickness);
     keyboardViewport->resizeKeyboard();
     keyboardViewport->centerOnKey((int)centerKeyPos);
+
+    if (keyboard->getWidth() < keyboardViewWidth)
+    {
+        keyboardViewport->setSize(keyboard->getWidth(), keyboardViewHeight);
+        keyboardViewport->setTopLeftPosition((getWidth() - keyboard->getWidth()) / 2, keyboardY);
+    }
+
     viewportScrollBar->addListener(this);
 
     pluginState->getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr);

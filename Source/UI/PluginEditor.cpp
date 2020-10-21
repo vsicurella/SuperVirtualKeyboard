@@ -73,15 +73,22 @@ void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifi
 {
     if (parent == pluginEditorNode && property == IDs::windowBoundsH)
     {
-        VirtualKeyboard::Keyboard* keyboard = controlComponent->getKeyboard();
         Viewport* viewport = controlComponent->getViewport();
+        VirtualKeyboard::Keyboard* keyboard = controlComponent->getKeyboard();
 
-        setResizeLimits(
-            defaultMinWidth,
-            getHeight() - keyboard->getHeight() + 100 + viewport->getScrollBarThickness() + 1,
-            controlComponent->getViewport()->getX() * 2 + keyboard->getWidth(),
-            defaultMaxHeight
-        );
+        int viewportHeight = viewport->getHeight() - viewport->getScrollBarThickness();
+        int keyboardWidth = keyboard->getPianoWidth(viewportHeight);
+
+        // Not sure if this is a great solution, but should keep mins < maxes.
+        if (viewportHeight > 1 && keyboardWidth > 1)
+        {
+            setResizeLimits(
+                defaultMinWidth,
+                jmax(defaultMinHeight, getHeight() - viewportHeight + 100 + 1),
+                jmax(defaultMaxWidth, controlComponent->getViewport()->getX() * 2 + keyboardWidth),
+                defaultMaxHeight
+            );
+        }
     }
 }
 

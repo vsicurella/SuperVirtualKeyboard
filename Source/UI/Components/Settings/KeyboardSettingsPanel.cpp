@@ -95,8 +95,8 @@ void KeyboardSettingsPanel::sliderValueChanged(Slider* sliderChanged)
     {
         if (sliderChanged == keyRatioSlider)
         {
-            virtualKeyboard->setKeySizeRatio(sliderChanged->getValue());
-            virtualKeyboard->resized();
+            virtualKeyboard->setKeySizeRatio(sliderChanged->getValue(), false);
+            getParentComponent()->getParentComponent()->resized();
         }
     }
 }

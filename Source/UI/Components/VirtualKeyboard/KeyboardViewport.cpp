@@ -251,7 +251,8 @@ void KeyboardViewport::redrawButtons(int heightIn)
 
 void KeyboardViewport::resizeKeyboard()
 {
-    keyboard->setBounds(0, 0, keyboard->getPianoWidth(getMaximumVisibleHeight()), getMaximumVisibleHeight());
+    int heightWithScrollbar = getHeight() - getScrollBarThickness();
+    keyboard->setBounds(0, 0, keyboard->getPianoWidth(heightWithScrollbar), heightWithScrollbar);
 }
 
 void KeyboardViewport::resized()

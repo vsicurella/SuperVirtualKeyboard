@@ -192,7 +192,7 @@ void Keyboard::resized()
     {
         Key& modeKey = *keys[modeKeys[i]];
 
-        int keyX = (keyWidth + keyPositioner.getKeyGap()) * i;
+        int keyX = (keyWidth + keyPositioner.getKeyGap() - 1) * i;
         modeKey.setTopLeftPosition(keyX, 0);
 
         if (modeKey.step > 1)
@@ -700,7 +700,7 @@ int Keyboard::getKeyHeight()
 
 int Keyboard::getPianoWidth(int heightIn)
 {
-    return numOrder0Keys * (heightIn * keySizeRatio + keyPositioner.getKeyGap());
+    return numOrder0Keys  * (heightIn * keySizeRatio + keyPositioner.getKeyGap() - 1);
 }
 
 float Keyboard::getKeySizeRatio()
@@ -1233,11 +1233,13 @@ void Keyboard::setKeyColor(int keyNumIn, Colour colourIn)
 
 //===============================================================================================
 
-void Keyboard::setKeySizeRatio(float keySizeRatioIn)
+void Keyboard::setKeySizeRatio(float keySizeRatioIn, bool resizeSelf)
 {
     keySizeRatio = keySizeRatioIn;
     pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
-    setSize(getPianoWidth(getHeight()), getHeight());
+
+    if (resizeSelf)
+        setSize(getPianoWidth(getHeight()), getHeight());
 }
 
 void Keyboard::setKeyWidthSize(int widthSizeIn)

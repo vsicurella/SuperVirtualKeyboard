@@ -37,7 +37,7 @@ private:
     std::unique_ptr<PluginControlComponent> controlComponent;
 
     int defaultMinWidth = 750;
-    int defaultMinHeight = 100;
+    int defaultMinHeight = 172;
     int defaultMaxWidth = 10e4;
     int defaultMaxHeight = 10e4;
 
