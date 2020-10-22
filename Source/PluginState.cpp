@@ -302,7 +302,7 @@ int SvkPluginState::getModeViewedSlotNumber() const
 
 int SvkPluginState::getMappingMode() const
 {
-    return presetNode.getChildWithName(IDs::midiMapNode)[IDs::mappingMode];
+    return presetNode.getChildWithName(IDs::presetProperties)[IDs::mappingMode];
 }
 
 int SvkPluginState::getAutoMappingStyle() const
@@ -363,25 +363,27 @@ void SvkPluginState::handleModeSelection(int modeBoxNum, int idIn)
 
 void SvkPluginState::setMapMode(int mapModeSelectionIn)
 {
-    ValueTree mappingNode = presetNode.getChildWithName(IDs::midiMapNode);
-    mappingNode.setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
-    DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
+    svkPreset->getPresetNode().getChildWithName(IDs::presetProperties).setProperty(IDs::mappingMode, mapModeSelectionIn, nullptr);
     
+    DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
+
     if (mapModeSelectionIn == 2) // Auto Mapping
+    {
         doAutoMapping();
+        midiProcessor->setInManualMappingMode(false);
+    }
     
     else
     {
         if (mapModeSelectionIn == 3) // Manual Mapping
         {
             midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
-
-            // TODO: control state with button
-            mappingNode.setProperty(IDs::manualMappingEditOn, 1, nullptr);
+            midiProcessor->setInManualMappingMode(true);
         }
 
         else // Mapping Off
         {
+            midiProcessor->setInManualMappingMode(false);
             midiProcessor->setInputRemap(NoteMap(), false);
             midiProcessor->setOutputFilter(NoteMap(), false);
             setModeSelectorViewed(1);
@@ -478,10 +480,7 @@ void SvkPluginState::doAutoMapping(const Mode* mode1, const Mode* mode2, bool se
 {
     NoteMap noteMap = modeMapper->map(*mode1, *mode2, *midiProcessor->getInputNoteRemap());
 
-    setMidiInputMap(noteMap, false);
-
-    if (sendChangeMessage)
-        listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
+    setMidiInputMap(noteMap, false, sendChangeMessage);
 }
 
 void SvkPluginState::doAutoMapping(bool sendChangeMessage)
@@ -489,7 +488,7 @@ void SvkPluginState::doAutoMapping(bool sendChangeMessage)
     if (getMappingMode() == 2)
     {
         DBG("Applying new MIDI mapping");
-        doAutoMapping(getMode1(), getMode2());
+        doAutoMapping(getMode1(), getMode2(), sendChangeMessage);
     }
     else
     {

@@ -98,7 +98,6 @@ static Identifier modeMapFromRootNote("ModeMapFromRootNote");
 static Identifier modeMapFromPreset("ModeMapFromPreset");
 static Identifier mappingMode("MappingMode");
 static Identifier autoMappingStyle("ModeMappingType");
-static Identifier manualMappingEditOn("ManualMappingEditOn");
 static Identifier mode1OrderMapping("Mode1OrderMapping");
 static Identifier mode2OrderMapping("Mode2OrderMapping");
 static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");

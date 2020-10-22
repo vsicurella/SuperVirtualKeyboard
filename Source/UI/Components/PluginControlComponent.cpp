@@ -315,6 +315,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
         if (properties.isValid())
         {
+            setMappingMode(properties[IDs::mappingMode]);
             mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
         }
 
@@ -325,7 +326,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
         if (mapping.isValid())
         {
-            setMappingMode(mapping[IDs::mappingMode]);
             setMappingStyleId(mapping[IDs::autoMappingStyle]);
         }
 
@@ -724,7 +724,7 @@ void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
 void PluginControlComponent::mappingChanged(NoteMap& newMapping)
 {
     DBG("MAPPING CHANGED");
-    pluginState->setMidiInputMap(newMapping, true);
+    pluginState->setMidiInputMap(newMapping, mapModeBox->getSelectedId() == 3);
 }
 
 //==============================================================================
