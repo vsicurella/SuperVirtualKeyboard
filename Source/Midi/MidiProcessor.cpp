@@ -56,20 +56,26 @@ void SvkMidiProcessor::updateNodes()
     
     NoteMap standardNoteMap;
 
-    NoteMap* inputFilter = midiInputFilter->getNoteMap();
-    midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputFilter), nullptr);
-    if (*inputFilter != standardNoteMap)
-        midiMapNode.appendChild(inputFilter->getAsValueTree(IDs::midiInputFilter), nullptr);
+    // Unused so far / TODO
+    //NoteMap* inputFilter = midiInputFilter->getNoteMap();
+    //midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputFilter), nullptr);
+    //if (*inputFilter != standardNoteMap)
+    //    midiMapNode.appendChild(inputFilter->getAsValueTree(IDs::midiInputFilter), nullptr);
     
-    NoteMap* inputRemap = midiInputRemap->getNoteMap();
-    midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
-    if (*inputRemap != standardNoteMap)
-        midiMapNode.appendChild(inputRemap->getAsValueTree(IDs::midiInputRemap), nullptr);
+    // TODO: put this somewhere better
+    if (inManualMappingMode)
+    {
+        NoteMap* inputRemap = midiInputRemap->getNoteMap();
+        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
+        if (*inputRemap != standardNoteMap)
+            midiMapNode.appendChild(inputRemap->getAsValueTree(IDs::midiInputRemap), nullptr);
+    }
 
-    NoteMap* outputFilter = midiOutputFilter->getNoteMap();
-    midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputFilter), nullptr);
-    if (*outputFilter != standardNoteMap)
-        midiMapNode.appendChild(outputFilter->getAsValueTree(IDs::midiOutputFilter), nullptr);
+    // Unused so far / TODO
+    //NoteMap* outputFilter = midiOutputFilter->getNoteMap();
+    //midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiOutputFilter), nullptr);
+    //if (*outputFilter != standardNoteMap)
+    //    midiMapNode.appendChild(outputFilter->getAsValueTree(IDs::midiOutputFilter), nullptr);
 }
 
 
@@ -428,6 +434,11 @@ void SvkMidiProcessor::setMappingHelper(MappingHelper* helperIn)
     mappingHelper = helperIn;
 }
 
+void SvkMidiProcessor::setInManualMappingMode(bool manualModeOn)
+{
+    inManualMappingMode = manualModeOn;
+}
+
 //==============================================================================
 
 void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
@@ -453,7 +464,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         {
             midiNote = msg.getNoteNumber();
 
-            if ((int)midiMapNode[IDs::mappingMode] == 3 && midiMapNode[IDs::manualMappingEditOn])
+            if (inManualMappingMode)
             {
                 if (mappingHelper->isWaitingForKeyInput())
                 {

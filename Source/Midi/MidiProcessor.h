@@ -106,6 +106,8 @@ public:
     //void setRetuneOn(bool retuneOn);
 
     void setMappingHelper(MappingHelper* helperIn);
+
+    void setInManualMappingMode(bool manualModeOn);
     
     void resetInputFilter(bool updateNode=true);
     void resetInputMap(bool updateNode=true);
@@ -173,6 +175,8 @@ private:
     std::unique_ptr<MidiFilter> midiOutputFilter;
 
     MappingHelper* mappingHelper;
+
+    bool inManualMappingMode = false;
 
     int mpePitchbendTrackingMode = 0;
     int mpePressureTrackingMode = 0;
