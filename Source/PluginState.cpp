@@ -369,16 +369,16 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn)
 
     if (mapModeSelectionIn == 2) // Auto Mapping
     {
-        doAutoMapping();
         midiProcessor->setInManualMappingMode(false);
+        doAutoMapping();
     }
     
     else
     {
         if (mapModeSelectionIn == 3) // Manual Mapping
         {
-            midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
             midiProcessor->setInManualMappingMode(true);
+            midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
         }
 
         else // Mapping Off
