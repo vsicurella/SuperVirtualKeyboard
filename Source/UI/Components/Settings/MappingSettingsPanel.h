@@ -13,31 +13,24 @@
 #include "SvkSettingsPanel.h"
 #include "../NoteMapEditor.h"
 
-class MappingSettingsPanel : public SvkSettingsPanel, public MappingEditor::Listener
+class MappingSettingsPanel : public SvkSettingsPanel, 
+                             public SvkPluginState::Listener, 
+                             public MappingEditor::Listener
 {
 public:
 
     MappingSettingsPanel(SvkPluginState* pluginStateIn);
     ~MappingSettingsPanel();
 
-    void buttonClicked(Button*) override;
-
     void visibilityChanged() override;
 
-    //================================================================
+    void mappingModeChanged(int mappingModeId) override;
 
-    void mappingChanged(NoteMap&) override;
+    void inputMappingChanged(NoteMap&) override;
 
-    //================================================================
-
-    void setEditorToListenTo(MappingEditor* mappingEditor);
-
-    void listenToEditor(MappingEditor::Listener* listenerIn);
-
-    void setNoteEditorEnabled(bool doEnable);
+    void mappingEditorChanged(NoteMap&) override;
 
 private:
 
-    MappingEditor* externalEditor = nullptr;
     NoteMapEditor* noteMapEditor;
 };

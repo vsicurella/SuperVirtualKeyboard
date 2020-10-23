@@ -18,12 +18,11 @@
 #include "../Structures/MappingHelper.h"
 
 class SvkMidiProcessor : public MidiInputCallback,
-                         public MidiKeyboardStateListener,
-                         private AudioProcessorValueTreeState::Listener
+                         public MidiKeyboardStateListener
 {
 public:
     
-    SvkMidiProcessor(AudioProcessorValueTreeState&);
+    SvkMidiProcessor();
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
@@ -51,6 +50,8 @@ public:
     NoteMap* getInputNoteFilter();
     NoteMap* getInputNoteRemap();
     NoteMap* getOutputNoteFilter();
+
+    NoteMap getManualNoteMap() const;
 
     MidiFilter* getInputMidiFilter();
     MidiFilter* getInputRemapMidiFilter();
@@ -123,7 +124,7 @@ public:
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
     
-    void parameterChanged(const String& paramID, float newValue) override;
+    //void parameterChanged(const String& paramID, float newValue) override;
     
     // Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
@@ -131,8 +132,6 @@ public:
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
 
 private:
-
-    AudioProcessorValueTreeState& svkTree;
 
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;

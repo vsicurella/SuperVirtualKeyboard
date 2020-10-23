@@ -202,7 +202,7 @@ NoteMap NoteMapEditor::getCurrentNoteMapping() const
 void NoteMapEditor::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
 {
     currentNoteMap.setValue(midiNoteIn, keyNumberOut);
-    listeners.call(&MappingEditor::Listener::mappingChanged, currentNoteMap);
+    listeners.call(&MappingEditor::Listener::mappingEditorChanged, currentNoteMap);
     resetMapping(currentNoteMap, false);
 }
 
@@ -212,14 +212,9 @@ void NoteMapEditor::resetMapping(NoteMap mappingIn, bool sendMessage)
     currentNoteMapNode = currentNoteMap.getAsValueTree(IDs::midiInputRemap);
     
     if (sendMessage)
-        listeners.call(&MappingEditor::Listener::mappingChanged, currentNoteMap);
+        listeners.call(&MappingEditor::Listener::mappingEditorChanged, currentNoteMap);
 
     table.updateContent();
-}
-
-void NoteMapEditor::mappingChanged(NoteMap& newMapping)
-{
-    resetMapping(newMapping, false);
 }
 
 //=============================================================================
@@ -272,7 +267,7 @@ void NoteMapEditor::labelTextChanged(Label* label)
             currentNoteMapNode.getChild(tl->getRowNumber()).removeProperty(IDs::pianoKeyNumber, nullptr);
         }
 
-        listeners.call(&MappingEditor::Listener::mappingChanged, currentNoteMap);
+        listeners.call(&MappingEditor::Listener::mappingEditorChanged, currentNoteMap);
         break;
 
     case ColumnType::MidiNoteIn:

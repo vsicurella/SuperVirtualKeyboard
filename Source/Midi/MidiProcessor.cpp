@@ -10,8 +10,7 @@
 
 #include "MidiProcessor.h"
 
-SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
-    : svkTree(svkTreeIn)
+SvkMidiProcessor::SvkMidiProcessor()
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);
@@ -96,6 +95,7 @@ bool SvkMidiProcessor::restoreMappingNode(ValueTree midiMapIn)
     if (midiMapIn.hasType(IDs::midiMapNode))
     {
         midiMapNode = midiMapIn;
+        inManualMappingMode = (int)midiMapNode[IDs::mappingMode] == 3;
 
         Array<int> map;
 
@@ -113,10 +113,11 @@ bool SvkMidiProcessor::restoreMappingNode(ValueTree midiMapIn)
         ValueTree remapNode = midiMapIn.getChildWithName(IDs::midiInputRemap);
         noteMap = NoteMap(midiMapIn.getChildWithName(IDs::midiInputRemap));
 
-        setInputRemap(noteMap);
-
         if (remapNode.isValid() && remapNode.getNumChildren() > 0)
+        {
             loadedMap = true;
+            setInputRemap(noteMap);
+        }
 
         //map.clear();
         //get_array_from_node(midiMapIn, map, IDs::midiOutputFilter);
@@ -211,6 +212,11 @@ NoteMap* SvkMidiProcessor::getInputNoteRemap()
 NoteMap* SvkMidiProcessor::getOutputNoteFilter()
 {
     return midiOutputFilter->getNoteMap();
+}
+
+NoteMap SvkMidiProcessor::getManualNoteMap() const
+{
+    return manualRemap;
 }
 
 MidiFilter* SvkMidiProcessor::getInputRemapMidiFilter()
@@ -564,39 +570,39 @@ bool SvkMidiProcessor::isMidiPaused()
 }
 
 //==============================================================================
-
-void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
-{
-    if (paramID == IDs::mappingMode.toString())
-    {
-        isInputRemapped = newValue > 1;
-    }
-    else if (paramID == IDs::periodShift.toString())
-    {
-        periodShift = newValue;
-        updateNoteTransposition();
-    }
-    else if (paramID == IDs::periodShiftModeSize.toString())
-    {
-        periodShiftModeSize = newValue;
-    }
-    else if (paramID == IDs::transposeAmt.toString())
-    {
-        transposeAmt = newValue;
-        updateNoteTransposition();
-    }
-    else if (paramID == IDs::keyboardMidiChannel.toString())
-    {
-        //allNotesOff(midiChannelOut);
-        midiChannelOut = newValue;
-    }
-    else if (paramID == IDs::mpeOn.toString())
-    {
-        mpeOn = newValue;
-    }
-    
-    DBG("Midi processor updated parameter " + paramID + " to " + String(newValue));
-}
+//
+//void SvkMidiProcessor::parameterChanged(const String& paramID, float newValue)
+//{
+//    if (paramID == IDs::mappingMode.toString())
+//    {
+//        isInputRemapped = newValue > 1;
+//    }
+//    else if (paramID == IDs::periodShift.toString())
+//    {
+//        periodShift = newValue;
+//        updateNoteTransposition();
+//    }
+//    else if (paramID == IDs::periodShiftModeSize.toString())
+//    {
+//        periodShiftModeSize = newValue;
+//    }
+//    else if (paramID == IDs::transposeAmt.toString())
+//    {
+//        transposeAmt = newValue;
+//        updateNoteTransposition();
+//    }
+//    else if (paramID == IDs::keyboardMidiChannel.toString())
+//    {
+//        //allNotesOff(midiChannelOut);
+//        midiChannelOut = newValue;
+//    }
+//    else if (paramID == IDs::mpeOn.toString())
+//    {
+//        mpeOn = newValue;
+//    }
+//    
+//    DBG("Midi processor updated parameter " + paramID + " to " + String(newValue));
+//}
 
 void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {

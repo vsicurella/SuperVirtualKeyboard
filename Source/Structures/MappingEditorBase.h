@@ -33,7 +33,7 @@ public:
 
         virtual void keyMapConfirmed(int keyNumber, int midiNote) {};
 
-        virtual void mappingChanged(NoteMap& newMapping) {};
+        virtual void mappingEditorChanged(NoteMap& newMapping) {};
     };
 
     void addListener(Listener* listenerIn) { listeners.add(listenerIn); }
