@@ -386,7 +386,7 @@ void SvkMidiProcessor::setInputRemap(Array<int> mapIn, bool updateNode)
 
 void SvkMidiProcessor::setInputRemap(NoteMap mapIn, bool updateNode)
 {
-    if (inManualMappingMode)
+    if (inManualMappingMode || updateNode)
         manualRemap = mapIn;
     
     currentRemap = mapIn;
