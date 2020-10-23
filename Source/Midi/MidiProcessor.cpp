@@ -54,22 +54,15 @@ void SvkMidiProcessor::updateNodes()
     //midiSettingsNode.setProperty(IDs::mpeTimbreTrackingMode, mpeTimbreTrackingMode, nullptr);
     //midiSettingsNode.setProperty(IDs::mpeTuningPreserveMidiNote, mpeTuningPreserveMidiNote, nullptr);
     
-    NoteMap standardNoteMap;
-
     // Unused so far / TODO
     //NoteMap* inputFilter = midiInputFilter->getNoteMap();
     //midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputFilter), nullptr);
     //if (*inputFilter != standardNoteMap)
     //    midiMapNode.appendChild(inputFilter->getAsValueTree(IDs::midiInputFilter), nullptr);
     
-    // TODO: put this somewhere better
-    if (inManualMappingMode)
-    {
-        NoteMap* inputRemap = midiInputRemap->getNoteMap();
-        midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
-        if (*inputRemap != standardNoteMap)
-            midiMapNode.appendChild(inputRemap->getAsValueTree(IDs::midiInputRemap), nullptr);
-    }
+    midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
+    if (inManualMappingMode || (manualRemap != currentRemap))
+        midiMapNode.appendChild(manualRemap.getAsValueTree(IDs::midiInputRemap), nullptr);
 
     // Unused so far / TODO
     //NoteMap* outputFilter = midiOutputFilter->getNoteMap();
@@ -387,12 +380,16 @@ void SvkMidiProcessor::setInputRemap(Array<int> mapIn, bool updateNode)
 
 void SvkMidiProcessor::setInputRemap(NoteMap mapIn, bool updateNode)
 {
-    midiInputRemap->setNoteMap(mapIn);
+    if (inManualMappingMode)
+        manualRemap = mapIn;
+    
+    currentRemap = mapIn;
+    midiInputRemap->setNoteMap(currentRemap);
 
     if (updateNode)
     {
         midiMapNode.removeChild(midiMapNode.getChildWithName(IDs::midiInputRemap), nullptr);
-        midiMapNode.appendChild(mapIn.getAsValueTree(IDs::midiInputRemap), nullptr);
+        midiMapNode.appendChild(currentRemap.getAsValueTree(IDs::midiInputRemap), nullptr);
         //add_array_to_node(midiMapNode, midiInputRemap->getNoteMap()->getValues(), IDs::midiInputRemap, "Note");
     }
 }

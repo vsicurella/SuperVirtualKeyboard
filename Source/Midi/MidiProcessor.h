@@ -175,6 +175,8 @@ private:
     std::unique_ptr<MidiFilter> midiOutputFilter;
 
     MappingHelper* mappingHelper;
+    NoteMap currentRemap;
+    NoteMap manualRemap;
 
     bool inManualMappingMode = false;
 
