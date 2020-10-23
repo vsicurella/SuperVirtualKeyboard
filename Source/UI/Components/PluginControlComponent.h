@@ -73,7 +73,9 @@ public:
 
     void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
-    void inputMappingChanged(NoteMap* inputNoteMap) override;
+    void mappingModeChanged(int mappingModeId) override;
+
+    void inputMappingChanged(NoteMap& inputNoteMap) override;
 
     void customModeChanged(Mode* newCustomMode) override;
 
@@ -85,7 +87,7 @@ public:
 
     void keyMapConfirmed(int keyNumber, int midiNote) override;
 
-    void mappingChanged(NoteMap&) override;
+    void mappingEditorChanged(NoteMap&) override;
 
     //==============================================================================
 
@@ -119,7 +121,7 @@ public:
 
     int getModeSelectorViewed();
 
-    void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
+    void setMapModeBoxId(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
 
     void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
 

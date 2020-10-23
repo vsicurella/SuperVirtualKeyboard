@@ -19,12 +19,6 @@ ModeMapper::ModeMapper()
 
 ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
 {
-    if (!modeMappingNodeIn.hasType(IDs::midiMapNode))
-    {
-        modeMappingNodeIn = ValueTree(IDs::midiMapNode);
-        DBG("MODE MAPPER UNSYCHED");
-    }
-
     mappingNode = modeMappingNodeIn;
     
     mappingStyle = mappingNode[IDs::autoMappingStyle];

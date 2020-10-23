@@ -1037,7 +1037,7 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
     pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 }
 
-void Keyboard::setInputNoteMap(NoteMap* noteMapIn)
+void Keyboard::setInputNoteMap(NoteMap& noteMapIn)
 {
     noteMapOnDisplay = noteMapIn;
 }

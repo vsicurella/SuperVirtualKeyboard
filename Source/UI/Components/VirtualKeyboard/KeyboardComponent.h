@@ -337,7 +337,7 @@ namespace VirtualKeyboard
         /*
             Set the Input NoteMap being used.
         */
-        void setInputNoteMap(NoteMap* noteMapIn);
+        void setInputNoteMap(NoteMap& noteMapIn);
         
         //===============================================================================================
 
@@ -518,7 +518,7 @@ namespace VirtualKeyboard
         UndoManager* undo;
         KeyboardPositioner keyPositioner;
         MidiKeyboardState* externalKeyboardToDisplay = nullptr;
-        NoteMap* noteMapOnDisplay;
+        NoteMap noteMapOnDisplay;
         bool hasDirtyKeys = true;
         
         MidiBuffer buffer;

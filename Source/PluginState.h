@@ -96,7 +96,7 @@ public:
 
     void setParameterValue(Identifier paramIdIn, float valueIn);
 
-    void setMapMode(int mapModeSelectionIn);
+    void setMapMode(int mapModeSelectionIn, bool sendChangeMessage = true);
     void setAutoMapStyle(int mapStyleIn);
 
     void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
@@ -153,9 +153,11 @@ public:
 
         virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
 
-        virtual void inputMappingChanged(NoteMap* inputNoteMap) {};
+        virtual void mappingModeChanged(int mappingModeId) {};
 
-        virtual void outputMappingChanged(NoteMap* outputNoteMap) {};
+        virtual void inputMappingChanged(NoteMap& inputNoteMap) {};
+
+        virtual void outputMappingChanged(NoteMap& outputNoteMap) {};
 
         virtual void customModeChanged(Mode* newCustomMode) {};
 

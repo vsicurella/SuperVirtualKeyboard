@@ -315,7 +315,6 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
         if (properties.isValid())
         {
-            setMappingMode(properties[IDs::mappingMode]);
             mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
         }
 
@@ -326,6 +325,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
         if (mapping.isValid())
         {
+            mapModeBox->setSelectedId(mapping[IDs::mappingMode]);
             setMappingStyleId(mapping[IDs::autoMappingStyle]);
         }
 
@@ -515,7 +515,6 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
         pluginState->setMapMode(mapModeBox->getSelectedId());
-        setMappingMode(mapModeBox->getSelectedId());
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
@@ -634,7 +633,58 @@ void PluginControlComponent::modeViewedChanged(Mode* modeIn, int selectorNumber,
     onModeViewedChange(modeIn);
 }
 
-void PluginControlComponent::inputMappingChanged(NoteMap* inputNoteMap)
+void PluginControlComponent::mappingModeChanged(int mappingModeId)
+{
+    inMappingMode = mappingModeId > 1;
+
+    for (auto c : mappingComponents)
+    {
+        c->setVisible(inMappingMode);
+        c->setEnabled(inMappingMode);
+    }
+
+    if (inMappingMode)
+    {
+        if (mappingModeId == 2 && mapStyleBox->getSelectedId() == 3)
+        {
+            mapOrderEditBtn->setVisible(true);
+            mapApplyBtn->setVisible(true);
+        }
+        else
+        {
+            mapOrderEditBtn->setVisible(false);
+            mapApplyBtn->setVisible(false);
+        }
+
+        mode2ViewBtn->setToggleState(true, sendNotification);
+    }
+
+    if (mappingModeId == 3)
+    {
+        beginManualMapping();
+    }
+    else
+    {
+        mapManualTip->setVisible(false);
+        mapManualStatus->setVisible(false);
+        mapManualCancel->setVisible(false);
+        mapManualResetBtn->setVisible(false);
+
+        // TODO: make sure this doesn't conflict with color editing
+        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
+
+        if (mappingHelper.get())
+        {
+            mappingHelper->removeListener(this);
+            mappingHelper = nullptr;
+            mapManualStatus->setText(noKeySelectedTrans, sendNotification);
+        }
+    }
+
+    resized();
+}
+
+void PluginControlComponent::inputMappingChanged(NoteMap& inputNoteMap)
 {
     keyboard->setInputNoteMap(inputNoteMap);
 }
@@ -677,14 +727,6 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
     if (tabName == "Mapping")
     {
         mappingSettingsOpen = true;
-
-        MappingSettingsPanel* msp = static_cast<MappingSettingsPanel*>(panelChangedTo);
-        if (mapModeBox->getSelectedId() == 3)
-        {
-            msp->setEditorToListenTo(mappingHelper.get());
-        }
-
-        msp->listenToEditor(this);
     }
 
     else if (mappingSettingsOpen)
@@ -721,7 +763,7 @@ void PluginControlComponent::keyMapConfirmed(int keyNumber, int midiNote)
     resized();
 }
 
-void PluginControlComponent::mappingChanged(NoteMap& newMapping)
+void PluginControlComponent::mappingEditorChanged(NoteMap& newMapping)
 {
     DBG("MAPPING CHANGED");
     pluginState->setMidiInputMap(newMapping, mapModeBox->getSelectedId() == 3);
@@ -789,62 +831,9 @@ int PluginControlComponent::getModeSelectorViewed()
     return mode2ViewBtn->getToggleState();
 }
 
-void PluginControlComponent::setMappingMode(int mappingModeId, NotificationType notify)
+void PluginControlComponent::setMapModeBoxId(int mappingModeId, NotificationType notify)
 {
     mapModeBox->setSelectedId(mappingModeId, notify);
-    inMappingMode = mappingModeId > 1;
-    
-    for (auto c : mappingComponents)
-    {
-        c->setVisible(inMappingMode);
-        c->setEnabled(inMappingMode);
-    }
-
-    if (inMappingMode)
-    {
-        if (mappingModeId == 2 && mapStyleBox->getSelectedId() == 3)
-        {
-            mapOrderEditBtn->setVisible(true);
-            mapApplyBtn->setVisible(true);
-        }
-        else
-        {
-            mapOrderEditBtn->setVisible(false);
-            mapApplyBtn->setVisible(false);
-        }
-
-        mode2ViewBtn->setToggleState(true, sendNotification);
-    }
-
-    if (mappingModeId == 3)
-    {
-        beginManualMapping();
-    }
-    else
-    {
-        mapManualTip->setVisible(false);
-        mapManualStatus->setVisible(false);
-        mapManualCancel->setVisible(false);
-        mapManualResetBtn->setVisible(false);
-
-        // TODO: make sure this doesn't conflict with color editing
-        keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
-
-        if (mappingHelper.get())
-        {
-            mappingHelper->removeListener(this);
-            mappingHelper = nullptr;
-            mapManualStatus->setText(noKeySelectedTrans, sendNotification);
-        }
-
-        // TODO: handle this in a Listener system
-        if (settingsContainer.get() && settingsContainer->getCurrentTabName() == "Mapping")
-        {
-            static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())->setNoteEditorEnabled(false);
-        }
-    }
-
-    resized();
 }
 
 void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify)
@@ -963,7 +952,8 @@ void PluginControlComponent::endColorEditing()
     mapApplyBtn->setEnabled(true);
     mapCopyToManualBtn->setEnabled(true);
 
-    setMappingMode(mapModeBox->getSelectedId());
+    // Restore previous UI state
+    pluginState->setMapMode(mapModeBox->getSelectedId());
 }
 
 void PluginControlComponent::beginManualMapping()
@@ -992,14 +982,6 @@ void PluginControlComponent::beginManualMapping()
 
     // Selects the MIDI note that maps to the selected key
     pluginState->getMidiProcessor()->setMappingHelper(mappingHelper.get());
-
-    // Updates MappingSettingsPanel with changes
-    if (settingsContainer && settingsContainer->getCurrentTabName() == "Mapping")
-    {
-        MappingSettingsPanel* msp = static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent());
-        msp->setEditorToListenTo(mappingHelper.get());
-        msp->setNoteEditorEnabled(true);
-    }
 }
 
 void PluginControlComponent::setMode1Root(int rootIn, NotificationType notify)

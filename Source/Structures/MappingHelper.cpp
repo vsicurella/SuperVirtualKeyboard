@@ -33,7 +33,7 @@ NoteMap MappingHelper::getCurrentNoteMapping() const
 void MappingHelper::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
 {
     noteMapping.setValue(midiNoteIn, keyNumberOut);
-    listeners.call(&Listener::mappingChanged, noteMapping);
+    listeners.call(&Listener::mappingEditorChanged, noteMapping);
 }
 
 void MappingHelper::resetMapping(NoteMap mappingIn, bool sendMessage)
@@ -41,7 +41,7 @@ void MappingHelper::resetMapping(NoteMap mappingIn, bool sendMessage)
     noteMapping = mappingIn;
 
     if (sendMessage)
-        listeners.call(&Listener::mappingChanged, noteMapping);
+        listeners.call(&Listener::mappingEditorChanged, noteMapping);
 }
 
 //================================================================
