@@ -51,6 +51,7 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
 
 MappingSettingsPanel::~MappingSettingsPanel()
 {
+    pluginState->removeListener(this);
 }
 
 void MappingSettingsPanel::visibilityChanged()
