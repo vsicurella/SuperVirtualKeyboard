@@ -29,6 +29,8 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
         }
     )
 {
+    currentMappingLabel = static_cast<Label*>(getSectionFlexBox(0)->items.getReference(0).associatedComponent);
+
     noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
     controls.set(0, noteMapEditor, true);
     addAndMakeVisible(noteMapEditor);
@@ -64,10 +66,12 @@ void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
     if (mappingModeId == 3)
     {
         noteMapEditor->setEnabled(true);
+        currentMappingLabel->setText("Current Mapping", dontSendNotification);
     }
     else
     {
         noteMapEditor->setEnabled(false);
+        currentMappingLabel->setText("Current Mapping (Read-only)", dontSendNotification);
     }
 }
 
