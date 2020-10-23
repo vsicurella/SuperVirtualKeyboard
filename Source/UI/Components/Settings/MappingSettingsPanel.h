@@ -32,5 +32,6 @@ public:
 
 private:
 
+    Label* currentMappingLabel;
     NoteMapEditor* noteMapEditor;
 };
