@@ -26,6 +26,7 @@
 
 #include "../../File IO/ReaperWriter.h"
 #include "../../File IO/AbletonMidiWriter.h"
+#include "../../File IO/KbmWriter.h"
 
 class PluginControlComponent  : public Component,
                                 public TextEditor::Listener,
@@ -39,6 +40,24 @@ class PluginControlComponent  : public Component,
                                 private MappingHelper::Listener,
                                 private Timer
 {
+public:
+
+    enum SaveMenuOptions
+    {
+        SaveMode = 1,
+        SavePreset,
+        ExportKBM,
+        ExportReaper,
+        ExportAbleton
+    };
+
+    enum LoadMenuOptions
+    {
+        LoadMode = 1,
+        LoadPreset,
+        LoadKBM
+    };
+
 public:
     //==============================================================================
     PluginControlComponent (SvkPluginState* pluginStateIn);
@@ -159,6 +178,8 @@ public:
 
     bool exportModeViewedForAbleton();
 
+    bool exportKbmMapping();
+
 private:
 
     SvkPluginState* pluginState;
@@ -169,15 +190,15 @@ private:
     std::unique_ptr<Image> settingsIcon;
 
     std::unique_ptr<PopupMenu> saveMenu;
+    Array<PopupMenu::Item> saveMenuItems;
+
     std::unique_ptr<PopupMenu> loadMenu;
-    std::unique_ptr<PopupMenu> exportMenu;
-
+    Array<PopupMenu::Item> loadMenuItems;
+    
     std::unique_ptr<MappingHelper> mappingHelper;
-
     std::unique_ptr<SettingsContainer> settingsContainer;
 
     ScrollBar* viewportScrollBar;
-
     ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
 

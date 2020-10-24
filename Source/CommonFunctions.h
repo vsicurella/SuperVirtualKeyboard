@@ -145,6 +145,22 @@ struct Pair
     }
 };
 
+static bool toggleMenuItemEnablement(PopupMenu& menuIn, int itemIdIn, bool shouldBeEnabled)
+{
+    PopupMenu::MenuItemIterator menuItems(menuIn);
+    while (menuItems.next())
+    {
+        PopupMenu::Item& item = menuItems.getItem();
+        if (item.itemID == itemIdIn)
+        {
+            item.isEnabled = shouldBeEnabled;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //struct MidiPitch : Pair<int, int>
 //{
 //    MidiPitch(int midiNoteIn=-1, int pitchbendIn=0)

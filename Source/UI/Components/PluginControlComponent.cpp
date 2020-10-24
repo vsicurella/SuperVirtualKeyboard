@@ -16,131 +16,131 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     pluginState->addListener(this);
     presetManager = pluginState->getPresetManager();
 
-    scaleTextBox.reset (new TextEditor ("Scale Text Box"));
-    addAndMakeVisible (scaleTextBox.get());
-    scaleTextBox->setMultiLine (false);
-    scaleTextBox->setReturnKeyStartsNewLine (false);
-    scaleTextBox->setReadOnly (false);
-    scaleTextBox->setScrollbarsShown (true);
-    scaleTextBox->setCaretVisible (true);
-    scaleTextBox->setPopupMenuEnabled (true);
-    scaleTextBox->setText (String());
+    scaleTextBox.reset(new TextEditor("Scale Text Box"));
+    addAndMakeVisible(scaleTextBox.get());
+    scaleTextBox->setMultiLine(false);
+    scaleTextBox->setReturnKeyStartsNewLine(false);
+    scaleTextBox->setReadOnly(false);
+    scaleTextBox->setScrollbarsShown(true);
+    scaleTextBox->setCaretVisible(true);
+    scaleTextBox->setPopupMenuEnabled(true);
+    scaleTextBox->setText(String());
 
-    mode1Box.reset (new ReferencedComboBox ("Mode1 Box"));
-    addAndMakeVisible (mode1Box.get());
-    mode1Box->setEditableText (false);
-    mode1Box->setJustificationType (Justification::centredLeft);
-    mode1Box->setTextWhenNothingSelected (String());
-    mode1Box->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    mode1Box.reset(new ReferencedComboBox("Mode1 Box"));
+    addAndMakeVisible(mode1Box.get());
+    mode1Box->setEditableText(false);
+    mode1Box->setJustificationType(Justification::centredLeft);
+    mode1Box->setTextWhenNothingSelected(String());
+    mode1Box->setTextWhenNoChoicesAvailable(TRANS("(no choices)"));
     mode1Box->setTooltip(inputModeTooltip);
-    mode1Box->addListener (this);
+    mode1Box->addListener(this);
 
-    mode2Box.reset (new ReferencedComboBox ("Mode2 Box"));
-    addAndMakeVisible (mode2Box.get());
-    mode2Box->setEditableText (false);
-    mode2Box->setJustificationType (Justification::centredLeft);
-    mode2Box->setTextWhenNothingSelected (String());
-    mode2Box->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    mode2Box.reset(new ReferencedComboBox("Mode2 Box"));
+    addAndMakeVisible(mode2Box.get());
+    mode2Box->setEditableText(false);
+    mode2Box->setJustificationType(Justification::centredLeft);
+    mode2Box->setTextWhenNothingSelected(String());
+    mode2Box->setTextWhenNoChoicesAvailable(TRANS("(no choices)"));
     mode2Box->setTooltip(outputModeTooltip);
-    mode2Box->addListener (this);
+    mode2Box->addListener(this);
 
-    mode1RootSld.reset (new Slider ("Mode1 Root Slider"));
-    addAndMakeVisible (mode1RootSld.get());
-    mode1RootSld->setRange (0, 127, 1);
-    mode1RootSld->setSliderStyle (Slider::IncDecButtons);
-    mode1RootSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
-    mode1RootSld->addListener (this);
+    mode1RootSld.reset(new Slider("Mode1 Root Slider"));
+    addAndMakeVisible(mode1RootSld.get());
+    mode1RootSld->setRange(0, 127, 1);
+    mode1RootSld->setSliderStyle(Slider::IncDecButtons);
+    mode1RootSld->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 20);
+    mode1RootSld->addListener(this);
 
-    mode2RootSld.reset (new Slider ("mode2RootSld"));
-    addAndMakeVisible (mode2RootSld.get());
-    mode2RootSld->setRange (0, 127, 1);
-    mode2RootSld->setSliderStyle (Slider::IncDecButtons);
-    mode2RootSld->setTextBoxStyle (Slider::TextBoxLeft, false, 40, 20);
-    mode2RootSld->addListener (this);
+    mode2RootSld.reset(new Slider("mode2RootSld"));
+    addAndMakeVisible(mode2RootSld.get());
+    mode2RootSld->setRange(0, 127, 1);
+    mode2RootSld->setSliderStyle(Slider::IncDecButtons);
+    mode2RootSld->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 20);
+    mode2RootSld->addListener(this);
 
-    scaleEntryBtn.reset (new TextButton ("Scale Entry Button"));
-    addAndMakeVisible (scaleEntryBtn.get());
-    scaleEntryBtn->setButtonText (TRANS("OK"));
-    scaleEntryBtn->addListener (this);
+    scaleEntryBtn.reset(new TextButton("Scale Entry Button"));
+    addAndMakeVisible(scaleEntryBtn.get());
+    scaleEntryBtn->setButtonText(TRANS("OK"));
+    scaleEntryBtn->addListener(this);
 
-    modeInfoButton.reset (new TextButton ("Mode Info Button"));
-    addAndMakeVisible (modeInfoButton.get());
-    modeInfoButton->setButtonText (TRANS("i"));
-    modeInfoButton->addListener (this);
+    modeInfoButton.reset(new TextButton("Mode Info Button"));
+    addAndMakeVisible(modeInfoButton.get());
+    modeInfoButton->setButtonText(TRANS("i"));
+    modeInfoButton->addListener(this);
 
-    mode1ViewBtn.reset (new ToggleButton ("Mode1 View Button"));
-    addChildComponent (mode1ViewBtn.get());
-    mode1ViewBtn->setButtonText (String());
-    mode1ViewBtn->setRadioGroupId (10);
-    mode1ViewBtn->addListener (this);
-    mode1ViewBtn->setToggleState (true, dontSendNotification);
+    mode1ViewBtn.reset(new ToggleButton("Mode1 View Button"));
+    addChildComponent(mode1ViewBtn.get());
+    mode1ViewBtn->setButtonText(String());
+    mode1ViewBtn->setRadioGroupId(10);
+    mode1ViewBtn->addListener(this);
+    mode1ViewBtn->setToggleState(true, dontSendNotification);
 
-    mode2ViewBtn.reset (new ToggleButton ("Mode2 View Button"));
-    addChildComponent (mode2ViewBtn.get());
-    mode2ViewBtn->setButtonText (String());
-    mode2ViewBtn->setRadioGroupId (10);
-    mode2ViewBtn->addListener (this);
+    mode2ViewBtn.reset(new ToggleButton("Mode2 View Button"));
+    addChildComponent(mode2ViewBtn.get());
+    mode2ViewBtn->setButtonText(String());
+    mode2ViewBtn->setRadioGroupId(10);
+    mode2ViewBtn->addListener(this);
 
-    mode1RootLbl.reset (new Label ("Mode1 Root Label",
-                                   TRANS("C4")));
-    addAndMakeVisible (mode1RootLbl.get());
-    mode1RootLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    mode1RootLbl->setJustificationType (Justification::centredLeft);
-    mode1RootLbl->setEditable (false, false, false);
-    mode1RootLbl->setColour (TextEditor::textColourId, Colours::black);
-    mode1RootLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    mode1RootLbl.reset(new Label("Mode1 Root Label",
+        TRANS("C4")));
+    addAndMakeVisible(mode1RootLbl.get());
+    mode1RootLbl->setFont(Font(15.00f, Font::plain).withTypefaceStyle("Regular"));
+    mode1RootLbl->setJustificationType(Justification::centredLeft);
+    mode1RootLbl->setEditable(false, false, false);
+    mode1RootLbl->setColour(TextEditor::textColourId, Colours::black);
+    mode1RootLbl->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-    mode2RootLbl.reset (new Label ("Mode 2 Root Label",
-                                   TRANS("F5")));
-    addAndMakeVisible (mode2RootLbl.get());
-    mode2RootLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    mode2RootLbl->setJustificationType (Justification::centredLeft);
-    mode2RootLbl->setEditable (false, false, false);
-    mode2RootLbl->setColour (TextEditor::textColourId, Colours::black);
-    mode2RootLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    mode2RootLbl.reset(new Label("Mode 2 Root Label",
+        TRANS("F5")));
+    addAndMakeVisible(mode2RootLbl.get());
+    mode2RootLbl->setFont(Font(15.00f, Font::plain).withTypefaceStyle("Regular"));
+    mode2RootLbl->setJustificationType(Justification::centredLeft);
+    mode2RootLbl->setEditable(false, false, false);
+    mode2RootLbl->setColour(TextEditor::textColourId, Colours::black);
+    mode2RootLbl->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-    mapStyleBox.reset (new ComboBox ("Mapping Style Box"));
-    addAndMakeVisible (mapStyleBox.get());
-    mapStyleBox->setEditableText (false);
-    mapStyleBox->setJustificationType (Justification::centredLeft);
-    mapStyleBox->setTextWhenNothingSelected (TRANS("Mode To Mode"));
-    mapStyleBox->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    mapStyleBox->addItem (TRANS("Mode To Mode"), 1);
-    mapStyleBox->addItem (TRANS("Scale To Mode"), 2);
-    mapStyleBox->addItem (TRANS("By Key Layers"), 3);
+    mapStyleBox.reset(new ComboBox("Mapping Style Box"));
+    addAndMakeVisible(mapStyleBox.get());
+    mapStyleBox->setEditableText(false);
+    mapStyleBox->setJustificationType(Justification::centredLeft);
+    mapStyleBox->setTextWhenNothingSelected(TRANS("Mode To Mode"));
+    mapStyleBox->setTextWhenNoChoicesAvailable(TRANS("(no choices)"));
+    mapStyleBox->addItem(TRANS("Mode To Mode"), 1);
+    mapStyleBox->addItem(TRANS("Scale To Mode"), 2);
+    mapStyleBox->addItem(TRANS("By Key Layers"), 3);
     mapStyleBox->setTooltip(mapStyleTooltip);
-    mapStyleBox->addListener (this);
+    mapStyleBox->addListener(this);
 
-    mapStyleLbl.reset (new Label ("Mapping Style Label",
-                                  TRANS("Mapping Style:")));
-    addAndMakeVisible (mapStyleLbl.get());
-    mapStyleLbl->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    mapStyleLbl->setJustificationType (Justification::centredLeft);
-    mapStyleLbl->setEditable (false, false, false);
-    mapStyleLbl->setColour (TextEditor::textColourId, Colours::black);
-    mapStyleLbl->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    mapStyleLbl.reset(new Label("Mapping Style Label",
+        TRANS("Mapping Style:")));
+    addAndMakeVisible(mapStyleLbl.get());
+    mapStyleLbl->setFont(Font(15.00f, Font::plain).withTypefaceStyle("Regular"));
+    mapStyleLbl->setJustificationType(Justification::centredLeft);
+    mapStyleLbl->setEditable(false, false, false);
+    mapStyleLbl->setColour(TextEditor::textColourId, Colours::black);
+    mapStyleLbl->setColour(TextEditor::backgroundColourId, Colour(0x00000000));
 
-    mapOrderEditBtn.reset (new TextButton ("Map Order Edit Button", TRANS("Set layer mappings")));
+    mapOrderEditBtn.reset(new TextButton("Map Order Edit Button", TRANS("Set layer mappings")));
     addChildComponent(mapOrderEditBtn.get());
-    mapOrderEditBtn->setButtonText (TRANS("Layers"));
-    mapOrderEditBtn->addListener (this);
+    mapOrderEditBtn->setButtonText(TRANS("Layers"));
+    mapOrderEditBtn->addListener(this);
 
-    mapModeBox.reset (new ComboBox ("Mapping Mode Box"));
+    mapModeBox.reset(new ComboBox("Mapping Mode Box"));
     addAndMakeVisible(mapModeBox.get());
-    mapModeBox->setEditableText (false);
-    mapModeBox->setJustificationType (Justification::centredLeft);
-    mapModeBox->setTextWhenNothingSelected (TRANS("Mapping Off"));
-    mapModeBox->setTextWhenNoChoicesAvailable (TRANS("Mapping Off"));
-    mapModeBox->addItem (TRANS("Mapping Off"), 1);
-    mapModeBox->addItem (TRANS("Auto Map"), 2);
-    mapModeBox->addItem (TRANS("Manual Map"), 3);
+    mapModeBox->setEditableText(false);
+    mapModeBox->setJustificationType(Justification::centredLeft);
+    mapModeBox->setTextWhenNothingSelected(TRANS("Mapping Off"));
+    mapModeBox->setTextWhenNoChoicesAvailable(TRANS("Mapping Off"));
+    mapModeBox->addItem(TRANS("Mapping Off"), 1);
+    mapModeBox->addItem(TRANS("Auto Map"), 2);
+    mapModeBox->addItem(TRANS("Manual Map"), 3);
     mapModeBox->setTooltip(mapModeTooltip);
-    mapModeBox->addListener (this);
+    mapModeBox->addListener(this);
 
-    mapApplyBtn.reset (new TextButton ("Apply Layer Map Button"));
-    addChildComponent (mapApplyBtn.get());
-    mapApplyBtn->setButtonText (TRANS("Apply"));
-    mapApplyBtn->addListener (this);
+    mapApplyBtn.reset(new TextButton("Apply Layer Map Button"));
+    addChildComponent(mapApplyBtn.get());
+    mapApplyBtn->setButtonText(TRANS("Apply"));
+    mapApplyBtn->addListener(this);
 
     mapCopyToManualBtn.reset(new TextButton("Copy Mapping to Manual Button", TRANS("Edit this mapping in Manual mode.")));
     addChildComponent(mapCopyToManualBtn.get());
@@ -169,38 +169,38 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     keyboard.reset(new VirtualKeyboard::Keyboard());
     keyboard->addListener(pluginState->getMidiProcessor());
 
-    keyboardViewport.reset (new KeyboardViewport(keyboard.get(), "Keyboard Viewport"));
-    addAndMakeVisible (keyboardViewport.get());    
+    keyboardViewport.reset(new KeyboardViewport(keyboard.get(), "Keyboard Viewport"));
+    addAndMakeVisible(keyboardViewport.get());
     viewportScrollBar = &keyboardViewport->getHorizontalScrollBar();
 
-    saveButton.reset (new ImageButton ("Save Button"));
-    addAndMakeVisible (saveButton.get());
-    saveButton->setButtonText (TRANS("Save"));
-    saveButton->addListener (this);
-    saveButton->setImages (false, true, true,
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000));
+    saveButton.reset(new ImageButton("Save Button"));
+    addAndMakeVisible(saveButton.get());
+    saveButton->setButtonText(TRANS("Save"));
+    saveButton->addListener(this);
+    saveButton->setImages(false, true, true,
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000));
     saveButton->setSize(28, 28);
 
-    openButton.reset (new ImageButton ("Open Button"));
-    addAndMakeVisible (openButton.get());
-    openButton->setButtonText (TRANS("Open"));
-    openButton->addListener (this);
-    openButton->setImages (false, true, true,
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000));
+    openButton.reset(new ImageButton("Open Button"));
+    addAndMakeVisible(openButton.get());
+    openButton->setButtonText(TRANS("Open"));
+    openButton->addListener(this);
+    openButton->setImages(false, true, true,
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000));
     openButton->setSize(28, 28);
 
-    settingsButton.reset (new ImageButton ("Settings Button"));
-    addAndMakeVisible (settingsButton.get());
-    settingsButton->setButtonText (TRANS("Settings"));
-    settingsButton->addListener (this);
-    settingsButton->setImages (false, true, true,
-                               Image(), 1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000),
-                               Image(), 1.000f, Colour (0x00000000));
+    settingsButton.reset(new ImageButton("Settings Button"));
+    addAndMakeVisible(settingsButton.get());
+    settingsButton->setButtonText(TRANS("Settings"));
+    settingsButton->addListener(this);
+    settingsButton->setImages(false, true, true,
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000),
+        Image(), 1.000f, Colour(0x00000000));
     settingsButton->setSize(28, 28);
 
     saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
@@ -209,7 +209,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
     openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
-    
+
     scaleTextBox->addListener(this);
     scaleTextBox->setInputRestrictions(0, " 0123456789");
 
@@ -221,14 +221,25 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
 
 
     saveMenu.reset(new PopupMenu());
-    saveMenu->addItem("Save Mode", true, false, [&]() { pluginState->saveModeViewedToFile(); });
-    saveMenu->addItem("Save Preset", true, false, [&]() { pluginState->savePresetToFile(); });
-    saveMenu->addItem("Export for Reaper Note Names", true, false, [&]() { exportModeViewedForReaper(); });
-    saveMenu->addItem("Export for Ableton Folding", true, false, [&]() { exportModeViewedForAbleton(); });
-
+    saveMenuItems =
+    {
+        PopupMenu::Item("Save Mode").setID(SaveMenuOptions::SaveMode).setAction([&]() { pluginState->saveModeViewedToFile(); }),
+        PopupMenu::Item("Save Preset").setID(SaveMenuOptions::SavePreset).setAction([&]() { pluginState->savePresetToFile(); }),
+        PopupMenu::Item("Save Mapping as KBM").setID(SaveMenuOptions::ExportKBM).setAction([&]() { exportKbmMapping(); }),
+        PopupMenu::Item("Export for Reaper Note Names").setID(SaveMenuOptions::ExportReaper).setAction([&]() { exportModeViewedForReaper(); }),
+        PopupMenu::Item("Export for Ableton Folding").setID(SaveMenuOptions::ExportAbleton).setAction([&]() { exportModeViewedForAbleton(); })
+    };
+    for (auto item : saveMenuItems)
+        saveMenu->addItem(item);
+    
     loadMenu.reset(new PopupMenu());
-    loadMenu->addItem("Load Mode", true, false, [&]() { browseForModeToOpen(); });
-    loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
+    loadMenuItems =
+    {
+            PopupMenu::Item("Load Mode").setID(LoadMenuOptions::LoadMode).setAction([&]() { browseForModeToOpen(); }),
+            PopupMenu::Item("Load Preset").setID(LoadMenuOptions::LoadPreset).setAction([&]() { browseForPresetToOpen(); })
+    };
+    for (auto item : loadMenuItems)
+        loadMenu->addItem(item);
 
 
     ValueTree pluginWindowNode = pluginState->getPluginEditorNode();
@@ -657,6 +668,11 @@ void PluginControlComponent::mappingModeChanged(int mappingModeId)
         }
 
         mode2ViewBtn->setToggleState(true, sendNotification);
+        toggleMenuItemEnablement(*saveMenu, SaveMenuOptions::ExportKBM, true);
+    }
+    else
+    {
+        toggleMenuItemEnablement(*saveMenu, SaveMenuOptions::ExportKBM, false);
     }
 
     if (mappingModeId == 3)
@@ -1027,4 +1043,19 @@ bool PluginControlComponent::exportModeViewedForAbleton()
 {
     AbletonMidiWriter amw(*pluginState->getModeViewed());
     return amw.write();
+}
+
+bool PluginControlComponent::exportKbmMapping()
+{
+    KbmWriter kbm = KbmWriter::fromModes(pluginState->getMode1(), pluginState->getMode2(), *pluginState->getModeMapper());
+
+    FileChooser chooser("Save KBM file...", File(), "*.kbm");
+    
+    if (chooser.browseForFileToSave(true))
+    {
+        kbm.writeTo(chooser.getResult());
+        return true;
+    }
+
+    return false;
 }
