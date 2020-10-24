@@ -25,6 +25,7 @@
       <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
         <FILE id="tTU60E" name="AbletonMidiWriter.h" compile="0" resource="0"
               file="Source/File IO/AbletonMidiWriter.h"/>
+        <FILE id="fi0keh" name="KbmWriter.h" compile="0" resource="0" file="Source/File IO/KbmWriter.h"/>
         <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
               file="Source/File IO/ReaperWriter.cpp"/>
         <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
