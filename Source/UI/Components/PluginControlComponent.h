@@ -23,6 +23,7 @@
 
 #include "../Dialogs/ModeInfoDialog.h"
 #include "../Dialogs/MapByOrderDialog.h"
+#include "../Dialogs/ExportKbmDialog.h"
 
 #include "../../File IO/ReaperWriter.h"
 #include "../../File IO/AbletonMidiWriter.h"
@@ -178,7 +179,7 @@ public:
 
     bool exportModeViewedForAbleton();
 
-    bool exportKbmMapping();
+    void exportKbmMapping();
 
 private:
 

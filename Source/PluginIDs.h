@@ -102,6 +102,7 @@ static Identifier mode1OrderMapping("Mode1OrderMapping");
 static Identifier mode2OrderMapping("Mode2OrderMapping");
 static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
 static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
+static Identifier kbmFileLocation("KbmFileLocation");
 
 // Keyboard Window
 static Identifier pluginEditorNode("PluginWindow");

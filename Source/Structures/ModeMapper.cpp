@@ -140,8 +140,6 @@ Array<int> ModeMapper::getSelectedPeriodMap(const Mode& mode1, const Mode& mode2
     Array<int> mapOut;
     NoteMap fullMap;
 
-    DBG("Mapping Style: " + String(mappingStyle));
-
     switch (mappingStyle)
     {
     case ModeToScale:
@@ -394,7 +392,7 @@ Array<int> ModeMapper::getScaleToModePeriodMap(const Mode& mode1, const Mode& mo
         mode2ScaleIndex += mode2Steps[i];
     }
 
-    DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
+    //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
     return degreeMapOut;
 }
 

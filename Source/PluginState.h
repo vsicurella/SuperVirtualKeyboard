@@ -50,6 +50,7 @@ public:
     // Object getters
 
     ValueTree getPluginEditorNode() const;
+    ValueTree getMappingNode() const;
     
     SvkPresetManager* getPresetManager();
     SvkMidiProcessor* getMidiProcessor();
