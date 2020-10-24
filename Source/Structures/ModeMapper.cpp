@@ -135,12 +135,43 @@ NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, in
     return mapOut;
 }
 
+Array<int> ModeMapper::getSelectedPeriodMap(const Mode& mode1, const Mode& mode2) const
+{
+    Array<int> mapOut;
+    NoteMap fullMap;
+
+    DBG("Mapping Style: " + String(mappingStyle));
+
+    switch (mappingStyle)
+    {
+    case ModeToScale:
+        if (mode1.getScaleSize() == mode2.getModeSize())
+            mapOut = getScaleToModePeriodMap(mode1, mode2);
+        else // TODO: improve
+            mapOut = mapFull(mode1, mode2).getValues();
+        break;
+
+    case ModeByOrder: // TODO: improve
+        mapOut = mapFull(mode1, mode2, previousOrderMap.getValues()).getValues();
+        break;
+
+    default: // ModeToMode
+        if (mode1.getModeSize() == mode2.getModeSize())
+            mapOut = getModeToModePeriodMap(mode1, mode2);
+        else
+            mapOut = degreeMapFullMode(mode1, mode2);
+        break;
+    }
+
+    return mapOut;
+}
+
 NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn)
 {
     if (degreeMapIn.size() != mode1.getOrders().size())
         degreeMapIn = degreeMapFullMode(mode1, mode2);
     else
-        degreeMapIn = degreeMapPeriod(mode1, mode2);
+        degreeMapIn = getModeToModePeriodMap(mode1, mode2);
 
     NoteMap mappingOut;
     
@@ -209,7 +240,7 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
 {
     // ensure degree map is the same size as Mode1 Period
     if (degreeMapIn.size() != mode1.getScaleSize())
-        degreeMapIn = degreeMapPeriod(mode1, mode2);
+        degreeMapIn = getModeToModePeriodMap(mode1, mode2);
     
     int rootNoteFrom = mode1.getRootNote();
     int rootNoteTo = mode2.getRootNote();
@@ -298,7 +329,7 @@ NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
         return mapFull(meantone7_12, modeMapped);
 }
 
-Array<int> ModeMapper::degreeMapPeriod(const Mode& mode1, const Mode& mode2)
+Array<int> ModeMapper::getModeToModePeriodMap(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
     
@@ -347,6 +378,23 @@ Array<int> ModeMapper::degreeMapPeriod(const Mode& mode1, const Mode& mode2)
     }
 
     //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
+    return degreeMapOut;
+}
+
+Array<int> ModeMapper::getScaleToModePeriodMap(const Mode& mode1, const Mode& mode2)
+{
+    Array<int> degreeMapOut;
+
+    Array<int> mode2Steps = mode2.getSteps();
+    int mode2ScaleIndex = 0;
+
+    for (int i = 0; i < mode2Steps.size(); i++)
+    {
+        degreeMapOut.add(mode2ScaleIndex);
+        mode2ScaleIndex += mode2Steps[i];
+    }
+
+    DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
     return degreeMapOut;
 }
 

@@ -5,6 +5,8 @@
     Created: 30 May 2019 8:02:42pm
     Author:  Vincenzo
 
+    TODO: Lots of cleaning up, simplifying, and generalizing
+
   ==============================================================================
 */
 
@@ -64,6 +66,8 @@ public:
     NoteMap map(const Mode& mode1, const Mode& mode2, int mapStyleIn = -1, int order1=0, int order2=0, int offset1=0, int offset2=0,
                 NoteMap prevMap = NoteMap());
 
+    Array<int> getSelectedPeriodMap(const Mode& mode1, const Mode& mode2) const;
+
     // 
     static NoteMap mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn = Array<int>());
 
@@ -79,9 +83,12 @@ public:
     // Maps standard keyboard layout (white keys) to new mode (white keys)
     static NoteMap stdMidiToMode(const Mode& modeMapped, int rootNoteStd = 60);
     
-    // 
-    static Array<int> degreeMapPeriod(const Mode& mode1, const Mode& mode2);
-    
+    // A basic one-period mode-based mapping 
+    static Array<int> getModeToModePeriodMap(const Mode& mode1, const Mode& mode2);
+
+    // A basic one-period scale-based mapping, dependent on output mode's subscale being the same size as input mode's full scale
+    static Array<int> getScaleToModePeriodMap(const Mode& mode1, const Mode& mode2);
+
     // 
     static Array<int> degreeMapFullMode(const Mode& mode1, const Mode& mode2);
 };
