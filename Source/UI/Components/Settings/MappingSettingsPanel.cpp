@@ -36,8 +36,7 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
     addAndMakeVisible(noteMapEditor);
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
 
-    if (pluginState->getMappingMode() != 3)
-        noteMapEditor->setEnabled(false);
+    mappingModeChanged(pluginState->getMappingMode());
 
     pluginState->addListener(this);
 
@@ -64,15 +63,24 @@ void MappingSettingsPanel::visibilityChanged()
 
 void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
 {
-    if (mappingModeId == 3)
+    // Mapping off
+    if (mappingModeId == 1)
+    {
+        noteMapEditor->setEnabled(false);
+        currentMappingLabel->setText("Current Mapping (No mapping active)", dontSendNotification);
+        noteMapEditor->resetMapping(pluginState->getMidiProcessor()->getManualNoteMap(), false);
+    }
+    // Auto Map
+    else if (mappingModeId == 2)
+    {
+        noteMapEditor->setEnabled(false);
+        currentMappingLabel->setText("Current Mapping (Auto Map / Read-only)", dontSendNotification);
+    }
+    // Manual Map
+    else if (mappingModeId == 3)
     {
         noteMapEditor->setEnabled(true);
         currentMappingLabel->setText("Current Mapping", dontSendNotification);
-    }
-    else
-    {
-        noteMapEditor->setEnabled(false);
-        currentMappingLabel->setText("Current Mapping (Read-only)", dontSendNotification);
     }
 }
 
