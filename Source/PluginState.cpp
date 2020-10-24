@@ -74,6 +74,11 @@ ValueTree SvkPluginState::getPluginEditorNode() const
     return pluginStateNode.getChildWithName(IDs::pluginEditorNode);
 }
 
+ValueTree SvkPluginState::getMappingNode() const
+{
+    return midiProcessor->midiMapNode;
+}
+
 void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
 {
     presetEdited = false;

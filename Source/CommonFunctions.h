@@ -429,3 +429,8 @@ static void DBGArray(Array<T>& arrayIn, String arrayName="Array")
         DBG(String(i) + ": " + String(arrayIn[i]));
     }
 }
+
+static double getStdFrequency(int midiNoteIn)
+{
+    return 440.0 * pow(2, (midiNoteIn - 69) / 12.0);
+}

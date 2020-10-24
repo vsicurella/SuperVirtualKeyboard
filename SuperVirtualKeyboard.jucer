@@ -133,6 +133,8 @@
                 file="Source/UI/Components/ReferencedComboBox.h"/>
         </GROUP>
         <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
+          <FILE id="XJJu6w" name="ExportKbmDialog.h" compile="0" resource="0"
+                file="Source/UI/Dialogs/ExportKbmDialog.h"/>
           <FILE id="KNufAG" name="MapByOrderDialog.cpp" compile="1" resource="0"
                 file="Source/UI/Dialogs/MapByOrderDialog.cpp"/>
           <FILE id="Pt2NrT" name="MapByOrderDialog.h" compile="0" resource="0"

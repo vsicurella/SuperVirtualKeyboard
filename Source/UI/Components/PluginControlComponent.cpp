@@ -225,7 +225,7 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     {
         PopupMenu::Item("Save Mode").setID(SaveMenuOptions::SaveMode).setAction([&]() { pluginState->saveModeViewedToFile(); }),
         PopupMenu::Item("Save Preset").setID(SaveMenuOptions::SavePreset).setAction([&]() { pluginState->savePresetToFile(); }),
-        PopupMenu::Item("Save Mapping as KBM").setID(SaveMenuOptions::ExportKBM).setAction([&]() { exportKbmMapping(); }),
+        PopupMenu::Item("Export Mapping as KBM").setID(SaveMenuOptions::ExportKBM).setAction([&]() { exportKbmMapping(); }),
         PopupMenu::Item("Export for Reaper Note Names").setID(SaveMenuOptions::ExportReaper).setAction([&]() { exportModeViewedForReaper(); }),
         PopupMenu::Item("Export for Ableton Folding").setID(SaveMenuOptions::ExportAbleton).setAction([&]() { exportModeViewedForAbleton(); })
     };
@@ -1045,17 +1045,20 @@ bool PluginControlComponent::exportModeViewedForAbleton()
     return amw.write();
 }
 
-bool PluginControlComponent::exportKbmMapping()
+void PluginControlComponent::exportKbmMapping()
 {
-    KbmWriter kbm = KbmWriter::fromModes(pluginState->getMode1(), pluginState->getMode2(), *pluginState->getModeMapper());
+    DialogWindow::LaunchOptions options;
+    options.dialogTitle = "Export KBM file";
+    options.escapeKeyTriggersCloseButton = true;
+    options.componentToCentreAround = this;
+    options.content = OptionalScopedPointer<Component>(new ExportKbmDialog(
+        pluginState->getMappingNode(),
+        *pluginState->getMode1(), *pluginState->getMode2(), *pluginState->getModeMapper()), true
+        );
+    options.content->setSize(316, 112);
 
-    FileChooser chooser("Save KBM file...", File(), "*.kbm");
-    
-    if (chooser.browseForFileToSave(true))
-    {
-        kbm.writeTo(chooser.getResult());
-        return true;
-    }
-
-    return false;
+    if (JUCEApplication::isStandaloneApp())
+        options.runModal();
+    else
+        options.launchAsync();
 }
