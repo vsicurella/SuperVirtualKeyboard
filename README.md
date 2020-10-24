@@ -41,8 +41,8 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
    * Modes may still load
    * I can add support for old presets upon request
    * The new preset structure includes versioning which make backwards-compatibility more feasible
-1. Added basic manual mapping
-1. Improved GUI
+1. Basic manual mapping
+1. Basic KBM file export
 1. New Settings menu
    * Reintroduced key color features
    * Adjacent key placement style
@@ -50,6 +50,7 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
    * Fixed period shifting and transposition
    * MIDI Device selection for standalone app
    * Note mapping editor
+1. Simpler and improved GUI
 1. Smoothed window resizing
 
 ### To do:
