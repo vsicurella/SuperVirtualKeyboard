@@ -453,12 +453,11 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
     externalInputBuffer.clear();
     numInputMsgs = 0;
 
-    // Process external input
+    // Process input
     MidiBuffer combinedMessages;
     MidiMessage msg;
     int midiNote;
     
-    // Add external input into queue
     for (auto msgData : midiMessages)
     {
         msg = msgData.getMessage();
@@ -497,8 +496,11 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         combinedMessages.addEvent(msg, msgData.samplePosition);
     }
 
+    combinedMessages.addEvents(svkBuffer, 0, numSvkMsgs, 0);
+    MidiBuffer finalOutputBuffer;
+
     // Output Filtering on all MIDI events
-    for (auto msgData : svkBuffer)
+    for (auto msgData : combinedMessages)
     {
         if (!msgData.numBytes)
             continue;
@@ -521,13 +523,13 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
             msg.setNoteNumber(midiNote);
         }
 
-        combinedMessages.addEvent(msg, msgData.samplePosition);
+       finalOutputBuffer.addEvent(msg, msgData.samplePosition);
     }
 
     svkBuffer.clear();
     numSvkMsgs = 0;
 
-    midiMessages.swapWith(combinedMessages);
+    midiMessages.swapWith(finalOutputBuffer);
     sendBufferToOutputs(midiMessages);
 }
 
