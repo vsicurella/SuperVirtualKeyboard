@@ -150,7 +150,12 @@ private:
     MidiBuffer svkBuffer;
     int numSvkMsgs = 0;
 
+    MidiBuffer directOutBuffer;
+    int directMsgs = 0;
+
     MidiBuffer allNotesOffBuffer;
+
+    Array<Array<int>> notesOnPerChannel;
 
     Mode* modeViewed;
     Mode* mode1;

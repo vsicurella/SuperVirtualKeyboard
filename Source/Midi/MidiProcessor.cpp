@@ -26,6 +26,8 @@ SvkMidiProcessor::SvkMidiProcessor()
     originalKeyboardState.reset(new MidiKeyboardState());
     remappedKeyboardState.reset(new MidiKeyboardState());
 
+    notesOnPerChannel.resize(16);
+
     startTime = Time::getMillisecondCounterHiRes();
 
     // Create all-notes-off buffer
@@ -340,7 +342,16 @@ void SvkMidiProcessor::updateNoteTransposition()
     else
         currentNoteShift += periodShift * mode2->getScaleSize();
 
-    // TODO: handle sustained notes
+    // handle sustained notes | TODO: more thorough solution
+    for (int i = 0; i < 16; i++)
+    {
+        Array<int>& channel = notesOnPerChannel.getReference(i);
+
+        for (auto note : channel)
+        {
+            directOutBuffer.addEvent(MidiMessage::noteOff(i + 1, note), directMsgs++);
+        }
+    }
 }
 
 //void SvkMidiProcessor::setRetuneOn(bool retuneOn)
@@ -521,6 +532,12 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
                 continue;
 
             msg.setNoteNumber(midiNote);
+
+            // TODO: better method for handling this (when transpositions change before note off)
+            if (msg.isNoteOn())
+                notesOnPerChannel.getReference(msg.getChannel() - 1).addIfNotAlreadyThere(msg.getNoteNumber());
+            else if (msg.isNoteOff())
+                notesOnPerChannel.getReference(msg.getChannel() - 1).removeAllInstancesOf(msg.getNoteNumber());
         }
 
        finalOutputBuffer.addEvent(msg, msgData.samplePosition);
@@ -528,6 +545,10 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 
     svkBuffer.clear();
     numSvkMsgs = 0;
+
+    finalOutputBuffer.addEvents(directOutBuffer, 0, directMsgs, 0);
+    directOutBuffer.clear();
+    directMsgs = 0;
 
     midiMessages.swapWith(finalOutputBuffer);
     sendBufferToOutputs(midiMessages);
