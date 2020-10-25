@@ -12,7 +12,7 @@
 2 2 1 2 2 2 1, Meantone; MOS from 5\12, has been the foundation for Western harmony for centuries
 3 1 3 1 3 1, Augmented; Symmetrical scale with a period of 4\12 or 400 cents.
 2 1 2 1 2 1 2 1, Diminished; Symmetrical scale with a period of 3\12 or 300 cents
-2 2 1 2 1 3 1, HarmMinor; The popular Harmonic Minor scale
+2 1 2 2 1 3 1, HarmMinor; The popular Harmonic Minor scale
 2 2 2 2 2 2 1, Glacial; MOS from 2\13
 2 1 2 1 2 1 2 1 1, Orwell; MOS from 3\13, not considered suitable for accurate Orwell
 2 1 1 2 1 1 2 1 1 1, Sephiroth; MOS from 4\13
