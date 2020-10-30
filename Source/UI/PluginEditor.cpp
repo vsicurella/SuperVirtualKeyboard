@@ -41,11 +41,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     controlComponent.reset(new PluginControlComponent(pluginState));
     addAndMakeVisible(controlComponent.get());
 
-    if (pluginEditorNode[IDs::settingsOpen])
-        controlComponent->showSettingsDialog();
-
     setSize(controlComponent->getWidth(), controlComponent->getHeight());
     setResizeLimits(defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
+
+    if (pluginEditorNode[IDs::settingsOpen])
+        controlComponent->showSettingsDialog();
     
     pluginEditorNode.addListener(this);
 }

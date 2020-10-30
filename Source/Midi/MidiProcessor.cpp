@@ -445,7 +445,7 @@ void SvkMidiProcessor::resetOutputFilter(bool updateNode)
 
 void SvkMidiProcessor::setMappingHelper(MappingHelper* helperIn)
 {
-    mappingHelper = helperIn;
+    manualMappingHelper = helperIn;
 }
 
 void SvkMidiProcessor::setInManualMappingMode(bool manualModeOn)
@@ -479,10 +479,10 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
 
             if (inManualMappingMode)
             {
-                if (mappingHelper->isWaitingForKeyInput())
+                if (manualMappingHelper->isWaitingForKeyInput())
                 {
                     MessageManagerLock lock;
-                    mappingHelper->mapPreparedKeyToNote(midiNote, false);
+                    manualMappingHelper->mapPreparedKeyToNote(midiNote, false);
                     originalKeyboardState->processNextMidiEvent(msg);
                     continue;
                 }
