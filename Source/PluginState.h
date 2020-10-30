@@ -44,7 +44,6 @@ public:
     void commitStateNode();
 
     static int isValidStateNode(ValueTree pluginStateNodeIn);
-
     
     //==============================================================================
     // Object getters
@@ -126,7 +125,7 @@ public:
     void doAutoMapping(const Mode* mode1, const Mode* mode2, bool sendChangeMessage = true);
     void doAutoMapping(bool sendChangeMessage = true);
 
-    void revertToSavedPreset(bool fallbackToDefaultSettings = false, bool sendChange = true);
+    void revertToSavedState(bool fallbackToDefaultSettings = false, bool sendChange = true);
 
     bool savePresetToFile();
     bool loadPresetFromFile();

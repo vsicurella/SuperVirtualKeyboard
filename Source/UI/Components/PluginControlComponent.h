@@ -89,8 +89,6 @@ public:
 
     //==============================================================================
 
-    void presetLoaded(ValueTree presetNodeIn) override;
-
     void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
     void mappingModeChanged(int mappingModeId) override;

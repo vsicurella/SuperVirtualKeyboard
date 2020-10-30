@@ -11,11 +11,7 @@
 #include "MidiProcessor.h"
 
 SvkMidiProcessor::SvkMidiProcessor()
-{
-    midiSettingsNode = ValueTree(IDs::midiSettingsNode);
-    midiMapNode = ValueTree(IDs::midiMapNode);
-    midiDeviceNode = ValueTree(IDs::midiDeviceSettingsNode);
-    
+{    
     midiInputFilter.reset(new MidiFilter());
     midiInputRemap.reset(new MidiFilter());
     midiOutputFilter.reset(new MidiFilter());

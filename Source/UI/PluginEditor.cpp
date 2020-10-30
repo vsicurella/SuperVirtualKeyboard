@@ -47,6 +47,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     if (pluginEditorNode[IDs::settingsOpen])
         controlComponent->showSettingsDialog();
     
+    pluginState->addListener(this);
     pluginEditorNode.addListener(this);
 }
 
@@ -65,6 +66,20 @@ void SvkPluginEditor::paint(Graphics& g)
 void SvkPluginEditor::resized()
 {    
     controlComponent->setBounds(0, 0, getWidth(), getHeight());
+}
+
+void SvkPluginEditor::presetLoaded(ValueTree presetNodeIn)
+{
+    if (pluginEditorNode.isValid())
+        pluginEditorNode.removeListener(this);
+
+    pluginEditorNode = pluginState->getPluginEditorNode();
+ 
+    controlComponent->loadPresetNode(presetNodeIn);
+    if (pluginEditorNode[IDs::settingsOpen])
+        controlComponent->showSettingsDialog();
+
+    pluginEditorNode.addListener(this);
 }
 
 //==============================================================================

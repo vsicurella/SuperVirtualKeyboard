@@ -30,7 +30,7 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     buildFactoryDefaultState();
     buildUserDefaultState();
 
-    revertToSavedPreset(true, false);
+    revertToSavedState(true, false);
 }
 
 void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
@@ -51,8 +51,15 @@ void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSetting
             stateIn = factoryDefaultPluginStateNode.createCopy();
         }
     }
+    else if (status & PluginStateNodeStatus::IsPresetNode)
+    {
+        // TODO: change to default preset
+        stateIn = factoryDefaultPluginStateNode.createCopy();
+        stateIn.getOrCreateChildWithName(IDs::presetNode, nullptr).copyPropertiesAndChildrenFrom(nodeIn, nullptr);
+        stateIn.appendChild(pluginStateNode.getOrCreateChildWithName(IDs::pluginEditorNode, nullptr).createCopy(), nullptr);
+    }
 
-    if (stateIn.isValid())
+    if (stateIn.hasType(IDs::pluginStateNode))
     {
         bool loaded = presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false);
         if (!loaded)
@@ -63,7 +70,11 @@ void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSetting
         }
 
         pluginStateNode = stateIn.createCopy();
-        revertToSavedPreset(fallbackToDefaultSettings);
+        revertToSavedState(fallbackToDefaultSettings);
+    }
+    else
+    {
+        DBG("State not loaded successfully - no changes were made.");
     }
 
     DBG("Plugin State Node after recall:\n" + pluginStateNode.toXmlString());
@@ -79,7 +90,7 @@ ValueTree SvkPluginState::getMappingNode() const
     return midiProcessor->midiMapNode;
 }
 
-void SvkPluginState::revertToSavedPreset(bool fallbackToDefaultSettings, bool sendChange)
+void SvkPluginState::revertToSavedState(bool fallbackToDefaultSettings, bool sendChange)
 {
     presetEdited = false;
     presetManager->resetToSavedPreset();
@@ -156,6 +167,11 @@ int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
             // Check if it's an alpha preset
             stateNode = pluginStateNodeIn.getChildWithName(IDs::alphaPluginStateNode);
         }
+    }
+
+    else if (pluginStateNodeIn.hasType(IDs::presetNode))
+    {
+        status = PluginStateNodeStatus::IsPresetNode;
     }
 
     else if (pluginStateNodeIn.hasType(IDs::pluginStateNode))
@@ -609,6 +625,6 @@ void SvkPluginState::changeListenerCallback(ChangeBroadcaster* source)
     // Preset loaded
     if (source == presetManager.get())
     {
-        revertToSavedPreset();
+        revertToSavedState();
     }
 }

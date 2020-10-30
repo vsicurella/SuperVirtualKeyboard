@@ -15,7 +15,7 @@
 #include "../PluginProcessor.h"
 #include "Components/PluginControlComponent.h"
 
-class SvkPluginEditor : public AudioProcessorEditor, protected ValueTree::Listener
+class SvkPluginEditor : public AudioProcessorEditor, public SvkPluginState::Listener, protected ValueTree::Listener
 {
 public:
     SvkPluginEditor (SvkAudioProcessor&);
@@ -23,6 +23,8 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+
+    void presetLoaded(ValueTree presetNodeIn) override;
 
 protected:
 

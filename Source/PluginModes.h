@@ -78,6 +78,6 @@ enum PluginStateNodeStatus
     InvalidNode = 0,
     CurrentVersion,
     AlphaVersion,
-
+    IsPresetNode = 0x0100,
     IsAPVTSNode = 0x1000
 };

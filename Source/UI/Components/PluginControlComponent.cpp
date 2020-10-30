@@ -235,8 +235,8 @@ PluginControlComponent::PluginControlComponent(SvkPluginState* pluginStateIn)
     loadMenu.reset(new PopupMenu());
     loadMenuItems =
     {
-            PopupMenu::Item("Load Mode").setID(LoadMenuOptions::LoadMode).setAction([&]() { browseForModeToOpen(); }),
-            PopupMenu::Item("Load Preset").setID(LoadMenuOptions::LoadPreset).setAction([&]() { browseForPresetToOpen(); })
+        PopupMenu::Item("Load Mode").setID(LoadMenuOptions::LoadMode).setAction([&]() { browseForModeToOpen(); }),
+        PopupMenu::Item("Load Preset").setID(LoadMenuOptions::LoadPreset).setAction([&]() { browseForPresetToOpen(); })
     };
     for (auto item : loadMenuItems)
         loadMenu->addItem(item);
@@ -628,12 +628,6 @@ void PluginControlComponent::timerCallback()
 
 //==============================================================================
 
-void PluginControlComponent::presetLoaded(ValueTree presetNodeIn)
-{
-    DBG("UI LOADING PRESET");
-    loadPresetNode(presetNodeIn);
-}
-
 void PluginControlComponent::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
 {
     MidiKeyboardState* displayState = selectorNumber == 0
@@ -656,6 +650,10 @@ void PluginControlComponent::mappingModeChanged(int mappingModeId)
 
     if (inMappingMode)
     {
+        // this is a fallback
+        if (mappingModeId == 2)
+            mapStyleBox->setSelectedId(pluginState->getMappingNode()[IDs::autoMappingStyle], dontSendNotification);
+
         if (mappingModeId == 2 && mapStyleBox->getSelectedId() == 3)
         {
             mapOrderEditBtn->setVisible(true);
@@ -1029,7 +1027,7 @@ bool PluginControlComponent::browseForModeToOpen()
 bool PluginControlComponent::browseForPresetToOpen()
 {
     ValueTree presetLoaded = presetManager->presetFromFile(pluginState->getPluginSettings()->getPresetPath());
-    loadPresetNode(presetLoaded);
+    pluginState->recallState(presetLoaded);
     return true;
 }
 
