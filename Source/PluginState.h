@@ -181,6 +181,8 @@ private:
 
     void updateModeViewed(bool sendChange=true);
 
+    void syncNodes();
+
 private:
 
     std::unique_ptr<SvkPresetManager> presetManager;

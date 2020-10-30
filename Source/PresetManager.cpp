@@ -259,7 +259,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
         
         svkPresetSaved.restoreFromNode(presetNodeIn, true);
-        svkPresetWorking = svkPresetSaved;
+        svkPresetWorking = SvkPreset(svkPresetSaved);
         
         modeSlots.clear();
         for (auto mode : svkPresetWorking.getModeSlots())
@@ -275,6 +275,8 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 
         return true;
     }
+
+    DBG("Problem loading preset.");
 
     return false;
 }

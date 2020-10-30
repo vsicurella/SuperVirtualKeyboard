@@ -336,7 +336,7 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
         ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
         if (mapping.isValid())
         {
-            mapModeBox->setSelectedId(mapping[IDs::mappingMode]);
+            setMapModeBoxId(mapping[IDs::mappingMode]);
             setMappingStyleId(mapping[IDs::autoMappingStyle]);
         }
 
@@ -525,11 +525,10 @@ void PluginControlComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
-        pluginState->setMapMode(mapModeBox->getSelectedId());
+        setMapModeBoxId(mapModeBox->getSelectedId());
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-        pluginState->setAutoMapStyle(mapStyleBox->getSelectedId());
         setMappingStyleId(mapStyleBox->getSelectedId());
     }
 }
@@ -847,12 +846,15 @@ int PluginControlComponent::getModeSelectorViewed()
 
 void PluginControlComponent::setMapModeBoxId(int mappingModeId, NotificationType notify)
 {
-    mapModeBox->setSelectedId(mappingModeId, notify);
+    mapModeBox->setSelectedId(mappingModeId, dontSendNotification);
+
+    if (notify != dontSendNotification)
+        pluginState->setMapMode(mapModeBox->getSelectedId());
 }
 
 void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify)
 {
-    mapStyleBox->setSelectedId(idIn, notify);
+    mapStyleBox->setSelectedId(idIn, dontSendNotification);
 
     if (idIn == 3 && mapModeBox->getSelectedId() == 2)
     {
@@ -864,6 +866,9 @@ void PluginControlComponent::setMappingStyleId(int idIn, NotificationType notify
         mapOrderEditBtn->setVisible(false);
         mapApplyBtn->setVisible(false);
     }
+
+    if (notify != dontSendNotification)
+        pluginState->setAutoMapStyle(mapStyleBox->getSelectedId());
 
     resized();
 }
