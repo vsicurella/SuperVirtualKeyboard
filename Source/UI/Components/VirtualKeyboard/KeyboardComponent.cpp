@@ -335,7 +335,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
                 if (e.mods.isCtrlDown())
                     allPeriods = false;
 
-                mappingHelper->prepareKeyToMap(key->keyNumber, false);
+                manualMappingHelper->prepareKeyToMap(key->keyNumber, false);
                 highlightKey(key->keyNumber);
 
                 DBG("Preparing to map key: " + String(key->keyNumber));
@@ -348,8 +348,8 @@ void Keyboard::mouseDown(const MouseEvent& e)
         
         if (!key || !isMouseOver(true))
         {
-            highlightKey(mappingHelper->getVirtualKeyToMap(), false);
-            mappingHelper->cancelKeyMap();
+            highlightKey(manualMappingHelper->getVirtualKeyToMap(), false);
+            manualMappingHelper->cancelKeyMap();
         }
     }
 
@@ -1046,7 +1046,7 @@ void Keyboard::setInputNoteMap(NoteMap& noteMapIn)
 
 void Keyboard::setMappingHelper(MappingHelper* mappingHelperIn)
 {
-    mappingHelper = mappingHelperIn;
+    manualMappingHelper = mappingHelperIn;
 }
 
 void Keyboard::highlightKey(int keyNumberIn, bool highlightOn)

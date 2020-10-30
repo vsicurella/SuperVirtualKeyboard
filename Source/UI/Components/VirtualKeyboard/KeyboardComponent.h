@@ -523,7 +523,7 @@ namespace VirtualKeyboard
         
         MidiBuffer buffer;
 
-        MappingHelper* mappingHelper;
+        MappingHelper* manualMappingHelper;
         Array<Key*> highlightedKeys;
         
         //Array<Path> keyboardKeysPath;

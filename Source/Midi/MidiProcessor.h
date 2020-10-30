@@ -178,7 +178,7 @@ private:
     std::unique_ptr<MidiFilter> midiInputRemap;
     std::unique_ptr<MidiFilter> midiOutputFilter;
 
-    MappingHelper* mappingHelper;
+    MappingHelper* manualMappingHelper;
     NoteMap currentRemap;
     NoteMap manualRemap;
 
