@@ -108,8 +108,8 @@ bool SvkMidiProcessor::restoreMappingNode(ValueTree midiMapIn)
         //
         //map.clear();
 
-        ValueTree remapNode = midiMapIn.getChildWithName(IDs::midiInputRemap);
-        noteMap = NoteMap(midiMapIn.getChildWithName(IDs::midiInputRemap));
+        ValueTree remapNode = midiMapNode.getChildWithName(IDs::midiInputRemap);
+        noteMap = NoteMap(midiMapNode.getChildWithName(IDs::midiInputRemap));
 
         if (remapNode.isValid() && remapNode.getNumChildren() > 0)
         {

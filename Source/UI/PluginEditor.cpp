@@ -53,6 +53,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 SvkPluginEditor::~SvkPluginEditor()
 {
+    pluginEditorNode.removeListener(this);
+    pluginState->removeListener(this);
     controlComponent = nullptr;
 }
 

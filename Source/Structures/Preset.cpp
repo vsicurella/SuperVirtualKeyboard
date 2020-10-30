@@ -31,7 +31,7 @@ SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 }
 
 SvkPreset::SvkPreset(const SvkPreset& presetToCopy)
-:     SvkPreset(presetToCopy.parentNode)
+:     SvkPreset(presetToCopy.parentNode.createCopy())
 {
 }
 
@@ -79,7 +79,7 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
         if (createCopy)
             presetNodeIn = presetNodeIn.createCopy();
 
-        parentNode.copyPropertiesAndChildrenFrom(presetNodeIn, nullptr);
+        parentNode = presetNodeIn;
         parentNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
         
         thePropertiesNode = parentNode.getOrCreateChildWithName(IDs::presetProperties, nullptr);
