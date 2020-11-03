@@ -21,7 +21,7 @@
 #include "Structures/Preset.h"
 #include "Structures/ModeMapper.h"
 
-class SvkPluginState : public ChangeListener
+class SvkPluginState : public ChangeListener, public ValueTree::Listener
                         //private AudioProcessorValueTreeState::Listener
 {
 public:
@@ -92,9 +92,16 @@ public:
 
     bool isPresetEdited();
 
+    // ValueTree::Listener Implementation
+    void valueTreePropertyChanged(ValueTree&, const Identifier&) override;
+
+    void valueTreeChildAdded(ValueTree& parentTree, ValueTree& child) override;
+
+    void valueTreeChildRemoved(ValueTree& parentTree, ValueTree& child, int index) override;
+
     //==============================================================================
 
-    void setParameterValue(Identifier paramIdIn, float valueIn);
+    //void setParameterValue(Identifier paramIdIn, float valueIn);
 
     void setMapMode(int mapModeSelectionIn, bool sendChangeMessage = true);
     void setAutoMapStyle(int mapStyleIn);
@@ -190,6 +197,9 @@ private:
     std::unique_ptr<SvkPluginSettings> pluginSettings;
 
     std::unique_ptr<ModeMapper> modeMapper;
+
+    AudioParameterBool* notifyHostDummy;
+    bool notifyHostValue = true;
 
     ValueTree factoryDefaultPluginStateNode;
     ValueTree defaultPluginStateNode;

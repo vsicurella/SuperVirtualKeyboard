@@ -24,7 +24,7 @@ SvkAudioProcessor::SvkAudioProcessor() :
                        ),
 #endif
     svkUndo(new UndoManager()),
-    svkValueTree(*this, svkUndo.get())//, IDs::svkParentNode, createParameters())
+    svkValueTree(*this, svkUndo.get(), IDs::svkParentNode, createParameters())
 {
     // Temporary
     svkValueTree.state = ValueTree(IDs::svkParentNode);
@@ -205,8 +205,10 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 //    DBGArray(paramIDs);
 //}
 //
-//AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
-//{    
+AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
+{ 
+
+    return AudioProcessorValueTreeState::ParameterLayout::ParameterLayout({ std::make_unique<AudioParameterBool>("NotifyHostDummy", "SameAsInitialValue", true) });
 //    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
 //    
 //    //paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
@@ -264,4 +266,4 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 //    
 //
 //    return {paramsInit.begin(), paramsInit.end()};
-//}
+}
