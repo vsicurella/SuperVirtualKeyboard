@@ -31,6 +31,8 @@ SvkPluginState::SvkPluginState(AudioProcessorValueTreeState& svkTreeIn)
     buildUserDefaultState();
 
     revertToSavedState(true, false);
+
+    notifyHostDummy = static_cast<AudioParameterBool*>(svkTree.getParameter("NotifyHostDummy"));
 }
 
 void SvkPluginState::recallState(ValueTree nodeIn, bool fallbackToDefaultSettings)
@@ -118,7 +120,7 @@ void SvkPluginState::commitStateNode()
 
     syncNodes();
 
-    onModeUpdate(false, false);
+    onModeUpdate(true, true);
 
     DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
 
@@ -151,6 +153,8 @@ void SvkPluginState::syncNodes()
 
     if (JUCEApplication::isStandaloneApp())
         midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr));
+
+    pluginStateNode.addListener(this);
 }
 
 int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)
@@ -360,17 +364,42 @@ bool SvkPluginState::isPresetEdited()
     return presetEdited;
 }
 
-//==============================================================================
-
-void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
+void SvkPluginState::valueTreePropertyChanged(ValueTree& node, const Identifier& property)
 {
-    RangedAudioParameter* param = svkTree.getParameter(paramIdIn);
+    notifyHostValue = !notifyHostValue;
+    notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+}
 
-    if (param)
+void SvkPluginState::valueTreeChildAdded(ValueTree& parentTree, ValueTree& child)
+{
+    if (child == modeViewed->modeNode)
     {
-        param->setValueNotifyingHost(param->convertTo0to1(valueIn));
+        notifyHostValue = !notifyHostValue;
+        notifyHostDummy->setValueNotifyingHost(notifyHostValue);
     }
 }
+
+void SvkPluginState::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& child, int index)
+{
+    if (child == modeViewed->modeNode)
+    {
+        notifyHostValue = !notifyHostValue;
+        notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+    }
+}
+
+
+//==============================================================================
+
+//void SvkPluginState::setParameterValue(Identifier paramIdIn, float valueIn)
+//{
+//    RangedAudioParameter* param = svkTree.getParameter(paramIdIn);
+//
+//    if (param)
+//    {
+//        param->setValueNotifyingHost(param->convertTo0to1(valueIn));
+//    }
+//}
 
 void SvkPluginState::setModeSelectorViewed(int modeSelectorViewedIn)
 {
@@ -534,6 +563,8 @@ void SvkPluginState::doAutoMapping(bool sendChangeMessage)
 void SvkPluginState::updateModeViewed(bool sendChange)
 {
     modeViewed = presetManager->getModeBySelector(modeSelectorViewedNum);
+    modeViewed->modeNode.addListener(this);
+
     midiProcessor->setModeViewed(modeViewed);
 
     if (sendChange)

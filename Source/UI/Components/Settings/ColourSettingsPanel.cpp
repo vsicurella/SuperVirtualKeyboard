@@ -192,7 +192,7 @@ void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboard
     colourSelector->setFocusserCallback([&](Component* c, var dataIn) 
     { 
         if (dynamic_cast<PaintSwatch*>(c))
-            virtualKeyboard->updateKeyColors(false);
+            virtualKeyboard->updateKeyColors();
         else
             virtualKeyboard->getProperties().set(IDs::colorSelected, dataIn); 
     });
