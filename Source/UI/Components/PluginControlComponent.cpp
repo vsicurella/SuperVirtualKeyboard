@@ -362,10 +362,10 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 
                 updateRootNoteLabels();
 
-                if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
-                {
-                    modeViewedChanged(mode, num, 0 /*unused*/);
-                }
+                //if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
+                //{
+                //    modeViewedChanged(mode, num, 0 /*unused*/);
+                //}
             }
         }
     }
