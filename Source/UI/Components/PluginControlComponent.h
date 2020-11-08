@@ -194,7 +194,7 @@ private:
     std::unique_ptr<PopupMenu> loadMenu;
     Array<PopupMenu::Item> loadMenuItems;
     
-    std::unique_ptr<MappingHelper> manualMappingHelper;
+    MappingHelper* manualMappingHelper;
     std::unique_ptr<SettingsContainer> settingsContainer;
 
     ScrollBar* viewportScrollBar;

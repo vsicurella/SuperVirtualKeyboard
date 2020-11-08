@@ -56,6 +56,7 @@ public:
     SvkPluginSettings* getPluginSettings();
     
     ModeMapper* getModeMapper();
+    MappingHelper* getManualMappingHelper();
     
     NoteMap* getMidiInputFilterMap();
     NoteMap* getMidiOutputFilterMap();
@@ -112,6 +113,8 @@ public:
         Should be called whenever a mode is initialized in the PresetManager
     */
     void onModeUpdate(bool sendModeViewedChangeMessage = true, bool sendMappingChangeMessage = true);
+
+	void sendChangeNotificationToHost();
     
     //==============================================================================
     // User Functionality
@@ -197,6 +200,7 @@ private:
     std::unique_ptr<SvkPluginSettings> pluginSettings;
 
     std::unique_ptr<ModeMapper> modeMapper;
+    std::unique_ptr<MappingHelper> manualMappingHelper;
 
     AudioParameterBool* notifyHostDummy;
     bool notifyHostValue = true;

@@ -93,7 +93,6 @@ bool SvkMidiProcessor::restoreMappingNode(ValueTree midiMapIn)
     if (midiMapIn.hasType(IDs::midiMapNode))
     {
         midiMapNode = midiMapIn;
-        inManualMappingMode = (int)midiMapNode[IDs::mappingMode] == 3;
 
         Array<int> map;
 
@@ -393,7 +392,9 @@ void SvkMidiProcessor::setInputRemap(Array<int> mapIn, bool updateNode)
 
 void SvkMidiProcessor::setInputRemap(NoteMap mapIn, bool updateNode)
 {
-    if (inManualMappingMode || updateNode)
+    // not using inManualMappingMode because the processMidi call depends on it,
+    // and setting that to "true" before initialization is complete causes a crash in some hosts
+    if ((int)midiMapNode[IDs::mappingMode] == 3 || updateNode)
         manualRemap = mapIn;
     
     currentRemap = mapIn;
