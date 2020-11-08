@@ -629,6 +629,11 @@ void PluginControlComponent::timerCallback()
 
 //==============================================================================
 
+void PluginControlComponent::resyncPresetNode(ValueTree presetNode)
+{
+    keyboard->restoreNode(presetNode.getChildWithName(IDs::pianoNode), false);
+}
+
 void PluginControlComponent::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
 {
     MidiKeyboardState* displayState = selectorNumber == 0

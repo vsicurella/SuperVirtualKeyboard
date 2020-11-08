@@ -161,6 +161,8 @@ public:
 
         virtual void presetLoaded(ValueTree presetNodeIn) {};
 
+        virtual void resyncPresetNode(ValueTree presetNodeIn) {}; // TODO: make unnecessary
+
         virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
 
         virtual void mappingModeChanged(int mappingModeId) {};
@@ -191,7 +193,7 @@ private:
 
     void updateModeViewed(bool sendChange=true);
 
-    void syncNodes();
+    void syncNodes(bool sendChange=true);
 
 private:
 

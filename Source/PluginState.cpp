@@ -99,7 +99,7 @@ void SvkPluginState::revertToSavedState(bool fallbackToDefaultSettings, bool sen
 {
     presetManager->resetToSavedPreset();
 
-    syncNodes();
+    syncNodes(false);
 
     modeSelectorViewedNum = svkPreset->getModeSelectorViewed();
 
@@ -127,7 +127,7 @@ void SvkPluginState::commitStateNode()
     presetEdited = false;
 }
 
-void SvkPluginState::syncNodes()
+void SvkPluginState::syncNodes(bool sendChange)
 {
     svkPreset = &presetManager->getPreset();
     presetNode = svkPreset->getPresetNode();
@@ -155,6 +155,12 @@ void SvkPluginState::syncNodes()
         midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr));
 
     pluginStateNode.addListener(this);
+    presetNode.getChildWithName(IDs::pianoNode).addListener(this);
+
+    if (sendChange)
+        listeners.call(&SvkPluginState::Listener::resyncPresetNode, presetNode);
+
+    DBG("PluginState: Nodes synced");
 }
 
 int SvkPluginState::isValidStateNode(ValueTree pluginStateNodeIn)

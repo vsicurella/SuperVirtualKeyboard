@@ -89,6 +89,8 @@ public:
 
     //==============================================================================
 
+    void resyncPresetNode(ValueTree presetNode) override;
+
     void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
     void mappingModeChanged(int mappingModeId) override;

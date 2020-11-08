@@ -35,7 +35,7 @@ Keyboard::Keyboard(ValueTree keyboardNodeIn, Mode* modeIn, NoteMap* inputFilterM
     setWantsKeyboardFocus(true);
 
     initializeKeys(); // todo: load keyboard size
-    restoreNode(keyboardNodeIn, true);
+    restoreNode(keyboardNodeIn, true, true);
     
     if (modeIn)
         mode = modeIn;
@@ -54,7 +54,7 @@ Keyboard::~Keyboard()
 
 //===============================================================================================
 
-void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
+void Keyboard::restoreNode(ValueTree pianoNodeIn, bool reinitializeKeys, bool resetIfInvalid)
 {
     if (pianoNodeIn.hasType(IDs::pianoNode))
     {        
@@ -74,27 +74,30 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool resetIfInvalid)
         if (keySizeRatio < 0.01)
             keySizeRatio = 0.25f;
         
-        // TODO: keyboard key editing
-        pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyTreeNode), nullptr);
-        // unpack key data
-        //keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
-        
-        //if (keyTreeNode.getNumChildren() == keys.size())
-        //{
-        //    for (auto key : keys)
-        //        key->applyParameters(keyTreeNode.getChild(key->keyNumber));
-        //}
-        //else
-        //{
-        //    keyTreeNode.removeAllChildren(nullptr);
+        if (reinitializeKeys)
+        {
+            // TODO: keyboard key editing
+            pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyTreeNode), nullptr);
+            // unpack key data
+            //keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
 
-        initializeKeys();
-            
-        //for (auto key : keys)
-        //{
-        //    keyTreeNode.addChild(key->node, key->keyNumber, nullptr);
-        //}
-        //}        
+            //if (keyTreeNode.getNumChildren() == keys.size())
+            //{
+            //    for (auto key : keys)
+            //        key->applyParameters(keyTreeNode.getChild(key->keyNumber));
+            //}
+            //else
+            //{
+            //    keyTreeNode.removeAllChildren(nullptr);
+
+            initializeKeys();
+
+            //for (auto key : keys)
+            //{
+            //    keyTreeNode.addChild(key->node, key->keyNumber, nullptr);
+            //}
+            //}        
+        }
     }
     else
     {
