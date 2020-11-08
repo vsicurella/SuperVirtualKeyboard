@@ -48,7 +48,7 @@ namespace VirtualKeyboard
         
         //===============================================================================================
                 
-        void restoreNode(ValueTree keyboardNodeIn, bool resetIfInvalid=false);
+        void restoreNode(ValueTree keyboardNodeIn, bool reinitializeKeys = true, bool resetIfInvalid=false);
         
         void reset();
 
