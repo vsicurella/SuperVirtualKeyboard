@@ -208,7 +208,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameters()
 { 
 
-    return AudioProcessorValueTreeState::ParameterLayout::ParameterLayout({ std::make_unique<AudioParameterBool>("NotifyHostDummy", "SameAsInitialValue", true) });
+    return AudioProcessorValueTreeState::ParameterLayout({ std::make_unique<AudioParameterBool>("NotifyHostDummy", "SameAsInitialValue", true) });
 //    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
 //    
 //    //paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
