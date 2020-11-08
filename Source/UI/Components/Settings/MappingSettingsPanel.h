@@ -30,6 +30,8 @@ public:
 
     void mappingEditorChanged(NoteMap&) override;
 
+    void registerEditorListener(MappingEditor::Listener* listenerIn);
+
 private:
 
     Label* currentMappingLabel;
