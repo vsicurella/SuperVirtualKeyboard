@@ -93,3 +93,8 @@ void MappingSettingsPanel::mappingEditorChanged(NoteMap& newNoteMap)
 {
     pluginState->setMidiInputMap(newNoteMap, true, false);
 }
+
+void MappingSettingsPanel::registerEditorListener(MappingEditor::Listener* listenerIn)
+{
+    noteMapEditor->addListener(listenerIn);
+}
