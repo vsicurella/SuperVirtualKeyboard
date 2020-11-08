@@ -230,6 +230,11 @@ ModeMapper* SvkPluginState::getModeMapper()
     return modeMapper.get();
 }
 
+MappingHelper* SvkPluginState::getManualMappingHelper()
+{
+    return manualMappingHelper.get();
+}
+
 NoteMap* SvkPluginState::getMidiInputFilterMap()
 {
     return midiProcessor->getInputRemapMidiFilter()->getNoteMap();
@@ -366,16 +371,14 @@ bool SvkPluginState::isPresetEdited()
 
 void SvkPluginState::valueTreePropertyChanged(ValueTree& node, const Identifier& property)
 {
-    notifyHostValue = !notifyHostValue;
-    notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+	sendChangeNotificationToHost();
 }
 
 void SvkPluginState::valueTreeChildAdded(ValueTree& parentTree, ValueTree& child)
 {
     if (child == modeViewed->modeNode)
     {
-        notifyHostValue = !notifyHostValue;
-        notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+		sendChangeNotificationToHost();
     }
 }
 
@@ -383,8 +386,7 @@ void SvkPluginState::valueTreeChildRemoved(ValueTree& parentTree, ValueTree& chi
 {
     if (child == modeViewed->modeNode)
     {
-        notifyHostValue = !notifyHostValue;
-        notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+		sendChangeNotificationToHost();
     }
 }
 
@@ -424,6 +426,7 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn, bool sendChangeMessage)
     if (mapModeSelectionIn == 2) // Auto Mapping
     {
         midiProcessor->setInManualMappingMode(false);
+        manualMappingHelper = nullptr;
         doAutoMapping(false);
     }
     
@@ -431,6 +434,8 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn, bool sendChangeMessage)
     {
         if (mapModeSelectionIn == 3) // Manual Mapping
         {
+            manualMappingHelper.reset(new MappingHelper(*getMidiInputFilterMap()));
+            midiProcessor->setMappingHelper(manualMappingHelper.get());
             midiProcessor->setInManualMappingMode(true);
             setMidiInputMap(midiProcessor->getManualNoteMap(), true, false);
         }
@@ -438,12 +443,15 @@ void SvkPluginState::setMapMode(int mapModeSelectionIn, bool sendChangeMessage)
         else // Mapping Off
         {
             midiProcessor->setInManualMappingMode(false);
+            manualMappingHelper = nullptr;
+
             midiProcessor->setInputRemap(NoteMap(), false);
             midiProcessor->setOutputFilter(NoteMap(), false);
             setModeSelectorViewed(1);
         }
     }
 
+	sendChangeNotificationToHost();
 
     if (sendChangeMessage)
         listeners.call(&Listener::mappingModeChanged, mapModeSelectionIn);
@@ -491,11 +499,19 @@ void SvkPluginState::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMap
         doAutoMapping(sendMappingChangeMessage);
 }
 
+void SvkPluginState::sendChangeNotificationToHost()
+{
+	notifyHostValue = !notifyHostValue;
+	notifyHostDummy->setValueNotifyingHost(notifyHostValue);
+}
+
 //==============================================================================
 
 void SvkPluginState::setMidiInputMap(NoteMap noteMapIn, bool updateNode, bool sendChangeMessage)
 {
     midiProcessor->setInputRemap(noteMapIn, updateNode);
+
+    sendChangeNotificationToHost();
 
     if (sendChangeMessage)
         listeners.call(&Listener::inputMappingChanged, noteMapIn);

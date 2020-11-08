@@ -364,10 +364,10 @@ void PluginControlComponent::loadPresetNode(ValueTree presetNodeIn)
 
                 updateRootNoteLabels();
 
-                //if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
-                //{
-                //    modeViewedChanged(mode, num, 0 /*unused*/);
-                //}
+                if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
+                {
+                    modeViewedChanged(mode, num, 0 /*unused*/);
+                }
             }
         }
     }
@@ -685,15 +685,8 @@ void PluginControlComponent::mappingModeChanged(int mappingModeId)
         mapManualCancel->setVisible(false);
         mapManualResetBtn->setVisible(false);
 
-        // TODO: make sure this doesn't conflict with color editing
         keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
-
-        if (manualMappingHelper.get())
-        {
-            manualMappingHelper->removeListener(this);
-            manualMappingHelper = nullptr;
-            mapManualStatus->setText(noKeySelectedTrans, sendNotification);
-        }
+        mapManualStatus->setText(noKeySelectedTrans, sendNotification);
     }
 
     resized();
@@ -742,6 +735,7 @@ void PluginControlComponent::settingsTabChanged(int tabIndex, const String& tabN
     if (tabName == "Mapping")
     {
         mappingSettingsOpen = true;
+        static_cast<MappingSettingsPanel*>(panelChangedTo)->registerEditorListener(this);
     }
 
     else if (mappingSettingsOpen)
@@ -979,11 +973,7 @@ void PluginControlComponent::endColorEditing()
 
 void PluginControlComponent::beginManualMapping()
 {
-    if (manualMappingHelper.get())
-    {
-        manualMappingHelper->removeListener(this);
-        mapManualStatus->setText(noKeySelectedTrans, sendNotification);
-    }
+    mapManualStatus->setText(noKeySelectedTrans, sendNotification);
 
     mapStyleBox->setVisible(false);
     mapStyleLbl->setVisible(false);
@@ -993,16 +983,13 @@ void PluginControlComponent::beginManualMapping()
     mapManualStatus->setVisible(true);
     mapManualResetBtn->setVisible(true);
 
-    manualMappingHelper.reset(new MappingHelper(*pluginState->getMidiInputFilterMap()));
+    manualMappingHelper = pluginState->getManualMappingHelper();
     manualMappingHelper->addListener(this);
 
     keyboard->setUIMode(VirtualKeyboard::UIMode::mapMode);
 
     // Selects the key to map a MIDI note to
-    keyboard->setMappingHelper(manualMappingHelper.get());
-
-    // Selects the MIDI note that maps to the selected key
-    pluginState->getMidiProcessor()->setMappingHelper(manualMappingHelper.get());
+    keyboard->setMappingHelper(manualMappingHelper);
 }
 
 void PluginControlComponent::setMode1Root(int rootIn, NotificationType notify)
