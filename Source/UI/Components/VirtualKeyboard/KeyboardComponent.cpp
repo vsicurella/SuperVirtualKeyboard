@@ -1054,6 +1054,9 @@ void Keyboard::setMappingHelper(MappingHelper* mappingHelperIn)
 
 void Keyboard::highlightKey(int keyNumberIn, bool highlightOn)
 {
+    if (keyNumberIn < 0 || keyNumberIn >= keys.size())
+        return;
+
     if (highlightOn)
         highlightedKeys.add(keys[keyNumberIn]);
     else
@@ -1070,20 +1073,24 @@ Array<Colour>* Keyboard::getKeyIndividualColours()
 Colour Keyboard::getKeyColor(int keyNumIn)
 {
     Colour c;
-    Key* key = keys[keyNumIn];
 
-    if (keyColorsIndividual[key->keyNumber].isOpaque()) // need to fix this for switching modes
-        c = keyColorsIndividual[key->keyNumber];
+    if (keyNumIn >= 0 && keyNumIn < keys.size())
+    {
+        Key* key = keys[keyNumIn];
 
-    else if (keyColorsDegrees[key->scaleDegree].isOpaque())
+        if (keyColorsIndividual[key->keyNumber].isOpaque()) // need to fix this for switching modes
+            c = keyColorsIndividual[key->keyNumber];
+
+        else if (keyColorsDegrees[key->scaleDegree].isOpaque())
             c = keyColorsDegrees[key->scaleDegree];
 
-    else if (keyColorsOrders[key->order].isOpaque())
+        else if (keyColorsOrders[key->order].isOpaque())
             c = keyColorsOrders[key->order];
-    
-    else 
-        c = colorsDefaultOrders[key->order];
-    
+
+        else
+            c = colorsDefaultOrders[key->order];
+    }
+
   return c;
 }
 
@@ -1288,7 +1295,7 @@ void Keyboard::retriggerNotes()
 
 void Keyboard::triggerKey(int keyNumberIn, bool doNoteOn, float velocity)
 {
-    if (keyNumberIn < 0 || keyNumberIn > keys.size())
+    if (keyNumberIn < 0 || keyNumberIn >= keys.size())
         return;
 
     Key* key = keys[keyNumberIn];
@@ -1341,6 +1348,9 @@ int Keyboard::getOrderOfNotesOn()
 
 int Keyboard::transposeKeyModally(int keyNumIn, int stepsIn)
 {
+    if (keyNumIn < 0 || keyNumIn >= keys.size())
+        return -1;
+
     Key* key = keys[keyNumIn];
     Array<int> orderArray = keysOrder[key->order];
     int newKey = -1;
