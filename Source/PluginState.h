@@ -202,10 +202,8 @@ private:
     std::unique_ptr<SvkPluginSettings> pluginSettings;
 
     std::unique_ptr<ModeMapper> modeMapper;
-    std::unique_ptr<MappingHelper> manualMappingHelper;
-
-    AudioParameterBool* notifyHostDummy;
-    bool notifyHostValue = true;
+    
+    std::unique_ptr<FileChooser> chooser;
 
     ValueTree factoryDefaultPluginStateNode;
     ValueTree defaultPluginStateNode;

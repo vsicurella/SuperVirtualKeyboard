@@ -283,33 +283,29 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 
 bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath)
 {
-    File fileOut = File(absolutePath);
+    File requestedFile = File(absolutePath);
     
-    if (fileOut.isDirectory())
+    File saveDirectory = (requestedFile.isDirectory()) ? requestedFile : requestedFile.getParentDirectory();
+    if (!saveDirectory.exists())
     {
-        FileChooser chooser(saveMsg,
-            fileOut, fileEnding);
-
-        chooser.browseForFileToSave(true);
-        fileOut = chooser.getResult();
+        saveDirectory = File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory);
     }
-    else if (!fileOut.exists())
-    {
-        FileChooser chooser(saveMsg,
-            File::getSpecialLocation(File::SpecialLocationType::userDocumentsDirectory),
-            fileEnding);
-        
-        chooser.browseForFileToSave(true);
-        fileOut = chooser.getResult();
-    }
+    
+    chooser = std::make_unique<FileChooser>(saveMsg, saveDirectory, fileEnding);
+    chooser->launchAsync(
+        FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting,
+        [nodeToSave](const FileChooser& chooser)
+        {
+            auto fileOut = chooser.getResult();
+            if (fileOut.getParentDirectory().exists())
+            {
+                std::unique_ptr<XmlElement> xml(nodeToSave.createXml());
+                xml->writeTo(fileOut);
+            }
+        });
 
-    if (fileOut.getParentDirectory().exists())
-    {
-        std::unique_ptr<XmlElement> xml(nodeToSave.createXml());
-        return xml->writeTo(fileOut);
-    }
 
-    return false;
+    return true;
 }
 
 bool SvkPresetManager::savePresetToFile(String absolutePath)
@@ -345,39 +341,22 @@ bool SvkPresetManager::saveModeToFile(int modeSlotNumber, String absolutePath)
     return saved;
 }
 
-ValueTree SvkPresetManager::nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath)
+ValueTree SvkPresetManager::parseNodeFile(File fileIn)
 {
-    ValueTree nodeIn;
-    File fileIn = File(absoluteFilePath);
+    ValueTree nodeRead;
+    
+    if (!fileIn.exists())
+        return ValueTree();
+    
+    std::unique_ptr<XmlElement> xml = parseXML(fileIn);
+    nodeRead = ValueTree::fromXml(*(xml.get()));
 
-    if (!fileIn.existsAsFile())
-    {
-        std::unique_ptr<FileChooser> chooser;
-
-        if (fileIn.isDirectory())
-            chooser.reset(new FileChooser(openMsg, fileIn, fileEnding));
-        else
-            chooser.reset(new FileChooser(openMsg, File::getSpecialLocation(File::userDocumentsDirectory), fileEnding));
-
-        chooser->browseForFileToOpen();
-        fileIn = chooser->getResult();
-    }
-
-    if (fileIn.existsAsFile())
-    {
-        std::unique_ptr<XmlElement> xml = parseXML(fileIn);
-        nodeIn = ValueTree::fromXml(*(xml.get()));
-        
-        if (nodeIn.isValid())
-            return nodeIn;
-    }
-
-    return ValueTree();
+    return nodeRead;
 }
 
-ValueTree SvkPresetManager::modeFromFile(String absoluteFilePath)
+ValueTree SvkPresetManager::parseModeFile(File fileIn)
 {
-    ValueTree nodeIn = nodeFromFile("Open mode", "*.svk", absoluteFilePath);
+    ValueTree nodeIn = parseNodeFile(fileIn);
 
     if (nodeIn.hasType(IDs::modePresetNode))
         return nodeIn;
@@ -385,9 +364,9 @@ ValueTree SvkPresetManager::modeFromFile(String absoluteFilePath)
     return ValueTree();
 }
 
-ValueTree SvkPresetManager::presetFromFile(String absoluteFilePath)
+ValueTree SvkPresetManager::parsePresetFile(File fileIn)
 {
-    ValueTree nodeIn = nodeFromFile("Open preset", "*.svk", absoluteFilePath);
+    ValueTree nodeIn = parseNodeFile(fileIn);
 
     if (nodeIn.hasType(IDs::presetNode))
         return nodeIn;

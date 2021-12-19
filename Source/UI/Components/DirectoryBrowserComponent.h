@@ -18,11 +18,11 @@ class DirectoryBrowserComponent : public Component, public Button::Listener
 {
 public:
 
-    DirectoryBrowserComponent(const String dialogBoxTitle, const File& directoryIn = File())
-        : chooser(dialogBoxTitle, directoryIn)
+    DirectoryBrowserComponent(const String dialogBoxTitle, File directoryIn = File(), String fileTypes = "*")
     {
         setName(dialogBoxTitle);
-
+        chooser = std::make_unique<FileChooser>(dialogBoxTitle, directoryIn, fileTypes);
+        
         editor.reset(new TextEditor(dialogBoxTitle + "Editor"));
         editor->setMultiLine(false, false);
         editor->setReadOnly(true);
@@ -51,11 +51,12 @@ public:
 
     void buttonClicked(Button* buttonThatWasClicked) override
     {
-        if (chooser.browseForDirectory())
-        {
-            editor->setText(chooser.getResult().getFullPathName(), false);
-            listeners.call(&DirectoryBrowserComponent::Listener::directoryChanged, this, chooser.getResult());
-        }
+        chooser->launchAsync(FileBrowserComponent::FileChooserFlags::openMode | FileBrowserComponent::FileChooserFlags::canSelectFiles,
+            [&](const FileChooser& chooser)
+            {
+                editor->setText(chooser.getResult().getFullPathName(), false);
+                listeners.call(&DirectoryBrowserComponent::Listener::directoryChanged, this, chooser.getResult());
+            });
     }
 
     void setText(String textIn)
@@ -89,7 +90,7 @@ protected:
 
 private:
 
-    FileChooser chooser;
+    std::unique_ptr<FileChooser> chooser;
 
     std::unique_ptr<TextEditor> editor;
     std::unique_ptr<TextButton> openButton;
