@@ -562,11 +562,13 @@ void PluginControlComponent::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == saveButton.get())
     {
-        saveMenu->showAt(saveButton.get());
+        auto options = PopupMenu::Options().withTargetComponent(saveButton.get());
+        saveMenu->showMenuAsync(options);
     }
     else if (buttonThatWasClicked == openButton.get())
     {
-        loadMenu->showAt(openButton.get());
+        auto options = PopupMenu::Options().withTargetComponent(openButton.get());
+        loadMenu->showMenuAsync(options);
     }
     else if (buttonThatWasClicked == settingsButton.get())
     {
@@ -1002,33 +1004,22 @@ void PluginControlComponent::setMode2Root(int rootIn, NotificationType notify)
 
 bool PluginControlComponent::browseForModeToOpen()
 {
-    ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginState->getPluginSettings()->getModePath());
-
-    if (Mode::isValidMode(modeNode))
-    {
-        presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
-        onModeViewedChange(pluginState->getModeViewed());
-        return true;
-    }
-
-    return false;
+    return pluginState->loadModeFromFile();
 }
 
 bool PluginControlComponent::browseForPresetToOpen()
 {
-    ValueTree presetLoaded = presetManager->presetFromFile(pluginState->getPluginSettings()->getPresetPath());
-    loadPresetNode(presetLoaded);
-    return true;
+    return pluginState->loadPresetFromFile();
 }
 
 bool PluginControlComponent::exportModeViewedForReaper()
 {
-    ReaperWriter rpp = ReaperWriter(pluginState->getModeViewed());
-    return rpp.write();
+    ReaperWriter rpp(pluginState->getModeViewed());
+    return true;
 }
 
 bool PluginControlComponent::exportModeViewedForAbleton()
 {
-    AbletonMidiWriter amw(*pluginState->getModeViewed());
-    return amw.write();
+    AbletonMidiWriter amw(pluginState->getModeViewed());
+    return true;
 }
