@@ -43,7 +43,6 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPluginState* stateIn)
     colourSelector = new FocussedColourSelector();
     addAndMakeVisible(colourSelector);
     controls.set(0, colourSelector, true);
-    getSectionFlexBox(0)->items.getReference(0).associatedComponent = colourSelector;
 
     degreePaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsDegree]);
     degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
@@ -78,6 +77,7 @@ ColourSettingsPanel::~ColourSettingsPanel()
 
 void ColourSettingsPanel::resized()
 {
+    getSectionFlexBox(0)->items.set(0, FlexItem(100, 100, *colourSelector));
     getSectionFlexBox(0)->items.getReference(0).height = getHeight();
     SvkSettingsPanel::resized();
 }
