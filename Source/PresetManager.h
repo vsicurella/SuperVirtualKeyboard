@@ -35,6 +35,8 @@ class SvkPresetManager : public ChangeBroadcaster
     
     OwnedArray<Mode> modeSlots;
     std::unique_ptr<Mode> modeCustom;
+    
+    std::unique_ptr<FileChooser> chooser;
 
     // Methods
     void createFactoryModes();
@@ -115,9 +117,9 @@ public:
     */
     bool resetToSavedPreset();
 
-    static ValueTree nodeFromFile(String openMsg, String fileEnding, String absoluteFilePath = "");
-    static ValueTree modeFromFile(String absoluteFilePath = "");
-    static ValueTree presetFromFile(String absoluteFilePath = "");
+    static ValueTree parseNodeFile(File fileIn);
+    static ValueTree parseModeFile(File fileIn);
+    static ValueTree parsePresetFile(File fileIn);
     
     void requestModeMenu(PopupMenu* comboBoxToUse);
 

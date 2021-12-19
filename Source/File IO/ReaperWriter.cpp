@@ -10,29 +10,36 @@
 
 #include "ReaperWriter.h"
 
-ReaperWriter::ReaperWriter(Mode* modeIn)
+ReaperWriter::ReaperWriter(const Mode* modeIn)
 {
     mode = modeIn;
     
     // check if reaper resource path exists
-    
+    File defaultFolder;
     if ((SystemStats::getOperatingSystemType() & SystemStats::OperatingSystemType::MacOSX) != 0)
     {
-        filePath = File(File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile("REAPER").getChildFile("MIDINoteNames"));
+        defaultFolder = File(File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile("Application Support").getChildFile("REAPER").getChildFile("MIDINoteNames"));
     }
     else if ((SystemStats::getOperatingSystemType() & SystemStats::OperatingSystemType::Windows) != 0)
     {
-        filePath = File(File::getSpecialLocation(File::userHomeDirectory).getChildFile("AppData").getChildFile("Roaming").getChildFile("REAPER").getChildFile("MIDINoteNames"));
+        defaultFolder = File(File::getSpecialLocation(File::userHomeDirectory).getChildFile("AppData").getChildFile("Roaming").getChildFile("REAPER").getChildFile("MIDINoteNames"));
     }
     
-    if (!filePath.isDirectory())
-       filePath = File::getSpecialLocation(File::userDocumentsDirectory);
-
-    FileChooser chooser("Save as", filePath, "*.txt");
-    chooser.browseForFileToSave(true);
-    fileOut = chooser.getResult();
+    if (!defaultFolder.isDirectory())
+       defaultFolder = File::getSpecialLocation(File::userDocumentsDirectory);
 
     setup_default_symbols();
+
+    chooser = std::make_unique<FileChooser>("Save as", defaultFolder, "*.txt");
+    chooser->launchAsync(
+        FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting,
+            [&](const FileChooser& chooser)
+            {
+                fileToWrite = chooser.getResult();
+                if (fileToWrite.getParentDirectory().exists())
+                    write(fileToWrite);
+            });
+
 }
 
 ReaperWriter::~ReaperWriter()
@@ -51,8 +58,8 @@ void ReaperWriter::set_symbol(int orderIndex, String symbolIn)
 
 bool ReaperWriter::set_path(String pathIn)
 {
-    fileOut = File(pathIn);
-    return fileOut.getParentDirectory().isDirectory();
+    fileToWrite = File(pathIn);
+    return fileToWrite.getParentDirectory().isDirectory();
 }
 
 String ReaperWriter::ask_for_location()
@@ -72,7 +79,7 @@ String ReaperWriter::get_symbol(int orderIndexIn)
 
 String ReaperWriter::get_path()
 {
-    return fileOut.getFullPathName();
+    return fileToWrite.getFullPathName();
 }
 
 void ReaperWriter::setup_default_symbols()
@@ -97,7 +104,7 @@ void ReaperWriter::setup_default_symbols()
     }
 }
 
-bool ReaperWriter::write()
+bool ReaperWriter::write(File fileOut)
 {
     Array<int> modeOrders = mode->getOrders();
     Array<float> modeDegrees = Mode::ordersToModalDegrees(modeOrders);
