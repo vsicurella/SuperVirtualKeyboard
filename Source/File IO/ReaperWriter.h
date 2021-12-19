@@ -14,19 +14,21 @@
 
 class ReaperWriter
 {
-    Mode* mode;
+    std::unique_ptr<FileChooser> chooser;
+    
+    const Mode* mode;
     //Scale* scale;
     
     Array<String> orderSymbols;
  
-    File filePath;
-    File fileOut;
+//    File filePath;
+    File fileToWrite;
 
     void setup_default_symbols();
     
 public:
     
-    ReaperWriter(Mode* modeIn);
+    ReaperWriter(const Mode* modeIn);
     ~ReaperWriter();
     
     void set_mode(Mode* modeIn);
@@ -39,6 +41,6 @@ public:
     String get_symbol(int orderIndexIn);
     String get_path();
     
-    bool write();
+    bool write(File fileOut);
     
 };

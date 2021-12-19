@@ -25,7 +25,7 @@ class AbletonMidiWriter
 
 public:
 
-    AbletonMidiWriter(const Mode& modeIn)
+    AbletonMidiWriter(const Mode* modeIn)
         : mode(modeIn)
     {
         refreshSequence();
@@ -37,7 +37,7 @@ public:
             directory = File::getSpecialLocation(File::userDocumentsDirectory);
 
         if (filename.length() == 0)
-            filename = mode.getName();
+            filename = mode->getName();
 
         if (!filename.endsWith(".mid"))
             filename += ".mid";
@@ -63,7 +63,7 @@ public:
     bool write(String filename = "")
     {
         if (filename.length() == 0)
-            filename = mode.getName();
+            filename = mode->getName();
 
         if (!filename.endsWith(".mid"))
             filename += ".mid";
@@ -72,17 +72,27 @@ public:
             ? abletonUserLibrary.getChildFile(filename)
             : File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(filename);
 
-        FileChooser chooser("Save Ableton Midi Map", intendedFile, "*.mid");
+        chooser = std::make_unique<FileChooser>("Save Ableton Midi Map", intendedFile, "*.mid");
 
-        if (chooser.browseForFileToSave(true))
-            return writeTo(chooser.getResult().getParentDirectory(), chooser.getResult().getFileName());
+        bool fileWritten = false;
         
-        return false;
+        chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting,
+            [&](const FileChooser& chooser)
+            {
+                auto result = chooser.getResult();
+                if (result.getParentDirectory().exists())
+                {
+                    writeTo(result);
+                    fileWritten = true;
+                }
+            });
+        
+        return fileWritten;
     }
 
     void refreshSequence()
     {
-        Array<int> noteNums = mode.getNotesOfOrder();
+        Array<int> noteNums = mode->getNotesOfOrder();
         sequence.clear();
 
         for (auto noteNum : noteNums)
@@ -103,7 +113,9 @@ public:
 
 private:
 
-    const Mode& mode;
+    std::unique_ptr<FileChooser> chooser;
+    
+    const Mode* mode;
 
     MidiFile midiFile;
     MidiMessageSequence sequence;

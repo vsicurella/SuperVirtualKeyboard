@@ -285,13 +285,7 @@ void NoteMapEditor::labelTextChanged(Label* label)
             // Midi Note In mapping already exists
             if (keyMappedToNote != newNoteIn)
             {
-                AlertWindow::showMessageBox(
-                    AlertWindow::AlertIconType::WarningIcon, 
-                    mappingErrorTrans, 
-                    getAlreadyMappedMessage(newNoteIn, keyMappedToNote), 
-                    okTrans
-                );
-                
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, mappingErrorTrans, getAlreadyMappedMessage(newNoteIn, keyMappedToNote));                
                 label->setText(noneTrans, dontSendNotification);
             }
             else

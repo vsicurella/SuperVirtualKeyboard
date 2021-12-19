@@ -538,7 +538,8 @@ bool SvkPluginState::savePresetToFile()
 
 bool SvkPluginState::loadPresetFromFile()
 {
-    ValueTree presetLoaded = presetManager->presetFromFile(pluginSettings->getPresetPath());
+    File file(pluginSettings->getPresetPath());
+    ValueTree presetLoaded = presetManager->parsePresetFile(file);
     recallState(presetLoaded);
     return true;
 }
@@ -551,16 +552,24 @@ bool SvkPluginState::saveModeViewedToFile()
 
 bool SvkPluginState::loadModeFromFile()
 {
-    ValueTree modeNode = presetManager->nodeFromFile("Open Mode", "*.svk", pluginSettings->getModePath());
+    chooser = std::make_unique<FileChooser>("Open Mode",  pluginSettings->getModePath(), "*.svk");
+    
+    chooser->launchAsync(FileBrowserComponent::FileChooserFlags::openMode | FileBrowserComponent::FileChooserFlags::canSelectFiles,
+        [&](const FileChooser& chooser)
+        {
+            auto result = chooser.getResult();
+            if (result.existsAsFile())
+            {
+                auto modeTree = presetManager->parseModeFile(result);
+                if (Mode::isValidMode(modeTree))
+                {
+                    presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeTree);
+                    onModeUpdate();
+                }
+            }
+        });
 
-    if (Mode::isValidMode(modeNode))
-    {
-        presetManager->addSlotAndSetSelection(getModeSelectorViewed(), modeNode);
-        onModeUpdate();
-        return true;
-    }
-
-    return false;
+    return true;
 }
 
 //==============================================================================
