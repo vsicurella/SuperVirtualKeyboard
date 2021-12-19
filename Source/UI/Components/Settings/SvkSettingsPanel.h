@@ -14,7 +14,7 @@
 #include "../LabelledComponent.h"
 #include "../VirtualKeyboard/KeyboardComponent.h"
 
-#define defaultSectionFlexBox FlexBox(FlexBox::Direction::column, FlexBox::Wrap::wrap, FlexBox::AlignContent::stretch, FlexBox::AlignItems::flexStart, FlexBox::JustifyContent::spaceAround)
+#define defaultSectionFlexBox FlexBox(FlexBox::Direction::column, FlexBox::Wrap::wrap, FlexBox::AlignContent::stretch, FlexBox::AlignItems::stretch, FlexBox::JustifyContent::spaceAround)
 #define defaultSectionFlexItem FlexItem(250, 24).withFlex(1.0f).withMargin(FlexItem::Margin(5, 0, 5, 5))
 #define defaultSectionAsFlexItem FlexItem(100, 100).withFlex(1.0f);
 
@@ -165,7 +165,7 @@ protected:
         return nullptr;
     }
 
-    bool setControlFlexItem(int controlNum, FlexItem flexItemIn)
+    bool setControlFlexItem(int controlNum, FlexItem& flexItemIn)
     {
         FlexBox* sectionBox = getSectionFlexBox(controlTypes[controlNum].sectionNum);
         for (int i = 0; i < sectionBox->items.size(); i++)
