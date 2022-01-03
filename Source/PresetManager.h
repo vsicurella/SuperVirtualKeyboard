@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
@@ -67,6 +67,8 @@ public:
 
     int getModeSlotOfSelector(int modeSelectorNumIn) const;
 
+    bool isPresetEdited() const;
+
     ValueTree getModeInLibrary(int indexIn);
 
     /*
@@ -122,6 +124,33 @@ public:
     static ValueTree parsePresetFile(File fileIn);
     
     void requestModeMenu(PopupMenu* comboBoxToUse);
+
+    class Listener
+    {
+    public:
+
+        virtual ~Listener() {};
+
+        virtual void presetLoaded(ValueTree presetNodeIn) {};
+
+        virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
+
+        virtual void inputMappingChanged(NoteMap* inputNoteMap) {};
+
+        virtual void outputMappingChanged(NoteMap* outputNoteMap) {};
+
+        virtual void customModeChanged(Mode* newCustomMode) {};
+
+        virtual void modeInfoChanged(Mode* modeEdited) {};
+    };
+
+    void addListener(SvkPresetManager::Listener* listenerIn) { listeners.add(listenerIn); }
+
+    void removeListener(SvkPresetManager::Listener* listenerIn) { listeners.remove(listenerIn); }
+
+protected:
+
+    ListenerList<Listener> listeners;
 
 private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
