@@ -9,26 +9,23 @@
 */
 
 #pragma once
-#include "../../../PluginState.h"
 
 #include "GeneralSettingsPanel.h"
 #include "MidiSettingsPanel.h"
 #include "KeyboardSettingsPanel.h"
 #include "MappingSettingsPanel.h"
 #include "ColourSettingsPanel.h"
-//#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
 
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent, public SvkPluginState::Listener
+class SettingsContainer : public TabbedComponent, public SvkPresetManager::Listener
 {
 public:
     
-    SettingsContainer(SvkPluginState* pluginStateIn)
-    : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
-        pluginState(pluginStateIn)
+    SettingsContainer(ValueTree pluginStateNodeIn)
+        : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
     {
         tabColour = Colour(0xff323e44);
         backgroundColour = tabColour.darker();
@@ -44,22 +41,22 @@ public:
         for (auto panelName : panelNames)
         {
             if (panelName == "General")
-                panels.add(new GeneralSettingsPanel(pluginState));
+                panels.add(new GeneralSettingsPanel(pluginStateNodeIn));
 
             else if (panelName == "Midi")
-                panels.add(new MidiSettingsPanel(pluginState));
+                panels.add(new MidiSettingsPanel(pluginStateNodeIn));
 
             else if (panelName == "Keyboard")
-                panels.add(new KeyboardSettingsPanel(pluginState));
+                panels.add(new KeyboardSettingsPanel(pluginStateNodeIn));
 
             else if (panelName == "Mapping")
-                panels.add(new MappingSettingsPanel(pluginState));
+                panels.add(new MappingSettingsPanel(pluginStateNodeIn));
 
             else if (panelName == "Colors")
-                panels.add(new ColourSettingsPanel(pluginState));
+                panels.add(new ColourSettingsPanel(pluginStateNodeIn));
 
             else if (panelName == "Debug")
-                panels.add(new DebugSettingsPanel(pluginState));
+                panels.add(new DebugSettingsPanel(pluginStateNodeIn));
         }
 
         for (int i = 0; i < panels.size(); i++)
@@ -127,8 +124,6 @@ protected:
     ListenerList<Listener> listeners;
 
 private:
-
-    SvkPluginState* pluginState;
 
     Array<SvkSettingsPanel*> panels;
     std::unique_ptr<Viewport> view;

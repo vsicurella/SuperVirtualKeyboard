@@ -12,11 +12,10 @@
 
 #include <JuceHeader.h>
 #include "PresetManager.h"
-#include "UI/PluginEditor.h"
 #include "Constants.h"
 #include "PluginModes.h"
 #include "PluginSettings.h"
-#include "Midi/MidiProcessor.h"
+#include "MidiProcessor.h"
 #include "Structures/ModeMapper.h"
 
 typedef AudioProcessorValueTreeState::Parameter Parameter;
@@ -26,8 +25,8 @@ typedef AudioProcessorValueTreeState::Parameter Parameter;
 */
 
 class SvkAudioProcessor  : public AudioProcessor,
-                            public ChangeBroadcaster,
-                            public SvkPresetManager::Listener
+                           public ChangeBroadcaster,
+                           public SvkPresetManager::Listener
 {
 public:
     //==============================================================================
@@ -110,6 +109,9 @@ public:
 
     //==============================================================================
 
+    void addPresetManagerListener(SvkPresetManager::Listener* listenerIn);
+    void removePresetManagerListener(SvkPresetManager::Listener* listenerIn);
+    
     int getNumModesLoaded() const;
     int getModeSelectorViewed() const;
     int getModeViewedSlotNumber() const;
