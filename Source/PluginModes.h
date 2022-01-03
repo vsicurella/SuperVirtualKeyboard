@@ -66,6 +66,13 @@ namespace VirtualKeyboard
     };
 }
 
+enum class MappingMode
+{
+    None = 0,
+    Auto,
+    Manual
+}
+
 enum MappingStyle
 {
     ModeToMode = 1,

@@ -9,7 +9,6 @@
 */
 
 #pragma once
-#include "../../../PluginState.h"
 #include "../DirectoryBrowserComponent.h"
 #include "../LabelledComponent.h"
 #include "../VirtualKeyboard/KeyboardComponent.h"
@@ -19,10 +18,10 @@
 #define defaultSectionAsFlexItem FlexItem(100, 100).withFlex(1.0f);
 
 class SvkSettingsPanel : public Component,
-    protected Slider::Listener,
-    protected Button::Listener,
-    protected ComboBox::Listener,
-    protected DirectoryBrowserComponent::Listener
+                         protected Slider::Listener,
+                         protected Button::Listener,
+                         protected ComboBox::Listener,
+                         protected DirectoryBrowserComponent::Listener
 {
 
 public:

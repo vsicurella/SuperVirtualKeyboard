@@ -17,13 +17,12 @@
     </GROUP>
     <GROUP id="{E6193C1C-4830-9051-F8B2-795EEC7393A3}" name="Source">
       <FILE id="jXtU8j" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
-      <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
-        <FILE id="tTU60E" name="AbletonMidiWriter.h" compile="0" resource="0"
-              file="Source/File IO/AbletonMidiWriter.h"/>
-        <FILE id="fi0keh" name="KbmWriter.h" compile="0" resource="0" file="Source/File IO/KbmWriter.h"/>
-        <FILE id="IIylWS" name="ReaperWriter.cpp" compile="1" resource="0"
-              file="Source/File IO/ReaperWriter.cpp"/>
-        <FILE id="CWkeRo" name="ReaperWriter.h" compile="0" resource="0" file="Source/File IO/ReaperWriter.h"/>
+      <GROUP id="{039F041C-0637-CCA8-09C9-9A54C8830562}" name="IO">
+        <FILE id="BCALqQ" name="AbletonMidiWriter.h" compile="0" resource="0"
+              file="Source/IO/AbletonMidiWriter.h"/>
+        <FILE id="SBQFqF" name="ReaperWriter.cpp" compile="1" resource="0"
+              file="Source/IO/ReaperWriter.cpp"/>
+        <FILE id="s0JoY1" name="ReaperWriter.h" compile="0" resource="0" file="Source/IO/ReaperWriter.h"/>
       </GROUP>
       <GROUP id="{D5A25263-0D83-82C4-7DAC-24B92CE9D68C}" name="Structures">
         <FILE id="DkVoz7" name="MappingEditorBase.h" compile="0" resource="0"
@@ -118,14 +117,6 @@
           <FILE id="EKbdHq" name="NoteMapEditor.cpp" compile="1" resource="0"
                 file="Source/UI/Components/NoteMapEditor.cpp"/>
           <FILE id="HtSLNw" name="NoteMapEditor.h" compile="0" resource="0" file="Source/UI/Components/NoteMapEditor.h"/>
-          <FILE id="ZR3ZGY" name="PluginControlComponent.cpp" compile="1" resource="0"
-                file="Source/UI/Components/PluginControlComponent.cpp"/>
-          <FILE id="dYHjg9" name="PluginControlComponent.h" compile="0" resource="0"
-                file="Source/UI/Components/PluginControlComponent.h"/>
-          <FILE id="gtGOgZ" name="ReferencedComboBox.cpp" compile="1" resource="0"
-                file="Source/UI/Components/ReferencedComboBox.cpp"/>
-          <FILE id="el2G9f" name="ReferencedComboBox.h" compile="0" resource="0"
-                file="Source/UI/Components/ReferencedComboBox.h"/>
         </GROUP>
         <GROUP id="{47A64633-0278-4A78-4C12-7D9336B3BFC9}" name="Dialogs">
           <FILE id="XJJu6w" name="ExportKbmDialog.h" compile="0" resource="0"

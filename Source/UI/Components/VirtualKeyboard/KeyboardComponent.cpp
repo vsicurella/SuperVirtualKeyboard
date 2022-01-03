@@ -8,7 +8,6 @@
  ==============================================================================
  */
 
-#include "../../../../JuceLibraryCode/JuceHeader.h"
 #include "KeyboardComponent.h"
 
 using namespace VirtualKeyboard;

@@ -13,11 +13,8 @@
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
-
 #include "../../CommonFunctions.h"
 #include "../../Structures/ModeMapper.h"
-#include "../Components/ReferencedComboBox.h"
 
 
 //==============================================================================
