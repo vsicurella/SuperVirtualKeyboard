@@ -17,11 +17,6 @@
     </GROUP>
     <GROUP id="{E6193C1C-4830-9051-F8B2-795EEC7393A3}" name="Source">
       <FILE id="jXtU8j" name="Constants.h" compile="0" resource="0" file="Source/Constants.h"/>
-      <GROUP id="{BD1374F9-7E3C-2177-02A8-9052ECB56565}" name="Midi">
-        <FILE id="p3n0GM" name="MidiProcessor.h" compile="0" resource="0" file="Source/Midi/MidiProcessor.h"/>
-        <FILE id="fq1fV6" name="MidiProcessor.cpp" compile="1" resource="0"
-              file="Source/Midi/MidiProcessor.cpp"/>
-      </GROUP>
       <GROUP id="{D3D9BD2E-EBBF-50B0-2961-19C33D6AAA02}" name="File IO">
         <FILE id="tTU60E" name="AbletonMidiWriter.h" compile="0" resource="0"
               file="Source/File IO/AbletonMidiWriter.h"/>
@@ -144,18 +139,19 @@
           <FILE id="HsazKY" name="ModeInfoDialog.h" compile="0" resource="0"
                 file="Source/UI/Dialogs/ModeInfoDialog.h"/>
         </GROUP>
-        <FILE id="xP2S6O" name="PluginEditor.cpp" compile="1" resource="0"
-              file="Source/UI/PluginEditor.cpp"/>
-        <FILE id="gGW61u" name="PluginEditor.h" compile="0" resource="0" file="Source/UI/PluginEditor.h"/>
         <FILE id="cry3qn" name="VectorResources.h" compile="0" resource="0"
               file="Source/UI/VectorResources.h"/>
       </GROUP>
       <FILE id="ipy8hj" name="CommonFunctions.h" compile="0" resource="0"
             file="Source/CommonFunctions.h"/>
       <FILE id="qf8oNW" name="PluginIDs.h" compile="1" resource="0" file="Source/PluginIDs.h"/>
+      <FILE id="mxcatm" name="MidiProcessor.h" compile="0" resource="0" file="Source/MidiProcessor.h"/>
+      <FILE id="ac1DOj" name="MidiProcessor.cpp" compile="1" resource="0"
+            file="Source/MidiProcessor.cpp"/>
       <FILE id="iiiGEu" name="PluginModes.h" compile="0" resource="0" file="Source/PluginModes.h"/>
-      <FILE id="h9Uluy" name="PluginState.cpp" compile="1" resource="0" file="Source/PluginState.cpp"/>
-      <FILE id="OEUZCe" name="PluginState.h" compile="0" resource="0" file="Source/PluginState.h"/>
+      <FILE id="xtR2F4" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="OD1Hi6" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
       <FILE id="FI8LwH" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="M0F1cM" name="PluginProcessor.h" compile="0" resource="0"
