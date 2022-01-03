@@ -11,72 +11,29 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "Structures/MidiFilter.h"
-#include "CommonFunctions.h"
-#include "Structures/Mode.h"
+#include "../CommonFunctions.h"
 
-class SvkMidiProcessor : public MidiMessageCollector
+#include "../Structures/MidiFilter.h"
+#include "../Structures/Mode.h"
+#include "../Structures/MappingHelper.h"
+
+class SvkMidiProcessor : public MidiInputCallback,
+                         public MidiKeyboardStateListener,
+                         private AudioProcessorValueTreeState::Listener
 {
-    std::unique_ptr<MidiInput> midiInput;
-    std::unique_ptr<MidiOutput> midiOutput;
-    
-    String midiInputName = "";
-    String midiOutputName = "";
-    
-    String inputSelected = "";
-    String outputSelected = "";
-    
-    MidiBuffer midiBuffer;
-    int msgCount = 0;
-
-    Mode* modeViewed;
-    Mode* mode1;
-    Mode* mode2;
-    
-    float* midiChannelOut;
-    float* periodShift;
-    float* transposeAmt;
-    bool* useModePeriod;
-
-    std::unique_ptr<MidiFilter> midiInputFilter;
-    std::unique_ptr<MidiFilter> midiOutputFilter;
-    
-    std::unique_ptr<MPEInstrument> mpeInst;
-    
-    bool mpeOn = false;
-    bool mpeThru = false;
-    bool mpeLegacyOn = false;
-    MPEZoneLayout mpeZone;
-    
-    int pitchBendGlobalMax = 2;
-    int pitchBendNoteMax = 48;
-    int mpePitchTrackingMode = 0;
-    int mpePressureTrackingMode = 0;
-    int mpeTimbreTrackingMode = 0;
-    
-    bool midiInputPaused = false;
-    bool isInputRemapped = true;
-    bool isOutputRemapped = true;
-    
-    bool inputMapIsCustom = false;
-    bool outputMapIsCustom = false;
-    
-    std::unique_ptr<MidiKeyboardState> originalKeyboardState; // used for sending unchanged MIDI messages
-    std::unique_ptr<MidiKeyboardState> remappedKeyboardState; // used for displaying on VirtualKeyboard
-    
 public:
     
-    SvkMidiProcessor();
+    SvkMidiProcessor(AudioProcessorValueTreeState&);
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
     ValueTree midiMapNode;
+    ValueTree midiDeviceNode;
     
-    void updateNode();
-    bool restoreFromNode(ValueTree midiSettingsNodeIn);
-
-    StringArray getAvailableInputs() const;
-    Array<MidiDeviceInfo> getAvailableOutputs() const;
+    void updateNodes();
+    bool restoreSettingsNode(ValueTree midiSettingsNodeIn);
+    bool restoreMappingNode(ValueTree midiMapIn);
+    bool restoreDevicesNode(ValueTree midiDevicesNodeIn);
     
     MidiInput* getInputDevice();
     MidiOutput* getOutputDevice();
@@ -87,32 +44,24 @@ public:
     MidiKeyboardState* getOriginalKeyboardState();
     MidiKeyboardState* getRemappedKeyboardState();
     
-    int getRootNote() const;
     int getPeriodShift() const;
     int getTransposeAmt() const;
     int getMidiChannelOut() const;
 
-    NoteMap* getInputNoteMap();
-    NoteMap* getOutputNoteMap();
+    NoteMap* getInputNoteFilter();
+    NoteMap* getInputNoteRemap();
+    NoteMap* getOutputNoteFilter();
 
-    MidiFilter* getMidiInputFilter();
-    MidiFilter* getMidiOutputFilter();
-
+    MidiFilter* getInputMidiFilter();
+    MidiFilter* getInputRemapMidiFilter();
+    MidiFilter* getOutputMidiFilter();
+    
     int getInputNote(int midiNoteIn);
     int getOutputNote(int midiNoteIn);
-    
-    bool isMPEOn() const;
-    bool isMPELegacyMode() const;
-    bool isMPEThru() const;
-    MPEZoneLayout getMPEZone() const;
 
-    int getPitchBendNoteMax() const;
-    int getPitchBendGlobalMax() const;
-    int getPitchTrackingMode() const;
-    int getPressureTrackingMode() const;
-    int getTimbreTrackingMode() const;
+    int getVoiceLimit() const;
     
-    bool isAutoRemapping();
+    bool isRetuning() const;
     
     String setMidiInput(String deviceID);
     String setMidiOutput(String deviceID);
@@ -120,48 +69,125 @@ public:
     void setModeViewed(Mode* modeViewedIn);
     void setMode1(Mode* mode1In);
     void setMode2(Mode* mode2In);
-    
-    void setRootNote(int rootNoteIn);
-    void setMidiChannelOut(int channelOut);
-    void setPeriodShift(int shiftIn);
-    void setTransposeAmt(int notesToTranspose);
-    void periodUsesModeSize(bool useMode);
-    
-    void setMPEOn(bool turnOnMPE);
-    void setMPEThru(bool mpeOnThru);
-    void setMPELegacy(bool turnOnLegacy);
-    void setMPEZone(MPEZoneLayout zoneIn);
-    
-    void setPitchBendNoteMax(int bendAmtIn);
-    void setPitchBendGlobalMax(int bendAmtIn);
-    void setPitchTrackingMode(int modeIn);
-    void setPressureTrackingMode(int modeIn);
-    void setTimbreTrackingMode(int modeIn);
-    
+
+    void setInputToFilter(bool doRemap=true);
     void setInputToRemap(bool doRemap=true);
-    void setOutputToRemap(bool doRemap=true);
+    void setOutputToFilter(bool doFilter=true);
     
-    void setMidiMaps(ValueTree midiMapIn);
+    void setInputFilter(Array<int> mapIn, bool updateNode=true);
+    void setInputFilter(NoteMap mapIn, bool updateNode=true);
+    void setInputRemap(Array<int> mapIn, bool updateNode=true);
+    void setInputRemap(NoteMap mapIn, bool updateNode = true);
+    void setOutputFilter(Array<int> mapIn, bool updateNode = true);
+    void setOutputFilter(NoteMap mapIn, bool updateNode = true);
+
+    /*
+        How many periods to shift notes.
+        Notes held will be transposed for now.
+    */
+    void setPeriodShift(int periodsToShift);
+
+    /*
+        Sets the value to transpose all notes by
+    */
+    void setTransposeAmt(int transposeAmtIn);
+
+    /*
+        The MIDI channel for mouse-based virtual keyboard interaction
+    */
+    void setMidiChannelOut(int virtualKeyboardMidiChannelOut);
+
+    /*
+        Updates the note number transposition cache
+    */
+    void updateNoteTransposition();
+
+    //void setVoiceLimit(int maxVoicesIn);
+    //void setRetuneOn(bool retuneOn);
+
+    void setMappingHelper(MappingHelper* helperIn);
     
-    void setMidiInputMap(Array<int> mapIn, bool updateNode=true);
-    void setMidiInputMap(NoteMap mapIn, bool updateNode = true);
-    void setMidiOutputMap(Array<int> mapIn, bool updateNode = true);
-    void setMidiOutputMap(NoteMap mapIn, bool updateNode = true);
-    
-    void mapInputNote(int noteIn, int noteOut, bool updateNode = true);
-    void mapOutputNode(int noteIn, int noteOut, bool updateNode = true);
-    
+    void resetInputFilter(bool updateNode=true);
     void resetInputMap(bool updateNode=true);
-    void resetOutputMap(bool updateNode=true);
+    void resetOutputFilter(bool updateNode=true);
     
     void processMidi(MidiBuffer& midiMessages);
-    void sendMsgToOutputs(const MidiMessage& bufferToSend);
+    //MidiBuffer convertToMPE(const MidiBuffer& bufferToConvert);
+    
+    void sendMsgToOutputs(const MidiMessage& msgToSend);
+    void sendBufferToOutputs(const MidiBuffer& bufferToSend);
+    void allNotesOff();
     
     void pauseMidiInput(bool setPaused=true);
     bool isMidiPaused();
+    
+    void parameterChanged(const String& paramID, float newValue) override;
     
     // Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& msg) override;
+
+private:
+
+    AudioProcessorValueTreeState& svkTree;
+
+    std::unique_ptr<MidiInput> midiInput;
+    std::unique_ptr<MidiOutput> midiOutput;
+
+    String midiInputName = "";
+    String midiOutputName = "";
+
+    String inputSelected = "";
+    String outputSelected = "";
+
+    double startTime;
+
+    MidiBuffer externalInputBuffer;
+    int numInputMsgs = 0;
+
+    MidiBuffer svkBuffer;
+    int numSvkMsgs = 0;
+
+    MidiBuffer allNotesOffBuffer;
+
+    Mode* modeViewed;
+    Mode* mode1;
+    Mode* mode2;
+
+    int periodShift = 0;
+    bool periodShiftModeSize = false;
+    int transposeAmt = 0;
+    int currentNoteShift = 0;
+
+    int midiChannelOut = 1;
+
+    int maxNumVoices = 15;
+    int pitchBendNoteMax = 48;
+    int pitchBendGlobalMax = 2;
+
+    bool mpeTuningPreserveMidiNote = true;
+
+    std::unique_ptr<MidiFilter> midiInputFilter;
+    std::unique_ptr<MidiFilter> midiInputRemap;
+    std::unique_ptr<MidiFilter> midiOutputFilter;
+
+    MappingHelper* mappingHelper;
+
+    int mpePitchbendTrackingMode = 0;
+    int mpePressureTrackingMode = 0;
+    int mpeTimbreTrackingMode = 0;
+
+    bool mpeOn = false;
+    bool doRetuning = false;
+
+    bool midiInputPaused = false;
+    bool isInputFiltered = false;
+    bool isInputRemapped = true;
+    bool isOutputFiltered = false;
+
+    bool noteMapIsCustom = false;
+
+    std::unique_ptr<MidiKeyboardState> originalKeyboardState; // post-filtered input
+    std::unique_ptr<MidiKeyboardState> remappedKeyboardState; // remapped input
 };
