@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "../CommonFunctions.h"
-
-#include "../Structures/MidiFilter.h"
-#include "../Structures/Mode.h"
-#include "../Structures/MappingHelper.h"
+#include "./Structures/Preset.h"
+#include "./CommonFunctions.h"
+#include "./Structures/MidiFilter.h"
+#include "./Structures/Mode.h"
+#include "./Structures/MappingHelper.h"
 
 class SvkMidiProcessor : public MidiInputCallback,
                          public MidiKeyboardStateListener,
@@ -23,7 +22,7 @@ class SvkMidiProcessor : public MidiInputCallback,
 {
 public:
     
-    SvkMidiProcessor(AudioProcessorValueTreeState&);
+    SvkMidiProcessor(SvkPreset& workingPreset);
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
@@ -130,7 +129,8 @@ public:
 
 private:
 
-    AudioProcessorValueTreeState& svkTree;
+    //AudioProcessorValueTreeState& svkTree;
+    SvkPreset& preset;
 
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;

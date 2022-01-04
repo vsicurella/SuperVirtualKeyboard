@@ -10,9 +10,9 @@
 
 #include "MappingSettingsPanel.h"
 
-MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
+MappingSettingsPanel::MappingSettingsPanel(SvkPreset& presetIn)
     : SvkSettingsPanel(
-        "MappingSettings", pluginStateIn,
+        "MappingSettings", presetIn,
         {
             "Current Mapping",
             ""
@@ -29,9 +29,7 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
         }
     )
 {
-    currentMappingLabel = static_cast<Label*>(getSectionFlexBox(0)->items.getReference(0).associatedComponent);
-
-    noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
+    //noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
     controls.set(0, noteMapEditor, true);
     addAndMakeVisible(noteMapEditor);
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
@@ -63,25 +61,7 @@ void MappingSettingsPanel::visibilityChanged()
 
 void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
 {
-    // Mapping off
-    if (mappingModeId == 1)
-    {
-        noteMapEditor->setEnabled(false);
-        currentMappingLabel->setText("Current Mapping (No mapping active)", dontSendNotification);
-        noteMapEditor->resetMapping(pluginState->getMidiProcessor()->getManualNoteMap(), false);
-    }
-    // Auto Map
-    else if (mappingModeId == 2)
-    {
-        noteMapEditor->setEnabled(false);
-        currentMappingLabel->setText("Current Mapping (Auto Map / Read-only)", dontSendNotification);
-    }
-    // Manual Map
-    else if (mappingModeId == 3)
-    {
-        noteMapEditor->setEnabled(true);
-        currentMappingLabel->setText("Current Mapping", dontSendNotification);
-    }
+    preset.setMidiInputMap(noteMapIn, true, false);
 }
 
 void MappingSettingsPanel::inputMappingChanged(NoteMap& newNoteMap)

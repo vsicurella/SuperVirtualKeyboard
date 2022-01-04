@@ -10,8 +10,8 @@
 
 #include "MidiProcessor.h"
 
-SvkMidiProcessor::SvkMidiProcessor(AudioProcessorValueTreeState& svkTreeIn)
-    : svkTree(svkTreeIn)
+SvkMidiProcessor::SvkMidiProcessor(SvkPreset& presetIn)
+    : preset(presetIn)
 {
     midiSettingsNode = ValueTree(IDs::midiSettingsNode);
     midiMapNode = ValueTree(IDs::midiMapNode);

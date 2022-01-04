@@ -71,7 +71,7 @@ enum class MappingMode
     None = 0,
     Auto,
     Manual
-}
+};
 
 enum MappingStyle
 {

@@ -24,18 +24,23 @@ SvkAudioProcessor::SvkAudioProcessor() :
                        ),
 #endif
     svkUndo(new UndoManager()),
-    svkValueTree(*this, svkUndo.get(), IDs::svkParentNode, createParameters())
+    svkValueTree(*this, svkUndo.get()),//, IDs::svkParentNode, createParameters())
+    pluginSettings(std::make_unique<SvkPluginSettings>()),
+    presetManager(std::make_unique<SvkPresetManager>(pluginSettings->getSettingsNode())),
+    workingPreset(presetManager->getPreset())
 {
     // Temporary
     svkValueTree.state = ValueTree(IDs::svkParentNode);
 
-    pluginSettings.reset(new SvkPluginSettings());
+    //pluginSettings.reset(new SvkPluginSettings());
 
-    presetManager.reset(new SvkPresetManager(pluginSettings->getSettingsNode()));
+    //presetManager.reset(new SvkPresetManager(pluginSettings->getSettingsNode()));
     presetManager->addListener(this);
 
+    //workingPreset = presetManager->getPreset();
+
     // TODO: Factory default MIDI settings
-    midiProcessor.reset(new SvkMidiProcessor());
+    midiProcessor.reset(new SvkMidiProcessor(workingPreset));
 
     modeMapper.reset(new ModeMapper());
 
@@ -162,7 +167,8 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
     
     MemoryOutputStream memOut(destData, true);
-    commitStateNode();
+    auto stateTree = buildStateValueTree();
+    svkValueTree.state.copyPropertiesAndChildrenFrom(stateTree, nullptr);
     svkValueTree.state.writeToStream(memOut);
     DBG("Saving Plugin State node to internal memory:" + svkValueTree.state.toXmlString());
 }

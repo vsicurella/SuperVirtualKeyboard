@@ -31,11 +31,15 @@ SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 }
 
 SvkPreset::SvkPreset(const SvkPreset& presetToCopy)
-:     SvkPreset(presetToCopy.parentNode.createCopy())
 {
 }
 
 SvkPreset::~SvkPreset() {}
+
+bool SvkPreset::operator==(const SvkPreset& preset) const
+{
+    return parentNode.isEquivalentTo(preset.parentNode);
+}
 
 ValueTree SvkPreset::getPresetNode(bool sortModeSlots)
 {
@@ -114,6 +118,8 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
             if (!selector.hasProperty(IDs::modeSelectorRootNote))
                 selector.setProperty(IDs::modeSelectorRootNote, 60, nullptr);
         }
+
+        listeners.call(&Listener::presetReloaded);
 
         return true;
     }
@@ -338,6 +344,136 @@ void SvkPreset::resetModeSlots()
 
     setMode1SlotNumber(0);
     setMode2SlotNumber(1);
+}
+
+juce::String SvkPreset::getMidiInputName() const
+{
+
+}
+
+bool SvkPreset::setMidiInputDevice(MidiDeviceInfo deviceInfo)
+{
+    listeners.call(&Listener::midiInputDeviceChanged, deviceInfo);
+}
+
+juce::String SvkPreset::getMidiOutputName() const
+{
+
+}
+
+bool SvkPreset::setMidiOutputDevice(MidiDeviceInfo deviceInfo)
+{
+    listeners.call(&Listener::midiOutputDeviceChanged, deviceInfo);
+}
+
+int SvkPreset::getPeriodShift() const
+{
+
+}
+
+void SvkPreset::setPeriodShift(int shiftAmt)
+{
+    listeners.call(&Listener::periodShiftAmountChanged, shiftAmt);
+}
+
+bool SvkPreset::periodShiftIsModeSize() const
+{
+
+}
+
+void SvkPreset::setPeriodShiftToModeSize(bool isModeSize)
+{
+    listeners.call(&Listener::periodShiftSizeChanged, isModeSize);
+}
+
+int SvkPreset::getTransposeAmount() const
+{
+
+}
+
+void SvkPreset::setTransposeAmount(int steps)
+{
+    listeners.call(&Listener::transposeAmountChanged, steps);
+}
+
+int SvkPreset::getVoiceLimit() const
+{
+
+}
+
+void SvkPreset::setVoiceLimit(int maxVoices)
+{
+    listeners.call(&Listener::voiceLimitChanged, maxVoices);
+}
+
+int SvkPreset::getMpePitchbendRange() const
+{
+
+}
+
+void SvkPreset::setMpePitchbendRange(int semitones)
+{
+    listeners.call(&Listener::mpePitchbendRangeChanged, semitones);
+}
+
+int SvkPreset::getGlobalPitchbendRange() const
+{
+
+}
+
+void SvkPreset::setGlobalPitchbendRange(int semitones)
+{
+    listeners.call(&Listener::globalPitchbendRangeChanged, semitones);
+}
+
+NoteMap SvkPreset::getMidiInputMap() const
+{
+
+}
+
+void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage = true)
+{
+    listeners.call(&Listener::midiInputMapChanged, mapIn);
+}
+
+VirtualKeyboard::HighlightStyle SvkPreset::getKeyHighlightStyle() const
+{
+
+}
+
+void SvkPreset::setKeyHighlightStyle(VirtualKeyboard::HighlightStyle styleIn)
+{
+    listeners.call(&Listener::keyboardHighlightStyleChanged, styleIn);
+}
+
+VirtualKeyboard::KeyPlacementType SvkPreset::getKeyPlacementType() const
+{
+
+}
+
+void SvkPreset::setKeyPlacementType(VirtualKeyboard::KeyPlacementType placementTypeIn)
+{
+    listeners.call(&Listener::keyboardKeyPlacementTypeChanged, placementTypeIn);
+}
+
+float SvkPreset::getKeySizeRatio() const
+{
+
+}
+
+void SvkPreset::setKeySizeRatio(float keyRatio)
+{
+    listeners.call(&Listener::keyboardKeyRatioChanged, keyRatio);
+}
+
+bool SvkPreset::areNoteNumbersShown() const
+{
+
+}
+
+void SvkPreset::showNoteNumbers(bool showNumbers)
+{
+    listeners.call(&Listener::keyParametersShown, (int)showNumbers);
 }
 
 bool SvkPreset::isValidPresetNode(ValueTree presetNodeIn)

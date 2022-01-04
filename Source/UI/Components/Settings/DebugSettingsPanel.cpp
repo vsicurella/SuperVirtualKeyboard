@@ -10,9 +10,8 @@
 
 #include "DebugSettingsPanel.h"
 
-DebugSettingsPanel::DebugSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel("DebugSettingsPanel", pluginState, { "" }, {}, {}),
-      pluginState(pluginStateIn)
+DebugSettingsPanel::DebugSettingsPanel(SvkPreset& presetIn)
+    : SvkSettingsPanel("DebugSettingsPanel", presetIn, { "" }, {}, {})
 {
     setSize(100, 100);
 }

@@ -22,16 +22,15 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "../PluginIDs.h"
 #include "../CommonFunctions.h"
 #include "../Constants.h"
-#include "Mode.h"
+#include "../PluginModes.h"
+#include "./NoteMap.h"
+#include "./Mode.h"
 
 class SvkPreset
 {
-
-protected:
     ValueTree parentNode;
     ValueTree thePropertiesNode;
     ValueTree theModeSlots;
@@ -47,6 +46,9 @@ public:
     SvkPreset(const ValueTree presetNodeIn);
     SvkPreset(const SvkPreset& presetToCopy);
     ~SvkPreset();
+
+    bool operator==(const SvkPreset& preset) const;
+    bool operator!=(const SvkPreset& preset) const { return !operator==(preset); }
 
     /*
         Returns the parent node of the preset
@@ -199,6 +201,136 @@ public:
     void resetModeSlots();
 
     /*
+        Get the current midi input device name
+    */
+    juce::String getMidiInputName() const;
+
+    /*
+        Set the current midi input device
+    */
+    bool setMidiInputDevice(MidiDeviceInfo deviceInfo);
+
+    /*
+        Get the current midi output device name
+    */
+    juce::String getMidiOutputName() const;
+
+    /*
+        Set the current midi output device
+    */
+    bool setMidiOutputDevice(MidiDeviceInfo deviceInfo);
+
+    /*
+        Get the current period shift
+    */
+    int getPeriodShift() const;
+
+    /*
+        Set the current period shift
+    */
+    void setPeriodShift(int shiftAmt);
+
+    /*
+        Get period shift mode (scale or mode size)
+    */
+    bool periodShiftIsModeSize() const;
+
+    /*
+        Set period shift mode
+    */
+    void setPeriodShiftToModeSize(bool isModeSize);
+
+    /*
+        Get transpose amount
+    */
+    int getTransposeAmount() const;
+
+    /*
+        Set transpose amount
+    */
+    void setTransposeAmount(int steps);
+
+    /*
+        Get voice limit
+    */
+    int getVoiceLimit() const;
+
+    /*
+        Set voice limit
+    */
+    void setVoiceLimit(int maxVoices);
+
+    /*
+        Get MPE pitchbend range
+    */
+    int getMpePitchbendRange() const;
+    
+    /*
+        Set MPE Pitchbend Range
+    */
+    void setMpePitchbendRange(int semitones);
+
+    /*
+        Get global pitchbend range
+    */
+    int getGlobalPitchbendRange() const;
+
+    /*
+        Set Global Pitchbend Range
+    */
+    void setGlobalPitchbendRange(int semitones);
+
+    /*
+        Get Midi Input mapping
+    */
+    NoteMap getMidiInputMap() const;
+
+    /*
+        Set MidiInput Mapping
+    */
+    void setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage = true);
+
+    /*
+        Get Keyboard Highlight Style
+    */
+    VirtualKeyboard::HighlightStyle getKeyHighlightStyle() const;
+
+    /*
+        Set Keyboard Highlight Style
+    */
+    void setKeyHighlightStyle(VirtualKeyboard::HighlightStyle styleIn);
+
+    /*
+        Get Keyboard Placement Type
+    */
+    VirtualKeyboard::KeyPlacementType getKeyPlacementType() const;
+
+    /*
+        Set Keyboard Placement Type
+    */
+    void setKeyPlacementType(VirtualKeyboard::KeyPlacementType placementTypeIn);
+
+    /*
+        Get Key size ratio
+    */
+    float getKeySizeRatio() const;
+
+    /*
+        Set Key size ratio
+    */
+    void setKeySizeRatio(float keyRatio);
+
+    /*
+        Get whether or not note numbers are shown
+    */
+    bool areNoteNumbersShown() const;
+
+    /*
+        Set whether or not note numbres are shown
+    */
+    void showNoteNumbers(bool showNumbers);
+
+    /*
         Returns a readable version of the parent node
     */
     String toString();
@@ -206,6 +338,44 @@ public:
     static bool isValidPresetNode(ValueTree presetNodeIn);
 
     static SvkPreset getDefaultPreset();
+
+public:
+
+    class Listener
+    {
+    public:
+
+        // When this preset's data gets replaced
+        virtual void presetReloaded() = 0;
+
+        virtual void modeSelectorSlotChanged(int selectorIndex, int slotIndex /*, ValueTree modeLoaded */) {}
+        virtual void modeRootChanged(int selectorIndex, int newRootChannel, int newRootNote) {}
+        virtual void customModeChanged() {}
+        
+        virtual void midiInputDeviceChanged(MidiDeviceInfo deviceInfo) {}
+        virtual void midiOutputDeviceChanged(MidiDeviceInfo deviceInfo) {}
+        virtual void periodShiftAmountChanged(int shiftAmount) {}
+        virtual void periodShiftSizeChanged(bool isModeSize) {}
+        virtual void transposeAmountChanged(int transposeAmount) {}
+        virtual void voiceLimitChanged(int voiceLimit) {}
+        virtual void mpePitchbendRangeChanged(int steps) {}
+        virtual void globalPitchbendRangeChanged(int steps) {}
+        virtual void midiInputMapChanged(const NoteMap* inputNoteMap) {}
+
+        virtual void keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType) {}
+        virtual void keyboardHighlightStyleChanged(VirtualKeyboard::HighlightStyle highlightStyle) {}
+        virtual void keyboardKeyRatioChanged(float keyRatio) {}
+        virtual void keyParametersShown(int keyParameters) {} // extension of note numbers shown
+
+    };
+
+    void addPresetListener(Listener* presetListenerIn) { listeners.add(presetListenerIn); }
+
+    void removePresetListener(Listener* presetListenerIn) { listeners.remove(presetListenerIn); }
+
+protected:
+
+    ListenerList<Listener> listeners;
 
 private:
 

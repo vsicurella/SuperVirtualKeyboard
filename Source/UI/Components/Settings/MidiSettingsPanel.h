@@ -17,7 +17,7 @@ class MidiSettingsPanel : public SvkSettingsPanel, public Timer
     
 public:
     
-    MidiSettingsPanel(SvkPluginState*);
+    MidiSettingsPanel(SvkPreset& preset);
     ~MidiSettingsPanel();
 
     void visibilityChanged() override;
@@ -46,7 +46,7 @@ private:
     Array<MidiDeviceInfo> availableIns;
     Array<MidiDeviceInfo> availableOuts;
 
-    SvkMidiProcessor* midiProcessor;
+    //SvkMidiProcessor* midiProcessor;
 
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiSettingsPanel)

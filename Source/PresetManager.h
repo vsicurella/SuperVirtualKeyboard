@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include <JuceHeader.h>
-
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
 #include "Structures/Preset.h"
 #include "Structures/Mode.h"
+#include "Structures/NoteMap.h"
 
 class SvkPresetManager : public ChangeBroadcaster
 {

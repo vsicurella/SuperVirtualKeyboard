@@ -28,6 +28,11 @@ SvkPreset& SvkPresetManager::getPreset()
     return svkPresetWorking;
 }
 
+bool SvkPresetManager::isPresetEdited() const
+{
+    return svkPresetSaved != svkPresetWorking;
+}
+
 int SvkPresetManager::getNumMenuItems(bool withFactoryMenu , bool withUserMenu, bool withFavMenu, bool withSlots)
 {
     int totalMenuItems = 0;
@@ -259,8 +264,8 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
         
         svkPresetSaved.restoreFromNode(presetNodeIn, true);
-        svkPresetWorking = SvkPreset(svkPresetSaved);
         
+        // necessary??
         modeSlots.clear();
         for (auto mode : svkPresetWorking.getModeSlots())
         {

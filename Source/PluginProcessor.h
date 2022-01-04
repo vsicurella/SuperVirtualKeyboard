@@ -187,9 +187,9 @@ public:
 
 private:
 
+    std::unique_ptr<SvkPluginSettings> pluginSettings;
     std::unique_ptr<SvkPresetManager> presetManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
-    std::unique_ptr<SvkPluginSettings> pluginSettings;
 
     std::unique_ptr<ModeMapper> modeMapper;
     
@@ -197,6 +197,8 @@ private:
 
     ValueTree factoryDefaultPluginStateNode;
     ValueTree defaultPluginStateNode;
+
+    SvkPreset& workingPreset;
     
     Mode* modeViewed; // What is currently on screen
     int modeSelectorViewedNum = 1;
