@@ -17,12 +17,14 @@ class GeneralSettingsPanel : public SvkSettingsPanel
     
 public:
     
-    GeneralSettingsPanel(SvkPluginState*);
+    GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkPreset& presetIn);
     ~GeneralSettingsPanel() override;
     
     void directoryChanged(DirectoryBrowserComponent*, File) override;
     
 private:
+
+    SvkPluginSettings& globalSettings;
 
     LabelledComponent* presetLabel;
     LabelledComponent* modeLabel;

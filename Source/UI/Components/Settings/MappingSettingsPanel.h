@@ -19,7 +19,7 @@ class MappingSettingsPanel : public SvkSettingsPanel,
 {
 public:
 
-    MappingSettingsPanel(SvkPluginState* pluginStateIn);
+    MappingSettingsPanel(SvkPreset& presetIn);
     ~MappingSettingsPanel();
 
     void visibilityChanged() override;

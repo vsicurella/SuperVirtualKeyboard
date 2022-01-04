@@ -59,7 +59,7 @@ class ColourSettingsPanel : public SvkSettingsPanel
 {
 public:
 
-    ColourSettingsPanel(SvkPluginState*);
+    ColourSettingsPanel(SvkPreset& presetIn);
 
     ~ColourSettingsPanel() override;
 
@@ -74,8 +74,6 @@ public:
     void mouseDown(const MouseEvent& event) override;
 
     void mouseUp(const MouseEvent& event) override;
-
-    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
 
     void refreshPanel() override;
 

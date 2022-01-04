@@ -10,8 +10,8 @@
 
 #include "KeyboardSettingsPanel.h"
 
-KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel("KeyboardSettingsPanel", pluginStateIn,
+KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPreset& presetIn)
+    : SvkSettingsPanel("KeyboardSettingsPanel", presetIn,
         {
             "Keyboard settings"
         },
@@ -74,50 +74,44 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
 
 void KeyboardSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
 {
-    if (virtualKeyboard)
-    {
-        if (boxThatChanged == keyLayoutBox)
-        {
-            virtualKeyboard->setKeyStyle(boxThatChanged->getSelectedId());
-            virtualKeyboard->resized();
-        }
 
-        else if (boxThatChanged == keyHighlightBox)
-        {
-            virtualKeyboard->setHighlightStyle(boxThatChanged->getSelectedId());
-        }
+    if (boxThatChanged == keyLayoutBox)
+    {
+        preset.setKeyPlacementType((VirtualKeyboard::KeyPlacementType)boxThatChanged->getSelectedId());
+    }
+
+    else if (boxThatChanged == keyHighlightBox)
+    {
+        preset.setKeyHighlightStyle((VirtualKeyboard::HighlightStyle)boxThatChanged->getSelectedId());
     }
 }
 
 void KeyboardSettingsPanel::sliderValueChanged(Slider* sliderChanged)
 {
-    if (virtualKeyboard)
+
+    if (sliderChanged == keyRatioSlider)
     {
-        if (sliderChanged == keyRatioSlider)
-        {
-            virtualKeyboard->setKeySizeRatio(sliderChanged->getValue(), false);
-            getParentComponent()->getParentComponent()->resized();
-        }
+        preset.setKeySizeRatio(sliderChanged->getValue());
     }
+    
 }
 
 void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
 {
-    if (virtualKeyboard)
+
+    if (clickedButton == showNoteNumbers)
     {
-        if (clickedButton == showNoteNumbers)
-        {
-            virtualKeyboard->setShowNoteNumbers(clickedButton->getToggleState());
-        }
+        preset.showNoteNumbers(clickedButton->getToggleState());
     }
+    
 }
 
-void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
-{
-    virtualKeyboard = keyboardPointer;
-
-    keyLayoutBox->setSelectedId(virtualKeyboard->getKeyPlacementStyle(), dontSendNotification);
-    keyHighlightBox->setSelectedId(virtualKeyboard->getHighlightStyle(), dontSendNotification);
-    keyRatioSlider->setValue(virtualKeyboard->getKeySizeRatio(), dontSendNotification);
-    showNoteNumbers->setToggleState(virtualKeyboard->isShowingNoteNumbers(), dontSendNotification);
-}
+//void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+//{
+//    virtualKeyboard = keyboardPointer;
+//
+//    keyLayoutBox->setSelectedId(virtualKeyboard->getKeyPlacementStyle(), dontSendNotification);
+//    keyHighlightBox->setSelectedId(virtualKeyboard->getHighlightStyle(), dontSendNotification);
+//    keyRatioSlider->setValue(virtualKeyboard->getKeySizeRatio(), dontSendNotification);
+//    showNoteNumbers->setToggleState(virtualKeyboard->isShowingNoteNumbers(), dontSendNotification);
+//}

@@ -9,6 +9,8 @@
 */
 
 #pragma once
+#include "../../../Structures/Preset.h"
+#include "../../../PluginSettings.h"
 #include "../DirectoryBrowserComponent.h"
 #include "../LabelledComponent.h"
 #include "../VirtualKeyboard/KeyboardComponent.h"
@@ -59,7 +61,7 @@ public:
     
     SvkSettingsPanel(
         String                       panelName,
-        SvkPluginState*              pluginStateIn,
+        SvkPreset&                   presetIn,
         StringArray                  sectionNamesIn,
         Array<Identifier>            controlIdsIn,
         Array<SvkControlProperties>  controlTypesIn,
@@ -67,7 +69,7 @@ public:
         Array<FlexBox>               sectionBoxStyle = Array<FlexBox>(),
         Array<FlexItem>              sectionItemsStyle = Array<FlexItem>()
     ) :
-        pluginState(pluginStateIn),
+        preset(presetIn),
         sectionNames(sectionNamesIn),
         controlIdentifiers(controlIdsIn),
         controlTypes(controlTypesIn),
@@ -125,11 +127,6 @@ public:
     void resized() override
     {
         flexParent.performLayout(getLocalBounds());
-    }
-
-    virtual void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
-    {
-        virtualKeyboard = keyboardPointer;
     }
 
     virtual void refreshPanel() {};
@@ -258,9 +255,9 @@ private:
     }
 
 protected:
-    
-    SvkPluginState* pluginState;
 
+    SvkPreset& preset;
+    
     StringArray sectionNames;
     int numSections;
 
@@ -280,5 +277,5 @@ protected:
     int controlMinWidth = 250;
     int controlMinHeight = 24;
 
-    VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
+    //VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
 };

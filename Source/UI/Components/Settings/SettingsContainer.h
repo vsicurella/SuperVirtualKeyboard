@@ -24,7 +24,7 @@ class SettingsContainer : public TabbedComponent, public SvkPresetManager::Liste
 {
 public:
     
-    SettingsContainer(ValueTree pluginStateNodeIn)
+    SettingsContainer(SvkPluginSettings& globalSettings, SvkPreset& presetIn)
         : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
     {
         tabColour = Colour(0xff323e44);
@@ -41,22 +41,22 @@ public:
         for (auto panelName : panelNames)
         {
             if (panelName == "General")
-                panels.add(new GeneralSettingsPanel(pluginStateNodeIn));
+                panels.add(new GeneralSettingsPanel(globalSettings, presetIn));
 
             else if (panelName == "Midi")
-                panels.add(new MidiSettingsPanel(pluginStateNodeIn));
+                panels.add(new MidiSettingsPanel(presetIn));
 
             else if (panelName == "Keyboard")
-                panels.add(new KeyboardSettingsPanel(pluginStateNodeIn));
+                panels.add(new KeyboardSettingsPanel(presetIn));
 
             else if (panelName == "Mapping")
-                panels.add(new MappingSettingsPanel(pluginStateNodeIn));
+                panels.add(new MappingSettingsPanel(presetIn));
 
             else if (panelName == "Colors")
-                panels.add(new ColourSettingsPanel(pluginStateNodeIn));
+                panels.add(new ColourSettingsPanel(presetIn));
 
             else if (panelName == "Debug")
-                panels.add(new DebugSettingsPanel(pluginStateNodeIn));
+                panels.add(new DebugSettingsPanel(presetIn));
         }
 
         for (int i = 0; i < panels.size(); i++)
@@ -87,15 +87,6 @@ public:
             newCurrentTabName, 
             componentViewed
         );
-    }
-
-    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPtrIn)
-    {
-        for (int i = 0; i < panelNames.size(); i++)
-        {
-            if (keyboardPanels.contains(panelNames[i]))
-                panels[i]->setKeyboardPointer(keyboardPtrIn);
-        }
     }
 
     void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
