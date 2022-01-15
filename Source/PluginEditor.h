@@ -1,4 +1,4 @@
-/*
+/*  
   ==============================================================================
 
     This file was auto-generated!
@@ -35,6 +35,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
                         public ScrollBar::Listener,
                         public ChangeListener,
                         private SvkPresetManager::Listener,
+                        private SvkPreset::Listener,
                         private SettingsContainer::Listener,
                         private MappingHelper::Listener,
                         private Timer
@@ -64,16 +65,22 @@ public:
     void timerCallback() override;
 
     //==============================================================================
+    // SvkPresetManager::Listener implementation
+    
+    void modeLibraryUpdated(const PopupMenu& menu) override;
 
-    void presetLoaded(SvkPreset& presetNode) override;
+    //==============================================================================
+    // SvkPreset::Listener implementation
+    
+    void presetReloaded(SvkPreset& preset) override;
 
-    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
+    void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override;
 
-    void inputMappingChanged(NoteMap* inputNoteMap) override;
+    void inputMappingChanged(const NoteMap* inputNoteMap) override;
 
-    void customModeChanged(Mode* newCustomMode) override;
+    void customModeChanged(const Mode* newCustomMode) override;
 
-    void modeInfoChanged(Mode* modeEdited) override;
+    //void modeInfoChanged(const Mode* modeEdited) override;
 
     void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
 
@@ -110,7 +117,7 @@ public:
     /*
         Updates UI to the new mode
     */
-    void onModeViewedChange(Mode* modeViewed);
+    void onModeViewedChange(const Mode* modeViewed);
 
     int getModeSelectorViewed();
 
@@ -160,6 +167,7 @@ protected:
 private:
     SvkAudioProcessor& processor;
     SvkPresetManager* presetManager;
+    SvkPreset& currentPreset;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;

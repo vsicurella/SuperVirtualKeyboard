@@ -80,7 +80,7 @@ public:
     /*
         Recreate a preset from a ValueTree
     */
-    bool restoreFromNode(ValueTree presetNodeIn, bool createCopy = false); // TODO: Revise default parameter
+    bool restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage = true);
 
     /*
         Returns array of slot numbers in use
@@ -171,40 +171,40 @@ public:
         Sets the slot number used by the given selector, and returns the slot index
         If slot number doesn't exist, nothing will happen and this will return -1
     */
-    int setModeSelectorSlotNum(int selectorNumIn, int slotNumIn);
-    void setMode1SlotNumber(int slotNumIn);
-    void setMode2SlotNumber(int slotNumIn);
+    int setModeSelectorSlotNum(int selectorNumIn, int slotNumIn, bool sendChangeMessage = true);
+    void setMode1SlotNumber(int slotNumIn, bool sendChangeMessage = true);
+    void setMode2SlotNumber(int slotNumIn, bool sendChangeMessage = true);
 
     /*
         Sets the midi root note used by the mode selector
     */
-    void setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn);
+    void setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn, bool sendChangeMessage = true);
     
     /*
         Loads the given mode into the given slot number, and returns the slot index
     */
-    int setModeSlot(ValueTree modeNodeIn, int slotNumber);
+    int setModeSlot(ValueTree modeNodeIn, int slotNumber, bool sendChangeMessage = true);
 
     /*
         Puts the given mode in the smallest available free slot and returns the slot number
     */
-    int addModeSlot(ValueTree modeNodeIn);
+    int addModeSlot(ValueTree modeNodeIn, bool sendChangeMessage = true);
 
     /*
         Sets the custom mode and returns a reference to the mode node
     */
-    ValueTree setCustomMode(ValueTree customModeNodeIn, bool createCopy = false);
+    ValueTree setCustomMode(ValueTree customModeNodeIn, bool sendChangeMessage = true);
 
     /*
         Empties the given mode slot and retunrs the slot index it was in
     */
-    int removeModeSlot(int slotNumberIn);
+    int removeModeSlot(int slotNumberIn, bool sendChangeMessage = true);
 
     /*
         Replaces mode slots 1 & 2 with standard tuning, and removes other modes
         Also resets selectors 0 and 1 to respective mode slots
     */
-    void resetModeSlots();
+    void resetModeSlots(bool sendChangeMessage = true);
 
     /*
         Get the current midi input device name
@@ -352,11 +352,14 @@ public:
     public:
 
         // When this preset's data gets replaced
-        virtual void presetReloaded() = 0;
+        virtual void presetReloaded(SvkPreset& preset) = 0;
 
+        virtual void modeViewedChanged(const Mode* modeViewed, int selectorNum, int slotNum) {}
         virtual void modeSelectorSlotChanged(int selectorIndex, int slotIndex /*, ValueTree modeLoaded */) {}
         virtual void modeRootChanged(int selectorIndex, int newRootChannel, int newRootNote) {}
-        virtual void customModeChanged() {}
+        virtual void customModeChanged(const Mode* customMode) {}
+
+        virtual void inputMappingChanged(const NoteMap* inputNoteMap) {}
         
         virtual void midiInputDeviceChanged(MidiDeviceInfo deviceInfo) {}
         virtual void midiOutputDeviceChanged(MidiDeviceInfo deviceInfo) {}
@@ -366,7 +369,6 @@ public:
         virtual void voiceLimitChanged(int voiceLimit) {}
         virtual void mpePitchbendRangeChanged(int steps) {}
         virtual void globalPitchbendRangeChanged(int steps) {}
-        virtual void midiInputMapChanged(NoteMap inputNoteMap) {}
 
         virtual void keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType) {}
         virtual void keyboardHighlightStyleChanged(VirtualKeyboard::HighlightStyle highlightStyle) {}
@@ -390,4 +392,5 @@ private:
 private:
 
     Array<int> slotNumbersInUse;
+
 };

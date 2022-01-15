@@ -104,14 +104,11 @@ ValueTree SvkPreset::getMappingsNode()
     return theMappingsNode;
 }
 
-bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
+bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage)
 {
     if (isValidPresetNode(presetNodeIn))
     {
-        if (createCopy)
-            presetNodeIn = presetNodeIn.createCopy();
-
-        parentNode = presetNodeIn;
+        parentNode = presetNodeIn.createCopy();
         parentNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
        
         pullChildrenFromParentNode(parentNode);
@@ -141,7 +138,8 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool createCopy)
                 selector.setProperty(IDs::modeSelectorRootNote, 60, nullptr);
         }
 
-        listeners.call(&Listener::presetReloaded);
+        if (sendChangeMessage)
+            listeners.call(&Listener::presetReloaded);
 
         return true;
     }
@@ -253,7 +251,7 @@ ValueTree SvkPreset::getCustomMode()
     return theCustomMode.getChild(0);
 }
 
-int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
+int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn, bool sendChangeMessage)
 {
     if (selectorNumIn >= 0 && slotNumIn >= 0)
     {
@@ -272,17 +270,17 @@ int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn)
     return -1;
 }
 
-void SvkPreset::setMode1SlotNumber(int slotNumIn)
+void SvkPreset::setMode1SlotNumber(int slotNumIn, bool sendChangeMessage)
 {
     setModeSelectorSlotNum(0, slotNumIn);
 }
 
-void SvkPreset::setMode2SlotNumber(int slotNumIn)
+void SvkPreset::setMode2SlotNumber(int slotNumIn, bool sendChangeMessage)
 {
     setModeSelectorSlotNum(1, slotNumIn);
 }
 
-void SvkPreset::setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn)
+void SvkPreset::setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn, bool sendChangeMessage)
 {
     ValueTree node = theModeSelectors.getChild(modeSelectorNumIn);
 
@@ -290,7 +288,7 @@ void SvkPreset::setModeSelectorRootNote(int modeSelectorNumIn, int rootNoteIn)
         node.setProperty(IDs::modeSelectorRootNote, rootNoteIn, nullptr);
 }
 
-int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
+int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn, bool sendChangeMessage)
 {
     if (Mode::isValidMode(modeNodeIn) && slotNumberIn >= 0 && slotNumberIn <= MAX_MODE_SLOTS_INDEX)
     {
@@ -319,21 +317,17 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn)
     return -1;
 }
 
-int SvkPreset::addModeSlot(ValueTree modeNodeIn)
+int SvkPreset::addModeSlot(ValueTree modeNodeIn, bool sendChangeMessage)
 {
     int slotIndex = getNextFreeSlotNumber();
     return setModeSlot(modeNodeIn, slotIndex);
 }
 
-ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool createCopy)
+ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool sendChangeMessage)
 {
     if (Mode::isValidMode(customModeNodeIn))
     {
-        ValueTree nodeToAdd = customModeNodeIn;
-
-        if (createCopy)
-            nodeToAdd = customModeNodeIn.createCopy();
-
+        ValueTree nodeToAdd = customModeNodeIn.createCopy();
         theCustomMode.removeAllChildren(nullptr);
         theCustomMode.appendChild(nodeToAdd, nullptr);
 
@@ -343,7 +337,7 @@ ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool createCopy)
     return ValueTree();
 }
 
-int SvkPreset::removeModeSlot(int slotNumberIn)
+int SvkPreset::removeModeSlot(int slotNumberIn, bool sendChangeMessage)
 {
     int slotIndex = getSlotNumberIndex(slotNumberIn);
 
@@ -356,16 +350,22 @@ int SvkPreset::removeModeSlot(int slotNumberIn)
     return slotIndex;
 }
 
-void SvkPreset::resetModeSlots()
+void SvkPreset::resetModeSlots(bool sendChangeMessage)
 {
     theModeSelectors.removeAllChildren(nullptr);
     slotNumbersInUse.clear();
 
-    addModeSlot(STD_TUNING_MODE_NODE);
-    addModeSlot(STD_TUNING_MODE_NODE);
+    
+    addModeSlot(STD_TUNING_MODE_NODE, false);
+    addModeSlot(STD_TUNING_MODE_NODE, false);
 
-    setMode1SlotNumber(0);
-    setMode2SlotNumber(1);
+    setMode1SlotNumber(0, false);
+    setMode2SlotNumber(1, false);
+
+    if (sendChangeMessage)
+    {
+        // todo
+    }
 }
 
 juce::String SvkPreset::getMidiInputName() const
@@ -457,7 +457,9 @@ NoteMap SvkPreset::getMidiInputMap() const
 
 void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage)
 {
-    listeners.call(&Listener::midiInputMapChanged, mapIn);
+    // todo
+    if (sendChangeMessage)
+        listeners.call(&Listener::inputMappingChanged, mapIn);
 }
 
 VirtualKeyboard::HighlightStyle SvkPreset::getKeyHighlightStyle() const

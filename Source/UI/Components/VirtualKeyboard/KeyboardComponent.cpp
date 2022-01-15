@@ -814,7 +814,7 @@ int Keyboard::getScrollingStyle()
 //===============================================================================================
 
 
-void Keyboard::applyMode(Mode* modeIn, bool resize)
+void Keyboard::applyMode(const Mode* modeIn, bool resize)
 {
     mode = modeIn;
 
@@ -862,7 +862,8 @@ void Keyboard::applyMode(Mode* modeIn, bool resize)
     keyColorsDegrees.resize(mode->getScaleSize());
 
     // unpack color data
-    ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
+    auto modeNode = mode->getNode();
+    ValueTree keyColorsNode = modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
 
     keyColorsOrders.fill(Colour());
     for (auto layerColor : keyColorsNode.getChildWithName(IDs::pianoKeyColorsLayer))
@@ -1043,7 +1044,7 @@ void Keyboard::setLastKeyClicked(int keyNumIn)
     //pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 }
 
-void Keyboard::setInputNoteMap(NoteMap* noteMapIn)
+void Keyboard::setInputNoteMap(const NoteMap* noteMapIn)
 {
     noteMapOnDisplay = noteMapIn;
 }
@@ -1148,7 +1149,8 @@ void Keyboard::updateKeyColors(bool writeToNode)
 
     if (writeToNode)
     {
-        ValueTree keyColorsNode = mode->modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
+        auto modeNode = mode->getNode();
+        ValueTree keyColorsNode = modeNode.getOrCreateChildWithName(IDs::pianoKeyColorsNode, nullptr);
 
         ValueTree layersColorNode = ValueTree(IDs::pianoKeyColorsLayer);
         for (int i = 0; i < keyColorsOrders.size(); i++)

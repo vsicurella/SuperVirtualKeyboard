@@ -146,7 +146,7 @@ Mode* SvkPresetManager::setModeCustom(String stepsIn, String familyIn, String na
     return setModeCustom(Mode::createNode(stepsIn, familyIn, nameIn, infoIn, rootNoteIn));
 }
 
-int SvkPresetManager::setSlotToMode(int modeSlotNum, ValueTree modeNode)
+int SvkPresetManager::setSlotToMode(int modeSlotNum, ValueTree modeNode, bool sendChangeMessage)
 {
     int slotIndex = svkPresetWorking.setModeSlot(modeNode, modeSlotNum);
     modeNode = svkPresetWorking.getModeInSlot(modeSlotNum);
@@ -170,14 +170,14 @@ int SvkPresetManager::addSlot(ValueTree modeNode)
     return slotNumber;
 }
 
-int SvkPresetManager::setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode)
+int SvkPresetManager::setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode, bool sendChangeMessage)
 {
     int slotIndex = setSlotToMode(modeSlotNum, modeNode);
     svkPresetWorking.setModeSelectorSlotNum(modeSelectorNum, modeSlotNum);
     return slotIndex;
 }
 
-int SvkPresetManager::addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode)
+int SvkPresetManager::addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode, bool sendChangeMessage)
 {
     int modeSlotNum = addSlot(modeNode);
     svkPresetWorking.setModeSelectorSlotNum(modeSelectorNumber, modeSlotNum);
@@ -243,7 +243,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     else
     {
         DBG("Custom mode selected");
-        modeSelected = modeCustom->modeNode;
+        modeSelected = modeCustom->getNode();
         modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
     }
     
@@ -262,23 +262,19 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
     if (presetNodeIn.hasType(IDs::presetNode))
     {
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
-        svkPresetWorking.restoreFromNode(presetNodeIn, true);
+        svkPresetSaved.restoreFromNode(presetNodeIn, true);
         
         // necessary??
         modeSlots.clear();
-        for (auto mode : svkPresetWorking.getModeSlots())
+        for (auto mode : svkPresetSaved.getModeSlots())
         {
             modeSlots.add(new Mode(mode.getChild(0), false));
         }
 
-        ValueTree customModeNode = svkPresetWorking.getCustomMode();
+        ValueTree customModeNode = svkPresetSaved.getCustomMode();
         modeCustom.reset(new Mode(customModeNode, false));
 
-        svkPresetSaved.restoreFromNode(svkPresetWorking.getPresetNode(), true);
-
-        if (sendChangeSignal)
-            listeners.call(&Listener::presetLoaded, svkPresetWorking);
-
+        svkPresetWorking.restoreFromNode(svkPresetSaved.getPresetNode(), true);
         return true;
     }
 
@@ -330,11 +326,11 @@ bool SvkPresetManager::saveModeToFile(int modeSlotNumber, String absolutePath)
     else
         mode = modeCustom.get();
     
-    bool saved = saveNodeToFile(mode->modeNode, "Save mode", "*.svk", absolutePath);
+    bool saved = saveNodeToFile(mode->getNode(), "Save mode", "*.svk", absolutePath);
 
     if (saved)
     {
-        ValueTree newCopy = mode->modeNode.createCopy();
+        ValueTree newCopy = mode->getNode().createCopy();
         addAndSortMode(newCopy);
         loadedUserModes.add(newCopy);
 
@@ -535,9 +531,10 @@ int SvkPresetManager::addAndSortMode(ValueTree modeNodeIn)
     return ind;
 }
 
-void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
+//void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
+void SvkPresetManager::updateModeMenu()
 {
-    menuToUse->clear();
+    modeMenu.clear();
     
     PopupMenu scaleSizeMenu;
     PopupMenu modeSizeMenu;
@@ -625,20 +622,20 @@ void SvkPresetManager::requestModeMenu(PopupMenu* menuToUse)
         slotsMenu.addItem(++subMenuIndex, mode->getName());
     }
 
-    menuToUse->addSubMenu("by Scale Size", scaleSizeMenu);
-    menuToUse->addSubMenu("by Mode Size", modeSizeMenu);
-    menuToUse->addSubMenu("by Family", familyMenu);
-    menuToUse->addSubMenu("User", userMenu);
-    menuToUse->addSubMenu("Favorites", favMenu);
+    modeMenu.addSubMenu("by Scale Size", scaleSizeMenu);
+    modeMenu.addSubMenu("by Mode Size", modeSizeMenu);
+    modeMenu.addSubMenu("by Family", familyMenu);
+    modeMenu.addSubMenu("User", userMenu);
+    modeMenu.addSubMenu("Favorites", favMenu);
 
-    menuToUse->addSeparator();
-    menuToUse->addSubMenu("Slots", slotsMenu);
-    menuToUse->addSeparator();
+    modeMenu.addSeparator();
+    modeMenu.addSubMenu("Slots", slotsMenu);
+    modeMenu.addSeparator();
 
     String customModeName = modeCustom->getName();
 
     if (customModeName == "undefined[1] 1")
         customModeName = "Custom Mode";
 
-    menuToUse->addItem(++subMenuIndex, customModeName);
+    modeMenu.addItem(++subMenuIndex, customModeName);
 }

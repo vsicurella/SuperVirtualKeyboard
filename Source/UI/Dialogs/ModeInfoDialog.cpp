@@ -11,7 +11,7 @@
 
 //==============================================================================
 ModeInfoDialog::ModeInfoDialog (Mode* modeIn)
-    : modeOriginal(modeIn), modeWorking(Mode(modeIn->modeNode)), modeNode(modeWorking.modeNode)
+    : modeOriginal(modeIn), modeWorking(Mode(modeIn->getNode())), modeNode(modeWorking.getNode())
 {
     familyBox.reset (new TextEditor ("Family Box"));
     addAndMakeVisible (familyBox.get());

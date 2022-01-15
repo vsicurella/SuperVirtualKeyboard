@@ -14,7 +14,7 @@ using namespace VirtualKeyboard;
 
 //==============================================================================
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor(p)
+    : AudioProcessorEditor(&p), processor(p), currentPreset(processor.getPreset())
 {
     setName("SuperVirtualKeyboard");
     setResizable(true, true);
@@ -23,7 +23,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     setMouseClickGrabsKeyboardFocus(true);
     addMouseListener(this, true);
     
-    auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(IDs::pluginEditorNode);
+    //auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(IDs::pluginEditorNode);
+    auto pluginEditorNode = currentPreset.getPresetNode().getChildWithName(IDs::pluginEditorNode);
+    // TODO probably should be more of a state node than preset node
 
     // Intialization
     if (!pluginEditorNode.isValid())
@@ -237,8 +239,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     //keyboardViewport->setScrollingMode(3);
 
     // allows for implementing mouseDown() to update the menus
-    mode1Box->setInterceptsMouseClicks(false, false);
-    mode2Box->setInterceptsMouseClicks(false, false);
+    //mode1Box->setInterceptsMouseClicks(false, false);
+    //mode2Box->setInterceptsMouseClicks(false, false);
 
 
     saveMenu.reset(new PopupMenu());
@@ -335,20 +337,6 @@ SvkPluginEditor::~SvkPluginEditor()
     openIcon = nullptr;
     saveIcon = nullptr;
 }
-
-//void SvkPluginEditor::presetLoaded(SvkPreset& preset)
-//{
-//    //if (pluginEditorNode.isValid())
-//    //    pluginEditorNode.removeListener(this);
-//
-//    //pluginEditorNode = pluginState->getPluginEditorNode();
-// 
-//    loadPreset(preset);
-//    //if (presetNodeIn[IDs::settingsOpen])
-//    //    showSettingsDialog();
-//
-//    //pluginEditorNode.addListener(this);
-//}
 
 //==============================================================================
 
@@ -461,7 +449,6 @@ void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifi
 //    }
 //}
 
-
 void SvkPluginEditor::loadPreset(SvkPreset& preset)
 {
     if (preset.getPresetVersion() == SVK_PRESET_VERSION)
@@ -516,7 +503,7 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
     }
 }
 
-void SvkPluginEditor::onModeViewedChange(Mode* modeViewed)
+void SvkPluginEditor::onModeViewedChange(const Mode* modeViewed)
 {
     setScaleEntryText(modeViewed->getStepsString());
     keyboard->applyMode(modeViewed, true);
@@ -630,25 +617,6 @@ void SvkPluginEditor::resized()
 
     // processor.getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr); ***********
     // processor.getPluginEditorNode().setProperty(IDs::windowBoundsH, basicHeight, nullptr);
-}
-
-void SvkPluginEditor::mouseDown(const MouseEvent& e)
-{
-    if (mode1Box->getBounds().contains(e.getPosition()))
-    {
-        String display = mode1Box->getText();
-        presetManager->requestModeMenu(mode1Box->getRootMenu());
-        mode1Box->setText(display, dontSendNotification);
-        mode1Box->showPopup();
-    }
-
-    if (mode2Box->getBounds().contains(e.getPosition()))
-    {
-        String display = mode2Box->getText();
-        presetManager->requestModeMenu(mode2Box->getRootMenu());
-        mode2Box->setText(display, dontSendNotification);
-        mode2Box->showPopup();
-    }
 }
 
 void SvkPluginEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -769,13 +737,21 @@ void SvkPluginEditor::timerCallback()
 
 //==============================================================================
 
-void SvkPluginEditor::presetLoaded(SvkPreset& preset)
+void SvkPluginEditor::modeLibraryUpdated(const PopupMenu& menu)
+{
+    // TODO keep selected id
+
+    mode1Box->getRootMenu()->operator=(menu);
+    mode2Box->getRootMenu()->operator=(menu);
+}
+
+void SvkPluginEditor::presetReloaded(SvkPreset& preset)
 {
     DBG("UI LOADING PRESET");
     loadPreset(preset);
 }
 
-void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
+void SvkPluginEditor::modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber)
 {
     MidiKeyboardState* displayState = selectorNumber == 0
         ? processor.getMidiProcessor()->getOriginalKeyboardState()
@@ -785,12 +761,12 @@ void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int sl
     onModeViewedChange(modeIn);
 }
 
-void SvkPluginEditor::inputMappingChanged(NoteMap* inputNoteMap)
+void SvkPluginEditor::inputMappingChanged(const NoteMap* inputNoteMap)
 {
     keyboard->setInputNoteMap(inputNoteMap);
 }
 
-void SvkPluginEditor::customModeChanged(Mode* newCustomMode)
+void SvkPluginEditor::customModeChanged(const Mode* newCustomMode)
 {
     // This is a hack and should be handled better
 
@@ -803,13 +779,13 @@ void SvkPluginEditor::customModeChanged(Mode* newCustomMode)
 
 }
 
-void SvkPluginEditor::modeInfoChanged(Mode* modeEdited)
-{
-    if (getModeSelectorViewed() == 1)
-        mode2Box->setText(modeEdited->getName(), dontSendNotification);
-    else
-        mode1Box->setText(modeEdited->getName(), dontSendNotification);
-}
+//void SvkPluginEditor::modeInfoChanged(const Mode* modeEdited)
+//{
+//    if (getModeSelectorViewed() == 1)
+//        mode2Box->setText(modeEdited->getName(), dontSendNotification);
+//    else
+//        mode1Box->setText(modeEdited->getName(), dontSendNotification);
+//}
 
 void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo)
 {
@@ -1039,7 +1015,8 @@ void SvkPluginEditor::showSettingsDialog()
         settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), processor.getPreset()));
         //settingsContainer->setKeyboardPointer(keyboard.get());
         settingsContainer->addListener(this);
-        processor.addPresetManagerListener(settingsContainer.get());
+        currentPreset.addPresetListener(settingsContainer.get());
+        //processor.addPresetManagerListener(settingsContainer.get());
 
         settingsPanelOpen = true;
         //processor.getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
@@ -1066,7 +1043,9 @@ void SvkPluginEditor::hideSettings()
 {
     settingsContainer->removeListener(this);
     settingsContainer->setVisible(false);
-    processor.removePresetManagerListener(settingsContainer.get());
+    //preset.removePresetManagerListener(settingsContainer.get());
+    currentPreset.removePresetListener(settingsContainer.get());
+
     settingsContainer = nullptr;
 
     settingsPanelOpen = false;
