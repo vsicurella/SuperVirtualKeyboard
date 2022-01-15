@@ -247,7 +247,7 @@ public:
     /*
         Rearranges the keys to fit the current mode, without changing other key data.
     */
-    void applyMode(Mode* modeIn, bool resize = false);
+    void applyMode(const Mode* modeIn, bool resize = false);
 
     /*
         Applies the key data to the keyboard so that it matches the data passed in.
@@ -332,7 +332,7 @@ public:
     /*
         Set the Input NoteMap being used.
     */
-    void setInputNoteMap(NoteMap* noteMapIn);
+    void setInputNoteMap(const NoteMap* noteMapIn);
     
     //===============================================================================================
 
@@ -513,7 +513,7 @@ private:
     UndoManager* undo;
     KeyboardPositioner keyPositioner;
     MidiKeyboardState* externalKeyboardToDisplay = nullptr;
-    NoteMap* noteMapOnDisplay;
+    const NoteMap* noteMapOnDisplay;
     bool hasDirtyKeys = true;
     
     MidiBuffer buffer;
@@ -552,7 +552,7 @@ private:
     Array<Colour> keyColorsIndividual;
     Array<Colour> keyOnColorsByChannel;
     
-    Mode* mode;
+    const Mode* mode;
     Mode modeDefault = Mode(STD_TUNING_MODE_NODE, true);
     
     Array<Colour> colorsDefaultOrders = {

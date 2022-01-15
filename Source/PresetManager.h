@@ -29,6 +29,8 @@ class SvkPresetManager : public ChangeBroadcaster
     ModeSizeSorter modeSizeSort;
     FamilyNameSorter familyNameSort;
 
+    PopupMenu modeMenu;
+
     SvkPreset svkPresetSaved;
     SvkPreset svkPresetWorking;
     
@@ -37,7 +39,8 @@ class SvkPresetManager : public ChangeBroadcaster
     
     std::unique_ptr<FileChooser> chooser;
 
-    // Methods
+
+private:
     void createFactoryModes();
     void resortModeLibrary();
 
@@ -47,6 +50,8 @@ class SvkPresetManager : public ChangeBroadcaster
     int addModeToLibrary(ValueTree modeNodeIn);
     void addModeToSort(ValueTree modeNodeIn);
     int addAndSortMode(ValueTree modeNodeIn);
+
+    void updateModeMenu();
 
 public:
 
@@ -86,10 +91,10 @@ public:
     Mode* setModeCustom(ValueTree modeNodeIn);
     Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
 
-    int setSlotToMode(int modeSlotNum, ValueTree modeNode);
+    int setSlotToMode(int modeSlotNum, ValueTree modeNode, bool sendChangeMessage = true);
     int addSlot(ValueTree modeNode);
-    int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
-    int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode);
+    int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode, bool sendChangeMessage = true);
+    int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode, bool sendChangeMessage = true);
 
     void removeMode(int modeSlotNum);
     void resetModeSlots();
@@ -121,26 +126,14 @@ public:
     static ValueTree parseNodeFile(File fileIn);
     static ValueTree parseModeFile(File fileIn);
     static ValueTree parsePresetFile(File fileIn);
-    
-    void requestModeMenu(PopupMenu* comboBoxToUse);
-
+   
     class Listener
     {
     public:
 
         virtual ~Listener() {};
 
-        virtual void presetLoaded(SvkPreset& preset) {};
-
-        virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
-
-        virtual void inputMappingChanged(NoteMap* inputNoteMap) {};
-
-        virtual void outputMappingChanged(NoteMap* outputNoteMap) {};
-
-        virtual void customModeChanged(Mode* newCustomMode) {};
-
-        virtual void modeInfoChanged(Mode* modeEdited) {};
+        virtual void modeLibraryUpdated(const PopupMenu& menu) {};
     };
 
     void addListener(SvkPresetManager::Listener* listenerIn) { listeners.add(listenerIn); }

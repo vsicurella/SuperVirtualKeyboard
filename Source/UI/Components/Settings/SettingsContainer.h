@@ -20,7 +20,7 @@
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent, public SvkPresetManager::Listener
+class SettingsContainer : public TabbedComponent, public SvkPreset::Listener
 {
 public:
     
@@ -89,7 +89,9 @@ public:
         );
     }
 
-    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
+    void presetReloaded(SvkPreset& preset) override { /* TODO */ }
+
+    void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override
     {
         for (auto p : panels)
         {

@@ -749,10 +749,10 @@ void SvkAudioProcessor::commitModeInfo(bool sendChangeMessage)
 {
     if (modeViewed == presetManager->getModeCustom())
     {
-        DBG("Custom mode edited:" + presetManager->getModeCustom()->modeNode.toXmlString());
+        DBG("Custom mode edited:" + presetManager->getModeCustom()->getNode().toXmlString());
     }
 
-    presetManager->setSlotToMode(modeSelectorViewedNum, modeViewed->modeNode);
+    presetManager->setSlotToMode(modeSelectorViewedNum, modeViewed->getNode());
     
     onModeUpdate(sendChangeMessage, sendChangeMessage);
 

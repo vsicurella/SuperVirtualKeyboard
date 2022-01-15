@@ -544,7 +544,7 @@ int Mode::isSimilarTo(Mode* modeToCompare) const
     return (rotations % (mode1Steps.size() + 1)) - 1;
 }
 
-Array<Array<int>> Mode::getNotesOrders()
+Array<Array<int>> Mode::getNotesOrders() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getMaxStep());
@@ -557,7 +557,7 @@ Array<Array<int>> Mode::getNotesOrders()
     return notesOut;
 }
 
-Array<Array<int>> Mode::getNotesInScaleDegrees()
+Array<Array<int>> Mode::getNotesInScaleDegrees() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getScaleSize());
@@ -565,7 +565,7 @@ Array<Array<int>> Mode::getNotesInScaleDegrees()
     return notesOut;
 }
 
-Array<Array<int>> Mode::getNotesInModalDegrees()
+Array<Array<int>> Mode::getNotesInModalDegrees() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getModeSize());

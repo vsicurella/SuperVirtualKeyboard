@@ -33,7 +33,7 @@ KeyboardViewport::KeyboardViewport(VirtualKeyboard::Keyboard* keyboardIn, const 
     setScrollingStyle(scrollingStyleIn);
 
     keyboard = keyboardIn;
-    setViewedComponent(keyboard);
+    setViewedComponent(keyboard, false);
 }
 
 void KeyboardViewport::viewedComponentChanged(Component* newComponent)
