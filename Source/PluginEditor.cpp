@@ -23,7 +23,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     setMouseClickGrabsKeyboardFocus(true);
     addMouseListener(this, true);
     
-    auto pluginEditorNode = processor.getPluginEditorNode();
+    auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(IDs::pluginEditorNode);
 
     // Intialization
     if (!pluginEditorNode.isValid())
@@ -232,7 +232,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
     
     scaleTextBox->addListener(this);
-    scaleTextBox->setInputFilter(&txtFilter, false);
+    //scaleTextBox->setInputFilter(&txtFilter, false);
 
     //keyboardViewport->setScrollingMode(3);
 
@@ -252,10 +252,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
 
 
-    ValueTree pluginWindowNode = processor.getPluginEditorNode();
-    int recallWidth = pluginWindowNode[IDs::windowBoundsW];
-    int recallHeight = pluginWindowNode[IDs::windowBoundsH];
-    centerKeyPos = pluginWindowNode[IDs::viewportPosition];
+    int recallWidth = pluginEditorNode[IDs::windowBoundsW];
+    int recallHeight = pluginEditorNode[IDs::windowBoundsH];
+    centerKeyPos = pluginEditorNode[IDs::viewportPosition];
 
     setSize(
         recallWidth > 0 ? recallWidth : 1000,
@@ -279,7 +278,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         mapCopyToManualBtn.get()
     };
 
-    loadPresetNode(processor.getPresetNode());
+    loadPreset(processor.getPreset());
 
     viewportScrollBar->addListener(this);
 
@@ -337,19 +336,19 @@ SvkPluginEditor::~SvkPluginEditor()
     saveIcon = nullptr;
 }
 
-void SvkPluginEditor::presetLoaded(ValueTree presetNodeIn)
-{
-    if (pluginEditorNode.isValid())
-        pluginEditorNode.removeListener(this);
-
-    pluginEditorNode = pluginState->getPluginEditorNode();
- 
-    controlComponent->loadPresetNode(presetNodeIn);
-    if (pluginEditorNode[IDs::settingsOpen])
-        controlComponent->showSettingsDialog();
-
-    pluginEditorNode.addListener(this);
-}
+//void SvkPluginEditor::presetLoaded(SvkPreset& preset)
+//{
+//    //if (pluginEditorNode.isValid())
+//    //    pluginEditorNode.removeListener(this);
+//
+//    //pluginEditorNode = pluginState->getPluginEditorNode();
+// 
+//    loadPreset(preset);
+//    //if (presetNodeIn[IDs::settingsOpen])
+//    //    showSettingsDialog();
+//
+//    //pluginEditorNode.addListener(this);
+//}
 
 //==============================================================================
 
@@ -463,11 +462,11 @@ void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifi
 //}
 
 
-void SvkPluginEditor::loadPresetNode(ValueTree presetNodeIn)
+void SvkPluginEditor::loadPreset(SvkPreset& preset)
 {
-    if (presetNodeIn.hasType(IDs::presetNode) && (float)presetNodeIn[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+    if (preset.getPresetVersion() == SVK_PRESET_VERSION)
     {
-        ValueTree presetNode = presetNodeIn;
+        ValueTree presetNode = preset.getPresetNode();
 
         ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
         if (properties.isValid())
@@ -750,7 +749,7 @@ void SvkPluginEditor::textEditorReturnKeyPressed(TextEditor& textEditor)
 void SvkPluginEditor::scrollBarMoved(ScrollBar* bar, double newRangeStart)
 {
     centerKeyPos = keyboardViewport->getCenterKeyProportion();
-    processor.getPluginEditorNode().setProperty(IDs::viewportPosition, centerKeyPos, nullptr);
+    //processor.getPluginEditorNode().setProperty(IDs::viewportPosition, centerKeyPos, nullptr);
 }
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
@@ -770,10 +769,10 @@ void SvkPluginEditor::timerCallback()
 
 //==============================================================================
 
-void SvkPluginEditor::presetLoaded(ValueTree presetNodeIn)
+void SvkPluginEditor::presetLoaded(SvkPreset& preset)
 {
     DBG("UI LOADING PRESET");
-    loadPresetNode(presetNodeIn);
+    loadPreset(preset);
 }
 
 void SvkPluginEditor::modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber)
@@ -833,10 +832,10 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
         MappingSettingsPanel* msp = static_cast<MappingSettingsPanel*>(panelChangedTo);
         if (mapModeBox->getSelectedId() == 3)
         {
-            msp->setEditorToListenTo(mappingHelper.get());
+            //msp->setEditorToListenTo(mappingHelper.get());
         }
 
-        msp->listenToEditor(this);
+        //msp->listenToEditor(this);
     }
 
     else if (mappingSettingsOpen)
@@ -846,7 +845,7 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
         // MappingSettingsPanel removes listeners from NoteMapEditor
     }
 
-    processor.getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
+    //processor.getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
 }
 
 void SvkPluginEditor::keyMappingStatusChanged(int keyNumber, bool preparedToMap)
@@ -873,11 +872,11 @@ void SvkPluginEditor::keyMapConfirmed(int keyNumber, int midiNote)
     resized();
 }
 
-void SvkPluginEditor::mappingChanged(NoteMap& newMapping)
-{
-    DBG("MAPPING CHANGED");
-    processor.setMidiInputMap(newMapping, true);
-}
+//void SvkPluginEditor::mappingChanged(NoteMap& newMapping)
+//{
+//    DBG("MAPPING CHANGED");
+//    processor.setMidiInputMap(newMapping, true);
+//}
 
 //==============================================================================
 
@@ -1037,20 +1036,20 @@ void SvkPluginEditor::showSettingsDialog()
     if (!settingsPanelOpen)
     {
         auto stateNode = processor.buildStateValueTree();
-        settingsContainer.reset(new SettingsContainer(stateNode));
-        settingsContainer->setKeyboardPointer(keyboard.get());
+        settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), processor.getPreset()));
+        //settingsContainer->setKeyboardPointer(keyboard.get());
         settingsContainer->addListener(this);
         processor.addPresetManagerListener(settingsContainer.get());
 
         settingsPanelOpen = true;
-        processor.getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
+        //processor.getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
         settingsButton->setToggleState(true, dontSendNotification);
 
         addAndMakeVisible(settingsContainer.get());
         getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
         
         int setToTab = 0;
-        String lastTab = processor.getPluginEditorNode()[IDs::settingsTabName].toString();
+        String lastTab = stateNode.getChildWithName(IDs::pluginEditorNode)[IDs::settingsTabName].toString();//processor.getPluginEditorNode()[IDs::settingsTabName].toString();
         DBG("Last tab: " + lastTab);
         if (lastTab.length() > 0)
             setToTab = settingsContainer->getTabNames().indexOf(lastTab);
@@ -1071,7 +1070,7 @@ void SvkPluginEditor::hideSettings()
     settingsContainer = nullptr;
 
     settingsPanelOpen = false;
-    processor.getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
+    //processor.getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
 
     if (isColorEditing)
         endColorEditing();
@@ -1138,7 +1137,7 @@ void SvkPluginEditor::beginManualMapping()
     // Updates MappingSettingsPanel with changes
     if (settingsContainer && settingsContainer->getCurrentTabName() == "Mapping")
     {
-        static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())->setEditorToListenTo(mappingHelper.get());
+        //static_cast<MappingSettingsPanel*>(settingsContainer->getCurrentContentComponent())->setEditorToListenTo(mappingHelper.get());
     }
 }
 

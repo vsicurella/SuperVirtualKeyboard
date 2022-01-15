@@ -276,7 +276,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
         modeCustom.reset(new Mode(customModeNode, false));
 
         if (sendChangeSignal)
-            sendChangeMessage();
+            listeners.call(&Listener::presetLoaded, svkPresetWorking);
 
         return true;
     }
@@ -384,10 +384,10 @@ bool SvkPresetManager::commitPreset()
     return loadPreset(svkPresetWorking.getPresetNode(), false);
 }
 
-bool SvkPresetManager::resetToSavedPreset()
+bool SvkPresetManager::resetToSavedPreset(bool sendChangeMessage)
 {
     DBG("PRESET MANAGER: Resetting to last saved preset.");
-    return loadPreset(svkPresetSaved.getPresetNode(), false);
+    return loadPreset(svkPresetSaved.getPresetNode(), sendChangeMessage);
 }
 
 void SvkPresetManager::initializeModePresets()

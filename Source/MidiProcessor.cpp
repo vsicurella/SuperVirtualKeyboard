@@ -42,6 +42,14 @@ SvkMidiProcessor::~SvkMidiProcessor()
 
 //==============================================================================
 
+ValueTree SvkMidiProcessor::getNode() const
+{
+    ValueTree midiNode(IDs::midiSettingsNode);
+    midiNode.addChild(midiMapNode, 0, nullptr);
+    midiNode.addChild(midiDeviceNode, 1, nullptr);
+    return midiNode;
+}
+
 void SvkMidiProcessor::updateNodes()
 {
     //midiSettingsNode.setProperty(IDs::mpeThru, mpeThru, nullptr);
@@ -453,7 +461,7 @@ void SvkMidiProcessor::processMidi(MidiBuffer &midiMessages)
         {
             midiNote = msg.getNoteNumber();
 
-            if ((int)midiMapNode[IDs::mappingMode] == 3 && midiMapNode[IDs::manualMappingEditOn])
+            if ((int)midiMapNode[IDs::mappingMode] == 3)
             {
                 if (mappingHelper->isWaitingForKeyInput())
                 {
