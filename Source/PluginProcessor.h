@@ -88,7 +88,7 @@ public:
     //==============================================================================
     // Object getters
 
-    ValueTree getPluginEditorNode() const;
+    //ValueTree getPluginEditorNode() const;
     
     SvkPresetManager* getPresetManager() const;
     SvkMidiProcessor* getMidiProcessor() const;
@@ -126,6 +126,7 @@ public:
     int getMode1Root() const;
     int getMode2Root() const;
 
+    SvkPreset& getPreset() const;
     bool isPresetEdited();
 
     //==============================================================================

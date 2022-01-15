@@ -65,7 +65,7 @@ public:
 
     //==============================================================================
 
-    void presetLoaded(ValueTree presetNodeIn) override;
+    void presetLoaded(SvkPreset& presetNode) override;
 
     void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
 
@@ -81,7 +81,7 @@ public:
 
     void keyMapConfirmed(int keyNumber, int midiNote) override;
 
-    void mappingChanged(NoteMap&) override;
+    //void mappingChanged(NoteMap&) override;
 
     //==============================================================================
 
@@ -105,7 +105,7 @@ public:
     /*
         Sets controls to plugin state
     */
-    void loadPresetNode(ValueTree presetNodeIn);
+    void loadPreset(SvkPreset& preset);
 
     /*
         Updates UI to the new mode
@@ -180,7 +180,7 @@ private:
 
     Array<Component*> mappingComponents;
 
-    TextFilterIntOrSpace txtFilter;
+    //TextFilterIntOrSpace txtFilter;
 
     bool settingsPanelOpen = false;
     bool isColorEditing = false;

@@ -116,7 +116,7 @@ public:
         Reverts the changes made since the last recall
         Returns true if successful
     */
-    bool resetToSavedPreset();
+    bool resetToSavedPreset(bool sendChangeMessage);
 
     static ValueTree parseNodeFile(File fileIn);
     static ValueTree parseModeFile(File fileIn);
@@ -130,7 +130,7 @@ public:
 
         virtual ~Listener() {};
 
-        virtual void presetLoaded(ValueTree presetNodeIn) {};
+        virtual void presetLoaded(SvkPreset& preset) {};
 
         virtual void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) {};
 

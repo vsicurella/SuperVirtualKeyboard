@@ -28,6 +28,8 @@ public:
     ValueTree midiSettingsNode;
     ValueTree midiMapNode;
     ValueTree midiDeviceNode;
+
+    ValueTree getNode() const;
     
     void updateNodes();
     bool restoreSettingsNode(ValueTree midiSettingsNodeIn);
