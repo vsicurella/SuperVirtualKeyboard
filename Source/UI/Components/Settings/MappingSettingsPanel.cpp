@@ -34,9 +34,9 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPreset& presetIn)
     addAndMakeVisible(noteMapEditor);
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
 
-    mappingModeChanged(pluginState->getMappingMode());
+    //mappingModeChanged(pluginState->getMappingMode());
 
-    pluginState->addListener(this);
+    //pluginState->addListener(this);
 
     Label* msg = new Label("Message", "Currently, you can only edit the key number. More mapping features on the way! :)");
     controls.set(1, msg, true);
@@ -48,7 +48,7 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPreset& presetIn)
 
 MappingSettingsPanel::~MappingSettingsPanel()
 {
-    pluginState->removeListener(this);
+
 }
 
 void MappingSettingsPanel::visibilityChanged()
@@ -59,19 +59,19 @@ void MappingSettingsPanel::visibilityChanged()
     }
 }
 
-void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
-{
-    preset.setMidiInputMap(noteMapIn, true, false);
-}
+//void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
+//{
+//    preset.setMidiInputMap(noteMapIn, true, false);
+//}
 
-void MappingSettingsPanel::inputMappingChanged(NoteMap& newNoteMap)
-{
-    noteMapEditor->resetMapping(newNoteMap, false);
-}
+//void MappingSettingsPanel::inputMappingChanged(NoteMap& newNoteMap)
+//{
+//    noteMapEditor->resetMapping(newNoteMap, false);
+//}
 
 void MappingSettingsPanel::mappingEditorChanged(NoteMap& newNoteMap)
 {
-    pluginState->setMidiInputMap(newNoteMap, true, false);
+    //pluginState->setMidiInputMap(newNoteMap, true, false);
 }
 
 void MappingSettingsPanel::registerEditorListener(MappingEditor::Listener* listenerIn)

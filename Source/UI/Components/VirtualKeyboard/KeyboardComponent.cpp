@@ -57,15 +57,15 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool reinitializeKeys, bool re
 {
     if (pianoNodeIn.hasType(IDs::pianoNode))
     {        
-        pianoNode = pianoNodeIn;
-        DBG("RESTORING KEYBOARD NODE: " + pianoNode.toXmlString());
+        //pianoNode = pianoNodeIn;
+        DBG("RESTORING KEYBOARD NODE: " + pianoNodeIn.toXmlString());
         
-        showNoteNumbers = pianoNode[IDs::pianoKeysShowNoteNumbers];
-        orientationSelected = pianoNode[IDs::keyboardOrientation];
-        keyPlacementSelected = pianoNode[IDs::keyboardKeysStyle];
-        highlightSelected = pianoNode[IDs::keyboardHighlightStyle];
-        lastKeyClicked = pianoNode[IDs::pianoLastKeyClicked];
-        keySizeRatio = (float) pianoNode[IDs::pianoWHRatio];
+        showNoteNumbers = pianoNodeIn[IDs::pianoKeysShowNoteNumbers];
+        orientationSelected = VirtualKeyboard::Orientation((int)pianoNodeIn[IDs::keyboardOrientation]);
+        keyPlacementSelected = VirtualKeyboard::KeyPlacementType((int)pianoNodeIn[IDs::keyboardKeysStyle]);
+        highlightSelected = VirtualKeyboard::HighlightStyle((int)pianoNodeIn[IDs::keyboardHighlightStyle]);
+        lastKeyClicked = (int)pianoNodeIn[IDs::pianoLastKeyClicked];
+        keySizeRatio = (float)pianoNodeIn[IDs::pianoWHRatio];
 
         keyPositioner.setKeyPlacement(keyPlacementSelected);
         
@@ -76,7 +76,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool reinitializeKeys, bool re
         if (reinitializeKeys)
         {
             // TODO: keyboard key editing
-            pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyTreeNode), nullptr);
+            //pianoNode.removeChild(pianoNode.getChildWithName(IDs::pianoKeyTreeNode), nullptr);
             // unpack key data
             //keyTreeNode = pianoNode.getOrCreateChildWithName(IDs::pianoKeyTreeNode, nullptr);
 
@@ -111,7 +111,7 @@ void Keyboard::restoreNode(ValueTree pianoNodeIn, bool reinitializeKeys, bool re
 
 void Keyboard::reset()
 {
-    pianoNode = ValueTree(IDs::pianoNode);
+    //pianoNode = ValueTree(IDs::pianoNode);
 
     setUIMode(UIMode::playMode);
     setOrientation(Orientation::horizontal);
@@ -128,7 +128,7 @@ void Keyboard::reset()
     setVelocityFixed(1);
     setInputVelocityScaled(false);
 
-    setKeySizeRatio(0.25f);
+    setKeySizeRatio(0.25f, false);
     setKeyOrderSizeScalar(1);
 
     keyOnColorsByChannel.resize(16);
@@ -337,7 +337,7 @@ void Keyboard::mouseDown(const MouseEvent& e)
                 if (e.mods.isCtrlDown())
                     allPeriods = false;
 
-                manualMappingHelper->prepareKeyToMap(key->keyNumber, false);
+                mappingHelper->prepareKeyToMap(key->keyNumber, false);
                 highlightKey(key->keyNumber);
 
                 DBG("Preparing to map key: " + String(key->keyNumber));
@@ -350,8 +350,8 @@ void Keyboard::mouseDown(const MouseEvent& e)
         
         if (!key || !isMouseOver(true))
         {
-            highlightKey(manualMappingHelper->getVirtualKeyToMap(), false);
-            manualMappingHelper->cancelKeyMap();
+            highlightKey(mappingHelper->getVirtualKeyToMap(), false);
+            mappingHelper->cancelKeyMap();
         }
     }
 
@@ -621,6 +621,10 @@ void Keyboard::modifierKeysChanged(const ModifierKeys& modifiers)
 
 ValueTree Keyboard::getNode()
 {
+    ValueTree pianoNode(IDs::pianoNode);
+
+    // todo build node
+
     return pianoNode;
 }
 
@@ -936,13 +940,13 @@ void Keyboard::setUIMode(int uiModeIn)
         updateKeyColors();
 
     uiModeSelected = uiModeIn;
-    pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
+    //pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
  }
 
 void Keyboard::setOrientation(int orientationIn)
 {
     orientationSelected = orientationIn;
-    pianoNode.setProperty(IDs::keyboardOrientation, orientationSelected, nullptr);
+    //pianoNode.setProperty(IDs::keyboardOrientation, orientationSelected, nullptr);
 
     // do stuff
 }
@@ -950,7 +954,7 @@ void Keyboard::setOrientation(int orientationIn)
 void Keyboard::setNumRows(int numRowsIn)
 {
     numRows = jlimit(1, 16, numRowsIn);
-    pianoNode.setProperty(IDs::keyboardNumRows, numRows, nullptr);
+    //pianoNode.setProperty(IDs::keyboardNumRows, numRows, nullptr);
     applyMode(mode);
 }
 
@@ -958,13 +962,13 @@ void Keyboard::setKeyStyle(int placementIn)
 {
     keyPlacementSelected = placementIn;
     keyPositioner.setKeyPlacement(keyPlacementSelected);
-    pianoNode.setProperty(IDs::keyboardKeysStyle, keyPlacementSelected, nullptr);
+    //pianoNode.setProperty(IDs::keyboardKeysStyle, keyPlacementSelected, nullptr);
 }
 
 void Keyboard::setHighlightStyle(int styleIn)
 {
     highlightSelected = styleIn;
-    pianoNode.setProperty(IDs::keyboardHighlightStyle, highlightSelected, nullptr);
+    //pianoNode.setProperty(IDs::keyboardHighlightStyle, highlightSelected, nullptr);
 
     for (auto key : keys)
     {
@@ -976,16 +980,16 @@ void Keyboard::setHighlightStyle(int styleIn)
 void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
 {
     velocitySelected = behaviorNumIn;
-    pianoNode.setProperty(IDs::pianoVelocityBehavior, velocitySelected, nullptr);
+    //pianoNode.setProperty(IDs::pianoVelocityBehavior, velocitySelected, nullptr);
 
     scaleMidiInputVelocity = scaleInputVelocity;
-    pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
+    //pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
 }
 
 void Keyboard::setScrollingStyle(int scrollingStyleIn)
 {
     scrollingSelected = scrollingStyleIn;
-    pianoNode.setProperty(IDs::keyboardScrollingStyle, scrollingSelected, nullptr);
+    //pianoNode.setProperty(IDs::keyboardScrollingStyle, scrollingSelected, nullptr);
 
     // do stuff?
 }
@@ -993,25 +997,25 @@ void Keyboard::setScrollingStyle(int scrollingStyleIn)
 void Keyboard::setMidiChannelOut(int midiChannelOutIn)
 {
     midiChannelOut = jlimit(1, 16, midiChannelOutIn);
-    pianoNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
+    //pianoNode.setProperty(IDs::keyboardMidiChannel, midiChannelOut, nullptr);
 }
 
 void Keyboard::setVelocityFixed(float velocityIn)
 {
     velocityFixed = velocityIn;
-    pianoNode.setProperty(IDs::pianoVelocityValue, velocityFixed, nullptr);
+    //pianoNode.setProperty(IDs::pianoVelocityValue, velocityFixed, nullptr);
 }
 
 void Keyboard::setInputVelocityScaled(bool shouldBeScaled)
 {
     scaleMidiInputVelocity = shouldBeScaled;
-    pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
+    //pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
 }
 
 void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
 {
     showNoteNumbers = shouldShowNumbers;
-    pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, showNoteNumbers, nullptr);
+    //pianoNode.setProperty(IDs::pianoKeysShowNoteNumbers, showNoteNumbers, nullptr);
 
     for (int i = 0; i < keys.size(); i++)
     {
@@ -1024,22 +1028,22 @@ void Keyboard::setShowNoteNumbers(bool shouldShowNumbers)
 void Keyboard::setShowFilteredNumbers(bool shouldShowNumbers)
 {
     showFilteredNoteNums = shouldShowNumbers;
-    pianoNode.setProperty(IDs::pianoKeysShowFilteredNotes, showFilteredNoteNums, nullptr);
+    //pianoNode.setProperty(IDs::pianoKeysShowFilteredNotes, showFilteredNoteNums, nullptr);
 }
 
 void Keyboard::setShowNoteLabels(bool shouldShowPitchNames)
 {
     showNoteLabels = shouldShowPitchNames;
-    pianoNode.setProperty(IDs::keyboardShowsNoteLabels, showNoteLabels, nullptr);
+    //pianoNode.setProperty(IDs::keyboardShowsNoteLabels, showNoteLabels, nullptr);
 }
 
 void Keyboard::setLastKeyClicked(int keyNumIn)
 {
     lastKeyClicked = keyNumIn;
-    pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
+    //pianoNode.setProperty(IDs::pianoLastKeyClicked, lastKeyClicked, nullptr);
 }
 
-void Keyboard::setInputNoteMap(NoteMap& noteMapIn)
+void Keyboard::setInputNoteMap(NoteMap* noteMapIn)
 {
     noteMapOnDisplay = noteMapIn;
 }
@@ -1048,7 +1052,7 @@ void Keyboard::setInputNoteMap(NoteMap& noteMapIn)
 
 void Keyboard::setMappingHelper(MappingHelper* mappingHelperIn)
 {
-    manualMappingHelper = mappingHelperIn;
+    mappingHelper = mappingHelperIn;
 }
 
 void Keyboard::highlightKey(int keyNumberIn, bool highlightOn)
@@ -1245,7 +1249,7 @@ void Keyboard::setKeyColor(int keyNumIn, Colour colourIn)
 void Keyboard::setKeySizeRatio(float keySizeRatioIn, bool resizeSelf)
 {
     keySizeRatio = keySizeRatioIn;
-    pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
+    //pianoNode.setProperty(IDs::pianoWHRatio, keySizeRatio, nullptr);
 
     if (resizeSelf)
         setSize(getPianoWidth(getHeight()), getHeight());

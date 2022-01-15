@@ -41,6 +41,11 @@ bool SvkPreset::operator==(const SvkPreset& preset) const
     return parentNode.isEquivalentTo(preset.parentNode);
 }
 
+float SvkPreset::getPresetVersion() const
+{
+    return (float)parentNode[IDs::pluginPresetVersion];
+}
+
 ValueTree SvkPreset::getPresetNode(bool sortModeSlots)
 {
     if (sortModeSlots)
@@ -348,27 +353,29 @@ void SvkPreset::resetModeSlots()
 
 juce::String SvkPreset::getMidiInputName() const
 {
-
+    return juce::String();
 }
 
 bool SvkPreset::setMidiInputDevice(MidiDeviceInfo deviceInfo)
 {
     listeners.call(&Listener::midiInputDeviceChanged, deviceInfo);
+    return false;
 }
 
 juce::String SvkPreset::getMidiOutputName() const
 {
-
+    return juce::String();
 }
 
 bool SvkPreset::setMidiOutputDevice(MidiDeviceInfo deviceInfo)
 {
     listeners.call(&Listener::midiOutputDeviceChanged, deviceInfo);
+    return false;
 }
 
 int SvkPreset::getPeriodShift() const
 {
-
+    return 0;
 }
 
 void SvkPreset::setPeriodShift(int shiftAmt)
@@ -378,7 +385,7 @@ void SvkPreset::setPeriodShift(int shiftAmt)
 
 bool SvkPreset::periodShiftIsModeSize() const
 {
-
+    return false;
 }
 
 void SvkPreset::setPeriodShiftToModeSize(bool isModeSize)
@@ -388,7 +395,7 @@ void SvkPreset::setPeriodShiftToModeSize(bool isModeSize)
 
 int SvkPreset::getTransposeAmount() const
 {
-
+    return 0;
 }
 
 void SvkPreset::setTransposeAmount(int steps)
@@ -398,7 +405,7 @@ void SvkPreset::setTransposeAmount(int steps)
 
 int SvkPreset::getVoiceLimit() const
 {
-
+    return 128;
 }
 
 void SvkPreset::setVoiceLimit(int maxVoices)
@@ -408,7 +415,7 @@ void SvkPreset::setVoiceLimit(int maxVoices)
 
 int SvkPreset::getMpePitchbendRange() const
 {
-
+    return 2;
 }
 
 void SvkPreset::setMpePitchbendRange(int semitones)
@@ -418,7 +425,7 @@ void SvkPreset::setMpePitchbendRange(int semitones)
 
 int SvkPreset::getGlobalPitchbendRange() const
 {
-
+    return 4;
 }
 
 void SvkPreset::setGlobalPitchbendRange(int semitones)
@@ -428,17 +435,17 @@ void SvkPreset::setGlobalPitchbendRange(int semitones)
 
 NoteMap SvkPreset::getMidiInputMap() const
 {
-
+    return NoteMap();
 }
 
-void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage = true)
+void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage)
 {
     listeners.call(&Listener::midiInputMapChanged, mapIn);
 }
 
 VirtualKeyboard::HighlightStyle SvkPreset::getKeyHighlightStyle() const
 {
-
+    return VirtualKeyboard::HighlightStyle((int)theKeyboardNode[IDs::keyboardHighlightStyle]);
 }
 
 void SvkPreset::setKeyHighlightStyle(VirtualKeyboard::HighlightStyle styleIn)
@@ -448,6 +455,7 @@ void SvkPreset::setKeyHighlightStyle(VirtualKeyboard::HighlightStyle styleIn)
 
 VirtualKeyboard::KeyPlacementType SvkPreset::getKeyPlacementType() const
 {
+    return VirtualKeyboard::KeyPlacementType();// (int)theKeyboardNode[IDs::pl]);
 
 }
 
@@ -458,7 +466,7 @@ void SvkPreset::setKeyPlacementType(VirtualKeyboard::KeyPlacementType placementT
 
 float SvkPreset::getKeySizeRatio() const
 {
-
+    return (bool)theKeyboardNode[IDs::pianoWHRatio];
 }
 
 void SvkPreset::setKeySizeRatio(float keyRatio)
@@ -468,7 +476,7 @@ void SvkPreset::setKeySizeRatio(float keyRatio)
 
 bool SvkPreset::areNoteNumbersShown() const
 {
-
+    return (bool)theKeyboardNode[IDs::pianoKeysShowNoteNumbers];
 }
 
 void SvkPreset::showNoteNumbers(bool showNumbers)
