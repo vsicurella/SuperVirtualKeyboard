@@ -46,9 +46,6 @@ SvkAudioProcessor::SvkAudioProcessor() :
 
     buildFactoryDefaultState();
     buildUserDefaultState();
-
-    revertToSavedPreset(true, false);
-
 }
 
 SvkAudioProcessor::~SvkAudioProcessor()

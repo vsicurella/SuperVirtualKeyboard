@@ -262,8 +262,7 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
     if (presetNodeIn.hasType(IDs::presetNode))
     {
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
-        
-        svkPresetSaved.restoreFromNode(presetNodeIn, true);
+        svkPresetWorking.restoreFromNode(presetNodeIn, true);
         
         // necessary??
         modeSlots.clear();
@@ -274,6 +273,8 @@ bool SvkPresetManager::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 
         ValueTree customModeNode = svkPresetWorking.getCustomMode();
         modeCustom.reset(new Mode(customModeNode, false));
+
+        svkPresetSaved.restoreFromNode(svkPresetWorking.getPresetNode(), true);
 
         if (sendChangeSignal)
             listeners.call(&Listener::presetLoaded, svkPresetWorking);
