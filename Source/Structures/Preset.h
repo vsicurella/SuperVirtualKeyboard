@@ -40,6 +40,10 @@ class SvkPreset
     ValueTree theMidiSettingsNode;
     ValueTree theMappingsNode;
 
+    ValueTree createNewParentNode();
+
+    void pullChildrenFromParentNode(ValueTree parentNode);
+
 public:
 
     SvkPreset();
