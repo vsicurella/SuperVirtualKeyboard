@@ -309,6 +309,8 @@ void SvkMidiProcessor::setMode1(Mode* mode1In)
 
 void SvkMidiProcessor::setMode2(Mode* mode2In)
 {
+    if (mode2In == nullptr)
+        mode2In = mode1;
     mode2 = mode2In;
     updateNoteTransposition();
 }
