@@ -3,9 +3,9 @@
 <JUCERPROJECT id="yB68Dv" name="SuperVirtualKeyboard" projectType="audioplug"
               companyName="Everytone" companyEmail="sicurella12@gmail.com"
               pluginCharacteristicsValue="pluginEditorRequiresKeys,pluginProducesMidiOut,pluginWantsMidiIn"
-              pluginVST3Category="Tools" pluginFormats="buildStandalone,buildVST,buildVST3"
+              pluginVST3Category="Tools" pluginFormats="buildStandalone,buildVST3"
               pluginAUMainType="'aumi'" version="0.03" displaySplashScreen="1"
-              jucerFormatVersion="1">
+              jucerFormatVersion="1" defines="SVK_VERBOSE=1">
   <MAINGROUP id="oAWhNL" name="SuperVirtualKeyboard">
     <GROUP id="{DEC1935A-4F72-85EF-022F-694C0238CC32}" name="Resources">
       <FILE id="w1tZ2V" name="FactoryModes.txt" compile="0" resource="1"
