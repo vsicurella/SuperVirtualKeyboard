@@ -43,7 +43,7 @@ public:
     
     //===============================================================================================
             
-    void restoreNode(ValueTree keyboardNodeIn, bool resetIfInvalid=false);
+    void restoreNode(ValueTree keyboardNodeIn, bool reinitializeKeys=true, bool resetIfInvalid=false);
     
     void reset();
 
@@ -427,7 +427,7 @@ public:
     /*
         Sets the proportion of the keys' width to height. Default is 0.25.
     */
-    void setKeySizeRatio(float keySizeRatioIn);
+    void setKeySizeRatio(float keySizeRatioIn, bool resizeSelf);
 
     /*
         Sets the width of the keys to a given size and conforms the keyboard to the current proportions.
@@ -544,8 +544,8 @@ private:
     float keySizeRatio = 0.25f;
             
     // Data
-    ValueTree pianoNode;
-    ValueTree keyTreeNode;
+    //ValueTree pianoNode;
+    //ValueTree keyTreeNode;
     OwnedArray<Key> keys;
     Array<Colour> keyColorsOrders;
     Array<Colour> keyColorsDegrees;

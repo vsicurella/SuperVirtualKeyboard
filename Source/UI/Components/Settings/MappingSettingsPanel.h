@@ -10,11 +10,12 @@
 
 #pragma once
 
+#include "../../../PresetManager.h"
 #include "SvkSettingsPanel.h"
 #include "../NoteMapEditor.h"
 
 class MappingSettingsPanel : public SvkSettingsPanel, 
-                             public SvkPluginState::Listener, 
+                             public SvkPresetManager::Listener, 
                              public MappingEditor::Listener
 {
 public:
@@ -24,9 +25,9 @@ public:
 
     void visibilityChanged() override;
 
-    void mappingModeChanged(int mappingModeId) override;
+    //void mappingModeChanged(int mappingModeId) override;
 
-    void inputMappingChanged(NoteMap&) override;
+    //void inputMappingChanged(NoteMap&) override;
 
     void mappingEditorChanged(NoteMap&) override;
 

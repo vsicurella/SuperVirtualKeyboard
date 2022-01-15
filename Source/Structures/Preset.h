@@ -50,6 +50,8 @@ public:
     bool operator==(const SvkPreset& preset) const;
     bool operator!=(const SvkPreset& preset) const { return !operator==(preset); }
 
+    float getPresetVersion() const;
+
     /*
         Returns the parent node of the preset
         Will sort mode slots by slot number if called with true.
@@ -360,7 +362,7 @@ public:
         virtual void voiceLimitChanged(int voiceLimit) {}
         virtual void mpePitchbendRangeChanged(int steps) {}
         virtual void globalPitchbendRangeChanged(int steps) {}
-        virtual void midiInputMapChanged(const NoteMap* inputNoteMap) {}
+        virtual void midiInputMapChanged(NoteMap inputNoteMap) {}
 
         virtual void keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType) {}
         virtual void keyboardHighlightStyleChanged(VirtualKeyboard::HighlightStyle highlightStyle) {}
