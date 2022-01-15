@@ -97,9 +97,9 @@ public:
         if (mappingNode.hasProperty(IDs::kbmFileLocation) && File::isAbsolutePath(mappingNode[IDs::kbmFileLocation].toString()))
             initialDirectory = File(mappingNode[IDs::kbmFileLocation]);
 
-        FileChooser chooser("Save KBM file...", initialDirectory, "*.kbm");
+        chooser = std::make_unique<FileChooser>("Save KBM file...", initialDirectory, "*.kbm");
 
-        if (chooser.browseForFileToSave(true))
+        chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode, [&](const FileChooser& chooser)
         {
             KbmWriter kbm = KbmWriter::fromModes(
                 &inputMode, &outputMode, mapper, 0, 127, -1,
@@ -113,14 +113,12 @@ public:
                 mappingNode.setProperty(IDs::tuningRootFreq, refFreqEditor->getText().getDoubleValue(), nullptr);
                 mappingNode.setProperty(IDs::kbmFileLocation, chooser.getResult().getParentDirectory().getFullPathName(), nullptr);
             }
-        }
 
-        if (!success)
-        {
-            AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "File Write Error", "Could not write .kbm file", "Ok", this);
-        }
-
-        delete getParentComponent();
+            if (!success)
+            {
+                AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File Write Error", "Could not write .kbm file", "Ok");
+            }
+        });
     }
 
 private:
@@ -136,6 +134,8 @@ private:
 
     std::unique_ptr<LabelledComponent> refFreqEditLabel;
     TextEditor* refFreqEditor;
+
+    std::unique_ptr<FileChooser> chooser;
 
     std::unique_ptr<TextButton> autoFreqButton;
     std::unique_ptr<TextButton> saveButton;
