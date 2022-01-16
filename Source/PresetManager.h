@@ -30,15 +30,8 @@ class SvkPresetManager : public ChangeBroadcaster
     FamilyNameSorter familyNameSort;
 
     PopupMenu modeMenu;
-
-    SvkPreset svkPresetSaved;
-    SvkPreset svkPresetWorking;
-    
-    OwnedArray<Mode> modeSlots;
-    std::unique_ptr<Mode> modeCustom;
     
     std::unique_ptr<FileChooser> chooser;
-
 
 private:
     void createFactoryModes();
@@ -64,8 +57,6 @@ public:
 
     SvkPreset& getPreset();
     int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
-
-    int getNumModeSlots() const;
     
     Array<int> getModeSlotsInUse() const;
 
@@ -74,30 +65,6 @@ public:
     bool isPresetEdited() const;
 
     ValueTree getModeInLibrary(int indexIn);
-
-    /*
-        Returns the mode in the given mode slot number
-    */
-    Mode* getModeInSlot(int modeSlotNumIn);
-
-    /*
-        Returns the mode used by given selector
-        If the selector is set to an invalid slot, this will return nullptr
-    */
-    Mode* getModeBySelector(int selectorNumber);
-
-    Mode* getModeCustom();
-    
-    Mode* setModeCustom(ValueTree modeNodeIn);
-    Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
-
-    int setSlotToMode(int modeSlotNum, ValueTree modeNode, bool sendChangeMessage = true);
-    int addSlot(ValueTree modeNode);
-    int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode, bool sendChangeMessage = true);
-    int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode, bool sendChangeMessage = true);
-
-    void removeMode(int modeSlotNum);
-    void resetModeSlots();
 
     /*
         Replaces the mode slot the selector is pointed to with a new mode

@@ -31,6 +31,9 @@
 
 class SvkPreset
 {
+
+
+private:
     ValueTree parentNode;
     ValueTree thePropertiesNode;
     ValueTree theModeSlots;
@@ -39,6 +42,15 @@ class SvkPreset
     ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;
     ValueTree theMappingsNode;
+
+    OwnedArray<Mode> modeSlots;
+    std::unique_ptr<Mode> modeCustom;
+
+    Array<int> slotNumbersInUse;
+
+    std::unique_ptr<NoteMap> inputNoteMap;
+
+private:
 
     ValueTree createNewParentNode();
 
@@ -88,6 +100,11 @@ public:
     Array<int> getSlotNumbersInUse() const;
 
     /*
+        Returns number of populated slots
+    */
+    int getNumSlotsInUse() const;
+
+    /*
         Returns the mode selector that's currently in view
     */
     int getModeSelectorViewed() const;
@@ -135,32 +152,50 @@ public:
     /*
         Returns the mode with the given slot number (which may be different from the index it's in)
     */
-    ValueTree getModeInSlot(int slotNum);
+    //ValueTree getModeInSlot(int slotNum);
 
     /*
         Returns the mode loaded in the given mode selector
     */
-    ValueTree getModeBySelector(int selectorNumIn);
+    //ValueTree getModeBySelector(int selectorNumIn);
 
     /*
         Returns the mode loaded in selector 0 (input keyboard)
     */
-    ValueTree getMode1();
+    Mode* getMode1();
 
     /*
         Returns the mode loaded in selector 1 (output keyboard)
     */
-    ValueTree getMode2();
+    Mode* getMode2();
 
     /*
         Returns the mode currently being viewed
     */
-    ValueTree getModeViewed();
+    Mode* getModeViewed();
 
     /*
         Returns the current custom mode
     */
-    ValueTree getCustomMode();
+    Mode* getCustomMode();
+
+    /*
+       Returns the mode in the given mode slot number
+   */
+    Mode* getModeInSlot(int modeSlotNumIn);
+
+    /*
+        Returns the mode used by given selector
+        If the selector is set to an invalid slot, this will return nullptr
+    */
+    Mode* getModeBySelector(int selectorNumber);
+
+    Mode* setModeCustom(ValueTree modeNodeIn);
+    Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
+
+    int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode, bool sendChangeMessage = true);
+
+    int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode, bool sendChangeMessage = true);
 
     /*
         Finds the slot index of a given slot number, or returns -1 if not found
@@ -341,6 +376,8 @@ public:
     */
     String toString();
 
+public:
+
     static bool isValidPresetNode(ValueTree presetNodeIn);
 
     static SvkPreset getDefaultPreset();
@@ -389,8 +426,4 @@ private:
 
     int getNextFreeSlotNumber();
     
-private:
-
-    Array<int> slotNumbersInUse;
-
 };

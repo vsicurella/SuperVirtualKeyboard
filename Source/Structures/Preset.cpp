@@ -139,7 +139,7 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage)
         }
 
         if (sendChangeMessage)
-            listeners.call(&Listener::presetReloaded);
+            listeners.call(&Listener::presetReloaded, *this);
 
         return true;
     }
@@ -150,6 +150,11 @@ bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage)
 Array<int> SvkPreset::getSlotNumbersInUse() const
 {
     return slotNumbersInUse;
+}
+
+int SvkPreset::getNumSlotsInUse() const
+{
+    return slotNumbersInUse.size();
 }
 
 int SvkPreset::getModeSelectorViewed() const
@@ -221,34 +226,89 @@ ValueTree SvkPreset::getModeSlots()
     return theModeSlots;
 }
 
-ValueTree SvkPreset::getModeInSlot(int slotNum)
-{
-    return theModeSlots.getChild(getSlotNumberIndex(slotNum)).getChild(0);
-}
-
-ValueTree SvkPreset::getModeBySelector(int selectorNumIn)
-{
-    return theModeSlots.getChild(getSlotNumberIndex(getSlotNumberBySelector(selectorNumIn))).getChild(0);
-}
-
-ValueTree SvkPreset::getMode1()
+Mode* SvkPreset::getMode1()
 {
     return getModeBySelector(0);
 }
 
-ValueTree SvkPreset::getMode2()
+Mode* SvkPreset::getMode2()
 {
     return getModeBySelector(1);
 }
 
-ValueTree SvkPreset::getModeViewed()
+Mode* SvkPreset::getModeViewed()
 {
     return getModeBySelector(thePropertiesNode[IDs::modeSelectorViewed]);
 }
 
-ValueTree SvkPreset::getCustomMode()
+Mode* SvkPreset::getCustomMode()
 {
-    return theCustomMode.getChild(0);
+    if (modeCustom != nullptr)
+        return modeCustom.get();
+    return nullptr;
+}
+
+Mode* SvkPreset::getModeInSlot(int modeSlotNumIn)
+{
+    int slotIndex = getSlotNumberIndex(modeSlotNumIn);
+
+    if (slotIndex >= 0)
+    {
+        jassert(slotIndex < getNumSlotsInUse());
+
+        Mode* mode = modeSlots[slotIndex];
+        DBG("GRABBING MODE " + String(modeSlotNumIn) + " which is: " + mode->getDescription());
+
+        return mode;
+    }
+    else if (modeSlotNumIn > 0)
+    {
+        return modeCustom.get();
+    }
+
+    return nullptr;
+}
+
+Mode* SvkPreset::getModeBySelector(int selectorNumber)
+{
+    int slotNumber = getSlotNumberBySelector(selectorNumber);
+    if (isSlotNumberInUse(slotNumber))
+    {
+        auto index = getSlotNumberIndex(slotNumber);
+        return getModeInSlot(index);
+    }
+
+    else if (slotNumber > MAX_MODE_SLOTS_INDEX)
+    {
+        return modeCustom.get();
+    }
+
+    return nullptr;
+}
+
+Mode* SvkPreset::setModeCustom(ValueTree modeNodeIn)
+{
+    setCustomMode(modeNodeIn);
+    return getCustomMode();
+}
+
+Mode* SvkPreset::setModeCustom(String stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn)
+{
+    return setModeCustom(Mode::createNode(stepsIn, familyIn, nameIn, infoIn, rootNoteIn));
+}
+
+int SvkPreset::setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode, bool sendChangeMessage)
+{
+    int slotIndex = setModeSlot(modeNode, modeSlotNum, false);
+    setModeSelectorSlotNum(modeSelectorNum, modeSlotNum, sendChangeMessage);
+    return slotIndex;
+}
+
+int SvkPreset::addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode, bool sendChangeMessage)
+{
+    int modeSlotNum = addModeSlot(modeNode, false);
+    setModeSelectorSlotNum(modeSelectorNumber, modeSlotNum, sendChangeMessage);
+    return modeSlotNum;
 }
 
 int SvkPreset::setModeSelectorSlotNum(int selectorNumIn, int slotNumIn, bool sendChangeMessage)
@@ -305,8 +365,11 @@ int SvkPreset::setModeSlot(ValueTree modeNodeIn, int slotNumberIn, bool sendChan
             theModeSlots.appendChild(slotNode, nullptr);
         }
 
+        auto modeNode = modeNodeIn.createCopy();
         slotNode.setProperty(IDs::modeSlotNumber, slotNumberIn, nullptr);
-        slotNode.appendChild(modeNodeIn.createCopy(), nullptr);
+        slotNode.appendChild(modeNode, nullptr);
+
+        modeSlots.set(slotNumberIn, new Mode(modeNode));
 
         if (slotNumbersInUse.indexOf(slotNumberIn) < 0)
             slotNumbersInUse.addUsingDefaultSort(slotNumberIn);
@@ -331,6 +394,7 @@ ValueTree SvkPreset::setCustomMode(ValueTree customModeNodeIn, bool sendChangeMe
         theCustomMode.removeAllChildren(nullptr);
         theCustomMode.appendChild(nodeToAdd, nullptr);
 
+        modeCustom = std::make_unique<Mode>(nodeToAdd, false);
         return nodeToAdd;
     }
 
@@ -354,7 +418,6 @@ void SvkPreset::resetModeSlots(bool sendChangeMessage)
 {
     theModeSelectors.removeAllChildren(nullptr);
     slotNumbersInUse.clear();
-
     
     addModeSlot(STD_TUNING_MODE_NODE, false);
     addModeSlot(STD_TUNING_MODE_NODE, false);
@@ -457,9 +520,9 @@ NoteMap SvkPreset::getMidiInputMap() const
 
 void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage)
 {
-    // todo
+    inputNoteMap = std::make_unique<NoteMap>(mapIn);
     if (sendChangeMessage)
-        listeners.call(&Listener::inputMappingChanged, mapIn);
+        listeners.call(&Listener::inputMappingChanged, inputNoteMap.get());
 }
 
 VirtualKeyboard::HighlightStyle SvkPreset::getKeyHighlightStyle() const
