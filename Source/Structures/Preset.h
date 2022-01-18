@@ -25,15 +25,12 @@
 #include "../PluginIDs.h"
 #include "../CommonFunctions.h"
 #include "../Constants.h"
-#include "../PluginModes.h"
+#include "../Parameters.h"
 #include "./NoteMap.h"
 #include "./Mode.h"
 
 class SvkPreset
 {
-
-
-private:
     ValueTree parentNode;
     ValueTree thePropertiesNode;
     ValueTree theModeSlots;
@@ -47,8 +44,6 @@ private:
     std::unique_ptr<Mode> modeCustom;
 
     Array<int> slotNumbersInUse;
-
-    std::unique_ptr<NoteMap> inputNoteMap;
 
 private:
 
