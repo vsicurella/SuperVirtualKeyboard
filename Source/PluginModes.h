@@ -13,21 +13,21 @@
 
 namespace VirtualKeyboard
 {
-    enum UIMode
+    enum class UIMode
     {
         playMode = 0,
         editMode,
         mapMode
     };
 
-    enum Orientation
+    enum class Orientation
     {
         horizontal = 0,
         verticalLeft,
         verticalRight
     };
 
-    enum HighlightStyle
+    enum class HighlightStyle
     {
         full = 1,
         inside,
@@ -36,7 +36,7 @@ namespace VirtualKeyboard
         squares
     };
 
-    enum VelocityStyle
+    enum class VelocityStyle
     {
         linear = 1,
         curved,
@@ -49,7 +49,7 @@ namespace VirtualKeyboard
         stepped
     };
 
-    enum KeyPlacementType
+    enum class KeyPlacementType
     {
         nestedRight = 1,
         nestedCenter,
@@ -73,7 +73,7 @@ enum class MappingMode
     Manual
 };
 
-enum MappingStyle
+enum class MappingStyle
 {
     ModeToMode = 1,
     ModeToScale,
