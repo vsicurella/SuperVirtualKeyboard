@@ -77,6 +77,8 @@ public:
 
     //==============================================================================
     // Data
+
+    bool loadPreset(ValueTree presetNode, bool sendChangeSignal);
     
     void recallState(ValueTree nodeIn, bool fallbackToDefaultSettings = false);
 
@@ -96,16 +98,16 @@ public:
     
     ModeMapper* getModeMapper() const;
     
-    NoteMap* getMidiInputFilterMap() const;
-    NoteMap* getMidiOutputFilterMap() const;
+    //NoteMap* getMidiInputFilterMap() const;
+    //NoteMap* getMidiOutputFilterMap() const;
 
-    ValueTree getPresetNode() const;
+    //ValueTree getPresetNode() const;
 
-    Mode* getModeInSlot(int slotNumIn) const;
-    Mode* getModeViewed() const;
-    Mode* getMode1() const;
-    Mode* getMode2() const;
-    Mode* getModeCustom() const;
+    //Mode* getModeInSlot(int slotNumIn) const;
+    //Mode* getModeViewed() const;
+    //Mode* getMode1() const;
+    //Mode* getMode2() const;
+    //Mode* getModeCustom() const;
 
     //==============================================================================
 
@@ -199,7 +201,8 @@ private:
     ValueTree factoryDefaultPluginStateNode;
     ValueTree defaultPluginStateNode;
 
-    SvkPreset& workingPreset;
+    SvkPreset savedPreset;
+    SvkPreset workingPreset;
     
     Mode* modeViewed; // What is currently on screen
     int modeSelectorViewedNum = 1;

@@ -37,8 +37,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
     }
 
-    presetManager = processor.getPresetManager();
-
     scaleTextBox.reset (new TextEditor ("Scale Text Box"));
     addAndMakeVisible (scaleTextBox.get());
     scaleTextBox->setMultiLine (false);
@@ -478,7 +476,7 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
             for (int num = 0; num < modeSelectors.getNumChildren(); num++)
             {
                 ValueTree selector = modeSelectors.getChild(num);
-                Mode* mode = presetManager->getModeBySelector(num);
+                Mode* mode = currentPreset.getModeBySelector(num);
 
                 // TODO: generalize
                 if (num == 0)

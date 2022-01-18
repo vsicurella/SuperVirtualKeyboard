@@ -154,6 +154,7 @@
       <FILE id="go0rYg" name="PresetManager.h" compile="0" resource="0" file="Source/PresetManager.h"/>
       <FILE id="CD8Pzj" name="PresetManager.cpp" compile="1" resource="0"
             file="Source/PresetManager.cpp"/>
+      <FILE id="DrLkRH" name="Parameters.h" compile="0" resource="0" file="Source/Parameters.h"/>
     </GROUP>
     <FILE id="uIhRsv" name="README.md" compile="0" resource="1" file="README.md"/>
   </MAINGROUP>

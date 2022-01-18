@@ -47,8 +47,6 @@ public:
     void paint (Graphics&) override;
     void resized() override;
 
-    void mouseDown(const MouseEvent& e) override;
-
     void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged(Slider* sliderThatWasMoved) override;
     void buttonClicked(Button* buttonThatWasClicked) override;
@@ -166,7 +164,6 @@ protected:
 
 private:
     SvkAudioProcessor& processor;
-    SvkPresetManager* presetManager;
     SvkPreset& currentPreset;
 
     std::unique_ptr<Image> saveIcon;
