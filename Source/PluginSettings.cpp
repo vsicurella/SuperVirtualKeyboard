@@ -17,7 +17,8 @@ SvkPluginSettings::SvkPluginSettings()
          
     if (settingsDirectory.isDirectory())
     {
-        std::unique_ptr<XmlElement> xml = parseXML(settingsDirectory.getChildFile(settingsFileName));
+        auto settingsFile = settingsDirectory.getChildFile(settingsFileName);
+        auto xml = parseXML(settingsFile);
        
         if (xml.get())
         {
@@ -141,6 +142,6 @@ void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
 bool SvkPluginSettings::writeSettingsToFile(ValueTree settingsNode)
 {
     DBG("Writing settings to: " + currentSettingsLocation.getFullPathName());
-    auto xml = std::make_unique<XmlElement>(settingsNode.createXml());
+    auto xml = settingsNode.createXml();
     return xml->writeTo(currentSettingsLocation.getChildFile(settingsFileName));
 }
