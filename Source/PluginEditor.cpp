@@ -466,8 +466,8 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
         ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
         if (mapping.isValid())
         {
-            setMappingMode(mapping[IDs::mappingMode]);
-            setMappingStyleId(mapping[IDs::autoMappingStyle]);
+            setMappingMode((MappingMode)(int)mapping[IDs::mappingMode]);
+            setMappingStyleId((MappingStyle)(int)mapping[IDs::autoMappingStyle]);
         }
 
         ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
@@ -629,13 +629,13 @@ void SvkPluginEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
-        processor.setMapMode(mapModeBox->getSelectedId());
-        setMappingMode(mapModeBox->getSelectedId());
+        auto mode = (MappingMode)mapModeBox->getSelectedId();
+        setMappingMode(mode);
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
-        processor.setAutoMapStyle(mapStyleBox->getSelectedId());
-        setMappingStyleId(mapStyleBox->getSelectedId());
+        auto style = (MappingStyle)mapStyleBox->getSelectedId();
+        setMappingStyleId(style);
     }
 }
 

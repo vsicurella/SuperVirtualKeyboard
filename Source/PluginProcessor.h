@@ -105,8 +105,8 @@ public:
 
     //Mode* getModeInSlot(int slotNumIn) const;
     //Mode* getModeViewed() const;
-    //Mode* getMode1() const;
-    //Mode* getMode2() const;
+    Mode* getMode1() const;
+    Mode* getMode2() const;
     //Mode* getModeCustom() const;
 
     //==============================================================================
@@ -118,8 +118,8 @@ public:
     int getModeSelectorViewed() const;
     int getModeViewedSlotNumber() const;
 
-    int getMappingMode() const;
-    int getAutoMappingStyle() const;
+    MappingMode getMappingMode() const;
+    MappingStyle getAutoMappingStyle() const;
     bool isAutoMapping() const;
 
     //bool isAutoRetuning();
@@ -129,14 +129,14 @@ public:
     int getMode2Root() const;
 
     SvkPreset& getPreset() const;
-    bool isPresetEdited();
+    bool isPresetEdited() const;
 
     //==============================================================================
 
     void setParameterValue(Identifier paramIdIn, float valueIn);
 
-    void setMapMode(int mapModeSelectionIn);
-    void setAutoMapStyle(int mapStyleIn);
+    void setMapMode(MappingMode mapModeSelectionIn);
+    void setAutoMapStyle(MappingStyle mapStyleIn);
 
     void setModeSelectorRoot(int modeSlotIn, int rootNoteIn, bool updateParameter=false);
 

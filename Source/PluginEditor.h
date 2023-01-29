@@ -119,9 +119,9 @@ public:
 
     int getModeSelectorViewed();
 
-    void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
+    void setMappingMode(MappingMode mapModeIn, NotificationType notify = NotificationType::dontSendNotification);
 
-    void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
+    void setMappingStyleId(MappingStyle idIn, NotificationType notify = NotificationType::dontSendNotification);
 
     void setMode1Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 

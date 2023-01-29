@@ -755,17 +755,17 @@ int Keyboard::getModeSize() const
 
 //===============================================================================================
 
-int Keyboard::getUIMode()
+UIMode Keyboard::getUIMode()
 {
     return uiModeSelected;
 }
 
-int Keyboard::getOrientation()
+Orientation Keyboard::getOrientation()
 {
     return orientationSelected;
 }
 
-int Keyboard::getKeyPlacementStyle()
+KeyPlacementType Keyboard::getKeyPlacementStyle()
 {
     return keyPlacementSelected;
 }
@@ -785,12 +785,12 @@ bool Keyboard::isShowingNoteNames()
     return showNoteLabels;
 }
 
-int Keyboard::getHighlightStyle()
+HighlightStyle Keyboard::getHighlightStyle()
 {
     return highlightSelected;
 }
 
-int Keyboard::getVelocityStyle()
+VelocityStyle Keyboard::getVelocityStyle()
 {
     return velocitySelected;
 }
@@ -805,7 +805,7 @@ bool Keyboard::isInputVelocityScaled()
     return scaleMidiInputVelocity;
 }
 
-int Keyboard::getScrollingStyle()
+ScrollingStyle Keyboard::getScrollingStyle()
 {
     return scrollingSelected;
 }
@@ -935,7 +935,7 @@ void Keyboard::displayKeyboardState(MidiKeyboardState* keyboardStateIn)
 
 //===============================================================================================
 
-void Keyboard::setUIMode(int uiModeIn)
+void Keyboard::setUIMode(UIMode uiModeIn)
 {
     if (uiModeSelected == UIMode::editMode && uiModeIn != uiModeSelected)
         updateKeyColors();
@@ -944,7 +944,7 @@ void Keyboard::setUIMode(int uiModeIn)
     //pianoNode.setProperty(IDs::pianoUIMode, uiModeSelected, nullptr);
  }
 
-void Keyboard::setOrientation(int orientationIn)
+void Keyboard::setOrientation(Orientation orientationIn)
 {
     orientationSelected = orientationIn;
     //pianoNode.setProperty(IDs::keyboardOrientation, orientationSelected, nullptr);
@@ -959,14 +959,14 @@ void Keyboard::setNumRows(int numRowsIn)
     applyMode(mode);
 }
 
-void Keyboard::setKeyStyle(int placementIn)
+void Keyboard::setKeyStyle(KeyPlacementType placementIn)
 {
     keyPlacementSelected = placementIn;
     keyPositioner.setKeyPlacement(keyPlacementSelected);
     //pianoNode.setProperty(IDs::keyboardKeysStyle, keyPlacementSelected, nullptr);
 }
 
-void Keyboard::setHighlightStyle(int styleIn)
+void Keyboard::setHighlightStyle(HighlightStyle styleIn)
 {
     highlightSelected = styleIn;
     //pianoNode.setProperty(IDs::keyboardHighlightStyle, highlightSelected, nullptr);
@@ -978,7 +978,7 @@ void Keyboard::setHighlightStyle(int styleIn)
     }
 }
 
-void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
+void Keyboard::setVelocityBehavior(VelocityStyle behaviorNumIn, bool scaleInputVelocity)
 {
     velocitySelected = behaviorNumIn;
     //pianoNode.setProperty(IDs::pianoVelocityBehavior, velocitySelected, nullptr);
@@ -987,7 +987,7 @@ void Keyboard::setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity)
     //pianoNode.setProperty(IDs::pianoVelocityScaleInput, scaleMidiInputVelocity, nullptr);
 }
 
-void Keyboard::setScrollingStyle(int scrollingStyleIn)
+void Keyboard::setScrollingStyle(ScrollingStyle scrollingStyleIn)
 {
     scrollingSelected = scrollingStyleIn;
     //pianoNode.setProperty(IDs::keyboardScrollingStyle, scrollingSelected, nullptr);
