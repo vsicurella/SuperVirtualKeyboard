@@ -10,25 +10,23 @@
 
 #include "VirtualKeyboardKey.h"
 
-using namespace VirtualKeyboard;
-
-Key::Key()
+VirtualKeyboard::Key::Key()
 {
     setName("Key");
     node = ValueTree(IDs::pianoKeyNode);
     setDisplayColor(Colours::transparentBlack);
 }
 
-Key::Key(int keyNumIn)
-: Key()
+VirtualKeyboard::Key::Key(int keyNumIn)
+    : Key()
 {
     keyNumber = keyNumIn;
 }
 
-Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
+VirtualKeyboard::Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int stepIn,
     String pitchNameIn, int widthModIn, int heightModIn, int xOff, int yOff,
     bool showNoteNumIn, bool showNoteNameIn, Colour colorIn)
-: Key()
+    : Key()
 {
     keyNumber = keyNumIn;
     order = orderIn;
@@ -45,7 +43,7 @@ Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int modeDegreeIn, int ste
     color = colorIn;
 }
 
-Key::Key(ValueTree keyNodeIn)
+VirtualKeyboard::Key::Key(ValueTree keyNodeIn)
     : Key()
 {
     if (keyNodeIn.hasType(IDs::pianoKeyNode))
@@ -55,7 +53,7 @@ Key::Key(ValueTree keyNodeIn)
     }
 }
 
-Key::Key(const Key& keyToCopy)
+VirtualKeyboard::Key::Key(const Key& keyToCopy)
 : Key(keyToCopy.keyNumber, keyToCopy.order, keyToCopy.scaleDegree, keyToCopy.modeDegree, keyToCopy.step,
       keyToCopy.pitchName, keyToCopy.widthMod, keyToCopy.heightMod, keyToCopy.xOffset, keyToCopy.yOffset,
       keyToCopy.showNoteNumber, keyToCopy.showNoteLabel, keyToCopy.color)
@@ -63,12 +61,12 @@ Key::Key(const Key& keyToCopy)
     node = keyToCopy.node.createCopy();
 }
 
-void Key::setPath(Path keyPathIn)
+void VirtualKeyboard::Key::setPath(Path keyPathIn)
 {
     keyPath = keyPathIn;
 }
 
-void Key::applyParameters(ValueTree nodeIn)
+void VirtualKeyboard::Key::applyParameters(ValueTree nodeIn)
 {
     if (nodeIn.hasType(IDs::pianoKeyNode))
     {
@@ -99,12 +97,12 @@ void Key::applyParameters(ValueTree nodeIn)
     }
 }
 
-Colour Key::getDisplayColor() const
+Colour VirtualKeyboard::Key::getDisplayColor() const
 {
     return color;
 }
 
-void Key::paint(Graphics& g)
+void VirtualKeyboard::Key::paint(Graphics& g)
 {
     g.fillAll(color);
 
@@ -128,40 +126,46 @@ void Key::paint(Graphics& g)
         
         g.setColour(colorToUse);
 
-        // Full or Inside
-        if (highlightStyleId < 3)
+        switch (highlightStyleId)
+        {
+        case HighlightStyle::full:
+        case HighlightStyle::inside:
         {
             Rectangle<int> bounds = getLocalBounds();
 
-            if (highlightStyleId == 2)
+            if (highlightStyleId == HighlightStyle::inside)
             {
                 int margin = sqrt(getWidth() * getHeight()) * 0.07;
                 bounds.reduce(margin, margin);
             }
 
             g.fillRect(bounds);
+            break;
         }
-        
-        // Border
-        else if (highlightStyleId == 3)
+
+        case HighlightStyle::outline:
         {
             float margin = sqrt(getWidth() * getHeight()) * 0.07f;
             g.drawRect(getLocalBounds(), margin);
+            break;
         }
 
-        else
+        case HighlightStyle::circles:
+        case HighlightStyle::squares:
         {
             float margin = sqrt(getWidth() * getHeight()) * 0.05f;
             float boundsWidth = getWidth() - margin * 2;
             Rectangle<float> shapeBounds = { margin, getHeight() - margin - boundsWidth, boundsWidth, boundsWidth };
 
             // Circle
-            if (highlightStyleId == 4)
+            if (highlightStyleId == HighlightStyle::circles)
                 g.fillEllipse(shapeBounds);
-            
+
             // Square
             else
                 g.fillRect(shapeBounds);
+            break;
+        }
         }
     }
 
@@ -189,7 +193,7 @@ void Key::paint(Graphics& g)
     isDirty = false;
 }
 
-void Key::setDisplayColor(Colour colorIn)
+void VirtualKeyboard::Key::setDisplayColor(Colour colorIn)
 {
     color = colorIn;
     node.setProperty(IDs::pianoKeyColorsNode, color.toString(), nullptr);

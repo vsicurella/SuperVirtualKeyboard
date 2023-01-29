@@ -89,19 +89,54 @@ ValueTree SvkPreset::getPresetNode(bool sortModeSlots)
     return parentNode;
 }
 
-ValueTree SvkPreset::getKeyboardNode()
+//ValueTree SvkPreset::getKeyboardNode()
+//{
+//    return theKeyboardNode;
+//}
+//
+//ValueTree SvkPreset::getMidiSettingsNode()
+//{
+//    return theMidiSettingsNode;
+//}
+//
+//ValueTree SvkPreset::getMappingsNode()
+//{
+//    return theMappingsNode;
+//}
+
+VirtualKeyboard::Orientation SvkPreset::getKeyboardOrientation() const
 {
-    return theKeyboardNode;
+    return (VirtualKeyboard::Orientation)(int)this->theKeyboardNode[IDs::keyboardOrientation];
 }
 
-ValueTree SvkPreset::getMidiSettingsNode()
+VirtualKeyboard::HighlightStyle SvkPreset::getHighlightStyle() const
 {
-    return theMidiSettingsNode;
+    return (VirtualKeyboard::HighlightStyle)(int)this->theKeyboardNode[IDs::keyboardHighlightStyle];
 }
 
-ValueTree SvkPreset::getMappingsNode()
+VirtualKeyboard::ScrollingStyle SvkPreset::getScrollingStyle() const
 {
-    return theMappingsNode;
+    return (VirtualKeyboard::ScrollingStyle)(int)this->theKeyboardNode[IDs::keyboardScrollingStyle];
+}
+
+VirtualKeyboard::KeyPlacementType SvkPreset::getKeyPlacementType() const
+{
+    return (VirtualKeyboard::KeyPlacementType)(int)this->theKeyboardNode[IDs::keyboardKeysStyle];
+}
+
+VirtualKeyboard::VelocityStyle SvkPreset::getVelocityStyle() const
+{
+    return (VirtualKeyboard::VelocityStyle)(int)this->theKeyboardNode[IDs::pianoVelocityBehavior];
+}
+
+MappingMode SvkPreset::getMappingMode() const
+{
+    return (MappingMode)(int)this->theMappingsNode[IDs::mappingMode];
+}
+
+MappingStyle SvkPreset::getMappingStyle() const
+{
+    return (MappingStyle)(int)this->theMappingsNode[IDs::autoMappingStyle];
 }
 
 bool SvkPreset::restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage)
@@ -520,9 +555,9 @@ NoteMap SvkPreset::getMidiInputMap() const
 
 void SvkPreset::setMidiInputMap(const NoteMap& mapIn, bool updateNode, bool sendChangeMessage)
 {
-    inputNoteMap = std::make_unique<NoteMap>(mapIn);
-    if (sendChangeMessage)
-        listeners.call(&Listener::inputMappingChanged, inputNoteMap.get());
+    //inputNoteMap = std::make_unique<NoteMap>(mapIn);
+    //if (sendChangeMessage)
+    //    listeners.call(&Listener::inputMappingChanged, inputNoteMap.get());
 }
 
 VirtualKeyboard::HighlightStyle SvkPreset::getKeyHighlightStyle() const

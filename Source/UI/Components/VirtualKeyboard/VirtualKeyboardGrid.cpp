@@ -45,7 +45,7 @@ void KeyboardPositioner::setKeyGap(int keyGapIn)
     parentResized();
 }
 
-void KeyboardPositioner::setKeyPlacement(int keyPlacementTypeIn)
+void KeyboardPositioner::setKeyPlacement(KeyPlacementType keyPlacementTypeIn)
 {
     keyPlacement = keyPlacementTypeIn;
 }
@@ -77,13 +77,13 @@ void KeyboardPositioner::resizeKey(Key& key)
 
         switch (keyPlacement)
         {
-            case(KeyPlacementType::flat):
+            case KeyPlacementType::flat:
             {
                 height = stepHeight - stepHeight * (key.order - 1) / (float)key.step * 1.125f;
                 break;
             }
 
-            case(KeyPlacementType::adjacent):
+            case KeyPlacementType::adjacent:
             {
                 height = stepHeight;
                 width /= (key.step - 1) * 0.9f; // mode keys of step 1 will not be in this else condition

@@ -45,6 +45,6 @@ namespace VirtualKeyboard
         float heightLayerMult;
         float widthLayerMult;
 
-        VirtualKeyboard::KeyPlacementType keyPlacement = VirtualKeyboard::nestedRight;
+        VirtualKeyboard::KeyPlacementType keyPlacement = VirtualKeyboard::KeyPlacementType::nestedRight;
     };
 }

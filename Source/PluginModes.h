@@ -20,6 +20,20 @@ namespace VirtualKeyboard
         mapMode
     };
 
+    static juce::String UIModeToString(UIMode mode)
+    {
+        switch (mode)
+        {
+        case UIMode::playMode:
+            return "Play";
+        case UIMode::editMode:
+            return "Edit";
+        case UIMode::mapMode:
+            return "Map";
+        }
+        return juce::String("Unknown UIMode");
+    }
+
     enum class Orientation
     {
         horizontal = 0,
@@ -73,12 +87,40 @@ enum class MappingMode
     Manual
 };
 
+static juce::String MappingModeToString(MappingMode mode)
+{
+    switch (mode)
+    {
+    case MappingMode::None:
+        return "None";
+    case MappingMode::Auto:
+        return "Auto";
+    case MappingMode::Manual:
+        return "Manual";
+    }
+    return juce::String("Unknown MappingMode");
+}
+
 enum class MappingStyle
 {
     ModeToMode = 1,
     ModeToScale,
     ModeByOrder
 };
+
+static juce::String MappingStyleToString(MappingStyle style)
+{
+    switch (style)
+    {
+    case MappingStyle::ModeToMode:
+        return "ModeToMode";
+    case MappingStyle::ModeToScale:
+        return "ModeToScale";
+    case MappingStyle::ModeByOrder:
+        return "ModeByOrder";
+    }
+    return juce::String("Unknown MappingStyle");
+}
 
 enum PluginStateNodeStatus
 {

@@ -189,17 +189,17 @@ public:
     /*
         Returns the UI mode of which the keyboard is in.
     */
-    int getUIMode();
+    UIMode getUIMode();
     
     /*
         Returns the orientation of which the keyboard is in.
     */
-    int getOrientation();
+    Orientation getOrientation();
 
     /*
         Returns the style of which the keys are nested.
     */
-    int getKeyPlacementStyle();
+    KeyPlacementType getKeyPlacementStyle();
 
     /*
         Returns whether or not note numbers are showing
@@ -220,12 +220,12 @@ public:
     /*
         Returns the style of which the keys get highlighted.
     */
-    int getHighlightStyle();
+    HighlightStyle getHighlightStyle();
 
     /*
         Returns the style of note velocity.
     */
-    int getVelocityStyle();
+    VelocityStyle getVelocityStyle();
     
     /*
         Returns the value of velocity if in fixed mode.
@@ -240,7 +240,7 @@ public:
     /*
         Returns the scrolling style selected
     */
-    int getScrollingStyle();
+    ScrollingStyle getScrollingStyle();
 
     //===============================================================================================
 
@@ -264,12 +264,12 @@ public:
     /*
         Sets the keyboards UI mode.
     */
-    void setUIMode(int uiModeIn);
+    void setUIMode(UIMode uiModeIn);
 
     /*
         Sets the orientation of the keyboard.
     */
-    void setOrientation(int orientationIn);
+    void setOrientation(Orientation orientationIn);
     
     /*
         Sets the amount of rows to split the keyboard into
@@ -279,22 +279,22 @@ public:
     /*
         Sets the style of which the keys are nested in.
     */
-    void setKeyStyle(int placementIn);
+    void setKeyStyle(KeyPlacementType placementIn);
     
     /*
         Set the way the keys are highlighted
     */
-    void setHighlightStyle(int styleIn);
+    void setHighlightStyle(HighlightStyle styleIn);
 
     /*
     Sets the velocity behavior of the keyboard
     */
-    void setVelocityBehavior(int behaviorNumIn, bool scaleInputVelocity = false);
+    void setVelocityBehavior(VelocityStyle behaviorNumIn, bool scaleInputVelocity = false);
 
     /*
     Sets the scrolling style of the keyboard.
     */
-    void setScrollingStyle(int scrollingStyleIn);
+    void setScrollingStyle(ScrollingStyle scrollingStyleIn);
 
     /*
         Set the Midi Channel that the keyboard outputs on clicks.
@@ -524,12 +524,12 @@ private:
     //Array<Path> keyboardKeysPath;
 
     // Parameters
-    int uiModeSelected = 0;
-    int orientationSelected = 0;
-    int keyPlacementSelected = 1;
-    int highlightSelected = 1;
-    int velocitySelected = 1;
-    int scrollingSelected = 1;
+    UIMode uiModeSelected = UIMode::playMode;
+    Orientation orientationSelected = Orientation::horizontal;
+    KeyPlacementType keyPlacementSelected = KeyPlacementType::nestedRight;
+    HighlightStyle highlightSelected = HighlightStyle::full;
+    VelocityStyle velocitySelected = VelocityStyle::linear;
+    ScrollingStyle scrollingSelected = ScrollingStyle::smooth;
     
     int numRows = 1;
 

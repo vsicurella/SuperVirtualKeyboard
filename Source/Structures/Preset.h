@@ -31,6 +31,8 @@
 
 class SvkPreset
 {
+public: // Not decided on how to do this yet
+    
     ValueTree parentNode;
     ValueTree thePropertiesNode;
     ValueTree theModeSlots;
@@ -39,6 +41,8 @@ class SvkPreset
     ValueTree theKeyboardNode;
     ValueTree theMidiSettingsNode;
     ValueTree theMappingsNode;
+
+private:
 
     OwnedArray<Mode> modeSlots;
     std::unique_ptr<Mode> modeCustom;
@@ -72,17 +76,28 @@ public:
     /*
         Returns the keyboard node of the preset
     */
-    ValueTree getKeyboardNode();
+    //ValueTree getKeyboardNode();
+    VirtualKeyboard::Orientation getKeyboardOrientation() const;
+
+    VirtualKeyboard::HighlightStyle getHighlightStyle() const;
+
+    VirtualKeyboard::ScrollingStyle getScrollingStyle() const;
+
+    VirtualKeyboard::KeyPlacementType getKeyPlacementType() const;
 
     /*
         Returns the midi settings node of the preset
     */
-    ValueTree getMidiSettingsNode();
+    //ValueTree getMidiSettingsNode();
+    VirtualKeyboard::VelocityStyle getVelocityStyle() const;
 
     /*
         Returns the mappings node of the preset
     */
-    ValueTree getMappingsNode();
+    //ValueTree getMappingsNode();
+    MappingMode getMappingMode() const;
+
+    MappingStyle getMappingStyle() const;
 
     /*
         Recreate a preset from a ValueTree

@@ -471,16 +471,16 @@ ModeMapper* SvkAudioProcessor::getModeMapper() const
 //    return modeViewed;
 //}
 
-//Mode* SvkAudioProcessor::getMode1() const
-//{
-//    return workingPreset.getMode1();
-//}
-//
-//Mode* SvkAudioProcessor::getMode2() const
-//{
-//    return workingPreset.getMode2();
-//}
-//
+Mode* SvkAudioProcessor::getMode1() const
+{
+    return getPreset().getMode1();
+}
+
+Mode* SvkAudioProcessor::getMode2() const
+{
+    return getPreset().getMode2();
+}
+
 //Mode* SvkAudioProcessor::getModeCustom() const
 //{
 //    return workingPreset.getCustomMode();
@@ -554,24 +554,27 @@ int SvkAudioProcessor::getModeViewedSlotNumber() const
     return presetManager->getModeSlotOfSelector(modeSelectorViewedNum);
 }
 
-int SvkAudioProcessor::getMappingMode() const
+MappingMode SvkAudioProcessor::getMappingMode() const
 {
-    return getPresetNode().getChildWithName(IDs::midiMapNode)[IDs::mappingMode];
+    return getPreset().getMappingMode();
 }
 
-int SvkAudioProcessor::getAutoMappingStyle() const
+MappingStyle SvkAudioProcessor::getAutoMappingStyle() const
 {
-    return getPresetNode().getChildWithName(IDs::midiMapNode)[IDs::autoMappingStyle];
+    return getPreset().getMappingStyle();
 }
 
 bool SvkAudioProcessor::isAutoMapping() const
 {
-    return getMappingMode() == 2.0f;
+    return getMappingMode() == MappingMode::Auto;
 }
 
 int SvkAudioProcessor::getModeSlotRoot(int slotNum) const
 {
-    return getModeInSlot(slotNum)->getRootNote();
+    auto mode = getPreset().getModeInSlot(slotNum);
+    if (mode)
+        return mode->getRootNote();
+    return -1;
 }
 
 int SvkAudioProcessor::getMode1Root() const
@@ -586,10 +589,10 @@ int SvkAudioProcessor::getMode2Root() const
 
 SvkPreset& SvkAudioProcessor::getPreset() const
 {
-    return workingPreset;
+    return const_cast<SvkPreset&>(workingPreset);
 }
 
-bool SvkAudioProcessor::isPresetEdited()
+bool SvkAudioProcessor::isPresetEdited() const
 {
     return presetManager->isPresetEdited();
 }
@@ -618,16 +621,16 @@ void SvkAudioProcessor::handleModeSelection(int modeBoxNum, int idIn)
     onModeUpdate();
 }
 
-void SvkAudioProcessor::setMapMode(int mapModeSelectionIn)
+void SvkAudioProcessor::setMapMode(MappingMode mapModeSelectionIn)
 {
-    DBG("Plugin State Map Mode Selection: " + String(mapModeSelectionIn));
+    DBG("mappingMode: " + MappingModeToString(mapModeSelectionIn));
     
-    if (mapModeSelectionIn == 2) // Auto Mapping
+    if (mapModeSelectionIn == MappingMode::Auto)
         doAutoMapping();
     
     else
     {
-        if (mapModeSelectionIn == 3) // Manual Mapping
+        if (mapModeSelectionIn == MappingMode::Manual)
         {
             midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
         }
@@ -643,10 +646,10 @@ void SvkAudioProcessor::setMapMode(int mapModeSelectionIn)
     }
 }
 
-void SvkAudioProcessor::setAutoMapStyle(int mapStyleIn)
+void SvkAudioProcessor::setAutoMapStyle(MappingStyle mapStyleIn)
 {
     modeMapper->setMappingStyle(mapStyleIn);
-    DBG("mapStyle index = " + String(mapStyleIn));
+    DBG(String("mapStyle: ") + MappingStyleToString(mapStyleIn));
     if (isAutoMapping())
     {
         doAutoMapping();
@@ -670,8 +673,8 @@ void SvkAudioProcessor::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteI
 
 void SvkAudioProcessor::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMappingChangeMessage)
 {
-    midiProcessor->setMode1(getMode1());
-    midiProcessor->setMode2(getMode2());
+    midiProcessor->setMode1(getPreset().getMode1());
+    midiProcessor->setMode2(getPreset().getMode2());
 
     updateModeViewed(sendMappingChangeMessage);
     
@@ -735,10 +738,10 @@ void SvkAudioProcessor::doAutoMapping(const Mode* mode1, const Mode* mode2, bool
 
 void SvkAudioProcessor::doAutoMapping(bool sendChangeMessage)
 {
-    if (getMappingMode() == 2)
+    if (getMappingMode() == MappingMode::Auto)
     {
         DBG("Applying new MIDI mapping");
-        doAutoMapping(getMode1(), getMode2());
+        doAutoMapping(getPreset().getMode1(), getPreset().getMode2());
     }
     else
     {

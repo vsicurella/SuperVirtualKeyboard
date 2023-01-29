@@ -68,6 +68,6 @@ namespace VirtualKeyboard
         float velocityFixed = 1;
 
         Colour color = Colours::transparentBlack;
-        int highlightStyleId = HighlightStyle::full;
+        VirtualKeyboard::HighlightStyle highlightStyleId = VirtualKeyboard::HighlightStyle::full;
     };
 }

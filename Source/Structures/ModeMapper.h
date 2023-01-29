@@ -16,12 +16,13 @@
 #include "../PluginModes.h"
 #include "Mode.h"
 #include "NoteMap.h"
+#include "Preset.h"
 
 class ModeMapper
 {
     ValueTree mappingNode;
 
-    int mappingStyle = 1;
+    MappingStyle mappingStyle = MappingStyle::ModeToMode;
     
     int mapByOrderNum1 = 0;
     int mapByOrderNum2 = 0;
@@ -29,12 +30,30 @@ class ModeMapper
     int mapByOrderOffset2 = 0; 
 
     NoteMap previousOrderMap;
+
+    struct MappingArguments
+    {
+        const Mode& mode1;
+        const Mode& mode2;
+        MappingStyle mapStyle = MappingStyle::ModeToMode;
+        
+        // Specify a non-primary order of a mode
+        int order1 = 0;
+        int order2 = 0;
+        
+        // Specify a note offset/transposition
+        int offset1 = 0;
+        int offset2 = 0;
+
+        MappingArguments(const Mode& mode1, const Mode& mode2)
+            : mode1(mode1), mode2(mode2) {}
+    };
     
 public:
     
     ModeMapper();
     
-    ModeMapper(ValueTree modeMappingNodeIn);
+    ModeMapper(const SvkPreset& preset);
 
     ValueTree getMappingNode();
 
@@ -46,7 +65,7 @@ public:
 
     int getMode2OrderOffset() const;
 
-    void setMappingStyle(int mapTypeIn);
+    void setMappingStyle(MappingStyle mapTypeIn);
     
     void setMapOrdersParameters(int order1, int order2, int offset1, int offset2);
 
@@ -63,8 +82,7 @@ public:
     NoteMap map(const Mode& mode1, const Mode& mode2, NoteMap prevMap = NoteMap());
     
     // Returns certain type of mapping based off of passed in parameters
-    NoteMap map(const Mode& mode1, const Mode& mode2, int mapStyleIn = -1, int order1=0, int order2=0, int offset1=0, int offset2=0,
-                NoteMap prevMap = NoteMap());
+    NoteMap map(MappingArguments args, NoteMap prevMap = NoteMap());
 
     Array<int> getSelectedPeriodMap(const Mode& mode1, const Mode& mode2) const;
 
@@ -72,7 +90,7 @@ public:
     static NoteMap mapFull(const Mode& mode1, const Mode& mode2, Array<int> degreeMapIn = Array<int>());
 
     // Creates a mapping of mode1 onto mode2 via aligning key orders (white vs black vs colored)
-    static NoteMap mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order=0, int mode2Order=0, int mode1Offset=0, int mode2Offset=0, NoteMap prevMap=NoteMap());
+    static NoteMap mapByOrder(MappingArguments args, NoteMap prevMap=NoteMap());
 
     // 
     static NoteMap mapToMode1Period(const Mode& mapFrom, const Mode& mapTo, Array<int> degreeMapIn=Array<int>());

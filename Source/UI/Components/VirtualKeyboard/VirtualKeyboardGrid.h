@@ -23,7 +23,7 @@ namespace VirtualKeyboard
         
         int numModeKeys;
         int keyGap = 0;
-        int keyPlacement = 1;
+        KeyPlacementType keyPlacement = KeyPlacementType::nestedRight;
         float baseWidthRatio = 0.8f;
         float baseHeightRatio = 0.55f;
 
@@ -44,7 +44,7 @@ namespace VirtualKeyboard
 
         void setKeyGap(int keyGapIn);
         
-        void setKeyPlacement(int keyPlacementTypeIn);
+        void setKeyPlacement(KeyPlacementType keyPlacementTypeIn);
 
         void setLayerKeysWidthRatio(float widthRatioIn);
         void setLayerKeysHeightRatio(float widthRatioIn);
