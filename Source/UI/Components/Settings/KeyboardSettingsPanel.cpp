@@ -16,10 +16,10 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPreset& presetIn)
             "Keyboard settings"
         },
         {
-            IDs::keyboardKeysStyle,
-            IDs::keyboardHighlightStyle,
-            IDs::pianoWHRatio,
-            IDs::pianoKeyShowNumber
+            SvkProperty::keyboardKeysStyle,
+            SvkProperty::keyboardHighlightStyle,
+            SvkProperty::pianoWHRatio,
+            SvkProperty::pianoKeyShowNumber
         }, 
         {
             SvkControlProperties(ControlTypeNames::MenuControl, "Key Layout Style", true),

@@ -11,8 +11,8 @@
 #pragma once
 #include "./PluginModes.h"
 #include "./PluginIDs.h"
-#include "./NoteMap.h"
-#include "./Mode.h"
+#include "./Structures/NoteMap.h"
+#include "./Structures/Mode.h"
 
 struct KeyboardParameters
 {
@@ -94,10 +94,10 @@ struct KeyboardParameters
 
     KeyboardParameters(ValueTree tree)
     {
-        if (tree.hasType(IDs::pianoNode))
+        if (tree.hasType(SvkProperty::pianoNode))
         {
-            keyPlacement = stringToKeyPlacement(tree[IDs::keyboardKeysStyle].toString());
-            highlightStyle = stringToHighlightStyle(tree[IDs::keyboardHighlightStyle].toString());
+            keyPlacement = stringToKeyPlacement(tree[SvkProperty::keyboardKeysStyle].toString());
+            highlightStyle = stringToHighlightStyle(tree[SvkProperty::keyboardHighlightStyle].toString());
         }
     }
 
@@ -109,10 +109,10 @@ struct KeyboardParameters
 
     ValueTree toValueTree() const
     {
-        auto tree = ValueTree(IDs::pianoNode);
+        auto tree = ValueTree(SvkProperty::pianoNode);
 
-        tree.setProperty(IDs::keyboardKeysStyle, keyPlacementToString(keyPlacement), nullptr);
-        tree.setProperty(IDs::keyboardHighlightStyle, highlightStyleToString(highlightStyle), nullptr);
+        tree.setProperty(SvkProperty::keyboardKeysStyle, keyPlacementToString(keyPlacement), nullptr);
+        tree.setProperty(SvkProperty::keyboardHighlightStyle, highlightStyleToString(highlightStyle), nullptr);
     }
 };
 
@@ -183,16 +183,16 @@ struct MappingParameters
 
     MappingParameters(ValueTree tree)
     {
-        if (tree.hasType(IDs::midiMapNode))
+        if (tree.hasType(SvkProperty::midiMapNode))
         {
-            mode = stringToMappingMode(tree[IDs::mappingMode].toString());
-            style = stringToMappingStyle(tree[IDs::autoMappingStyle].toString());
+            mode = stringToMappingMode(tree[SvkProperty::mappingMode].toString());
+            style = stringToMappingStyle(tree[SvkProperty::autoMappingStyle].toString());
             
-            auto inputMapNode = tree.getChildWithName(IDs::midiInputRemap);
+            auto inputMapNode = tree.getChildWithName(SvkProperty::midiInputRemap);
             if (inputMapNode.isValid())
                 inputMap = NoteMap(inputMapNode);
 
-            auto outputMapNode = tree.getChildWithName(IDs::midiOutputFilter);
+            auto outputMapNode = tree.getChildWithName(SvkProperty::midiOutputFilter);
             if (outputMapNode.isValid())
                 inputMap = NoteMap(outputMapNode);
         }
@@ -208,11 +208,11 @@ struct MappingParameters
 
     ValueTree toValueTree() const
     {
-        auto tree = ValueTree(IDs::midiMapNode);
-        tree.setProperty(IDs::mappingMode, mappingModeToString(mode), nullptr);
-        tree.setProperty(IDs::autoMappingStyle, mappingStyleToString(style), nullptr);
-        tree.addChild(inputMap.getAsValueTree(IDs::midiInputRemap), 0, nullptr);
-        tree.addChild(outputMap.getAsValueTree(IDs::midiOutputFilter), 0, nullptr);
+        auto tree = ValueTree(SvkProperty::midiMapNode);
+        tree.setProperty(SvkProperty::mappingMode, mappingModeToString(mode), nullptr);
+        tree.setProperty(SvkProperty::autoMappingStyle, mappingStyleToString(style), nullptr);
+        tree.addChild(inputMap.getAsValueTree(SvkProperty::midiInputRemap), 0, nullptr);
+        tree.addChild(outputMap.getAsValueTree(SvkProperty::midiOutputFilter), 0, nullptr);
     }
 };
 
@@ -246,13 +246,13 @@ struct ScaleParameters
         targetMode = targetIn;
 
         if (sourceRoot < 0)
-            sourceRoot = (int)sourceMode[IDs::modeRootNote];
+            sourceRoot = (int)sourceMode[SvkProperty::modeRootNote];
 
         if (sourceRoot >= 0)
             sourceModeRootNote = sourceRoot;
         
         if (targetRoot < 0)
-            targetRoot = (int)targetMode[IDs::modeRootNote];
+            targetRoot = (int)targetMode[SvkProperty::modeRootNote];
         
         if (targetRoot >= 0)
             targetModeRootNote = targetRoot;
@@ -286,18 +286,18 @@ struct MidiParameters
 
     MidiParameters(ValueTree tree)
     {
-        auto settings = tree.getChildWithName(IDs::midiSettingsNode);
+        auto settings = tree.getChildWithName(SvkProperty::midiSettingsNode);
         if (settings.isValid())
         {
-            periodShiftAmount = (int)settings[IDs::periodShift];
-            transposeAmount = (int)settings[IDs::transposeAmt];
+            periodShiftAmount = (int)settings[SvkProperty::periodShift];
+            transposeAmount = (int)settings[SvkProperty::transposeAmt];
         }
 
-        auto device = tree.getChildWithName(IDs::midiDeviceSettingsNode);
+        auto device = tree.getChildWithName(SvkProperty::midiDeviceSettingsNode);
         if (device.isValid())
         {
-            midiInputDeviceId = device[IDs::midiInputName].toString();
-            midiOutputDeviceId = device[IDs::midiOutputName].toString();
+            midiInputDeviceId = device[SvkProperty::midiInputName].toString();
+            midiOutputDeviceId = device[SvkProperty::midiOutputName].toString();
         }
     }
 
@@ -305,17 +305,17 @@ struct MidiParameters
     {
         ValueTree parent("MidiNode");
 
-        auto midiSettings = ValueTree(IDs::midiSettingsNode);
+        auto midiSettings = ValueTree(SvkProperty::midiSettingsNode);
 
-        midiSettings.setProperty(IDs::periodShift, periodShiftAmount, nullptr);
-        midiSettings.setProperty(IDs::transposeAmt, transposeAmount, nullptr);
+        midiSettings.setProperty(SvkProperty::periodShift, periodShiftAmount, nullptr);
+        midiSettings.setProperty(SvkProperty::transposeAmt, transposeAmount, nullptr);
         parent.addChild(midiSettings, 0, nullptr);
 
         if (JUCEApplication::isStandaloneApp())
         {
-            auto midiDeviceSettings = ValueTree(IDs::midiDeviceSettingsNode);
-            midiDeviceSettings.setProperty(IDs::midiInputName, midiInputDeviceId, nullptr);
-            midiDeviceSettings.setProperty(IDs::midiOutputName, midiOutputDeviceId, nullptr);
+            auto midiDeviceSettings = ValueTree(SvkProperty::midiDeviceSettingsNode);
+            midiDeviceSettings.setProperty(SvkProperty::midiInputName, midiInputDeviceId, nullptr);
+            midiDeviceSettings.setProperty(SvkProperty::midiOutputName, midiOutputDeviceId, nullptr);
             parent.addChild(midiDeviceSettings, 1, nullptr);
         }
     }
@@ -334,10 +334,10 @@ struct SvkParameters
         : keyboard(keyParams), scale(scaleParams), mapping(mappingParams), midi(midiParams) {}
 
     SvkParameters(ValueTree presetNode)
-        : keyboard(presetNode.getChildWithName(IDs::pianoNode)),
-          scale(presetNode.getChildWithName(IDs::modeSlotsNode)), // TODO make a correct parent node
-          mapping(presetNode.getChildWithName(IDs::midiMapNode)),
-          midi(presetNode.getChildWithName(IDs::midiSettingsNode))
+        : keyboard(presetNode.getChildWithName(SvkProperty::pianoNode)),
+          scale(presetNode.getChildWithName(SvkProperty::modeSlotsNode)), // TODO make a correct parent node
+          mapping(presetNode.getChildWithName(SvkProperty::midiMapNode)),
+          midi(presetNode.getChildWithName(SvkProperty::midiSettingsNode))
     {
 
     }

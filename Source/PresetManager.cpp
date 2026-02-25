@@ -10,12 +10,14 @@
 
 #include "PresetManager.h"
 
-SvkPresetManager::SvkPresetManager(ValueTree pluginSettingsNodeIn)
+SvkPresetManager::SvkPresetManager(SvkPreset& presetIn, ValueTree pluginSettingsNodeIn)
+    : SvkPreset(presetIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
     initializeModePresets();
     
-    loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
+
+    //loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
 }
 
 SvkPresetManager::~SvkPresetManager()
@@ -45,7 +47,7 @@ int SvkPresetManager::getNumMenuItems(bool withFactoryMenu , bool withUserMenu, 
         totalMenuItems += favoriteModes.size();
 
     if (withSlots)
-        totalMenuItems += svkPresetWorking.getNumSlotsInUse();
+        totalMenuItems += getNumSlotsInUse();
 
     return totalMenuItems;
 }
@@ -82,7 +84,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     int favIdx = userModesIndex - loadedUserModes.size();
     int slotIdx = favIdx - favoriteModes.size();
     
-    int modeSlotNumber = svkPresetWorking.getSlotNumberBySelector(selectorNumber);
+    int modeSlotNumber = getSlotNumberBySelector(selectorNumber);
 
     // if selector was set to a custom mode, change the slot to the selector's number
     if (modeSlotNumber > MAX_MODE_SLOTS_INDEX)
@@ -102,7 +104,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     {
         modeSelected = favoriteModes[favIdx].createCopy();
     }
-    else if (slotIdx < svkPresetWorking.getNumSlotsInUse())
+    else if (slotIdx < getNumSlotsInUse())
     {
         // Currently the only way to switch a selector's mode slot pointer
         modeSelected = ValueTree();
@@ -111,18 +113,18 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     else
     {
         DBG("Custom mode selected");
-        modeSelected = svkPresetWorking.getCustomMode()->getNode();
+        modeSelected = getCustomMode()->getNode();
         modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
     }
     
     // Replaces the mode selector's mode slot with new mode
     if (modeSelected.isValid() && selectorNumber < 2 && modeSlotNumber <= MAX_MODE_SLOTS_INDEX)
     {
-        svkPresetWorking.setModeSlot(modeSelected, modeSlotNumber);
+        setModeSlot(modeSelected, modeSlotNumber);
     }
     
-    svkPresetWorking.setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
-    svkPresetWorking.getModeInSlot(modeSlotNumber)->setRootNote(svkPresetWorking.getModeSelectorRootNote(selectorNumber));
+    setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
+    getModeInSlot(modeSlotNumber)->setRootNote(getModeSelectorRootNote(selectorNumber));
 }
 
 
@@ -157,13 +159,15 @@ bool SvkPresetManager::saveNodeToFile(ValueTree nodeToSave, String saveMsg, Stri
 bool SvkPresetManager::savePresetToFile(String absolutePath)
 {
     commitPreset();
-    DBG("Saving the following node to " + absolutePath + ": " + svkPresetWorking.toString());
-    return saveNodeToFile(svkPresetWorking.getPresetNode(), "Save preset", "*.svk", absolutePath);
+    //DBG("Saving the following node to " + absolutePath + ": " + svkPresetWorking.toString());
+    //return saveNodeToFile(svkPresetWorking.getPresetNode(), "Save preset", "*.svk", absolutePath);
+    return false;
 }
 
 bool SvkPresetManager::saveModeToFile(int modeSlotNumber, String absolutePath)
 {
-    Mode* mode = svkPresetWorking.getModeInSlot(modeSlotNumber);
+    //Mode* mode = svkPresetWorking.getModeInSlot(modeSlotNumber);
+    Mode* mode = nullptr;
     if (mode == nullptr)
         return false;
     
@@ -202,7 +206,7 @@ ValueTree SvkPresetManager::parseModeFile(File fileIn)
 {
     ValueTree nodeIn = parseNodeFile(fileIn);
 
-    if (nodeIn.hasType(IDs::modePresetNode))
+    if (nodeIn.hasType(SvkProperty::modePresetNode))
         return nodeIn;
 
     return ValueTree();
@@ -212,7 +216,7 @@ ValueTree SvkPresetManager::parsePresetFile(File fileIn)
 {
     ValueTree nodeIn = parseNodeFile(fileIn);
 
-    if (nodeIn.hasType(IDs::presetNode))
+    if (nodeIn.hasType(SvkProperty::presetNode))
         return nodeIn;
     
     return ValueTree();
@@ -220,18 +224,20 @@ ValueTree SvkPresetManager::parsePresetFile(File fileIn)
 
 bool SvkPresetManager::commitPreset()
 {
-    return loadPreset(svkPresetWorking.getPresetNode(), false);
+    //return loadPreset(*this, false);
+    return false;
 }
 
 bool SvkPresetManager::resetToSavedPreset(bool sendChangeMessage)
 {
     DBG("PRESET MANAGER: Resetting to last saved preset.");
-    return loadPreset(svkPresetSaved.getPresetNode(), sendChangeMessage);
+    //return loadPreset(svkPresetSaved, sendChangeMessage);
+    return false;
 }
 
 void SvkPresetManager::initializeModePresets()
 {
-    modeLibraryNode = ValueTree(IDs::modeLibraryNode);
+    modeLibraryNode = ValueTree(SvkProperty::modeLibraryNode);
     loadedFactoryModes.clear();
     loadedUserModes.clear();
     modesSorted.clear();
@@ -245,38 +251,38 @@ void SvkPresetManager::initializeModePresets()
 
 void SvkPresetManager::createFactoryModes()
 {
-    if (!(bool) pluginSettingsNode[IDs::saveFactoryModes] || !(bool)pluginSettingsNode[IDs::createPresetFolder])
+    if (!(bool) pluginSettingsNode[SvkProperty::saveFactoryModes] || !(bool)pluginSettingsNode[SvkProperty::createPresetFolder])
     {
-        const char* factoryModes = BinaryData::FactoryModes_txt;
-        int size = BinaryData::FactoryModes_txtSize;
+    //     const char* factoryModes = BinaryData::FactoryModes_txt;
+    //     int size = BinaryData::FactoryModes_txtSize;
 
         loadedFactoryModes.clear();
 
-        if (factoryModes && size > 0)
-        {
-            MemoryInputStream instream(factoryModes, size, false);
+    //     if (factoryModes && size > 0)
+    //     {
+    //         MemoryInputStream instream(factoryModes, size, false);
 
-            String line, steps, family, info, name;
-            ValueTree factoryMode;
+    //         String line, steps, family, info, name;
+    //         ValueTree factoryMode;
 
-            while (instream.getNumBytesRemaining() > 0)
-            {
-                line = instream.readNextLine();
-                steps = line.upToFirstOccurrenceOf(", ", false, true);
+    //         while (instream.getNumBytesRemaining() > 0)
+    //         {
+    //             line = instream.readNextLine();
+    //             steps = line.upToFirstOccurrenceOf(", ", false, true);
                 
-                family = line.upToFirstOccurrenceOf("; ", false, true);
-                family = family.substring(steps.length() + 2, family.length());
+    //             family = line.upToFirstOccurrenceOf("; ", false, true);
+    //             family = family.substring(steps.length() + 2, family.length());
                 
-                info = line.fromFirstOccurrenceOf("; ", false, true);
+    //             info = line.fromFirstOccurrenceOf("; ", false, true);
 
-                factoryMode = Mode::createNode(steps, family, "", info, 60, true);
+    //             factoryMode = Mode::createNode(steps, family, "", info, 60, true);
 
-                addAndSortMode(factoryMode);
-                loadedFactoryModes.add(factoryMode);
-             }
+    //             addAndSortMode(factoryMode);
+    //             loadedFactoryModes.add(factoryMode);
+    //          }
 
-            factoryMode = ValueTree();
-        }
+    //         factoryMode = ValueTree();
+    //     }
     }
     
     DBG("Amt of factory modes:" + String(loadedFactoryModes.size()));
@@ -286,9 +292,9 @@ void SvkPresetManager::loadModeDirectory()
 {
     // TODO: Add checking for duplicate modes
 
-    if ((bool)pluginSettingsNode[IDs::createPresetFolder])
+    if ((bool)pluginSettingsNode[SvkProperty::createPresetFolder])
     {
-        File modeDirectory = File(pluginSettingsNode[IDs::modeDirectory]);
+        File modeDirectory = File(pluginSettingsNode[SvkProperty::modeDirectory]);
         Array<File> filesToLoad = modeDirectory.findChildFiles(File::TypesOfFileToFind::findFiles, true, "*.svk");
 
         std::unique_ptr<XmlElement> xml;
@@ -299,11 +305,11 @@ void SvkPresetManager::loadModeDirectory()
             xml = parseXML(filesToLoad.removeAndReturn(0));
             modeNodeIn = ValueTree::fromXml(*(xml.get()));
 
-            if (modeNodeIn.hasType(IDs::modePresetNode))
+            if (modeNodeIn.hasType(SvkProperty::modePresetNode))
             {
                 addAndSortMode(modeNodeIn);
 
-                if ((bool)modeNodeIn[IDs::factoryPreset])
+                if ((bool)modeNodeIn[SvkProperty::factoryPreset])
                 {
                     loadedFactoryModes.add(modeNodeIn);
                 }
@@ -337,10 +343,10 @@ void SvkPresetManager::resortModeLibrary()
 
 int SvkPresetManager::addModeToLibrary(ValueTree modeNodeIn)
 {
-    if (modeNodeIn.hasType(IDs::modePresetNode))
+    if (modeNodeIn.hasType(SvkProperty::modePresetNode))
     {
         int libraryIndex = modeLibraryNode.getNumChildren();
-        modeNodeIn.setProperty(IDs::libraryIndexOfMode, libraryIndex, nullptr);
+        modeNodeIn.setProperty(SvkProperty::libraryIndexOfMode, libraryIndex, nullptr);
         
         modeLibraryNode.appendChild(modeNodeIn, nullptr);
 
@@ -352,13 +358,13 @@ int SvkPresetManager::addModeToLibrary(ValueTree modeNodeIn)
 
 void SvkPresetManager::addModeToSort(ValueTree modeNodeIn)
 {
-    if (modeNodeIn.hasType(IDs::modePresetNode))
+    if (modeNodeIn.hasType(SvkProperty::modePresetNode))
     {
         modesSorted.getReference(SortType::scaleSize).addSorted(scaleSizeSort, modeNodeIn);
         modesSorted.getReference(SortType::modeSize).addSorted(modeSizeSort, modeNodeIn);
         modesSorted.getReference(SortType::familyName).addSorted(familyNameSort, modeNodeIn);
 
-        if (!(bool)modeNodeIn[IDs::factoryPreset])
+        if (!(bool)modeNodeIn[SvkProperty::factoryPreset])
         {
             modesSorted.getReference(SortType::user).addSorted(scaleSizeSort, modeNodeIn);
         }
@@ -407,36 +413,36 @@ void SvkPresetManager::updateModeMenu()
             switch (subMenu)
             {
                 case (SortType::scaleSize):
-                    if (separatorProperty != presetIn[IDs::scaleSize])
+                    if (separatorProperty != presetIn[SvkProperty::scaleSize])
                         scaleSizeMenu.addSeparator();
-                    separatorProperty = presetIn[IDs::scaleSize];
-                    displayName = presetIn[IDs::modeName];
+                    separatorProperty = presetIn[SvkProperty::scaleSize];
+                    displayName = presetIn[SvkProperty::modeName];
                     scaleSizeMenu.addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::modeSize):
-                    if (separatorProperty != presetIn[IDs::modeSize])
+                    if (separatorProperty != presetIn[SvkProperty::modeSize])
                         modeSizeMenu.addSeparator();
-                    separatorProperty = presetIn[IDs::modeSize];
-                    displayName = presetIn[IDs::modeName];
+                    separatorProperty = presetIn[SvkProperty::modeSize];
+                    displayName = presetIn[SvkProperty::modeName];
                     modeSizeMenu.addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::familyName):
-                    if (separatorProperty != presetIn[IDs::family])
+                    if (separatorProperty != presetIn[SvkProperty::family])
                         familyMenu.addSeparator();
-                    separatorProperty = presetIn[IDs::family];
-                    displayName = presetIn[IDs::modeName];
+                    separatorProperty = presetIn[SvkProperty::family];
+                    displayName = presetIn[SvkProperty::modeName];
                     familyMenu.addItem(++subMenuIndex, displayName);
                     break;
                     
                 case (SortType::user):
-                    if (presetIn[IDs::factoryPreset])
+                    if (presetIn[SvkProperty::factoryPreset])
                         continue;
-                    if (separatorProperty != presetIn[IDs::scaleSize])
+                    if (separatorProperty != presetIn[SvkProperty::scaleSize])
                         userMenu.addSeparator();
-                    separatorProperty = presetIn[IDs::scaleSize];
-                    displayName = presetIn[IDs::modeName];
+                    separatorProperty = presetIn[SvkProperty::scaleSize];
+                    displayName = presetIn[SvkProperty::modeName];
                     userMenu.addItem(++subMenuIndex, displayName);
                     break;
             }
@@ -446,22 +452,22 @@ void SvkPresetManager::updateModeMenu()
     // USERS
 //    for (int i = 0; i < loadedUserModes.size(); i++)
 //    {
-//        userMenu.addItem(++subMenuIndex, loadedUserModes[i][IDs::modeName].toString());
+//        userMenu.addItem(++subMenuIndex, loadedUserModes[i][SvkProperty::modeName].toString());
 //    }
 
     // FAVORITES
     for (int i = 0; i < favoriteModes.size(); i++)
     {
-        favMenu.addItem(++subMenuIndex, favoriteModes[i][IDs::modeName].toString());
+        favMenu.addItem(++subMenuIndex, favoriteModes[i][SvkProperty::modeName].toString());
     }
 
     // SLOTS
     Mode* mode;
 
-    auto numSlots = svkPresetWorking.getNumSlotsInUse();
+    auto numSlots = getNumSlotsInUse();
     for (int i = 0; i < numSlots; i++)
     {
-        mode = svkPresetWorking.getModeInSlot(i);
+        mode = getModeInSlot(i);
         auto index = ++subMenuIndex;
         if (mode == nullptr)
         {
@@ -482,7 +488,7 @@ void SvkPresetManager::updateModeMenu()
     modeMenu.addSubMenu("Slots", slotsMenu);
     modeMenu.addSeparator();
 
-    auto customMode = svkPresetWorking.getCustomMode();
+    auto customMode = getCustomMode();
     if (customMode != nullptr)
     {
         String customModeName = customMode->getName();

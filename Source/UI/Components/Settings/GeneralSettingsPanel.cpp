@@ -13,9 +13,9 @@
 GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkPreset& presetIn)
     : SvkSettingsPanel("GeneralSettingsPanel", presetIn, { "File Directories" },
         {
-            IDs::presetDirectory,
-            IDs::modeDirectory,
-            IDs::settingsDirectory
+            SvkProperty::presetDirectory,
+            SvkProperty::modeDirectory,
+            SvkProperty::settingsDirectory
         },
         {
             SvkControlProperties(ControlTypeNames::DirectoryControl, "Preset Directory", true),
@@ -26,21 +26,21 @@ GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, 
     ),
     globalSettings(globalSettingsIn)
 {
-    presetLabel = static_cast<LabelledComponent*>(idToControl[IDs::presetDirectory]);
+    presetLabel = static_cast<LabelledComponent*>(idToControl[SvkProperty::presetDirectory]);
     presetLabel->setComponentSize(320, 24);
 
     presetDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(presetLabel);
     presetDirectoryBrowser->setText(globalSettings.getPresetPath());
     presetDirectoryBrowser->addListener(this);
 
-    modeLabel = static_cast<LabelledComponent*>(idToControl[IDs::modeDirectory]);
+    modeLabel = static_cast<LabelledComponent*>(idToControl[SvkProperty::modeDirectory]);
     modeLabel->setComponentSize(320, 24);
 
     modeDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(modeLabel);
     modeDirectoryBrowser->setText(globalSettings.getModePath());
     modeDirectoryBrowser->addListener(this);
 
-    settingsLabel = static_cast<LabelledComponent*>(idToControl[IDs::settingsDirectory]);
+    settingsLabel = static_cast<LabelledComponent*>(idToControl[SvkProperty::settingsDirectory]);
     settingsLabel->setComponentSize(320, 24);
 
     settingsDirectoryBrowser = LabelledComponent::getComponentPointer<DirectoryBrowserComponent>(settingsLabel);

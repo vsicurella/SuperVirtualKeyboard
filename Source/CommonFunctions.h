@@ -5,7 +5,7 @@
     Created: 6 May 2019 7:31:20pm
     Author:  Vincenzo
 
-  ==============================================================================
+  ================S==============================================================
 */
 
 #pragma once
@@ -19,17 +19,17 @@ struct ScaleSizeSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-           (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+           (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (sz1 < sz2) return -1;
             else if (sz1 > sz2) return 1;
@@ -56,17 +56,17 @@ struct ModeSizeSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-            (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+            (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (m1 < m2) return -1;
             else if (m1 > m2) return 1;
@@ -92,17 +92,17 @@ struct FamilyNameSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-            (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+            (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (f1 < f2) return -1;
             else if (f1 > f2) return 1;

@@ -11,7 +11,7 @@
  */
 
 #pragma once
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "../../../PluginIDs.h"
 #include "../../../PluginModes.h"
 

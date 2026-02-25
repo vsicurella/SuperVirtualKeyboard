@@ -24,14 +24,13 @@ SvkAudioProcessor::SvkAudioProcessor() :
                        ),
 #endif
     svkUndo(new UndoManager()),
-    svkValueTree(*this, svkUndo.get()),//, IDs::svkParentNode, createParameters())
+    svkValueTree(*this, svkUndo.get()),//, SvkProperty::svkParentNode, createParameters())
     pluginSettings(std::make_unique<SvkPluginSettings>()),
-    presetManager(std::make_unique<SvkPresetManager>(pluginSettings->getSettingsNode())),
-    workingPreset(presetManager->getPreset())
+    presetManager(std::make_unique<SvkPresetManager>(*this, pluginSettings->getSettingsNode()))
 {
     // Temporary
-    svkValueTree.state = ValueTree(IDs::svkParentNode);
-
+    svkValueTree.state = ValueTree(SvkProperty::svkParentNode);
+  
     //pluginSettings.reset(new SvkPluginSettings());
 
     //presetManager.reset(new SvkPresetManager(pluginSettings->getSettingsNode()));
@@ -40,7 +39,7 @@ SvkAudioProcessor::SvkAudioProcessor() :
     //workingPreset = presetManager->getPreset();
 
     // TODO: Factory default MIDI settings
-    midiProcessor.reset(new SvkMidiProcessor(workingPreset));
+    midiProcessor.reset(new SvkMidiProcessor(*this));
 
     modeMapper.reset(new ModeMapper());
 
@@ -179,7 +178,7 @@ void SvkAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     ValueTree presetRecall = ValueTree::readFromStream(memIn);
     DBG("Found this in memory:\n" + presetRecall.toXmlString());
 
-    //presetRecall.removeChild(presetRecall.getChildWithName(IDs::pluginStateNode), nullptr); // uncomment this line to test new instantiation
+    //presetRecall.removeChild(presetRecall.getChildWithName(SvkProperty::pluginStateNode), nullptr); // uncomment this line to test new instantiation
 
     //svkValueTree.replaceState(presetRecall);    
     //recordParamIDs();
@@ -223,58 +222,58 @@ AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameter
     return AudioProcessorValueTreeState::ParameterLayout({ std::make_unique<AudioParameterBool>("NotifyHostDummy", "SameAsInitialValue", true) });
 //    std::vector<std::unique_ptr<RangedAudioParameter>> paramsInit;
 //    
-//    //paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
+//    //paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::presetSlotViewed.toString(), "Preset Slot Viewed", 0, 1, 0));
 // //   
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
-// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode1SlotNum.toString(), "Mode 1 Slot Number", 0, 128, 0));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode2SlotNum.toString(), "Mode 2 Slot Number", 0, 128, 1));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode1RootNote.toString(), "Mode 1 Root Note", 0, 127, 60));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode2RootNote.toString(), "Mode 2 Root Note", 0, 127, 60));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode1RootChannel.toString(), "Mode 1 Root Channel", 1, 16, 1));
+// //   paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mode2RootChannel.toString(), "Mode 2 Root Channel", 1, 16, 1));
 //    
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::autoMappingStyle.toString(), "Mapping Style", 1, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::mappingMode.toString(), "Mapping Mode", 1, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::autoMappingStyle.toString(), "Mapping Style", 1, 3, 1));
 //    
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeOn.toString(), "MPE On", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::mpeOn.toString(), "MPE On", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::mpeLegacyOn.toString(), "MPE Legacy Mode", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::mpeTuningPreserveMidiNote.toString(), "Preserve Midi Notes", true));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pitchBendGlobalMax.toString(), "Global Pitch Bend", 0, 8192, 2));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pitchBendNoteMax.toString(), "Note Pitch Bend", 0, 8192, 48));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::maxVoices.toString(), "Max Polyphony", 1, 16, 15));
 //
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneOn.toString(), "Retune On", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::retuneAuto.toString(), "Retune Auto", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
-//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::retuneOn.toString(), "Retune On", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::retuneAuto.toString(), "Retune Auto", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::tuningRootNote.toString(), "Tuning Reference Note", 0, 127, 69));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(SvkProperty::tuningRootFreq.toString(), "Tuning Reference Frequency", 0.01f, 24000.0f, 440.0f));
 //
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::periodShift.toString(), "Period Shift", -10, 10, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::periodShiftModeSize.toString(), "Shift By Mode Size", 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::transposeAmt.toString(), "Transpose", -127, 127, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterBool>(IDs::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::periodShift.toString(), "Period Shift", -10, 10, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::periodShiftModeSize.toString(), "Shift By Mode Size", 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::transposeAmt.toString(), "Transpose", -127, 127, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardMidiChannel.toString(), "Midi Channel Out", 1, 16, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::pianoKeysShowNoteNumbers.toString(), "Show Note Numbers", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::pianoKeysShowFilteredNotes.toString(), "Show Filtered Numbers", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterBool>(SvkProperty::pianoKeyShowNoteLabel.toString(), "Show Pitch Names", false));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardScrollingMode.toString(), "Scrolling Mode", 0, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardScrollingStyle.toString(), "Scrolling Style", 0, 3, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::numKeysInWidth.toString(), "Num Keys in Width", 1, 128, 16));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardNumRows.toString(), "Keyboard Rows", 1, 16, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardOrientation.toString(), "Keyboard Orientation", 0, 3, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardKeysStyle.toString(), "Key Style", 1, 4, 1));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyboardHighlightStyle.toString(), "Highlight Style", 1, 4, 1));
 //    
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
-//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pianoVelocityBehavior.toString(), "Keyboard Velocity Mode", 0, 2, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pianoVelocityValue.toString(), "Default Velocity", 0, 127, 100));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(SvkProperty::pianoWHRatio.toString(), "Key Size Ratio", 0.01f, 1.62f, 0.25f));
 //    
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::modeSlotToEdit.toString(), "Mode Slot Debug", 0, 1, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::modeLibraryIndex.toString(), "Mode Debug Index", 0, 1, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::modeRootNote.toString(), "Mode Debug Root", 0, 127, 60));
 //    
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
-//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
-//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(IDs::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
-//    paramsInit.push_back(std::make_unique<AudioParameterInt>(IDs::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::keyNumberToEdit.toString(), "Key To Debug", 0, 127, 60));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(SvkProperty::pianoKeyWidthMod.toString(), "Key Debug Width Mod", 0.001f, 10.0f, 1.0f));
+//    paramsInit.push_back(std::make_unique<AudioParameterFloat>(SvkProperty::pianoKeyHeightMod.toString(), "Key Debug Height Mod", 0.001f, 10.0f, 1.0f));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pianoKeyXOffset.toString(), "Key Debug X Offset", -1000, 1000, 0));
+//    paramsInit.push_back(std::make_unique<AudioParameterInt>(SvkProperty::pianoKeyYOffset.toString(), "Key Debug Y Offset", -1000, 1000, 0));
 //    
 //
 //    return {paramsInit.begin(), paramsInit.end()};
@@ -282,11 +281,11 @@ AudioProcessorValueTreeState::ParameterLayout SvkAudioProcessor::createParameter
 
 bool SvkAudioProcessor::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal)
 {
-    if (presetNodeIn.hasType(IDs::presetNode))
+    if (presetNodeIn.hasType(SvkProperty::presetNode))
     {
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
         savedPreset.restoreFromNode(presetNodeIn, sendChangeSignal);
-        workingPreset.restoreFromNode(savedPreset.getPresetNode(), sendChangeSignal);
+        restoreFromNode(savedPreset.getPresetNode(), sendChangeSignal);
         return true;
     }
 
@@ -305,31 +304,31 @@ void SvkAudioProcessor::recallState(ValueTree nodeIn, bool fallbackToDefaultSett
     if (status & PluginStateNodeStatus::IsAPVTSNode)
     {
         if (status & 1)
-            stateIn = stateIn.getChildWithName(IDs::pluginStateNode);
+            stateIn = stateIn.getChildWithName(SvkProperty::pluginStateNode);
         
         // TODO
         else
         {
-            //stateIn = stateIn.getChildWithName(IDs::alphaPluginStateNode);
+            //stateIn = stateIn.getChildWithName(SvkProperty::alphaPluginStateNode);
             stateIn = factoryDefaultPluginStateNode.createCopy();
         }
     }
 
     if (stateIn.isValid())
-    {
-        bool loaded = presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false);
+    {/*
+        bool loaded = presetManager->loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
         if (!loaded)
-        {
+     */   {
             // Might not be good - will actually delete existing properties that are set properly
             stateIn = defaultPluginStateNode;
-            presetManager->loadPreset(stateIn.getChildWithName(IDs::presetNode), false);
+            //presetManager->loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
         }
 
         revertToSavedPreset(fallbackToDefaultSettings);
     }
 
-    auto pluginStateNode = buildStateValueTree();
-    svkValueTree.state.copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
+    //auto pluginStateNode = buildStateValueTree();
+    //svkValueTree.state.copyPropertiesAndChildrenFrom(pluginStateNode, nullptr);
 
     DBG("Plugin State Node after recall:\n" + svkValueTree.state.toXmlString());
 }
@@ -338,18 +337,18 @@ void SvkAudioProcessor::revertToSavedPreset(bool fallbackToDefaultSettings, bool
 {
     presetManager->resetToSavedPreset(sendChange);
 
-    auto pluginStateNode = svkValueTree.state.getChildWithName(IDs::pluginStateNode);
+    auto pluginStateNode = svkValueTree.state.getChildWithName(SvkProperty::pluginStateNode);
 
     // svkTree.state.appendChild(pluginStateNode, nullptr);
     
-    auto preset = presetManager->getPreset();
-    modeSelectorViewedNum = preset.getModeSelectorViewed();
+    //auto preset = presetManager->getPreset();
+    //modeSelectorViewedNum = preset.getModeSelectorViewed();
 
-    modeMapper.reset(new ModeMapper(preset.getMappingsNode()));
+    modeMapper.reset(new ModeMapper(theMappingsNode));
     // TODO: fallbacks
-    midiProcessor->restoreSettingsNode(preset.getMidiSettingsNode());
-    midiProcessor->restoreMappingNode(preset.getMappingsNode());
-    midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr));
+    midiProcessor->restoreSettingsNode(theMidiSettingsNode);
+    midiProcessor->restoreMappingNode(theMappingsNode);
+    midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(SvkProperty::midiDeviceSettingsNode, nullptr));
 
     onModeUpdate(!sendChange, !sendChange);
 }
@@ -359,17 +358,17 @@ ValueTree SvkAudioProcessor::buildStateValueTree()
     // TODO: make it so it's not necessary to call this before saving (?)
 
     auto midiNodes = midiProcessor->getNode();
-    // pluginStateNode.getOrCreateChildWithName(IDs::midiDeviceSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiDeviceNode, nullptr);
+    // pluginStateNode.getOrCreateChildWithName(SvkProperty::midiDeviceSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiDeviceNode, nullptr);
 
     auto presetManagerNode = presetManager->commitPreset();
-    auto presetNode = presetManager->getPreset().getPresetNode();
+    //auto presetNode = thePresetNode;
     
-    // presetNode.getOrCreateChildWithName(IDs::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(IDs::pianoNode), nullptr);
+    // presetNode.getOrCreateChildWithName(SvkProperty::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(SvkProperty::pianoNode), nullptr);
 
-    ValueTree pluginStateNode(IDs::pluginStateNode);
-    pluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+    ValueTree pluginStateNode(SvkProperty::pluginStateNode);
+    pluginStateNode.setProperty(SvkProperty::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 
-    pluginStateNode.addChild(presetNode, 0, nullptr);
+    //pluginStateNode.addChild(presetNode, 0, nullptr);
 
     onModeUpdate(false, false);
 
@@ -385,20 +384,20 @@ int SvkAudioProcessor::isValidStateNode(ValueTree pluginStateNodeIn)
     // Determine if it's a SVK state node or a APVTS node
     ValueTree stateNode;
 
-    if (pluginStateNodeIn.hasType(IDs::svkParentNode))
+    if (pluginStateNodeIn.hasType(SvkProperty::svkParentNode))
     {
         status = PluginStateNodeStatus::IsAPVTSNode;
 
-        stateNode = pluginStateNodeIn.getChildWithName(IDs::pluginStateNode);
+        stateNode = pluginStateNodeIn.getChildWithName(SvkProperty::pluginStateNode);
 
         if (!stateNode.isValid())
         {
             // Check if it's an alpha preset
-            stateNode = pluginStateNodeIn.getChildWithName(IDs::alphaPluginStateNode);
+            stateNode = pluginStateNodeIn.getChildWithName(SvkProperty::alphaPluginStateNode);
         }
     }
 
-    else if (pluginStateNodeIn.hasType(IDs::pluginStateNode))
+    else if (pluginStateNodeIn.hasType(SvkProperty::pluginStateNode))
     {
         stateNode = pluginStateNodeIn;
     }
@@ -406,7 +405,7 @@ int SvkAudioProcessor::isValidStateNode(ValueTree pluginStateNodeIn)
     if (stateNode.isValid())
     {
         // Determine if it's the current preset version or not
-        if ((float)stateNode[IDs::pluginPresetVersion] == SVK_PRESET_VERSION)
+        if ((float)stateNode[SvkProperty::pluginPresetVersion] == SVK_PRESET_VERSION)
         {
             status += PluginStateNodeStatus::CurrentVersion;
         }
@@ -446,24 +445,24 @@ ModeMapper* SvkAudioProcessor::getModeMapper() const
     return modeMapper.get();
 }
 
-//NoteMap* SvkAudioProcessor::getMidiInputFilterMap() const
-//{
-//    return midiProcessor->getInputRemapMidiFilter()->getNoteMap();
-//}
-//
-//NoteMap* SvkAudioProcessor::getMidiOutputFilterMap() const
-//{
-//    return midiProcessor->getOutputMidiFilter()->getNoteMap();
-//}
-//
+NoteMap* SvkAudioProcessor::getMidiInputFilterMap() const
+{
+    return midiProcessor->getInputRemapMidiFilter()->getNoteMap();
+}
+
+NoteMap* SvkAudioProcessor::getMidiOutputFilterMap() const
+{
+    return midiProcessor->getOutputMidiFilter()->getNoteMap();
+}
+
 //ValueTree SvkAudioProcessor::getPresetNode() const
 //{
-//    return presetManager->getPreset().getPresetNode();
+//    return presetManager->getPresetNode();
 //}
 
 //Mode* SvkAudioProcessor::getModeInSlot(int slotNumIn) const
 //{
-//    return workingPreset.getModeInSlot(slotNumIn);
+//    return getModeInSlot(slotNumIn);
 //}
 
 //Mode* SvkAudioProcessor::getModeViewed() const
@@ -471,19 +470,19 @@ ModeMapper* SvkAudioProcessor::getModeMapper() const
 //    return modeViewed;
 //}
 
-Mode* SvkAudioProcessor::getMode1() const
-{
-    return getPreset().getMode1();
-}
-
-Mode* SvkAudioProcessor::getMode2() const
-{
-    return getPreset().getMode2();
-}
+//Mode* SvkAudioProcessor::getMode1() const
+//{
+//    return getMode1();
+//}
+//
+//Mode* SvkAudioProcessor::getMode2() const
+//{
+//    return getMode2();
+//}
 
 //Mode* SvkAudioProcessor::getModeCustom() const
 //{
-//    return workingPreset.getCustomMode();
+//    return getCustomMode();
 //}
 
 //==============================================================================
@@ -541,7 +540,7 @@ void SvkAudioProcessor::removePresetManagerListener(SvkPresetManager::Listener* 
 
 int SvkAudioProcessor::getNumModesLoaded() const
 {
-    return workingPreset.getNumSlotsInUse();
+    return getNumSlotsInUse();
 }
 
 int SvkAudioProcessor::getModeSelectorViewed() const
@@ -551,17 +550,21 @@ int SvkAudioProcessor::getModeSelectorViewed() const
 
 int SvkAudioProcessor::getModeViewedSlotNumber() const
 {
-    return presetManager->getModeSlotOfSelector(modeSelectorViewedNum);
+    //return presetManager->getModeSlotOfSelector(modeSelectorViewedNum);
+    return 0;
 }
 
 MappingMode SvkAudioProcessor::getMappingMode() const
 {
-    return getPreset().getMappingMode();
+    int modeId = (int)theMappingsNode[SvkProperty::mappingMode];
+    if (modeId < (int)MappingMode::Auto)
+        return MappingMode::None;
+    return MappingMode(modeId);
 }
 
 MappingStyle SvkAudioProcessor::getAutoMappingStyle() const
 {
-    return getPreset().getMappingStyle();
+    return getMappingStyle();
 }
 
 bool SvkAudioProcessor::isAutoMapping() const
@@ -571,7 +574,7 @@ bool SvkAudioProcessor::isAutoMapping() const
 
 int SvkAudioProcessor::getModeSlotRoot(int slotNum) const
 {
-    auto mode = getPreset().getModeInSlot(slotNum);
+    auto mode = getModeInSlot(slotNum);
     if (mode)
         return mode->getRootNote();
     return -1;
@@ -587,14 +590,14 @@ int SvkAudioProcessor::getMode2Root() const
     return getModeSlotRoot(1);
 }
 
-SvkPreset& SvkAudioProcessor::getPreset() const
-{
-    return const_cast<SvkPreset&>(workingPreset);
-}
+//SvkPreset& SvkAudioProcessor::getPreset() const
+//{
+//    return const_cast<SvkPreset&>(*this);
+//}
 
 bool SvkAudioProcessor::isPresetEdited() const
 {
-    return presetManager->isPresetEdited();
+    return (SvkPreset&)(*this) != savedPreset;
 }
 
 //==============================================================================
@@ -659,9 +662,9 @@ void SvkAudioProcessor::setAutoMapStyle(MappingStyle mapStyleIn)
 void SvkAudioProcessor::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, bool updateParameter)
 {
     rootNoteIn = totalModulus(rootNoteIn, 128);
-    workingPreset.setModeSelectorRootNote(modeSelectorNumIn, rootNoteIn);
+    setModeSelectorRootNote(modeSelectorNumIn, rootNoteIn);
     
-    Mode* mode = workingPreset.getModeBySelector(modeSelectorNumIn);
+    Mode* mode = getModeBySelector(modeSelectorNumIn);
     mode->setRootNote(rootNoteIn);
 
     if (modeSelectorViewedNum == modeSelectorNumIn)
@@ -673,8 +676,8 @@ void SvkAudioProcessor::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteI
 
 void SvkAudioProcessor::onModeUpdate(bool sendModeViewedChangeMessage, bool sendMappingChangeMessage)
 {
-    midiProcessor->setMode1(getPreset().getMode1());
-    midiProcessor->setMode2(getPreset().getMode2());
+    //midiProcessor->setMode1(getMode1());
+    //midiProcessor->setMode2(getMode2());
 
     updateModeViewed(sendMappingChangeMessage);
     
@@ -699,9 +702,9 @@ void SvkAudioProcessor::setMidiOutputMap(NoteMap noteMapIn, bool updateNode)
 
 void SvkAudioProcessor::setModeCustom(String stepsIn, bool sendChangeMessage)
 {
-    workingPreset.setModeCustom(stepsIn);
+    Mode custom = Mode(stepsIn, "Custom");
+    setCustomMode(custom.getNode());
     handleModeSelection(getModeSelectorViewed(), 999);
-    
     //if (sendChangeMessage)
     //    listeners.call(&Listener::customModeChanged, presetManager->getModeCustom());
 }
@@ -741,7 +744,7 @@ void SvkAudioProcessor::doAutoMapping(bool sendChangeMessage)
     if (getMappingMode() == MappingMode::Auto)
     {
         DBG("Applying new MIDI mapping");
-        doAutoMapping(getPreset().getMode1(), getPreset().getMode2());
+        doAutoMapping(getMode1(), getMode2());
     }
     else
     {
@@ -756,7 +759,7 @@ void SvkAudioProcessor::doAutoMapping(bool sendChangeMessage)
 
 void SvkAudioProcessor::updateModeViewed(bool sendChange)
 {
-    modeViewed = workingPreset.getModeBySelector(modeSelectorViewedNum);
+    modeViewed = getModeBySelector(modeSelectorViewedNum);
     midiProcessor->setModeViewed(modeViewed);
 
     //if (sendChange)
@@ -765,14 +768,14 @@ void SvkAudioProcessor::updateModeViewed(bool sendChange)
 
 void SvkAudioProcessor::commitModeInfo(bool sendChangeMessage)
 {
-    auto customMode = workingPreset.getCustomMode();
+    auto customMode = getCustomMode();
     if (customMode != nullptr && modeViewed == customMode)
     {
         DBG("Custom mode edited:" + customMode->getNode().toXmlString());
     }
 
     // TODO
-    //workingPreset.setModeSlot(modeViewed->getNode(), );
+    //setModeSlot(modeViewed->getNode(), );
     
     onModeUpdate(sendChangeMessage, sendChangeMessage);
 
@@ -789,15 +792,16 @@ bool SvkAudioProcessor::savePresetToFile()
 bool SvkAudioProcessor::loadPresetFromFile()
 {
     File file(pluginSettings->getPresetPath());
-    ValueTree presetLoaded = presetManager->parsePresetFile(file);
-    recallState(presetLoaded);
-    return true;
+    //ValueTree presetLoaded = presetManager->parsePresetFile(file);
+    //recallState(presetLoaded);
+    return false;
 }
 
 bool SvkAudioProcessor::saveModeViewedToFile()
 {
-    return presetManager->saveModeToFile(
-        presetManager->getModeSlotOfSelector(modeSelectorViewedNum), pluginSettings->getModePath());
+    //return presetManager->saveModeToFile(
+    //    presetManager->getModeSlotOfSelector(modeSelectorViewedNum), pluginSettings->getModePath());
+    return false;
 }
 
 bool SvkAudioProcessor::loadModeFromFile()
@@ -813,7 +817,7 @@ bool SvkAudioProcessor::loadModeFromFile()
                 auto modeTree = presetManager->parseModeFile(result);
                 if (Mode::isValidMode(modeTree))
                 {
-                    workingPreset.addSlotAndSetSelection(getModeSelectorViewed(), modeTree);
+                    addSlotAndSetSelection(getModeSelectorViewed(), modeTree);
                     onModeUpdate();
                 }
             }
@@ -828,15 +832,15 @@ void SvkAudioProcessor::buildFactoryDefaultState()
 {
     ModeMapper mapper;
 
-    factoryDefaultPluginStateNode = ValueTree(IDs::pluginStateNode);
-    factoryDefaultPluginStateNode.setProperty(IDs::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
+    factoryDefaultPluginStateNode = ValueTree(SvkProperty::pluginStateNode);
+    factoryDefaultPluginStateNode.setProperty(SvkProperty::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
     factoryDefaultPluginStateNode.appendChild(pluginSettings->getSettingsNode().createCopy(), nullptr);
-    factoryDefaultPluginStateNode.appendChild(presetManager->getPreset().getPresetNode(), nullptr);
+    //factoryDefaultPluginStateNode.appendChild(presetManager->getPresetNode(), nullptr);
 }
 
 void SvkAudioProcessor::buildUserDefaultState()
 {
-    ValueTree defaultSettings = pluginSettings->getSettingsNode().getChildWithName(IDs::presetNode);
+    ValueTree defaultSettings = pluginSettings->getSettingsNode().getChildWithName(SvkProperty::presetNode);
     
     // TODO: connect to actual user default settings
 
@@ -848,11 +852,11 @@ void SvkAudioProcessor::buildUserDefaultState()
 
 //void SvkAudioProcessor::parameterChanged(const String& paramID, float newValue)
 //{
-//    if (paramID == IDs::mappingMode.toString())
+//    if (paramID == SvkProperty::mappingMode.toString())
 //    {
 //        setMapMode(newValue);
 //    }
-//    else if (paramID == IDs::autoMappingStyle.toString())
+//    else if (paramID == SvkProperty::autoMappingStyle.toString())
 //    {
 //        setAutoMapStyle(newValue);
 //    }

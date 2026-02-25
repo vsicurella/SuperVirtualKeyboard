@@ -17,11 +17,11 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPreset& presetIn)
             "Devices"
         },
         { 
-            IDs::periodShift,
-            IDs::transposeAmt,
-            IDs::keyboardMidiChannel,
-            IDs::midiInputName,
-            IDs::midiOutputName 
+            SvkProperty::periodShift,
+            SvkProperty::transposeAmt,
+            SvkProperty::keyboardMidiChannel,
+            SvkProperty::midiInputName,
+            SvkProperty::midiOutputName 
         },
         { 
             SvkControlProperties(ControlTypeNames::SliderControl, "Period Shift", true, 0, 0, -10, 10),
@@ -34,11 +34,11 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPreset& presetIn)
 {
     Array<Identifier> labelledControlIDs =
     {
-        IDs::periodShift,
-        IDs::transposeAmt,
-        IDs::keyboardMidiChannel,
-        IDs::midiInputName,
-        IDs::midiOutputName
+        SvkProperty::periodShift,
+        SvkProperty::transposeAmt,
+        SvkProperty::keyboardMidiChannel,
+        SvkProperty::midiInputName,
+        SvkProperty::midiOutputName
     };
 
     for (auto id : labelledControlIDs)
@@ -48,22 +48,22 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPreset& presetIn)
 
     //midiProcessor = pluginState->getMidiProcessor();
 
-    idToLabelledControl[IDs::periodShift]->setComponentSize(100, 24);
-    periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::periodShift]);
+    idToLabelledControl[SvkProperty::periodShift]->setComponentSize(100, 24);
+    periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::periodShift]);
     periodShiftSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     periodShiftSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
     periodShiftSlider->setValue(preset.getPeriodShift());
     periodShiftSlider->addListener(this);
 
-    idToLabelledControl[IDs::transposeAmt]->setComponentSize(100, 24);
-    transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::transposeAmt]);
+    idToLabelledControl[SvkProperty::transposeAmt]->setComponentSize(100, 24);
+    transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::transposeAmt]);
     transposeSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     transposeSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
     transposeSlider->setValue(preset.getTransposeAmount());
     transposeSlider->addListener(this);
 
-    idToLabelledControl[IDs::keyboardMidiChannel]->setComponentSize(100, 24);
-    midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::keyboardMidiChannel]);
+    idToLabelledControl[SvkProperty::keyboardMidiChannel]->setComponentSize(100, 24);
+    midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::keyboardMidiChannel]);
     //midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     //midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
     //midiChannelSlider->setValue(preest.getMidiChannelOut());
@@ -72,20 +72,20 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPreset& presetIn)
     // Setup device settings if on standalone version, or hide
     if (JUCEApplication::isStandaloneApp())
     {
-        inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiInputName]);
+        inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[SvkProperty::midiInputName]);
         inputBoxLabelled->setComponentSize(320, 24);
         inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
         inputBox->addListener(this);
 
-        outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiOutputName]);
+        outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[SvkProperty::midiOutputName]);
         outputBoxLabelled->setComponentSize(320, 24);
         outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
         outputBox->addListener(this);
     }
     else
     {
-        controls.removeObject(idToControl[IDs::midiInputName], true);
-        controls.removeObject(idToControl[IDs::midiOutputName], true);
+        controls.removeObject(idToControl[SvkProperty::midiInputName], true);
+        controls.removeObject(idToControl[SvkProperty::midiOutputName], true);
 
         sectionHeaderLabels.remove(1);
         flexParent.items.remove(1);

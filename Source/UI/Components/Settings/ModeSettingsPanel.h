@@ -16,7 +16,7 @@ class ModeSettingsPanel : public SvkSettingsPanel
 {
 public:
 
-    ModeSettingsPanel(SvkPluginState*);
+    ModeSettingsPanel();
     ~ModeSettingsPanel();
 
 };

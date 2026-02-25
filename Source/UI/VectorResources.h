@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 static void drawSaveIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFill=Colour(),
                          Colour outLineColor=Colours::lightgrey)

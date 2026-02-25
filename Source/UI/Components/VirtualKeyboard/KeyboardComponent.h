@@ -12,9 +12,6 @@
 
 #pragma once
 
-#include "../../../CommonFunctions.h"
-#include "../../../Constants.h"
-#include "../../../PluginIDs.h"
 #include "../../../Structures/Mode.h"
 #include "../../../Structures/MappingHelper.h"
 #include "VirtualKeyboardKey.h"

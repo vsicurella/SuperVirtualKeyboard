@@ -75,8 +75,8 @@ Component* NoteMapEditor::refreshComponentForCell(int rowNumber, int columnId, b
             {
             case ColumnType::MidiNoteIn:
 
-                if (node.hasProperty(IDs::mappingMidiNoteIn))
-                    value = node[IDs::mappingMidiNoteIn];
+                if (node.hasProperty(SvkProperty::mappingMidiNoteIn))
+                    value = node[SvkProperty::mappingMidiNoteIn];
                 else
                     value = noneTrans;
 
@@ -84,8 +84,8 @@ Component* NoteMapEditor::refreshComponentForCell(int rowNumber, int columnId, b
 
             case ColumnType::KeyNumber:
                 
-                if (node.hasProperty(IDs::pianoKeyNumber))
-                    value = node[IDs::pianoKeyNumber];
+                if (node.hasProperty(SvkProperty::pianoKeyNumber))
+                    value = node[SvkProperty::pianoKeyNumber];
                 else
                     value = noneTrans;
 
@@ -94,8 +94,8 @@ Component* NoteMapEditor::refreshComponentForCell(int rowNumber, int columnId, b
             case ColumnType::MidiNoteOut:
                 
                 // TODO: note out mapping implementation
-                if (node.hasProperty(IDs::pianoKeyNumber))
-                    value = node[IDs::pianoKeyNumber];
+                if (node.hasProperty(SvkProperty::pianoKeyNumber))
+                    value = node[SvkProperty::pianoKeyNumber];
                 else
                     value = noneTrans;
 
@@ -209,7 +209,7 @@ void NoteMapEditor::mapMidiNoteToKey(int midiNoteIn, int keyNumberOut)
 void NoteMapEditor::resetMapping(NoteMap mappingIn, bool sendMessage)
 {
     currentNoteMap = mappingIn;
-    currentNoteMapNode = currentNoteMap.getAsValueTree(IDs::midiInputRemap);
+    currentNoteMapNode = currentNoteMap.getAsValueTree(SvkProperty::midiInputRemap);
     
     if (sendMessage)
         listeners.call(&MappingEditor::Listener::mappingEditorChanged, currentNoteMap);
@@ -230,12 +230,12 @@ void NoteMapEditor::editorShown(Label* label, TextEditor& editor)
     switch (tl->getColumnId())
     {
     case ColumnType::KeyNumber:
-        editor.setText(mapNode[IDs::pianoKeyNumber]);
+        editor.setText(mapNode[SvkProperty::pianoKeyNumber]);
         break;
 
     // TODO: implement actual midi channel out
     case ColumnType::MidiChannelOut:
-        editor.setText(mapNode[IDs::pianoKeyNumber]);
+        editor.setText(mapNode[SvkProperty::pianoKeyNumber]);
         break;
     }
 }
@@ -264,7 +264,7 @@ void NoteMapEditor::labelTextChanged(Label* label)
         else
         {
             label->setText(noneTrans, dontSendNotification);
-            currentNoteMapNode.getChild(tl->getRowNumber()).removeProperty(IDs::pianoKeyNumber, nullptr);
+            currentNoteMapNode.getChild(tl->getRowNumber()).removeProperty(SvkProperty::pianoKeyNumber, nullptr);
         }
 
         listeners.call(&MappingEditor::Listener::mappingEditorChanged, currentNoteMap);
@@ -285,13 +285,13 @@ void NoteMapEditor::labelTextChanged(Label* label)
             }
             else
             {
-                currentNoteMapNode.getChild(tl->getRowNumber()).setProperty(IDs::mappingMidiNoteIn, newNoteIn, nullptr);
+                currentNoteMapNode.getChild(tl->getRowNumber()).setProperty(SvkProperty::mappingMidiNoteIn, newNoteIn, nullptr);
             }
         }
         else
         {
             label->setText(noneTrans, dontSendNotification);
-            currentNoteMapNode.getChild(tl->getRowNumber()).removeProperty(IDs::mappingMidiNoteIn, nullptr);
+            currentNoteMapNode.getChild(tl->getRowNumber()).removeProperty(SvkProperty::mappingMidiNoteIn, nullptr);
         }
 
         break;
@@ -320,13 +320,13 @@ void NoteMapEditor::buttonClicked(Button* button)
 
 void NoteMapEditor::addNewMapping()
 {
-    currentNoteMapNode.appendChild(ValueTree(IDs::noteMapNode), nullptr);
+    currentNoteMapNode.appendChild(ValueTree(SvkProperty::noteMapNode), nullptr);
     table.updateContent();
 }
 
 void NoteMapEditor::editMapping(int rowNumber, int keyNumberOut, bool sendMappingChangedMessage)
 {
-    currentNoteMapNode.getChild(rowNumber).setProperty(IDs::pianoKeyNumber, keyNumberOut, nullptr);
+    currentNoteMapNode.getChild(rowNumber).setProperty(SvkProperty::pianoKeyNumber, keyNumberOut, nullptr);
     currentNoteMap = NoteMap(currentNoteMapNode);
     resetMapping(currentNoteMap, sendMappingChangedMessage);
 }

@@ -9,11 +9,12 @@
 */
 
 #pragma once
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 // IDENTIFIERS
 
-namespace IDs
+
+namespace SvkProperty
 {
 // Plugin State & Presets
 static Identifier svkParentNode("SVKValueTreeParent");

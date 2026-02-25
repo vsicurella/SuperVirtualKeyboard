@@ -19,7 +19,7 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPreset& presetIn)
             //"Advanced Mapping"
         },
         {
-            IDs::noteMapNode,
+            SvkProperty::noteMapNode,
             Identifier("Message")
         },
         {

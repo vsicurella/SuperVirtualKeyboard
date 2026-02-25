@@ -164,7 +164,7 @@ protected:
 
 private:
     SvkAudioProcessor& processor;
-    SvkPreset& currentPreset;
+    SvkPreset currentPreset;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;

@@ -281,7 +281,7 @@ void ModeInfoDialog::buttonClicked (Button* buttonThatWasClicked)
         {
             nameBox->setEnabled(false);
             modeWorking.setFamily(familyBox->getText());
-            modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
+            modeNode.setProperty(SvkProperty::family, familyBox->getText(), nullptr);
             nameBox->setText(modeWorking.getDescription());
         }
         else
@@ -308,7 +308,7 @@ void ModeInfoDialog::sliderValueChanged (Slider* sliderThatWasMoved)
         modeWorking.rotate(lastRotateAmt - sliderThatWasMoved->getValue());
         lastRotateAmt = sliderThatWasMoved->getValue();
 
-        modeNode.setProperty(IDs::stepString, modeWorking.getStepsString(), nullptr);
+        modeNode.setProperty(SvkProperty::stepString, modeWorking.getStepsString(), nullptr);
         stepsBox->setText(modeWorking.getStepsString());
     }
 }
@@ -328,9 +328,9 @@ void ModeInfoDialog::textEditorTextChanged(TextEditor& textEditor)
 
 void ModeInfoDialog::commitMode()
 {
-    modeNode.setProperty(IDs::modeName, nameBox->getText(), nullptr);
-    modeNode.setProperty(IDs::family, familyBox->getText(), nullptr);
-    modeNode.setProperty(IDs::modeInfo, infoBox->getText(), nullptr);
+    modeNode.setProperty(SvkProperty::modeName, nameBox->getText(), nullptr);
+    modeNode.setProperty(SvkProperty::family, familyBox->getText(), nullptr);
+    modeNode.setProperty(SvkProperty::modeInfo, infoBox->getText(), nullptr);
 
     modeOriginal->restoreNode(modeNode);
 }

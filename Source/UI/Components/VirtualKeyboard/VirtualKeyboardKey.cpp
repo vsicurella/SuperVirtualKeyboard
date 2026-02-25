@@ -13,7 +13,7 @@
 VirtualKeyboard::Key::Key()
 {
     setName("Key");
-    node = ValueTree(IDs::pianoKeyNode);
+    node = ValueTree(SvkProperty::pianoKeyNode);
     setDisplayColor(Colours::transparentBlack);
 }
 
@@ -46,7 +46,7 @@ VirtualKeyboard::Key::Key(int keyNumIn, int orderIn, int scaleDegreeIn, int mode
 VirtualKeyboard::Key::Key(ValueTree keyNodeIn)
     : Key()
 {
-    if (keyNodeIn.hasType(IDs::pianoKeyNode))
+    if (keyNodeIn.hasType(SvkProperty::pianoKeyNode))
     {
         applyParameters(keyNodeIn);
         node = keyNodeIn;
@@ -68,28 +68,28 @@ void VirtualKeyboard::Key::setPath(Path keyPathIn)
 
 void VirtualKeyboard::Key::applyParameters(ValueTree nodeIn)
 {
-    if (nodeIn.hasType(IDs::pianoKeyNode))
+    if (nodeIn.hasType(SvkProperty::pianoKeyNode))
     {
         Identifier id;
         for (int i = 0; i < nodeIn.getNumProperties(); i++)
         {
             id = nodeIn.getPropertyName(i);
 
-            if (id == IDs::pianoKeyNumber)
+            if (id == SvkProperty::pianoKeyNumber)
                 keyNumber = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyWidthMod)
+            else if (id == SvkProperty::pianoKeyWidthMod)
                 widthMod = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyHeightMod)
+            else if (id == SvkProperty::pianoKeyHeightMod)
                 heightMod = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyXOffset)
+            else if (id == SvkProperty::pianoKeyXOffset)
                 xOffset = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyYOffset)
+            else if (id == SvkProperty::pianoKeyYOffset)
                 yOffset = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyShowNumber)
+            else if (id == SvkProperty::pianoKeyShowNumber)
                 showNoteNumber = nodeIn.getProperty(id);
-            else if (id == IDs::keyboardShowsNoteLabels)
+            else if (id == SvkProperty::keyboardShowsNoteLabels)
                 showNoteLabel = nodeIn.getProperty(id);
-            else if (id == IDs::pianoKeyColorsNode)
+            else if (id == SvkProperty::pianoKeyColorsNode)
                 color = Colour::fromString(nodeIn.getProperty(id).toString());
         }
 
@@ -196,6 +196,6 @@ void VirtualKeyboard::Key::paint(Graphics& g)
 void VirtualKeyboard::Key::setDisplayColor(Colour colorIn)
 {
     color = colorIn;
-    node.setProperty(IDs::pianoKeyColorsNode, color.toString(), nullptr);
+    node.setProperty(SvkProperty::pianoKeyColorsNode, color.toString(), nullptr);
     repaint();
 }

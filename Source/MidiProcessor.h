@@ -18,6 +18,7 @@
 
 class SvkMidiProcessor : public MidiInputCallback,
                          public MidiKeyboardStateListener,
+                         protected SvkPreset,
                          private AudioProcessorValueTreeState::Listener
 {
 public:
@@ -49,11 +50,11 @@ public:
     int getTransposeAmt() const;
     int getMidiChannelOut() const;
 
-    NoteMap* getInputNoteFilter();
+    //NoteMap* getInputNoteFilter();
     NoteMap* getInputNoteRemap();
     NoteMap* getOutputNoteFilter();
 
-    MidiFilter* getInputMidiFilter();
+    //MidiFilter* getInputMidiFilter();
     MidiFilter* getInputRemapMidiFilter();
     MidiFilter* getOutputMidiFilter();
     
@@ -68,13 +69,13 @@ public:
     String setMidiOutput(String deviceID);
 
     void setModeViewed(Mode* modeViewedIn);
-    void setMode1(Mode* mode1In);
-    void setMode2(Mode* mode2In);
+    //void setMode1(Mode* mode1In);
+    //void setMode2(Mode* mode2In);
 
     void setInputToFilter(bool doRemap=true);
     void setInputToRemap(bool doRemap=true);
     void setOutputToFilter(bool doFilter=true);
-    
+
     void setInputFilter(Array<int> mapIn, bool updateNode=true);
     void setInputFilter(NoteMap mapIn, bool updateNode=true);
     void setInputRemap(Array<int> mapIn, bool updateNode=true);
@@ -132,7 +133,7 @@ public:
 private:
 
     //AudioProcessorValueTreeState& svkTree;
-    SvkPreset& preset;
+    //SvkPreset& preset;
 
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;
@@ -154,8 +155,8 @@ private:
     MidiBuffer allNotesOffBuffer;
 
     Mode* modeViewed;
-    Mode* mode1;
-    Mode* mode2;
+    //Mode* mode1;
+    //Mode* mode2;
 
     int periodShift = 0;
     bool periodShiftModeSize = false;

@@ -22,79 +22,94 @@
 
 #pragma once
 
+#include "./SvkStateBase.h"
 #include "../PluginIDs.h"
-#include "../CommonFunctions.h"
-#include "../Constants.h"
 #include "../Parameters.h"
-#include "./NoteMap.h"
-#include "./Mode.h"
+#include "../Structures/Preset.h"
 
-class SvkPreset
+class Mode;
+class NoteMap;
+
+class SvkState : protected SvkStateBase
 {
-public: // Not decided on how to do this yet
-    
-    ValueTree parentNode;
-    ValueTree thePropertiesNode;
-    ValueTree theModeSlots;
-    ValueTree theModeSelectors;
-    ValueTree theCustomMode;
-    ValueTree theKeyboardNode;
-    ValueTree theMidiSettingsNode;
-    ValueTree theMappingsNode;
+protected:
 
-private:
-
-    OwnedArray<Mode> modeSlots;
-    std::unique_ptr<Mode> modeCustom;
-
-    Array<int> slotNumbersInUse;
-
-private:
-
-    ValueTree createNewParentNode();
-
-    void pullChildrenFromParentNode(ValueTree parentNode);
+    juce::ValueTree keyboardProperties;
+    juce::ValueTree mappingProperties;
+    juce::ValueTree midiProperties;
+    juce::ValueTree presetProperties;
+    juce::ValueTree modeSlotProperties;      // modeSlotsNode    — actual mode data per slot
+    juce::ValueTree modeSelectorProperties;  // modeSelectorsNode — selector → slot mappings
+    juce::ValueTree customModeProperties;
 
 public:
 
-    SvkPreset();
-    SvkPreset(const ValueTree presetNodeIn);
-    SvkPreset(const SvkPreset& presetToCopy);
-    ~SvkPreset();
+    // Top-level constructor
+    SvkState(juce::ValueTree stateIn);
+    SvkState(juce::String nameIn, const SvkState& presetToCopy);
+    ~SvkState() override;
 
-    bool operator==(const SvkPreset& preset) const;
-    bool operator!=(const SvkPreset& preset) const { return !operator==(preset); }
+    // bool operator==(const SvkState& preset) const;
+    // bool operator!=(const SvkState& preset) const { return !operator==(preset); }
+
+    juce::ValueTree loadStateProperties(juce::ValueTree stateIn) override;
+
+    void handleStatePropertyChange(juce::ValueTree treeWhosePropertyHasChanged, const juce::Identifier& property) override;
+
+    void loadPropertiesFile(juce::PropertiesFile* properties) override;
 
     float getPresetVersion() const;
+
+    /*
+        Assembles the current live state into a presetNode-shaped ValueTree
+        suitable for serialization or passing to SvkPreset.
+    */
+    juce::ValueTree getPresetNode() const;
+
+    /*
+        Returns the last committed (saved) preset snapshot.
+    */
+    const SvkPreset& getSavedPreset() const;
+
+    /*
+        Returns true if the live state differs from the last committed snapshot.
+    */
+    bool isPresetEdited() const;
+
+    /*
+        Snapshots the current live state into savedPreset.
+    */
+    void commitPreset();
+
+    /*
+        Reverts the live state to the last committed snapshot.
+    */
+    void revertPreset(bool sendChangeMessage = true);
 
     /*
         Returns the parent node of the preset
         Will sort mode slots by slot number if called with true.
     */
-    ValueTree getPresetNode(bool sortModeSlots = false);
+    // ValueTree getPresetNode(bool sortModeSlots = false);
 
     /*
         Returns the keyboard node of the preset
     */
     //ValueTree getKeyboardNode();
     VirtualKeyboard::Orientation getKeyboardOrientation() const;
-
     VirtualKeyboard::HighlightStyle getHighlightStyle() const;
-
     VirtualKeyboard::ScrollingStyle getScrollingStyle() const;
-
     VirtualKeyboard::KeyPlacementType getKeyPlacementType() const;
 
     /*
         Returns the midi settings node of the preset
     */
     //ValueTree getMidiSettingsNode();
-    VirtualKeyboard::VelocityStyle getVelocityStyle() const;
+    // VirtualKeyboard::VelocityStyle getVelocityStyle() const;
 
     /*
         Returns the mappings node of the preset
     */
-    //ValueTree getMappingsNode();
     MappingMode getMappingMode() const;
 
     MappingStyle getMappingStyle() const;
@@ -107,7 +122,7 @@ public:
     /*
         Returns array of slot numbers in use
     */
-    Array<int> getSlotNumbersInUse() const;
+    const juce::Array<int>* getSlotNumbersInUse() const;
 
     /*
         Returns number of populated slots
@@ -157,7 +172,7 @@ public:
     /*
         Returns the mode slots node
     */
-    ValueTree getModeSlots();
+    // ValueTree getModeSlots();
 
     /*
         Returns the mode with the given slot number (which may be different from the index it's in)
@@ -172,12 +187,12 @@ public:
     /*
         Returns the mode loaded in selector 0 (input keyboard)
     */
-    Mode* getMode1() const;
+    Mode* getMode1();
 
     /*
         Returns the mode loaded in selector 1 (output keyboard)
     */
-    Mode* getMode2() const;
+    Mode* getMode2();
 
     /*
         Returns the mode currently being viewed
@@ -192,13 +207,13 @@ public:
     /*
        Returns the mode in the given mode slot number
    */
-    Mode* getModeInSlot(int modeSlotNumIn) const;
+    Mode* getModeInSlot(int modeSlotNumIn);
 
     /*
         Returns the mode used by given selector
         If the selector is set to an invalid slot, this will return nullptr
     */
-    Mode* getModeBySelector(int selectorNumber) const;
+    Mode* getModeBySelector(int selectorNumber);
 
     Mode* setModeCustom(ValueTree modeNodeIn);
     Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
@@ -210,7 +225,7 @@ public:
     /*
         Finds the slot index of a given slot number, or returns -1 if not found
     */
-    int getSlotNumberIndex(int slotNumIn) const;
+    int getSlotNumberIndex(int slotNumIn);
 
     /*
         Sets the slot number used by the given selector, and returns the slot index
@@ -352,11 +367,6 @@ public:
     void setKeyHighlightStyle(VirtualKeyboard::HighlightStyle styleIn);
 
     /*
-        Get Keyboard Placement Type
-    */
-    //VirtualKeyboard::KeyPlacementType getKeyPlacementType() const;
-
-    /*
         Set Keyboard Placement Type
     */
     void setKeyPlacementType(VirtualKeyboard::KeyPlacementType placementTypeIn);
@@ -379,7 +389,7 @@ public:
     /*
         Set whether or not note numbres are shown
     */
-    void showNoteNumbers(bool showNumbers);
+    void setShowNumbers(bool showNumbers);
 
     /*
         Returns a readable version of the parent node
@@ -390,7 +400,25 @@ public:
 
     static bool isValidPresetNode(ValueTree presetNodeIn);
 
-    static SvkPreset getDefaultPreset();
+    static SvkState getDefaultPreset();
+
+
+private:
+
+    SvkPreset savedPreset; // Snapshot of state at last commit; used for dirty-check and revert
+
+    std::shared_ptr<OwnedArray<Mode>>   modeSlots;
+    std::shared_ptr<Mode>               modeCustom;
+
+    std::shared_ptr<juce::Array<int>>   slotNumbersInUse;
+
+
+private:
+
+    ValueTree createNewParentNode();
+
+    void pullChildrenFromParentNode(ValueTree parentNode);
+
 
 public:
 
@@ -399,7 +427,7 @@ public:
     public:
 
         // When this preset's data gets replaced
-        virtual void presetReloaded(SvkPreset& preset) = 0;
+        virtual void presetReloaded(SvkState& preset) = 0;
 
         virtual void modeViewedChanged(const Mode* modeViewed, int selectorNum, int slotNum) {}
         virtual void modeSelectorSlotChanged(int selectorIndex, int slotIndex /*, ValueTree modeLoaded */) {}

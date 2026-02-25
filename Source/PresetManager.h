@@ -16,7 +16,7 @@
 #include "Structures/Mode.h"
 #include "Structures/NoteMap.h"
 
-class SvkPresetManager : public ChangeBroadcaster
+class SvkPresetManager : public ChangeBroadcaster, protected SvkPreset
 {
     Array<ValueTree> loadedFactoryModes;
     Array<ValueTree> loadedUserModes;
@@ -52,17 +52,17 @@ public:
     ValueTree modeLibraryNode;
     ValueTree pluginSettingsNode;
 
-    SvkPresetManager(ValueTree pluginSettingsNodeIn);
+    SvkPresetManager(SvkPreset& presetIn, ValueTree pluginSettingsNodeIn);
     ~SvkPresetManager();
 
-    SvkPreset& getPreset();
+    //SvkPreset& getPreset();
     int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
     
-    Array<int> getModeSlotsInUse() const;
+    //Array<int> getModeSlotsInUse() const ;
 
-    int getModeSlotOfSelector(int modeSelectorNumIn) const;
+    //int getModeSlotOfSelector(int modeSelectorNumIn) const;
 
-    bool isPresetEdited() const;
+    //bool isPresetEdited() const;
 
     ValueTree getModeInLibrary(int indexIn);
 
@@ -72,7 +72,7 @@ public:
     */
     void handleModeSelection(int selectorNumber, int idIn);
 
-    bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
+    //bool loadPreset(SvkPreset presetNodeIn, bool sendChangeSignal=true);
 
     bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
     bool savePresetToFile(String absolutePath="");

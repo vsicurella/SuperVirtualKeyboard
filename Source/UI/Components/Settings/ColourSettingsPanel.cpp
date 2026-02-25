@@ -19,11 +19,11 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPreset& presetIn)
             ""
         },
         {
-            IDs::pianoKeyColor,
-            IDs::pianoKeyColorsDegree,
-            IDs::pianoKeyColorsLayer,
-            IDs::pianoKeyColorsIndividual,
-            IDs::pianoKeyColorReset,
+            SvkProperty::pianoKeyColor,
+            SvkProperty::pianoKeyColorsDegree,
+            SvkProperty::pianoKeyColorsLayer,
+            SvkProperty::pianoKeyColorsIndividual,
+            SvkProperty::pianoKeyColorReset,
             Identifier("KeyColourLibrary"),
             Identifier("NoteOnColourLibrary")
         },
@@ -44,20 +44,20 @@ ColourSettingsPanel::ColourSettingsPanel(SvkPreset& presetIn)
     addAndMakeVisible(colourSelector);
     controls.set(0, colourSelector, true);
 
-    degreePaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsDegree]);
+    degreePaintButton = static_cast<TextButton*>(idToControl[SvkProperty::pianoKeyColorsDegree]);
     degreePaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
     degreePaintButton->setToggleState(true, dontSendNotification);
     degreePaintButton->addListener(this);
 
-    layerPaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsLayer]);
+    layerPaintButton = static_cast<TextButton*>(idToControl[SvkProperty::pianoKeyColorsLayer]);
     layerPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
     layerPaintButton->addListener(this);
 
-    keyPaintButton = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorsIndividual]);
+    keyPaintButton = static_cast<TextButton*>(idToControl[SvkProperty::pianoKeyColorsIndividual]);
     keyPaintButton->setRadioGroupId(paintTypeRadioGroup, dontSendNotification);
     keyPaintButton->addListener(this);
 
-    resetColourToggle = static_cast<TextButton*>(idToControl[IDs::pianoKeyColorReset]);
+    resetColourToggle = static_cast<TextButton*>(idToControl[SvkProperty::pianoKeyColorReset]);
     resetColourToggle->addListener(this);
 
     flexParent.items.getReference(numSections - 1).margin = FlexItem::Margin(0, 5, 0, 0);
@@ -83,20 +83,20 @@ void ColourSettingsPanel::buttonClicked(Button* buttonThatWasClicked)
 {
     if (buttonThatWasClicked == degreePaintButton)
     {
-        //virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 0);
+        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 0);
     }
     else if (buttonThatWasClicked == layerPaintButton)
     {
-        //virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 1);
+        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 1);
     }
     else if (buttonThatWasClicked == keyPaintButton)
     {
-        //virtualKeyboard->getProperties().set(IDs::pianoKeyPaintType, 2);
+        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 2);
     }
 
     if (buttonThatWasClicked == resetColourToggle)
     {
-        //virtualKeyboard->getProperties().set(IDs::pianoKeyColorReset, buttonThatWasClicked->getToggleState());
+        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyColorReset, buttonThatWasClicked->getToggleState());
         userClickedReset = buttonThatWasClicked->getToggleState();
     }
 }
@@ -138,7 +138,7 @@ void ColourSettingsPanel::mouseDown(const MouseEvent& event)
     //    colourSelector->setComponentToFocusOn(event.eventComponent);
 
     //    // TODO: find out why this isn't being done in ColourSelector focusser callback
-    //    virtualKeyboard->getProperties().set(IDs::colorSelected, colourSelector->getCurrentColour().toString());
+    //    virtualKeyboard->getProperties().set(SvkProperty::colorSelected, colourSelector->getCurrentColour().toString());
     //}
     //
     //else
@@ -155,7 +155,7 @@ void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 //{
 //    virtualKeyboard = keyboardPointer;
 //
-//    Colour init = Colour::fromString(virtualKeyboard->getProperties()[IDs::colorSelected].toString());
+//    Colour init = Colour::fromString(virtualKeyboard->getProperties()[SvkProperty::colorSelected].toString());
 //    if (init.isTransparent())
 //        init = virtualKeyboard->getKeyLayerColor(0);
 //    colourSelector->setCurrentColour(init, dontSendNotification);
@@ -191,7 +191,7 @@ void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 //        if (dynamic_cast<PaintSwatch*>(c))
 //            virtualKeyboard->updateKeyColors(false);
 //        else
-//            virtualKeyboard->getProperties().set(IDs::colorSelected, dataIn); 
+//            virtualKeyboard->getProperties().set(SvkProperty::colorSelected, dataIn); 
 //    });
 //    
 //    virtualKeyboard->addMouseListener(this, true);

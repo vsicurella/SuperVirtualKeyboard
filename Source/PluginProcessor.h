@@ -26,7 +26,8 @@ typedef AudioProcessorValueTreeState::Parameter Parameter;
 
 class SvkAudioProcessor  : public AudioProcessor,
                            public ChangeBroadcaster,
-                           public SvkPresetManager::Listener
+                           public SvkPresetManager::Listener,
+                           public SvkPreset
 {
 public:
     //==============================================================================
@@ -98,18 +99,19 @@ public:
     
     ModeMapper* getModeMapper() const;
     
-    //NoteMap* getMidiInputFilterMap() const;
-    //NoteMap* getMidiOutputFilterMap() const;
+    NoteMap* getMidiInputFilterMap() const;
+    NoteMap* getMidiOutputFilterMap() const;
 
     //ValueTree getPresetNode() const;
 
     //Mode* getModeInSlot(int slotNumIn) const;
     //Mode* getModeViewed() const;
-    Mode* getMode1() const;
-    Mode* getMode2() const;
+    //Mode* getMode1() const;
+    //Mode* getMode2() const;
     //Mode* getModeCustom() const;
 
     //==============================================================================
+    // Should make this SvkAppPreset ?
 
     void addPresetManagerListener(SvkPresetManager::Listener* listenerIn);
     void removePresetManagerListener(SvkPresetManager::Listener* listenerIn);
@@ -128,7 +130,7 @@ public:
     int getMode1Root() const;
     int getMode2Root() const;
 
-    SvkPreset& getPreset() const;
+    //SvkPreset& getPreset() const;
     bool isPresetEdited() const;
 
     //==============================================================================
@@ -202,7 +204,6 @@ private:
     ValueTree defaultPluginStateNode;
 
     SvkPreset savedPreset;
-    SvkPreset workingPreset;
     
     Mode* modeViewed; // What is currently on screen
     int modeSelectorViewedNum = 1;

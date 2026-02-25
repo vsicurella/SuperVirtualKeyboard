@@ -87,13 +87,13 @@ DebugSettingsPanel::~DebugSettingsPanel()
 //    RangedAudioParameter* param = processorTree.getParameter(paramName);
 //    AudioParameterInt* api;
 //    
-//    if (paramName == IDs::pianoWHRatio.toString())
+//    if (paramName == SvkProperty::pianoWHRatio.toString())
 //    {
 //        //param->setValue(slider->getValue());
 //        //pluginState->getKeyboard()->setKeySizeRatio(param->getValue());
 //    }
 //    
-//    else if (paramName == IDs::keyboardNumRows.toString())
+//    else if (paramName == SvkProperty::keyboardNumRows.toString())
 //    {
 //        //api = dynamic_cast<AudioParameterInt*>(param);
 //        //*api = slider->getValue();

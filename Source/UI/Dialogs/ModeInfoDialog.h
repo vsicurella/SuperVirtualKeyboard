@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "../../../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "../../CommonFunctions.h"
 #include "../../Structures/Mode.h"
 

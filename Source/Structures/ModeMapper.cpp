@@ -12,7 +12,7 @@
 
 ModeMapper::ModeMapper()
 {
-    mappingNode = ValueTree(IDs::midiMapNode);
+    mappingNode = ValueTree(SvkProperty::midiMapNode);
     setMappingStyle(MappingStyle::ModeToMode);
     setMapOrdersParameters(0, 0, 0, 0);
 }
@@ -21,13 +21,13 @@ ModeMapper::ModeMapper(const SvkPreset& preset)
 {
     mappingNode = preset.theMappingsNode;
     
-    mappingStyle = (MappingStyle)((int)mappingNode[IDs::autoMappingStyle]);
+    mappingStyle = (MappingStyle)((int)mappingNode[SvkProperty::autoMappingStyle]);
 
-    mapByOrderNum1 = mappingNode[IDs::mode1OrderMapping];
-    mapByOrderNum2 = mappingNode[IDs::mode2OrderMapping];
+    mapByOrderNum1 = mappingNode[SvkProperty::mode1OrderMapping];
+    mapByOrderNum2 = mappingNode[SvkProperty::mode2OrderMapping];
 
-    mapByOrderOffset1 = mappingNode[IDs::mode1OrderOffsetMapping];
-    mapByOrderOffset2 = mappingNode[IDs::mode2OrderOffsetMapping];
+    mapByOrderOffset1 = mappingNode[SvkProperty::mode1OrderOffsetMapping];
+    mapByOrderOffset2 = mappingNode[SvkProperty::mode2OrderOffsetMapping];
 }
 
 ValueTree ModeMapper::getMappingNode()
@@ -58,7 +58,7 @@ int ModeMapper::getMode2OrderOffset() const
 void ModeMapper::setMappingStyle(MappingStyle mapTypeIn)
 {
     mappingStyle = mapTypeIn;
-    mappingNode.setProperty(IDs::autoMappingStyle, (int)mapTypeIn, nullptr);
+    mappingNode.setProperty(SvkProperty::autoMappingStyle, (int)mapTypeIn, nullptr);
 }
 
 void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
@@ -72,25 +72,25 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
 void ModeMapper::setMode1OrderNum(int orderNumber)
 {
     mapByOrderNum1 = orderNumber;
-    mappingNode.setProperty(IDs::mode1OrderMapping, mapByOrderNum1, nullptr);
+    mappingNode.setProperty(SvkProperty::mode1OrderMapping, mapByOrderNum1, nullptr);
 }
 
 void ModeMapper::setMode2OrderNum(int orderNumber)
 {
     mapByOrderNum2 = orderNumber;
-    mappingNode.setProperty(IDs::mode2OrderMapping, mapByOrderNum2, nullptr);
+    mappingNode.setProperty(SvkProperty::mode2OrderMapping, mapByOrderNum2, nullptr);
 }
 
 void ModeMapper::setMode1OrderOffset(int orderOffset)
 {
     mapByOrderOffset1 = orderOffset;
-    mappingNode.setProperty(IDs::mode1OrderOffsetMapping, mapByOrderOffset1, nullptr);
+    mappingNode.setProperty(SvkProperty::mode1OrderOffsetMapping, mapByOrderOffset1, nullptr);
 }
 
 void ModeMapper::setMode2OrderOffset(int orderOffset)
 {
     mapByOrderOffset2 = orderOffset;
-    mappingNode.setProperty(IDs::mode2OrderOffsetMapping, mapByOrderOffset2, nullptr);
+    mappingNode.setProperty(SvkProperty::mode2OrderOffsetMapping, mapByOrderOffset2, nullptr);
 }
 
 void ModeMapper::setPreviousOrderNoteMap(NoteMap prevNoteMapIn)
@@ -117,7 +117,7 @@ NoteMap ModeMapper::map(MappingArguments args, NoteMap prevMap)
         
     setMappingStyle(args.mapStyle);
 
-    mappingNode.setProperty(IDs::autoMappingStyle, (int)args.mapStyle, nullptr);
+    mappingNode.setProperty(SvkProperty::autoMappingStyle, (int)args.mapStyle, nullptr);
     
     switch (mappingStyle)
     {

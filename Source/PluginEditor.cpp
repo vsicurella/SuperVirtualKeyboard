@@ -14,7 +14,7 @@ using namespace VirtualKeyboard;
 
 //==============================================================================
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor(p), currentPreset(processor.getPreset())
+    : AudioProcessorEditor(&p), processor(p), currentPreset(processor)
 {
     setName("SuperVirtualKeyboard");
     setResizable(true, true);
@@ -23,18 +23,18 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     setMouseClickGrabsKeyboardFocus(true);
     addMouseListener(this, true);
     
-    //auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(IDs::pluginEditorNode);
-    auto pluginEditorNode = currentPreset.getPresetNode().getChildWithName(IDs::pluginEditorNode);
+    //auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(SvkProperty::pluginEditorNode);
+    auto pluginEditorNode = currentPreset.getPresetNode().getChildWithName(SvkProperty::pluginEditorNode);
     // TODO probably should be more of a state node than preset node
 
     // Intialization
     if (!pluginEditorNode.isValid())
     {
-        pluginEditorNode = ValueTree(IDs::pluginEditorNode);
-        pluginEditorNode.setProperty(IDs::windowBoundsW, 1000, nullptr);
-        pluginEditorNode.setProperty(IDs::windowBoundsH, 210, nullptr);
-        pluginEditorNode.setProperty(IDs::viewportPosition, 60, nullptr);
-        pluginEditorNode.setProperty(IDs::settingsOpen, false, nullptr);
+        pluginEditorNode = ValueTree(SvkProperty::pluginEditorNode);
+        pluginEditorNode.setProperty(SvkProperty::windowBoundsW, 1000, nullptr);
+        pluginEditorNode.setProperty(SvkProperty::windowBoundsH, 210, nullptr);
+        pluginEditorNode.setProperty(SvkProperty::viewportPosition, 60, nullptr);
+        pluginEditorNode.setProperty(SvkProperty::settingsOpen, false, nullptr);
     }
 
     scaleTextBox.reset (new TextEditor ("Scale Text Box"));
@@ -252,9 +252,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
 
 
-    int recallWidth = pluginEditorNode[IDs::windowBoundsW];
-    int recallHeight = pluginEditorNode[IDs::windowBoundsH];
-    centerKeyPos = pluginEditorNode[IDs::viewportPosition];
+    int recallWidth = pluginEditorNode[SvkProperty::windowBoundsW];
+    int recallHeight = pluginEditorNode[SvkProperty::windowBoundsH];
+    centerKeyPos = pluginEditorNode[SvkProperty::viewportPosition];
 
     setSize(
         recallWidth > 0 ? recallWidth : 1000,
@@ -278,7 +278,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         mapCopyToManualBtn.get()
     };
 
-    loadPreset(processor.getPreset());
+    loadPreset(currentPreset);
 
     viewportScrollBar->addListener(this);
 
@@ -287,11 +287,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     startTimerHz(30);
 #endif
 
-    if (pluginEditorNode[IDs::settingsOpen])
+    if (pluginEditorNode[SvkProperty::settingsOpen])
         showSettingsDialog();
 
-    int width = (int)pluginEditorNode[IDs::windowBoundsW];
-    int height = (int)pluginEditorNode[IDs::windowBoundsH];
+    int width = (int)pluginEditorNode[SvkProperty::windowBoundsW];
+    int height = (int)pluginEditorNode[SvkProperty::windowBoundsH];
 
     setSize(width, height);
     setResizeLimits(defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
@@ -340,7 +340,7 @@ SvkPluginEditor::~SvkPluginEditor()
 
 void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifier& property)
 {
-    // if (parent == pluginEditorNode && property == IDs::windowBoundsH) ***************
+    // if (parent == pluginEditorNode && property == SvkProperty::windowBoundsH) ***************
     // {
     //     VirtualKeyboard::Keyboard* keyboard = controlComponent->getKeyboard();
     //     Viewport* viewport = controlComponent->getViewport();
@@ -361,85 +361,85 @@ void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifi
 //{
 //    switch (commandID)
 //    {
-//    case IDs::CommandIDs::savePresetToFile:
+//    case SvkProperty::CommandSvkProperty::savePresetToFile:
 //        result.setInfo("Save Preset", "Save your custom layout to a file.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::saveMode:
+//    case SvkProperty::CommandSvkProperty::saveMode:
 //        result.setInfo("Save Mode", "Save the currently viewed mode.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::showSaveMenu:
+//    case SvkProperty::CommandSvkProperty::showSaveMenu:
 //        result.setInfo("Show Saving Options", "Save current mode or whole preset.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::loadPreset:
+//    case SvkProperty::CommandSvkProperty::loadPreset:
 //        result.setInfo("Load Preset", "Load a custom layout from a file.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::loadMode:
+//    case SvkProperty::CommandSvkProperty::loadMode:
 //        result.setInfo("Load Mode", "Load only the mode of a preset.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::showLoadMenu:
+//    case SvkProperty::CommandSvkProperty::showLoadMenu:
 //        result.setInfo("Show Loading Options", "Load a mode or whole preset.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::exportReaperMap:
+//    case SvkProperty::CommandSvkProperty::exportReaperMap:
 //        result.setInfo("Export for Reaper", "Exports the current preset to a MIDI Note Name text file for use in Reaper's piano roll.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::exportAbletonMap:
+//    case SvkProperty::CommandSvkProperty::exportAbletonMap:
 //        result.setInfo("Export for Ableton", "Exports the mode mapping to a MIDI file for to use in Ableton's piano roll for folding.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::showExportMenu:
+//    case SvkProperty::CommandSvkProperty::showExportMenu:
 //        result.setInfo("Show Export Options", "Shows different ways you can export a mode or preset.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::showSettingsDialog:
+//    case SvkProperty::CommandSvkProperty::showSettingsDialog:
 //        result.setInfo("Show Settings Dialog", "Change default directories", "Settings", 0);
 //        break;
-//    case IDs::CommandIDs::commitCustomScale:
+//    case SvkProperty::CommandSvkProperty::commitCustomScale:
 //        result.setInfo("Commit custom scale", "Registers the entered scale steps as the current custom scale.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::setMode1:
+//    case SvkProperty::CommandSvkProperty::setMode1:
 //        result.setInfo("Set Mode 1", "Loads the mode into the Mode 1 slot.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::setMode2:
+//    case SvkProperty::CommandSvkProperty::setMode2:
 //        result.setInfo("Set Mode 2", "Loads the mode into the Mode 2 slot.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::setMode1RootNote:
+//    case SvkProperty::CommandSvkProperty::setMode1RootNote:
 //        result.setInfo("Set Mode 1 Root", "Applies the selected root note for Mode 1.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::setMode2RootNote:
+//    case SvkProperty::CommandSvkProperty::setMode2RootNote:
 //        result.setInfo("Set Mode 2 Root", "Applies the selected root note for Mode 2.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::setModeViewed:
+//    case SvkProperty::CommandSvkProperty::setModeViewed:
 //        result.setInfo("Set Mode Viewed", "Shows the mode slot on the keyboard.", "Keyboard", 0);
 //        break;
-//    case IDs::CommandIDs::showModeInfo:
+//    case SvkProperty::CommandSvkProperty::showModeInfo:
 //        result.setInfo("Show Mode Info", "Shows information regarding the selected Mode.", "Mode", 0);
 //        break;
-//    case IDs::CommandIDs::setMappingStyle:
+//    case SvkProperty::CommandSvkProperty::setMappingStyle:
 //        result.setInfo("Mapping Style", "Choose a mapping style for remapping MIDI notes.", "Midi", 0);
 //        break;
-//    case IDs::CommandIDs::showMapOrderEdit:
+//    case SvkProperty::CommandSvkProperty::showMapOrderEdit:
 //        result.setInfo("Edit Mappings by Order", "Choose how to map modes with the order mapping method.", "Preset", 0);
 //        break;
-//    case IDs::CommandIDs::applyMapping:
+//    case SvkProperty::CommandSvkProperty::applyMapping:
 //        result.setInfo("Apply Mapping", "Map incoming MIDI notes to Mode 2 with the selected mapping style.", "Midi", 0);
 //        break;
-//    case IDs::CommandIDs::setMappingMode:
+//    case SvkProperty::CommandSvkProperty::setMappingMode:
 //        result.setInfo("Auto Map to Scale", "Remap Midi notes when scale changes", "Midi", 0);
 //        break;
-//    case IDs::CommandIDs::beginColorEditing:
+//    case SvkProperty::CommandSvkProperty::beginColorEditing:
 //        result.setInfo("Change Keyboard Colors", "Allows you to change the default colors for the rows of keys.", "Keyboard", 0);
 //        break;
-    //case IDs::CommandIDs::setPeriodShift:
+    //case SvkProperty::CommandSvkProperty::setPeriodShift:
     //    result.setInfo("Shift by Mode 2 Period", "Shift the outgoing MIDI notes by the selected number of Mode 2 periods.", "Midi", 0);
     //    break;
-    //case IDs::CommandIDs::setMidiChannelOut:
+    //case SvkProperty::CommandSvkProperty::setMidiChannelOut:
     //    result.setInfo("Set MIDI Channel Out", "Set the outgoing MIDI Notes to the selected MIDI Channel.", "Midi", 0);
     //    break;
-    //case IDs::CommandIDs::showMidiNoteNumbers:
+    //case SvkProperty::CommandSvkProperty::showMidiNoteNumbers:
     //    result.setInfo("Show Midi Note Numbers", "Shows incoming MIDI notes on Mode 1 and outgoing MIDI Notes on Mode 2.", "Keyboard", 0);
     //    break;
-    //case IDs::CommandIDs::setKeyStyle:
+    //case SvkProperty::CommandSvkProperty::setKeyStyle:
     //    result.setInfo("Set Key Style", "Sets the selected style for drawing overlapping degrees between mode degrees.", "Keyboard", 0);
     //    break;
-    //case IDs::CommandIDs::setHighlightStyle:
+    //case SvkProperty::CommandSvkProperty::setHighlightStyle:
     //    result.setInfo("Set Highlight Style", "Sets the selected style for drawing triggered notes.", "Keyboard", 0);
     //    break;
 //    default:
@@ -453,24 +453,24 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
     {
         ValueTree presetNode = preset.getPresetNode();
 
-        ValueTree properties = presetNode.getChildWithName(IDs::presetProperties);
+        ValueTree properties = presetNode.getChildWithName(SvkProperty::presetProperties);
         if (properties.isValid())
         {
-            mode2ViewBtn->setToggleState((int)properties[IDs::modeSelectorViewed], dontSendNotification);
+            mode2ViewBtn->setToggleState((int)properties[SvkProperty::modeSelectorViewed], dontSendNotification);
         }
 
-        ValueTree keyboardSettings = presetNode.getChildWithName(IDs::pianoNode);
+        ValueTree keyboardSettings = presetNode.getChildWithName(SvkProperty::pianoNode);
         if (keyboardSettings.isValid())
             keyboard->restoreNode(keyboardSettings);
 
-        ValueTree mapping = presetNode.getChildWithName(IDs::midiMapNode);
+        ValueTree mapping = presetNode.getChildWithName(SvkProperty::midiMapNode);
         if (mapping.isValid())
         {
-            setMappingMode((MappingMode)(int)mapping[IDs::mappingMode]);
-            setMappingStyleId((MappingStyle)(int)mapping[IDs::autoMappingStyle]);
+            setMappingMode((MappingMode)(int)mapping[SvkProperty::mappingMode]);
+            setMappingStyleId((MappingStyle)(int)mapping[SvkProperty::autoMappingStyle]);
         }
 
-        ValueTree modeSelectors = presetNode.getChildWithName(IDs::modeSelectorsNode);
+        ValueTree modeSelectors = presetNode.getChildWithName(SvkProperty::modeSelectorsNode);
         if (modeSelectors.isValid())
         {
             for (int num = 0; num < modeSelectors.getNumChildren(); num++)
@@ -481,18 +481,18 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
                 // TODO: generalize
                 if (num == 0)
                 {
-                    mode1RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
+                    mode1RootSld->setValue(selector[SvkProperty::modeSelectorRootNote], dontSendNotification);
                     mode1Box->setText(mode->getName(), dontSendNotification);
                 }
                 else if (num == 1)
                 {
-                    mode2RootSld->setValue(selector[IDs::modeSelectorRootNote], dontSendNotification);
+                    mode2RootSld->setValue(selector[SvkProperty::modeSelectorRootNote], dontSendNotification);
                     mode2Box->setText(mode->getName(), dontSendNotification);
                 }
 
                 updateRootNoteLabels();
 
-                if (num == (int)presetNode.getChildWithName(IDs::presetProperties)[IDs::modeSelectorViewed])
+                if (num == (int)presetNode.getChildWithName(SvkProperty::presetProperties)[SvkProperty::modeSelectorViewed])
                 {
                     modeViewedChanged(mode, num, 0 /*unused*/);
                 }
@@ -613,8 +613,8 @@ void SvkPluginEditor::resized()
     keyboardViewport->centerOnKey((int)centerKeyPos);
     viewportScrollBar->addListener(this);
 
-    // processor.getPluginEditorNode().setProperty(IDs::windowBoundsW, getWidth(), nullptr); ***********
-    // processor.getPluginEditorNode().setProperty(IDs::windowBoundsH, basicHeight, nullptr);
+    // processor.getPluginEditorNode().setProperty(SvkProperty::windowBoundsW, getWidth(), nullptr); ***********
+    // processor.getPluginEditorNode().setProperty(SvkProperty::windowBoundsH, basicHeight, nullptr);
 }
 
 void SvkPluginEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -715,7 +715,7 @@ void SvkPluginEditor::textEditorReturnKeyPressed(TextEditor& textEditor)
 void SvkPluginEditor::scrollBarMoved(ScrollBar* bar, double newRangeStart)
 {
     centerKeyPos = keyboardViewport->getCenterKeyProportion();
-    //processor.getPluginEditorNode().setProperty(IDs::viewportPosition, centerKeyPos, nullptr);
+    //processor.getPluginEditorNode().setProperty(SvkProperty::viewportPosition, centerKeyPos, nullptr);
 }
 
 void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
@@ -819,7 +819,7 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
         // MappingSettingsPanel removes listeners from NoteMapEditor
     }
 
-    //processor.getPluginEditorNode().setProperty(IDs::settingsTabName, tabName, nullptr);
+    //processor.getPluginEditorNode().setProperty(SvkProperty::settingsTabName, tabName, nullptr);
 }
 
 void SvkPluginEditor::keyMappingStatusChanged(int keyNumber, bool preparedToMap)
@@ -909,10 +909,10 @@ int SvkPluginEditor::getModeSelectorViewed()
     return mode2ViewBtn->getToggleState();
 }
 
-void SvkPluginEditor::setMappingMode(int mappingModeId, NotificationType notify)
+void SvkPluginEditor::setMappingMode(MappingMode mappingModeId, NotificationType notify)
 {
-    mapModeBox->setSelectedId(mappingModeId, notify);
-    inMappingMode = mappingModeId > 1;
+    mapModeBox->setSelectedId((int)mappingModeId, notify);
+    inMappingMode = mappingModeId > MappingMode::None;
     
     for (auto c : mappingComponents)
     {
@@ -922,7 +922,7 @@ void SvkPluginEditor::setMappingMode(int mappingModeId, NotificationType notify)
 
     if (inMappingMode)
     {
-        if (mappingModeId == 2 && mapStyleBox->getSelectedId() == 3)
+        if (mappingModeId == MappingMode::Auto && mapStyleBox->getSelectedId() == 3)
         {
             mapOrderEditBtn->setVisible(true);
             mapApplyBtn->setVisible(true);
@@ -936,7 +936,7 @@ void SvkPluginEditor::setMappingMode(int mappingModeId, NotificationType notify)
         mode2ViewBtn->setToggleState(true, sendNotification);
     }
 
-    if (mappingModeId == 3)
+    if (mappingModeId == MappingMode::Manual)
     {
         beginManualMapping();
     }
@@ -961,11 +961,11 @@ void SvkPluginEditor::setMappingMode(int mappingModeId, NotificationType notify)
     resized();
 }
 
-void SvkPluginEditor::setMappingStyleId(int idIn, NotificationType notify)
+void SvkPluginEditor::setMappingStyleId(MappingStyle idIn, NotificationType notify)
 {
-    mapStyleBox->setSelectedId(idIn, notify);
+    mapStyleBox->setSelectedId((int)idIn, notify);
 
-    if (idIn == 3 && mapModeBox->getSelectedId() == 2)
+    if (idIn == MappingStyle::ModeToMode && mapModeBox->getSelectedId() == (int)MappingMode::Auto)
     {
         mapOrderEditBtn->setVisible(true);
         mapApplyBtn->setVisible(true);
@@ -1010,21 +1010,21 @@ void SvkPluginEditor::showSettingsDialog()
     if (!settingsPanelOpen)
     {
         auto stateNode = processor.buildStateValueTree();
-        settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), processor.getPreset()));
+        settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), currentPreset));
         //settingsContainer->setKeyboardPointer(keyboard.get());
         settingsContainer->addListener(this);
         currentPreset.addPresetListener(settingsContainer.get());
         //processor.addPresetManagerListener(settingsContainer.get());
 
         settingsPanelOpen = true;
-        //processor.getPluginEditorNode().setProperty(IDs::settingsOpen, true, nullptr);
+        //processor.getPluginEditorNode().setProperty(SvkProperty::settingsOpen, true, nullptr);
         settingsButton->setToggleState(true, dontSendNotification);
 
         addAndMakeVisible(settingsContainer.get());
         getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
         
         int setToTab = 0;
-        String lastTab = stateNode.getChildWithName(IDs::pluginEditorNode)[IDs::settingsTabName].toString();//processor.getPluginEditorNode()[IDs::settingsTabName].toString();
+        String lastTab = stateNode.getChildWithName(SvkProperty::pluginEditorNode)[SvkProperty::settingsTabName].toString();//processor.getPluginEditorNode()[SvkProperty::settingsTabName].toString();
         DBG("Last tab: " + lastTab);
         if (lastTab.length() > 0)
             setToTab = settingsContainer->getTabNames().indexOf(lastTab);
@@ -1047,7 +1047,7 @@ void SvkPluginEditor::hideSettings()
     settingsContainer = nullptr;
 
     settingsPanelOpen = false;
-    //processor.getPluginEditorNode().setProperty(IDs::settingsOpen, false, nullptr);
+    //processor.getPluginEditorNode().setProperty(SvkProperty::settingsOpen, false, nullptr);
 
     if (isColorEditing)
         endColorEditing();
@@ -1081,7 +1081,7 @@ void SvkPluginEditor::endColorEditing()
     mapApplyBtn->setEnabled(true);
     mapCopyToManualBtn->setEnabled(true);
 
-    setMappingMode(mapModeBox->getSelectedId());
+    setMappingMode(MappingMode(mapModeBox->getSelectedId()));
 }
 
 void SvkPluginEditor::beginManualMapping()

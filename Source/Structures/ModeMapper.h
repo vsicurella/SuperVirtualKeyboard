@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "../PluginModes.h"
 #include "Mode.h"
 #include "NoteMap.h"

@@ -24,7 +24,7 @@ public:
         : mappingNode(mappingNodeIn), inputMode(modeInput), outputMode(modeOutput), mapper(mapperIn)
     {
         if (!mappingNode.isValid())
-            mappingNode = ValueTree(IDs::midiMapNode);
+            mappingNode = ValueTree(SvkProperty::midiMapNode);
 
         refNoteSld = new Slider(Slider::SliderStyle::IncDecButtons, Slider::TextBoxLeft);
         refNoteSld->setRange(0, 127, 1);
@@ -52,13 +52,13 @@ public:
         cancelButton->onClick = [&]() { delete getParentComponent(); };
         addAndMakeVisible(cancelButton.get());
 
-        if (mappingNode.hasProperty(IDs::tuningRootNote))
-            refNoteSld->setValue((int)mappingNode[IDs::tuningRootNote]);
+        if (mappingNode.hasProperty(SvkProperty::tuningRootNote))
+            refNoteSld->setValue((int)mappingNode[SvkProperty::tuningRootNote]);
         else
             refNoteSld->setValue(69);
 
-        if (mappingNode.hasProperty(IDs::tuningRootFreq))
-            refFreqEditor->setText(mappingNode[IDs::tuningRootFreq].toString());
+        if (mappingNode.hasProperty(SvkProperty::tuningRootFreq))
+            refFreqEditor->setText(mappingNode[SvkProperty::tuningRootFreq].toString());
         else
             refFreqEditor->setText("440.0");
     }
@@ -94,8 +94,8 @@ public:
         bool success = false;
 
         File initialDirectory;
-        if (mappingNode.hasProperty(IDs::kbmFileLocation) && File::isAbsolutePath(mappingNode[IDs::kbmFileLocation].toString()))
-            initialDirectory = File(mappingNode[IDs::kbmFileLocation]);
+        if (mappingNode.hasProperty(SvkProperty::kbmFileLocation) && File::isAbsolutePath(mappingNode[SvkProperty::kbmFileLocation].toString()))
+            initialDirectory = File(mappingNode[SvkProperty::kbmFileLocation]);
 
         chooser = std::make_unique<FileChooser>("Save KBM file...", initialDirectory, "*.kbm");
 
@@ -109,9 +109,9 @@ public:
             if (kbm.writeTo(chooser.getResult()))
             {
                 success = true;
-                mappingNode.setProperty(IDs::tuningRootNote, refNoteSld->getValue(), nullptr);
-                mappingNode.setProperty(IDs::tuningRootFreq, refFreqEditor->getText().getDoubleValue(), nullptr);
-                mappingNode.setProperty(IDs::kbmFileLocation, chooser.getResult().getParentDirectory().getFullPathName(), nullptr);
+                mappingNode.setProperty(SvkProperty::tuningRootNote, refNoteSld->getValue(), nullptr);
+                mappingNode.setProperty(SvkProperty::tuningRootFreq, refFreqEditor->getText().getDoubleValue(), nullptr);
+                mappingNode.setProperty(SvkProperty::kbmFileLocation, chooser.getResult().getParentDirectory().getFullPathName(), nullptr);
             }
 
             if (!success)
