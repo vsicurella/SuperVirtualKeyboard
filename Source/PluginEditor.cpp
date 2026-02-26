@@ -14,7 +14,7 @@ using namespace VirtualKeyboard;
 
 //==============================================================================
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
-    : AudioProcessorEditor(&p), processor(p), currentPreset(processor)
+    : AudioProcessorEditor(&p), processor(p), svkState(processor.getState())
 {
     setName("SuperVirtualKeyboard");
     setResizable(true, true);
@@ -24,7 +24,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     addMouseListener(this, true);
     
     //auto pluginEditorNode = processor.buildStateValueTree().getChildWithName(SvkProperty::pluginEditorNode);
-    auto pluginEditorNode = currentPreset.getPresetNode().getChildWithName(SvkProperty::pluginEditorNode);
+    auto pluginEditorNode = svkState.getPresetNode().getChildWithName(SvkProperty::pluginEditorNode);
     // TODO probably should be more of a state node than preset node
 
     // Intialization
@@ -278,7 +278,9 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
         mapCopyToManualBtn.get()
     };
 
-    loadPreset(currentPreset);
+    svkState.addPresetListener(this);
+
+    loadPreset(svkState);
 
     viewportScrollBar->addListener(this);
 
@@ -299,6 +301,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
 SvkPluginEditor::~SvkPluginEditor()
 {
+    svkState.removePresetListener(this);
     settingsButton = nullptr;
     openButton = nullptr;
     saveButton = nullptr;
@@ -447,11 +450,11 @@ void SvkPluginEditor::valueTreePropertyChanged(ValueTree& parent, const Identifi
 //    }
 //}
 
-void SvkPluginEditor::loadPreset(SvkPreset& preset)
+void SvkPluginEditor::loadPreset(SvkState& stateIn)
 {
-    if (preset.getPresetVersion() == SVK_PRESET_VERSION)
+    if (stateIn.getPresetVersion() == SVK_PRESET_VERSION)
     {
-        ValueTree presetNode = preset.getPresetNode();
+        ValueTree presetNode = stateIn.getPresetNode();
 
         ValueTree properties = presetNode.getChildWithName(SvkProperty::presetProperties);
         if (properties.isValid())
@@ -476,7 +479,7 @@ void SvkPluginEditor::loadPreset(SvkPreset& preset)
             for (int num = 0; num < modeSelectors.getNumChildren(); num++)
             {
                 ValueTree selector = modeSelectors.getChild(num);
-                Mode* mode = currentPreset.getModeBySelector(num);
+                Mode* mode = svkState.getModeBySelector(num);
 
                 // TODO: generalize
                 if (num == 0)
@@ -666,7 +669,7 @@ void SvkPluginEditor::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == mode1ViewBtn.get() || buttonThatWasClicked == mode2ViewBtn.get())
     {
         processor.setModeSelectorViewed(mode2ViewBtn->getToggleState());
-        scaleTextBox->setText(processor.getModeViewed()->getStepsString(), false);
+        scaleTextBox->setText(processor.getState().getModeViewed()->getStepsString(), false);
     }
     else if (buttonThatWasClicked == mapCopyToManualBtn.get())
     {
@@ -724,7 +727,7 @@ void SvkPluginEditor::changeListenerCallback(ChangeBroadcaster* source)
     if (source == modeInfo)
     {
         processor.commitModeInfo();
-        onModeViewedChange(processor.getModeViewed());
+        onModeViewedChange(processor.getState().getModeViewed());
     }
 }
 
@@ -743,10 +746,10 @@ void SvkPluginEditor::modeLibraryUpdated(const PopupMenu& menu)
     mode2Box->getRootMenu()->operator=(menu);
 }
 
-void SvkPluginEditor::presetReloaded(SvkPreset& preset)
+void SvkPluginEditor::presetReloaded(SvkState& stateIn)
 {
     DBG("UI LOADING PRESET");
-    loadPreset(preset);
+    loadPreset(stateIn);
 }
 
 void SvkPluginEditor::modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber)
@@ -994,14 +997,14 @@ void SvkPluginEditor::updateRootNoteLabels()
 
 void SvkPluginEditor::showModeInfo()
 {
-    modeInfo  = new ModeInfoDialog(processor.getModeViewed());
+    modeInfo  = new ModeInfoDialog(processor.getState().getModeViewed());
     modeInfo->addChangeListener(this);
     CallOutBox::launchAsynchronously(std::unique_ptr<Component>(modeInfo), scaleTextBox->getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::showMapOrderEditDialog()
 {
-    mapByOrderDialog = new MapByOrderDialog(processor.getModeMapper(), processor.getMode1(), processor.getMode2());
+    mapByOrderDialog = new MapByOrderDialog(processor.getModeMapper(), processor.getState().getMode1(), processor.getState().getMode2());
     CallOutBox::launchAsynchronously(std::unique_ptr<Component>(mapByOrderDialog), mapStyleBox->getScreenBounds(), nullptr);
 }
 
@@ -1010,10 +1013,10 @@ void SvkPluginEditor::showSettingsDialog()
     if (!settingsPanelOpen)
     {
         auto stateNode = processor.buildStateValueTree();
-        settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), currentPreset));
+        settingsContainer.reset(new SettingsContainer(*processor.getPluginSettings(), svkState));
         //settingsContainer->setKeyboardPointer(keyboard.get());
         settingsContainer->addListener(this);
-        currentPreset.addPresetListener(settingsContainer.get());
+        svkState.addPresetListener(settingsContainer.get());
         //processor.addPresetManagerListener(settingsContainer.get());
 
         settingsPanelOpen = true;
@@ -1042,7 +1045,7 @@ void SvkPluginEditor::hideSettings()
     settingsContainer->removeListener(this);
     settingsContainer->setVisible(false);
     //preset.removePresetManagerListener(settingsContainer.get());
-    currentPreset.removePresetListener(settingsContainer.get());
+    svkState.removePresetListener(settingsContainer.get());
 
     settingsContainer = nullptr;
 
@@ -1142,12 +1145,12 @@ bool SvkPluginEditor::browseForPresetToOpen()
 
 bool SvkPluginEditor::exportModeViewedForReaper()
 {
-    ReaperWriter rpp(processor.getModeViewed());
+    ReaperWriter rpp(processor.getState().getModeViewed());
     return true;
 }
 
 bool SvkPluginEditor::exportModeViewedForAbleton()
 {
-    AbletonMidiWriter amw(processor.getModeViewed());
+    AbletonMidiWriter amw(processor.getState().getModeViewed());
     return true;
 }

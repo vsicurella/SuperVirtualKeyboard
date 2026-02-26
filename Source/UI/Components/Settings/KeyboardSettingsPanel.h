@@ -17,7 +17,7 @@ class KeyboardSettingsPanel : public SvkSettingsPanel
     
 public:
     
-    KeyboardSettingsPanel(SvkPreset& presetIn);
+    KeyboardSettingsPanel(SvkState& presetIn);
     
     void comboBoxChanged(ComboBox*) override;
     void sliderValueChanged(Slider*) override;

@@ -12,11 +12,11 @@
 
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
-#include "Structures/Preset.h"
+#include "data/SvkState.h"
 #include "Structures/Mode.h"
 #include "Structures/NoteMap.h"
 
-class SvkPresetManager : public ChangeBroadcaster, protected SvkPreset
+class SvkPresetManager : public ChangeBroadcaster
 {
     Array<ValueTree> loadedFactoryModes;
     Array<ValueTree> loadedUserModes;
@@ -52,7 +52,7 @@ public:
     ValueTree modeLibraryNode;
     ValueTree pluginSettingsNode;
 
-    SvkPresetManager(SvkPreset& presetIn, ValueTree pluginSettingsNodeIn);
+    SvkPresetManager(SvkState& stateIn, ValueTree pluginSettingsNodeIn);
     ~SvkPresetManager();
 
     //SvkPreset& getPreset();
@@ -112,5 +112,7 @@ protected:
     ListenerList<Listener> listeners;
 
 private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
+    SvkState& state;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 };

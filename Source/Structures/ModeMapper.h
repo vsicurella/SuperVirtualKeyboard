@@ -16,7 +16,6 @@
 #include "../PluginModes.h"
 #include "Mode.h"
 #include "NoteMap.h"
-#include "Preset.h"
 
 class ModeMapper
 {
@@ -53,7 +52,7 @@ public:
     
     ModeMapper();
     
-    ModeMapper(const SvkPreset& preset);
+    ModeMapper(ValueTree mappingNodeIn);
 
     ValueTree getMappingNode();
 

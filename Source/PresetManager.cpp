@@ -10,8 +10,8 @@
 
 #include "PresetManager.h"
 
-SvkPresetManager::SvkPresetManager(SvkPreset& presetIn, ValueTree pluginSettingsNodeIn)
-    : SvkPreset(presetIn)
+SvkPresetManager::SvkPresetManager(SvkState& stateIn, ValueTree pluginSettingsNodeIn)
+    : state(stateIn)
 {
     pluginSettingsNode = pluginSettingsNodeIn;
     initializeModePresets();
@@ -47,7 +47,7 @@ int SvkPresetManager::getNumMenuItems(bool withFactoryMenu , bool withUserMenu, 
         totalMenuItems += favoriteModes.size();
 
     if (withSlots)
-        totalMenuItems += getNumSlotsInUse();
+        totalMenuItems += state.getNumSlotsInUse();
 
     return totalMenuItems;
 }
@@ -84,7 +84,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     int favIdx = userModesIndex - loadedUserModes.size();
     int slotIdx = favIdx - favoriteModes.size();
     
-    int modeSlotNumber = getSlotNumberBySelector(selectorNumber);
+    int modeSlotNumber = state.getSlotNumberBySelector(selectorNumber);
 
     // if selector was set to a custom mode, change the slot to the selector's number
     if (modeSlotNumber > MAX_MODE_SLOTS_INDEX)
@@ -104,7 +104,7 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     {
         modeSelected = favoriteModes[favIdx].createCopy();
     }
-    else if (slotIdx < getNumSlotsInUse())
+    else if (slotIdx < state.getNumSlotsInUse())
     {
         // Currently the only way to switch a selector's mode slot pointer
         modeSelected = ValueTree();
@@ -113,18 +113,18 @@ void SvkPresetManager::handleModeSelection(int selectorNumber, int idIn)
     else
     {
         DBG("Custom mode selected");
-        modeSelected = getCustomMode()->getNode();
+        modeSelected = state.getCustomMode()->getNode();
         modeSlotNumber = MAX_MODE_SLOTS_INDEX + 1;
     }
     
     // Replaces the mode selector's mode slot with new mode
     if (modeSelected.isValid() && selectorNumber < 2 && modeSlotNumber <= MAX_MODE_SLOTS_INDEX)
     {
-        setModeSlot(modeSelected, modeSlotNumber);
+        state.setModeSlot(modeSelected, modeSlotNumber);
     }
-    
-    setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
-    getModeInSlot(modeSlotNumber)->setRootNote(getModeSelectorRootNote(selectorNumber));
+
+    state.setModeSelectorSlotNum(selectorNumber, modeSlotNumber);
+    state.getModeInSlot(modeSlotNumber)->setRootNote(state.getModeSelectorRootNote(selectorNumber));
 }
 
 
@@ -224,15 +224,15 @@ ValueTree SvkPresetManager::parsePresetFile(File fileIn)
 
 bool SvkPresetManager::commitPreset()
 {
-    //return loadPreset(*this, false);
-    return false;
+    state.commitPreset();
+    return true;
 }
 
 bool SvkPresetManager::resetToSavedPreset(bool sendChangeMessage)
 {
     DBG("PRESET MANAGER: Resetting to last saved preset.");
-    //return loadPreset(svkPresetSaved, sendChangeMessage);
-    return false;
+    state.revertPreset(sendChangeMessage);
+    return true;
 }
 
 void SvkPresetManager::initializeModePresets()
@@ -464,10 +464,10 @@ void SvkPresetManager::updateModeMenu()
     // SLOTS
     Mode* mode;
 
-    auto numSlots = getNumSlotsInUse();
+    auto numSlots = state.getNumSlotsInUse();
     for (int i = 0; i < numSlots; i++)
     {
-        mode = getModeInSlot(i);
+        mode = state.getModeInSlot(i);
         auto index = ++subMenuIndex;
         if (mode == nullptr)
         {
@@ -488,7 +488,7 @@ void SvkPresetManager::updateModeMenu()
     modeMenu.addSubMenu("Slots", slotsMenu);
     modeMenu.addSeparator();
 
-    auto customMode = getCustomMode();
+    auto customMode = state.getCustomMode();
     if (customMode != nullptr)
     {
         String customModeName = customMode->getName();

@@ -10,7 +10,7 @@
 
 #include "MappingSettingsPanel.h"
 
-MappingSettingsPanel::MappingSettingsPanel(SvkPreset& presetIn)
+MappingSettingsPanel::MappingSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel(
         "MappingSettings", presetIn,
         {

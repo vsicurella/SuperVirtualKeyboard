@@ -20,11 +20,11 @@
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent, public SvkPreset::Listener
+class SettingsContainer : public TabbedComponent, public SvkState::Listener
 {
 public:
     
-    SettingsContainer(SvkPluginSettings& globalSettings, SvkPreset& presetIn)
+    SettingsContainer(SvkPluginSettings& globalSettings, SvkState& presetIn)
         : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
     {
         tabColour = Colour(0xff323e44);
@@ -89,7 +89,11 @@ public:
         );
     }
 
-    void presetReloaded(SvkPreset& preset) override { /* TODO */ }
+    void presetReloaded(SvkState& stateIn) override
+    {
+        for (auto p : panels)
+            p->refreshPanel();
+    }
 
     void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override
     {

@@ -26,8 +26,7 @@ typedef AudioProcessorValueTreeState::Parameter Parameter;
 
 class SvkAudioProcessor  : public AudioProcessor,
                            public ChangeBroadcaster,
-                           public SvkPresetManager::Listener,
-                           public SvkPreset
+                           public SvkPresetManager::Listener
 {
 public:
     //==============================================================================
@@ -93,6 +92,8 @@ public:
 
     //ValueTree getPluginEditorNode() const;
     
+    SvkState& getState();
+
     SvkPresetManager* getPresetManager() const;
     SvkMidiProcessor* getMidiProcessor() const;
     SvkPluginSettings* getPluginSettings() const;
@@ -126,9 +127,9 @@ public:
 
     //bool isAutoRetuning();
 
-    int getModeSlotRoot(int slotNum) const;
-    int getMode1Root() const;
-    int getMode2Root() const;
+    int getModeSlotRoot(int slotNum);
+    int getMode1Root();
+    int getMode2Root();
 
     //SvkPreset& getPreset() const;
     bool isPresetEdited() const;
@@ -192,19 +193,19 @@ public:
 
 private:
 
+    SvkState svkState;  // Owns all preset + live state — must be declared before subsystems
+
     std::unique_ptr<SvkPluginSettings> pluginSettings;
     std::unique_ptr<SvkPresetManager> presetManager;
     std::unique_ptr<SvkMidiProcessor> midiProcessor;
 
     std::unique_ptr<ModeMapper> modeMapper;
-    
+
     std::unique_ptr<FileChooser> chooser;
 
     ValueTree factoryDefaultPluginStateNode;
     ValueTree defaultPluginStateNode;
 
-    SvkPreset savedPreset;
-    
     Mode* modeViewed; // What is currently on screen
     int modeSelectorViewedNum = 1;
     

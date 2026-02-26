@@ -10,7 +10,7 @@
 
 #include "DebugSettingsPanel.h"
 
-DebugSettingsPanel::DebugSettingsPanel(SvkPreset& presetIn)
+DebugSettingsPanel::DebugSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel("DebugSettingsPanel", presetIn, { "" }, {}, {})
 {
     setSize(100, 100);

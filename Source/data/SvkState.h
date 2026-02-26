@@ -104,12 +104,13 @@ public:
     /*
         Returns the midi settings node of the preset
     */
-    //ValueTree getMidiSettingsNode();
-    // VirtualKeyboard::VelocityStyle getVelocityStyle() const;
+    juce::ValueTree getMidiSettingsNode();
 
     /*
         Returns the mappings node of the preset
     */
+    juce::ValueTree getMappingsNode();
+
     MappingMode getMappingMode() const;
 
     MappingStyle getMappingStyle() const;
@@ -455,6 +456,16 @@ public:
     void addPresetListener(Listener* presetListenerIn) { listeners.add(presetListenerIn); }
 
     void removePresetListener(Listener* presetListenerIn) { listeners.remove(presetListenerIn); }
+
+    void fireModeViewedChanged(const Mode* modeViewed, int selectorNum, int slotNum)
+    {
+        listeners.call(&Listener::modeViewedChanged, modeViewed, selectorNum, slotNum);
+    }
+
+    void fireInputMappingChanged(const NoteMap* noteMap)
+    {
+        listeners.call(&Listener::inputMappingChanged, noteMap);
+    }
 
 protected:
 

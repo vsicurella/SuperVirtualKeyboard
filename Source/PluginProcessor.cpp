@@ -25,8 +25,9 @@ SvkAudioProcessor::SvkAudioProcessor() :
 #endif
     svkUndo(new UndoManager()),
     svkValueTree(*this, svkUndo.get()),//, SvkProperty::svkParentNode, createParameters())
+    svkState(juce::ValueTree(SvkProperty::svkParentNode)),
     pluginSettings(std::make_unique<SvkPluginSettings>()),
-    presetManager(std::make_unique<SvkPresetManager>(*this, pluginSettings->getSettingsNode()))
+    presetManager(std::make_unique<SvkPresetManager>(svkState, pluginSettings->getSettingsNode()))
 {
     // Temporary
     svkValueTree.state = ValueTree(SvkProperty::svkParentNode);
@@ -39,7 +40,7 @@ SvkAudioProcessor::SvkAudioProcessor() :
     //workingPreset = presetManager->getPreset();
 
     // TODO: Factory default MIDI settings
-    midiProcessor.reset(new SvkMidiProcessor(*this));
+    midiProcessor.reset(new SvkMidiProcessor(svkState));
 
     modeMapper.reset(new ModeMapper());
 
@@ -192,6 +193,11 @@ UndoManager* SvkAudioProcessor::getUndoManager()
     return svkUndo.get();
 }
 
+SvkState& SvkAudioProcessor::getState()
+{
+    return svkState;
+}
+
 //const Array<String>& SvkAudioProcessor::getParamIDs() const
 //{
 //    return paramIDs;
@@ -284,8 +290,8 @@ bool SvkAudioProcessor::loadPreset(ValueTree presetNodeIn, bool sendChangeSignal
     if (presetNodeIn.hasType(SvkProperty::presetNode))
     {
         DBG("Loading Preset:" + presetNodeIn.toXmlString());
-        savedPreset.restoreFromNode(presetNodeIn, sendChangeSignal);
-        restoreFromNode(savedPreset.getPresetNode(), sendChangeSignal);
+        svkState.restoreFromNode(presetNodeIn, sendChangeSignal);
+        svkState.commitPreset();
         return true;
     }
 
@@ -315,14 +321,10 @@ void SvkAudioProcessor::recallState(ValueTree nodeIn, bool fallbackToDefaultSett
     }
 
     if (stateIn.isValid())
-    {/*
-        bool loaded = presetManager->loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
+    {
+        bool loaded = loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
         if (!loaded)
-     */   {
-            // Might not be good - will actually delete existing properties that are set properly
-            stateIn = defaultPluginStateNode;
-            //presetManager->loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
-        }
+            loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
 
         revertToSavedPreset(fallbackToDefaultSettings);
     }
@@ -344,10 +346,10 @@ void SvkAudioProcessor::revertToSavedPreset(bool fallbackToDefaultSettings, bool
     //auto preset = presetManager->getPreset();
     //modeSelectorViewedNum = preset.getModeSelectorViewed();
 
-    modeMapper.reset(new ModeMapper(theMappingsNode));
+    modeMapper.reset(new ModeMapper(svkState.getMappingsNode()));
     // TODO: fallbacks
-    midiProcessor->restoreSettingsNode(theMidiSettingsNode);
-    midiProcessor->restoreMappingNode(theMappingsNode);
+    midiProcessor->restoreSettingsNode(svkState.getMidiSettingsNode());
+    midiProcessor->restoreMappingNode(svkState.getMappingsNode());
     midiProcessor->restoreDevicesNode(pluginStateNode.getOrCreateChildWithName(SvkProperty::midiDeviceSettingsNode, nullptr));
 
     onModeUpdate(!sendChange, !sendChange);
@@ -540,7 +542,7 @@ void SvkAudioProcessor::removePresetManagerListener(SvkPresetManager::Listener* 
 
 int SvkAudioProcessor::getNumModesLoaded() const
 {
-    return getNumSlotsInUse();
+    return svkState.getNumSlotsInUse();
 }
 
 int SvkAudioProcessor::getModeSelectorViewed() const
@@ -556,15 +558,12 @@ int SvkAudioProcessor::getModeViewedSlotNumber() const
 
 MappingMode SvkAudioProcessor::getMappingMode() const
 {
-    int modeId = (int)theMappingsNode[SvkProperty::mappingMode];
-    if (modeId < (int)MappingMode::Auto)
-        return MappingMode::None;
-    return MappingMode(modeId);
+    return svkState.getMappingMode();
 }
 
 MappingStyle SvkAudioProcessor::getAutoMappingStyle() const
 {
-    return getMappingStyle();
+    return svkState.getMappingStyle();
 }
 
 bool SvkAudioProcessor::isAutoMapping() const
@@ -572,20 +571,20 @@ bool SvkAudioProcessor::isAutoMapping() const
     return getMappingMode() == MappingMode::Auto;
 }
 
-int SvkAudioProcessor::getModeSlotRoot(int slotNum) const
+int SvkAudioProcessor::getModeSlotRoot(int slotNum)
 {
-    auto mode = getModeInSlot(slotNum);
+    auto mode = svkState.getModeInSlot(slotNum);
     if (mode)
         return mode->getRootNote();
     return -1;
 }
 
-int SvkAudioProcessor::getMode1Root() const
+int SvkAudioProcessor::getMode1Root()
 {
     return getModeSlotRoot(0);
 }
 
-int SvkAudioProcessor::getMode2Root() const
+int SvkAudioProcessor::getMode2Root()
 {
     return getModeSlotRoot(1);
 }
@@ -597,7 +596,7 @@ int SvkAudioProcessor::getMode2Root() const
 
 bool SvkAudioProcessor::isPresetEdited() const
 {
-    return (SvkPreset&)(*this) != savedPreset;
+    return svkState.isPresetEdited();
 }
 
 //==============================================================================
@@ -627,25 +626,25 @@ void SvkAudioProcessor::handleModeSelection(int modeBoxNum, int idIn)
 void SvkAudioProcessor::setMapMode(MappingMode mapModeSelectionIn)
 {
     DBG("mappingMode: " + MappingModeToString(mapModeSelectionIn));
-    
+
+    // Persist to state first so getMappingMode() returns the correct value during doAutoMapping()
+    svkState.getMappingsNode().setProperty(SvkProperty::mappingMode, (int)mapModeSelectionIn, nullptr);
+
     if (mapModeSelectionIn == MappingMode::Auto)
-        doAutoMapping();
-    
-    else
     {
-        if (mapModeSelectionIn == MappingMode::Manual)
-        {
-            midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
-        }
-
-        else // Mapping Off
-        {
-            midiProcessor->setInputRemap(NoteMap(), false);
-            midiProcessor->setOutputFilter(NoteMap(), false);
-            setModeSelectorViewed(1);
-        }
-
-        //listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
+        doAutoMapping();  // fires inputMappingChanged
+    }
+    else if (mapModeSelectionIn == MappingMode::Manual)
+    {
+        midiProcessor->restoreMappingNode(midiProcessor->midiMapNode);
+        svkState.fireInputMappingChanged(midiProcessor->getInputNoteRemap());
+    }
+    else // Mapping Off
+    {
+        midiProcessor->setInputRemap(NoteMap(), false);
+        midiProcessor->setOutputFilter(NoteMap(), false);
+        svkState.fireInputMappingChanged(midiProcessor->getInputNoteRemap());
+        setModeSelectorViewed(1);
     }
 }
 
@@ -662,9 +661,9 @@ void SvkAudioProcessor::setAutoMapStyle(MappingStyle mapStyleIn)
 void SvkAudioProcessor::setModeSelectorRoot(int modeSelectorNumIn, int rootNoteIn, bool updateParameter)
 {
     rootNoteIn = totalModulus(rootNoteIn, 128);
-    setModeSelectorRootNote(modeSelectorNumIn, rootNoteIn);
-    
-    Mode* mode = getModeBySelector(modeSelectorNumIn);
+    svkState.setModeSelectorRootNote(modeSelectorNumIn, rootNoteIn);
+
+    Mode* mode = svkState.getModeBySelector(modeSelectorNumIn);
     mode->setRootNote(rootNoteIn);
 
     if (modeSelectorViewedNum == modeSelectorNumIn)
@@ -691,8 +690,8 @@ void SvkAudioProcessor::setMidiInputMap(NoteMap noteMapIn, bool updateNode, bool
 {
     midiProcessor->setInputRemap(noteMapIn, updateNode);
 
-    //if (sendChangeMessage)
-    //    listeners.call(&Listener::inputMappingChanged, midiProcessor->getInputNoteRemap());
+    if (sendChangeMessage)
+        svkState.fireInputMappingChanged(midiProcessor->getInputNoteRemap());
 }
 
 void SvkAudioProcessor::setMidiOutputMap(NoteMap noteMapIn, bool updateNode)
@@ -703,7 +702,7 @@ void SvkAudioProcessor::setMidiOutputMap(NoteMap noteMapIn, bool updateNode)
 void SvkAudioProcessor::setModeCustom(String stepsIn, bool sendChangeMessage)
 {
     Mode custom = Mode(stepsIn, "Custom");
-    setCustomMode(custom.getNode());
+    svkState.setCustomMode(custom.getNode());
     handleModeSelection(getModeSelectorViewed(), 999);
     //if (sendChangeMessage)
     //    listeners.call(&Listener::customModeChanged, presetManager->getModeCustom());
@@ -744,7 +743,7 @@ void SvkAudioProcessor::doAutoMapping(bool sendChangeMessage)
     if (getMappingMode() == MappingMode::Auto)
     {
         DBG("Applying new MIDI mapping");
-        doAutoMapping(getMode1(), getMode2());
+        doAutoMapping(svkState.getMode1(), svkState.getMode2());
     }
     else
     {
@@ -759,16 +758,17 @@ void SvkAudioProcessor::doAutoMapping(bool sendChangeMessage)
 
 void SvkAudioProcessor::updateModeViewed(bool sendChange)
 {
-    modeViewed = getModeBySelector(modeSelectorViewedNum);
+    modeViewed = svkState.getModeBySelector(modeSelectorViewedNum);
     midiProcessor->setModeViewed(modeViewed);
 
-    //if (sendChange)
-    //    listeners.call(&Listener::modeViewedChanged, modeViewed, modeSelectorViewedNum, presetManager->getModeSlotOfSelector(modeSelectorViewedNum));
+    if (sendChange)
+        svkState.fireModeViewedChanged(modeViewed, modeSelectorViewedNum,
+                                       svkState.getModeViewedSlotNumber());
 }
 
 void SvkAudioProcessor::commitModeInfo(bool sendChangeMessage)
 {
-    auto customMode = getCustomMode();
+    auto customMode = svkState.getCustomMode();
     if (customMode != nullptr && modeViewed == customMode)
     {
         DBG("Custom mode edited:" + customMode->getNode().toXmlString());
@@ -817,7 +817,7 @@ bool SvkAudioProcessor::loadModeFromFile()
                 auto modeTree = presetManager->parseModeFile(result);
                 if (Mode::isValidMode(modeTree))
                 {
-                    addSlotAndSetSelection(getModeSelectorViewed(), modeTree);
+                    svkState.addSlotAndSetSelection(getModeSelectorViewed(), modeTree);
                     onModeUpdate();
                 }
             }
@@ -830,12 +830,13 @@ bool SvkAudioProcessor::loadModeFromFile()
 
 void SvkAudioProcessor::buildFactoryDefaultState()
 {
-    ModeMapper mapper;
-
     factoryDefaultPluginStateNode = ValueTree(SvkProperty::pluginStateNode);
     factoryDefaultPluginStateNode.setProperty(SvkProperty::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
     factoryDefaultPluginStateNode.appendChild(pluginSettings->getSettingsNode().createCopy(), nullptr);
-    //factoryDefaultPluginStateNode.appendChild(presetManager->getPresetNode(), nullptr);
+
+    // Load default preset (2 chromatic modes) into live state so the plugin
+    // has something to show on a fresh start before any DAW state is recalled.
+    loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
 }
 
 void SvkAudioProcessor::buildUserDefaultState()

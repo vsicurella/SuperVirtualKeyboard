@@ -10,7 +10,7 @@
 
 #include "MidiSettingsPanel.h"
 
-MidiSettingsPanel::MidiSettingsPanel(SvkPreset& presetIn)
+MidiSettingsPanel::MidiSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel("MidiSettingsPanel", presetIn, 
         { 
             "Filters",

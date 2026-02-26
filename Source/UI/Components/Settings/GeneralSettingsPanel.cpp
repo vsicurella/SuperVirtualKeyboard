@@ -10,7 +10,7 @@
 
 #include "GeneralSettingsPanel.h"
 
-GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkPreset& presetIn)
+GeneralSettingsPanel::GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkState& presetIn)
     : SvkSettingsPanel("GeneralSettingsPanel", presetIn, { "File Directories" },
         {
             SvkProperty::presetDirectory,

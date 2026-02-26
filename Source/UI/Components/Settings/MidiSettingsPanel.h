@@ -17,7 +17,7 @@ class MidiSettingsPanel : public SvkSettingsPanel, public Timer
     
 public:
     
-    MidiSettingsPanel(SvkPreset& preset);
+    MidiSettingsPanel(SvkState& preset);
     ~MidiSettingsPanel();
 
     void visibilityChanged() override;

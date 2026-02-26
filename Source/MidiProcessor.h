@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "./Structures/Preset.h"
+#include "./data/SvkState.h"
 #include "./CommonFunctions.h"
 #include "./Structures/MidiFilter.h"
 #include "./Structures/Mode.h"
@@ -18,12 +18,11 @@
 
 class SvkMidiProcessor : public MidiInputCallback,
                          public MidiKeyboardStateListener,
-                         protected SvkPreset,
                          private AudioProcessorValueTreeState::Listener
 {
 public:
-    
-    SvkMidiProcessor(SvkPreset& workingPreset);
+
+    SvkMidiProcessor(SvkState& stateIn);
     ~SvkMidiProcessor();
     
     ValueTree midiSettingsNode;
@@ -132,8 +131,7 @@ public:
 
 private:
 
-    //AudioProcessorValueTreeState& svkTree;
-    //SvkPreset& preset;
+    SvkState& state;
 
     std::unique_ptr<MidiInput> midiInput;
     std::unique_ptr<MidiOutput> midiOutput;

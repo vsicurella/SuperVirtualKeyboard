@@ -17,10 +17,10 @@ ModeMapper::ModeMapper()
     setMapOrdersParameters(0, 0, 0, 0);
 }
 
-ModeMapper::ModeMapper(const SvkPreset& preset)
+ModeMapper::ModeMapper(ValueTree mappingNodeIn)
 {
-    mappingNode = preset.theMappingsNode;
-    
+    mappingNode = mappingNodeIn;
+
     mappingStyle = (MappingStyle)((int)mappingNode[SvkProperty::autoMappingStyle]);
 
     mapByOrderNum1 = mappingNode[SvkProperty::mode1OrderMapping];

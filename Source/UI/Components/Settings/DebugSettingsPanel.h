@@ -16,7 +16,7 @@ class DebugSettingsPanel : public SvkSettingsPanel, public Timer
 
 public:
 
-    DebugSettingsPanel(SvkPreset& presetIn);
+    DebugSettingsPanel(SvkState& presetIn);
 
     ~DebugSettingsPanel();
 

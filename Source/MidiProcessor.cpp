@@ -10,8 +10,8 @@
 
 #include "MidiProcessor.h"
 
-SvkMidiProcessor::SvkMidiProcessor(SvkPreset& presetIn)
-    : SvkPreset(presetIn)
+SvkMidiProcessor::SvkMidiProcessor(SvkState& stateIn)
+    : state(stateIn)
 {
     midiSettingsNode = ValueTree(SvkProperty::midiSettingsNode);
     midiMapNode = ValueTree(SvkProperty::midiMapNode);
@@ -340,11 +340,14 @@ void SvkMidiProcessor::setMidiChannelOut(int virtualKeyboardMidiChannelOut)
 void SvkMidiProcessor::updateNoteTransposition()
 {
     currentNoteShift = transposeAmt;
-    if (periodShiftModeSize)
-        currentNoteShift += periodShift * getMode2()->getModeSize();
-    else
-        currentNoteShift += periodShift * getMode2()->getScaleSize();
-
+    auto* mode2 = state.getMode2();
+    if (mode2 != nullptr)
+    {
+        if (periodShiftModeSize)
+            currentNoteShift += periodShift * mode2->getModeSize();
+        else
+            currentNoteShift += periodShift * mode2->getScaleSize();
+    }
     // TODO: handle sustained notes
 }
 
@@ -609,7 +612,7 @@ void SvkMidiProcessor::handleNoteOn(MidiKeyboardState* source, int midiChannel, 
 
 void SvkMidiProcessor::handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity)
 {
-    MidiMessage msg = MidiMessage::noteOn(midiChannelOut, midiNoteNumber, velocity);
+    MidiMessage msg = MidiMessage::noteOff(midiChannelOut, midiNoteNumber, velocity);
     msg.setTimeStamp(Time::getMillisecondCounterHiRes() - startTime);
     svkBuffer.addEvent(msg, numSvkMsgs++);
 }

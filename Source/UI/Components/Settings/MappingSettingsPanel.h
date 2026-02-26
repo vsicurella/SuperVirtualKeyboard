@@ -20,7 +20,7 @@ class MappingSettingsPanel : public SvkSettingsPanel,
 {
 public:
 
-    MappingSettingsPanel(SvkPreset& presetIn);
+    MappingSettingsPanel(SvkState& presetIn);
     ~MappingSettingsPanel();
 
     void visibilityChanged() override;

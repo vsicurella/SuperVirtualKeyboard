@@ -52,9 +52,9 @@ SvkPreset::SvkPreset(const ValueTree presetNodeIn)
 }
 
 SvkPreset::SvkPreset(const SvkPreset& presetToCopy)
+    : SvkPreset()  // initialise parentNode and child refs before restoreFromNode
 {
-    auto presetNode = presetToCopy.parentNode;
-    restoreFromNode(presetNode, true);
+    restoreFromNode(presetToCopy.parentNode, false);
 }
 
 SvkPreset::~SvkPreset() {}

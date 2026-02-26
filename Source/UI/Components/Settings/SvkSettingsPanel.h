@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "../../../Structures/Preset.h"
+#include "../../../data/SvkState.h"
 #include "../../../PluginSettings.h"
 #include "../DirectoryBrowserComponent.h"
 #include "../LabelledComponent.h"
@@ -61,7 +61,7 @@ public:
     
     SvkSettingsPanel(
         String                       panelName,
-        SvkPreset&                   presetIn,
+        SvkState&                    presetIn,
         StringArray                  sectionNamesIn,
         Array<Identifier>            controlIdsIn,
         Array<SvkControlProperties>  controlTypesIn,
@@ -256,7 +256,7 @@ private:
 
 protected:
 
-    SvkPreset& preset;
+    SvkState& preset;
     
     StringArray sectionNames;
     int numSections;

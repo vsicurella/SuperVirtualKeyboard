@@ -17,7 +17,7 @@ class GeneralSettingsPanel : public SvkSettingsPanel
     
 public:
     
-    GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkPreset& presetIn);
+    GeneralSettingsPanel(SvkPluginSettings& globalSettingsIn, SvkState& presetIn);
     ~GeneralSettingsPanel() override;
     
     void directoryChanged(DirectoryBrowserComponent*, File) override;

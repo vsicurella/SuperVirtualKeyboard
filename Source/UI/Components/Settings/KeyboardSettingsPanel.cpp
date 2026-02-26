@@ -10,7 +10,7 @@
 
 #include "KeyboardSettingsPanel.h"
 
-KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPreset& presetIn)
+KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel("KeyboardSettingsPanel", presetIn,
         {
             "Keyboard settings"
@@ -101,7 +101,7 @@ void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
 
     if (clickedButton == showNoteNumbers)
     {
-        preset.showNoteNumbers(clickedButton->getToggleState());
+        preset.setShowNumbers(clickedButton->getToggleState());
     }
     
 }

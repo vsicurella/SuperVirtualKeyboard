@@ -35,7 +35,7 @@ class SvkPluginEditor : public AudioProcessorEditor,
                         public ScrollBar::Listener,
                         public ChangeListener,
                         private SvkPresetManager::Listener,
-                        private SvkPreset::Listener,
+                        private SvkState::Listener,
                         private SettingsContainer::Listener,
                         private MappingHelper::Listener,
                         private Timer
@@ -70,7 +70,7 @@ public:
     //==============================================================================
     // SvkPreset::Listener implementation
     
-    void presetReloaded(SvkPreset& preset) override;
+    void presetReloaded(SvkState& stateIn) override;
 
     void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override;
 
@@ -110,7 +110,7 @@ public:
     /*
         Sets controls to plugin state
     */
-    void loadPreset(SvkPreset& preset);
+    void loadPreset(SvkState& stateIn);
 
     /*
         Updates UI to the new mode
@@ -164,7 +164,7 @@ protected:
 
 private:
     SvkAudioProcessor& processor;
-    SvkPreset currentPreset;
+    SvkState& svkState;
 
     std::unique_ptr<Image> saveIcon;
     std::unique_ptr<Image> openIcon;

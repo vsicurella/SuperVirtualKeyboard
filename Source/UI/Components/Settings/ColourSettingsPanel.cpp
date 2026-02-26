@@ -10,7 +10,7 @@
 
 #include "ColourSettingsPanel.h"
 
-ColourSettingsPanel::ColourSettingsPanel(SvkPreset& presetIn)
+ColourSettingsPanel::ColourSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel("ColourSettingsPanel", presetIn,
         {
             "",

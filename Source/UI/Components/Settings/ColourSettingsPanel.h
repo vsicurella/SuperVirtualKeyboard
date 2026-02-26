@@ -59,7 +59,7 @@ class ColourSettingsPanel : public SvkSettingsPanel
 {
 public:
 
-    ColourSettingsPanel(SvkPreset& presetIn);
+    ColourSettingsPanel(SvkState& presetIn);
 
     ~ColourSettingsPanel() override;
 

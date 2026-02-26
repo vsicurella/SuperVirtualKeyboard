@@ -50,6 +50,16 @@ float SvkState::getPresetVersion() const
     return (float)state[SvkProperty::pluginPresetVersion];
 }
 
+juce::ValueTree SvkState::getMidiSettingsNode()
+{
+    return midiProperties;
+}
+
+juce::ValueTree SvkState::getMappingsNode()
+{
+    return mappingProperties;
+}
+
 // ValueTree SvkState::getPresetNode(bool sortModeSlots)
 // {
 //     if (sortModeSlots)
@@ -119,6 +129,15 @@ bool SvkState::restoreFromNode(ValueTree presetNodeIn, bool sendChangeMessage)
         auto modeNode = slotNode.getChild(0); // mode data is the first (only) child of the slot node
         if (Mode::isValidMode(modeNode))
             modeSlots->set(slotNum, new Mode(modeNode));
+    }
+
+    // Restore custom mode from tree.
+    {
+        auto customNode = customModeProperties.getChild(0);
+        if (Mode::isValidMode(customNode))
+            modeCustom = std::make_unique<Mode>(customNode, false);
+        else
+            modeCustom = nullptr;
     }
 
     // Ensure at least 2 mode selectors.
@@ -684,7 +703,36 @@ void SvkState::pullChildrenFromParentNode(juce::ValueTree parentNode)
 
 void SvkState::handleStatePropertyChange(juce::ValueTree treeWhosePropertyHasChanged, const juce::Identifier& property)
 {
-    // TODO: dispatch typed listener notifications based on which subtree changed
+    if (treeWhosePropertyHasChanged == midiProperties)
+    {
+        if (property == SvkProperty::periodShift)
+            listeners.call(&Listener::periodShiftAmountChanged, (int)midiProperties[property]);
+        else if (property == SvkProperty::periodShiftModeSize)
+            listeners.call(&Listener::periodShiftSizeChanged, (bool)midiProperties[property]);
+        else if (property == SvkProperty::transposeAmt)
+            listeners.call(&Listener::transposeAmountChanged, (int)midiProperties[property]);
+        else if (property == SvkProperty::maxVoices)
+            listeners.call(&Listener::voiceLimitChanged, (int)midiProperties[property]);
+        else if (property == SvkProperty::pitchBendNoteMax)
+            listeners.call(&Listener::mpePitchbendRangeChanged, (int)midiProperties[property]);
+        else if (property == SvkProperty::pitchBendGlobalMax)
+            listeners.call(&Listener::globalPitchbendRangeChanged, (int)midiProperties[property]);
+    }
+    else if (treeWhosePropertyHasChanged == keyboardProperties)
+    {
+        if (property == SvkProperty::keyboardKeysStyle)
+            listeners.call(&Listener::keyboardKeyPlacementTypeChanged,
+                (VirtualKeyboard::KeyPlacementType)(int)keyboardProperties[property]);
+        else if (property == SvkProperty::keyboardHighlightStyle)
+            listeners.call(&Listener::keyboardHighlightStyleChanged,
+                (VirtualKeyboard::HighlightStyle)(int)keyboardProperties[property]);
+        else if (property == SvkProperty::pianoWHRatio)
+            listeners.call(&Listener::keyboardKeyRatioChanged,
+                (float)keyboardProperties[property]);
+        else if (property == SvkProperty::pianoKeysShowNoteNumbers)
+            listeners.call(&Listener::keyParametersShown,
+                (int)keyboardProperties[property]);
+    }
 }
 
 void SvkState::loadPropertiesFile(juce::PropertiesFile* properties)
