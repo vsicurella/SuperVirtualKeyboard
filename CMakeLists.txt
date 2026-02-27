@@ -24,6 +24,11 @@ set_directory_properties(
         COMPANY_EMAIL "someone@everytone.zone"
 )
 
+juce_add_binary_data(SuperVirtualKeyboard_BinaryData
+    SOURCES
+        Resources/FactoryModes.txt
+)
+
 file(GLOB_RECURSE SourceCode
     CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/Source/*.cpp"
@@ -52,6 +57,7 @@ target_link_libraries(SuperVirtualKeyboard
         juce::juce_audio_utils
         juce::juce_audio_devices
         juce::juce_opengl
+        SuperVirtualKeyboard_BinaryData
 
     PUBLIC
         juce::juce_recommended_config_flags

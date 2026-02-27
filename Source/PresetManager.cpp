@@ -9,6 +9,7 @@
 */
 
 #include "PresetManager.h"
+#include <BinaryData.h>
 
 SvkPresetManager::SvkPresetManager(SvkState& stateIn, ValueTree pluginSettingsNodeIn)
     : state(stateIn)
@@ -246,46 +247,44 @@ void SvkPresetManager::initializeModePresets()
 
     createFactoryModes();
     loadModeDirectory();
+
+    updateModeMenu();
+    listeners.call(&Listener::modeLibraryUpdated, modeMenu);
 }
 
 
 void SvkPresetManager::createFactoryModes()
 {
-    if (!(bool) pluginSettingsNode[SvkProperty::saveFactoryModes] || !(bool)pluginSettingsNode[SvkProperty::createPresetFolder])
+    loadedFactoryModes.clear();
+
+    const char* factoryModes = BinaryData::FactoryModes_txt;
+    int size = BinaryData::FactoryModes_txtSize;
+
+    if (factoryModes && size > 0)
     {
-    //     const char* factoryModes = BinaryData::FactoryModes_txt;
-    //     int size = BinaryData::FactoryModes_txtSize;
+        MemoryInputStream instream(factoryModes, size, false);
 
-        loadedFactoryModes.clear();
+        String line, steps, family, info;
+        ValueTree factoryMode;
 
-    //     if (factoryModes && size > 0)
-    //     {
-    //         MemoryInputStream instream(factoryModes, size, false);
+        while (instream.getNumBytesRemaining() > 0)
+        {
+            line = instream.readNextLine();
+            steps = line.upToFirstOccurrenceOf(", ", false, true);
 
-    //         String line, steps, family, info, name;
-    //         ValueTree factoryMode;
+            family = line.upToFirstOccurrenceOf("; ", false, true);
+            family = family.substring(steps.length() + 2, family.length());
 
-    //         while (instream.getNumBytesRemaining() > 0)
-    //         {
-    //             line = instream.readNextLine();
-    //             steps = line.upToFirstOccurrenceOf(", ", false, true);
-                
-    //             family = line.upToFirstOccurrenceOf("; ", false, true);
-    //             family = family.substring(steps.length() + 2, family.length());
-                
-    //             info = line.fromFirstOccurrenceOf("; ", false, true);
+            info = line.fromFirstOccurrenceOf("; ", false, true);
 
-    //             factoryMode = Mode::createNode(steps, family, "", info, 60, true);
+            factoryMode = Mode::createNode(steps, family, "", info, 60, true);
 
-    //             addAndSortMode(factoryMode);
-    //             loadedFactoryModes.add(factoryMode);
-    //          }
-
-    //         factoryMode = ValueTree();
-    //     }
+            addAndSortMode(factoryMode);
+            loadedFactoryModes.add(factoryMode);
+        }
     }
-    
-    DBG("Amt of factory modes:" + String(loadedFactoryModes.size()));
+
+    DBG("Amt of factory modes: " + String(loadedFactoryModes.size()));
 }
 
 void SvkPresetManager::loadModeDirectory()

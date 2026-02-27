@@ -279,6 +279,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     };
 
     svkState.addPresetListener(this);
+    processor.addPresetManagerListener(this);
+    modeLibraryUpdated(processor.getPresetManager()->getModeMenu());
 
     loadPreset(svkState);
 
@@ -302,6 +304,7 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 SvkPluginEditor::~SvkPluginEditor()
 {
     svkState.removePresetListener(this);
+    processor.removePresetManagerListener(this);
     settingsButton = nullptr;
     openButton = nullptr;
     saveButton = nullptr;
@@ -634,11 +637,13 @@ void SvkPluginEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         auto mode = (MappingMode)mapModeBox->getSelectedId();
         setMappingMode(mode);
+        processor.setMapMode(mode);
     }
     else if (comboBoxThatHasChanged == mapStyleBox.get())
     {
         auto style = (MappingStyle)mapStyleBox->getSelectedId();
         setMappingStyleId(style);
+        processor.setAutoMapStyle(style);
     }
 }
 

@@ -66,6 +66,8 @@ public:
 
     ValueTree getModeInLibrary(int indexIn);
 
+    const PopupMenu& getModeMenu() const { return modeMenu; }
+
     /*
         Replaces the mode slot the selector is pointed to with a new mode
         - See note above definition -
