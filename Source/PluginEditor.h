@@ -74,6 +74,10 @@ public:
 
     void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override;
 
+    void keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType) override;
+    void keyboardKeyRatioChanged(float keyRatio) override;
+    void keyParametersShown(int keyParameters) override;
+
     void inputMappingChanged(const NoteMap* inputNoteMap) override;
 
     void customModeChanged(const Mode* newCustomMode) override;

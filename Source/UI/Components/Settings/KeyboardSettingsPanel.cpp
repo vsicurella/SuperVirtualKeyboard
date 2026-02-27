@@ -42,6 +42,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
     keyLayoutBox->addItem(TRANS("Nested Center"), 2);
     keyLayoutBox->addItem(TRANS("Flat"), 3);
     keyLayoutBox->addItem(TRANS("Adjacent"), 4);
+    keyLayoutBox->setSelectedId((int)preset.getKeyPlacementType(), dontSendNotification);
 
     highlightLabel = static_cast<LabelledComponent*>(controls[1]);
     highlightLabel->setComponentSize(96, controlMinHeight);
@@ -65,10 +66,12 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
 
     keyRatioSlider = LabelledComponent::getComponentPointer<Slider>(ratioLabel);
     keyRatioSlider->setRange(0.01, 1, 0.01);
+    keyRatioSlider->setValue(preset.getKeySizeRatio(), dontSendNotification);
     keyRatioSlider->addListener(this);
 
     showNoteNumbers = static_cast<TextButton*>(controls[3]);
     showNoteNumbers->setSize(Font().getStringWidth(showNoteNumbers->getButtonText()) + 5, controlMinHeight);
+    showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
     showNoteNumbers->addListener(this);
 }
 
@@ -104,6 +107,13 @@ void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
         preset.setShowNumbers(clickedButton->getToggleState());
     }
     
+}
+
+void KeyboardSettingsPanel::refreshPanel()
+{
+    keyLayoutBox->setSelectedId((int)preset.getKeyPlacementType(), dontSendNotification);
+    keyRatioSlider->setValue(preset.getKeySizeRatio(), dontSendNotification);
+    showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
 }
 
 //void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)

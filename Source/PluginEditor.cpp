@@ -757,6 +757,23 @@ void SvkPluginEditor::presetReloaded(SvkState& stateIn)
     loadPreset(stateIn);
 }
 
+void SvkPluginEditor::keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType)
+{
+    keyboard->setKeyStyle(placementType);
+    keyboard->resized();
+}
+
+void SvkPluginEditor::keyboardKeyRatioChanged(float keyRatio)
+{
+    keyboard->setKeySizeRatio(keyRatio, true);
+}
+
+void SvkPluginEditor::keyParametersShown(int keyParameters)
+{
+    keyboard->setShowNoteNumbers(keyParameters != 0);
+    keyboard->repaint();
+}
+
 void SvkPluginEditor::modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber)
 {
     MidiKeyboardState* displayState = selectorNumber == 0
