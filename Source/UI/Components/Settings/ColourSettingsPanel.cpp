@@ -69,6 +69,9 @@ ColourSettingsPanel::ColourSettingsPanel(SvkState& presetIn)
 
 ColourSettingsPanel::~ColourSettingsPanel()
 {
+    if (virtualKeyboard)
+        virtualKeyboard->removeMouseListener(this);
+
     colourSelector = nullptr;
 }
 
@@ -81,23 +84,20 @@ void ColourSettingsPanel::resized()
 
 void ColourSettingsPanel::buttonClicked(Button* buttonThatWasClicked)
 {
+    if (!virtualKeyboard)
+        return;
+
     if (buttonThatWasClicked == degreePaintButton)
-    {
-        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 0);
-    }
+        virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 0);
     else if (buttonThatWasClicked == layerPaintButton)
-    {
-        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 1);
-    }
+        virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 1);
     else if (buttonThatWasClicked == keyPaintButton)
-    {
-        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 2);
-    }
+        virtualKeyboard->getProperties().set(SvkProperty::pianoKeyPaintType, 2);
 
     if (buttonThatWasClicked == resetColourToggle)
     {
-        //virtualKeyboard->getProperties().set(SvkProperty::pianoKeyColorReset, buttonThatWasClicked->getToggleState());
         userClickedReset = buttonThatWasClicked->getToggleState();
+        virtualKeyboard->getProperties().set(SvkProperty::pianoKeyColorReset, userClickedReset);
     }
 }
 
@@ -116,86 +116,125 @@ void ColourSettingsPanel::mouseDown(const MouseEvent& event)
 {
     if (event.mods.isRightButtonDown())
     {
+        // Right-click on a swatch: reset it to transparent (unedited)
+        if (auto* swatch = dynamic_cast<PaintSwatch*>(event.eventComponent))
+        {
+            swatch->resetToTransparent();
+            colourSelector->setComponentToFocusOn(nullptr);
+            if (virtualKeyboard)
+                virtualKeyboard->updateKeyColors(true);
+            return;
+        }
+
+        // Right-click elsewhere: activate reset mode for key painting
         resetColourToggle->setToggleState(true, dontSendNotification);
         userClickedReset = false;
+        if (virtualKeyboard)
+            virtualKeyboard->getProperties().set(SvkProperty::pianoKeyColorReset, true);
     }
 
-    // TODO: allow one click on virtual keyboard to set focus before painting?
-    //if (event.eventComponent->getParentComponent() == virtualKeyboard)
-    //{
-    //    colourSelector->setComponentToFocusOn(virtualKeyboard);
-
-    //    // TODO: better messaging for VirtualKeyboard changes
-    //    virtualKeyboard->updateKeyColors(false);
-    //    keyColourLibrary->refreshSwatches();
-    //}
-
-    //else if (colourSelector->isMouseOver() || event.eventComponent->getParentComponent() == colourSelector)
-    //    return;
-
-    //else if (dynamic_cast<FocusableComponent*>(event.eventComponent))
-    //{
-    //    colourSelector->setComponentToFocusOn(event.eventComponent);
-
-    //    // TODO: find out why this isn't being done in ColourSelector focusser callback
-    //    virtualKeyboard->getProperties().set(SvkProperty::colorSelected, colourSelector->getCurrentColour().toString());
-    //}
-    //
-    //else
-    //    colourSelector->setComponentToFocusOn(nullptr);
+    // Focus a PaintSwatch in the colour selector when clicked
+    if (!colourSelector->isMouseOver(true))
+    {
+        if (dynamic_cast<FocusableComponent*>(event.eventComponent))
+            colourSelector->setComponentToFocusOn(event.eventComponent);
+        else
+            colourSelector->setComponentToFocusOn(nullptr);
+    }
 }
 
 void ColourSettingsPanel::mouseUp(const MouseEvent& event)
 {
     if (!userClickedReset && resetColourToggle->getToggleState())
+    {
         resetColourToggle->setToggleState(false, dontSendNotification);
+        if (virtualKeyboard)
+            virtualKeyboard->getProperties().set(SvkProperty::pianoKeyColorReset, false);
+    }
+
+    // Refresh swatch library after painting a key on the keyboard
+    if (keyColourLibrary && virtualKeyboard && virtualKeyboard->isParentOf(event.eventComponent))
+        keyColourLibrary->refreshSwatches();
 }
 
-//void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
-//{
-//    virtualKeyboard = keyboardPointer;
-//
-//    Colour init = Colour::fromString(virtualKeyboard->getProperties()[SvkProperty::colorSelected].toString());
-//    if (init.isTransparent())
-//        init = virtualKeyboard->getKeyLayerColor(0);
-//    colourSelector->setCurrentColour(init, dontSendNotification);
-//
-//    // fill key color swatches
-//    keyColourLibrary = new ColourLibraryComponent(
-//        { "Key Layer Colors:",
-//            "Scale Degree Colors:",
-//            "Individual Key Colors:" },
-//        { virtualKeyboard->getKeyLayerColours(),
-//          virtualKeyboard->getKeyDegreeColours(),
-//          virtualKeyboard->getKeyIndividualColours() }
-//        , true, true
-//    );
-//    keyColourLibrary->setName("KeyColourLibrary");
-//    keyColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
-//    controls.set(5, keyColourLibrary, true);
-//    addAndMakeVisible(keyColourLibrary);
-//    getSectionFlexBox(2)->items.getReference(1).associatedComponent = keyColourLibrary;
-//
-//    // fill note on color swatches
-//    noteOnColourLibrary = new ColourLibraryComponent({ "Midi Channel Note On Colors:" }, { virtualKeyboard->getKeyNoteOnColours() }, true);
-//    noteOnColourLibrary->setName("NoteOnColourLibrary");
-//    noteOnColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId, Colour(Colour(0xff323e44).brighter(0.125f)));
-//    noteOnColourLibrary->forceSwatchColumns(8);
-//    controls.set(6, noteOnColourLibrary, true);
-//    addAndMakeVisible(noteOnColourLibrary);
-//    getSectionFlexBox(3)->items.getReference(0).associatedComponent = noteOnColourLibrary;
-//
-//    // callback for setting color in keyboard
-//    colourSelector->setFocusserCallback([&](Component* c, var dataIn) 
-//    { 
-//        if (dynamic_cast<PaintSwatch*>(c))
-//            virtualKeyboard->updateKeyColors(false);
-//        else
-//            virtualKeyboard->getProperties().set(SvkProperty::colorSelected, dataIn); 
-//    });
-//    
-//    virtualKeyboard->addMouseListener(this, true);
-//}
+void ColourSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+{
+    if (virtualKeyboard)
+        virtualKeyboard->removeMouseListener(this);
+
+    virtualKeyboard = keyboardPointer;
+
+    if (!virtualKeyboard)
+    {
+        colourSelector->setFocusserCallback({});
+        return;
+    }
+
+    // Sync colourSelector to keyboard's current colorSelected (or layer 0 default)
+    Colour init = Colour::fromString(virtualKeyboard->getProperties()[SvkProperty::colorSelected].toString());
+    if (init.isTransparent())
+        init = virtualKeyboard->getKeyLayerColor(0);
+    colourSelector->setCurrentColour(init, dontSendNotification);
+    virtualKeyboard->getProperties().set(SvkProperty::colorSelected, init.toString());
+
+    // Create or refresh key colour library (layer + degree only; transparent swatches visible)
+    if (keyColourLibrary == nullptr)
+    {
+        keyColourLibrary = new ColourLibraryComponent(
+            { "Key Layer Colors:", "Scale Degree Colors:" },
+            { virtualKeyboard->getKeyLayerColours(),
+              virtualKeyboard->getKeyDegreeColours() },
+            true, false
+        );
+        keyColourLibrary->setName("KeyColourLibrary");
+        keyColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId,
+            Colour(0xff323e44).brighter(0.125f));
+        controls.set(5, keyColourLibrary, true);
+        addAndMakeVisible(keyColourLibrary);
+        getSectionFlexBox(2)->items.getReference(1).associatedComponent = keyColourLibrary;
+    }
+    else
+    {
+        keyColourLibrary->setNewRows({
+            virtualKeyboard->getKeyLayerColours(),
+            virtualKeyboard->getKeyDegreeColours()
+        });
+        keyColourLibrary->refreshSwatches();
+    }
+
+    // Create or refresh note-on colour library
+    if (noteOnColourLibrary == nullptr)
+    {
+        noteOnColourLibrary = new ColourLibraryComponent(
+            { "Midi Channel Note On Colors:" },
+            { virtualKeyboard->getKeyNoteOnColours() },
+            true
+        );
+        noteOnColourLibrary->setName("NoteOnColourLibrary");
+        noteOnColourLibrary->setColour(ColourLibraryComponent::ColourIds::backgroundColourId,
+            Colour(0xff323e44).brighter(0.125f));
+        noteOnColourLibrary->forceSwatchColumns(8);
+        controls.set(6, noteOnColourLibrary, true);
+        addAndMakeVisible(noteOnColourLibrary);
+        getSectionFlexBox(3)->items.getReference(0).associatedComponent = noteOnColourLibrary;
+    }
+    else
+    {
+        noteOnColourLibrary->setNewRows({ virtualKeyboard->getKeyNoteOnColours() });
+        noteOnColourLibrary->refreshSwatches();
+    }
+
+    // Wire color selector: update colorSelected and repaint keyboard when a swatch changes
+    colourSelector->setFocusserCallback([this](Component* c, var dataIn)
+    {
+        virtualKeyboard->getProperties().set(SvkProperty::colorSelected, dataIn);
+        if (dynamic_cast<PaintSwatch*>(c))
+            virtualKeyboard->updateKeyColors(true);
+    });
+
+    virtualKeyboard->addMouseListener(this, true);
+    resized();
+}
 
 void ColourSettingsPanel::refreshPanel()
 {
