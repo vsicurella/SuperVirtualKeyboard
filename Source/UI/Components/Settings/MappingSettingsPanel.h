@@ -36,5 +36,5 @@ public:
 private:
 
     Label* currentMappingLabel;
-    NoteMapEditor* noteMapEditor;
+    NoteMapEditor* noteMapEditor = nullptr;
 };

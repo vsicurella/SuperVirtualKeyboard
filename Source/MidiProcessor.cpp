@@ -45,8 +45,8 @@ SvkMidiProcessor::~SvkMidiProcessor()
 ValueTree SvkMidiProcessor::getNode() const
 {
     ValueTree midiNode(SvkProperty::midiSettingsNode);
-    midiNode.addChild(midiMapNode, 0, nullptr);
-    midiNode.addChild(midiDeviceNode, 1, nullptr);
+    midiNode.addChild(midiMapNode.createCopy(), 0, nullptr);
+    midiNode.addChild(midiDeviceNode.createCopy(), 1, nullptr);
     return midiNode;
 }
 

@@ -30,9 +30,12 @@ MappingSettingsPanel::MappingSettingsPanel(SvkState& presetIn)
     )
 {
     //noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
-    controls.set(0, noteMapEditor, true);
-    addAndMakeVisible(noteMapEditor);
-    getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
+    if (noteMapEditor != nullptr)
+    {
+        controls.set(0, noteMapEditor, true);
+        addAndMakeVisible(noteMapEditor);
+        getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
+    }
 
     //mappingModeChanged(pluginState->getMappingMode());
 
@@ -53,7 +56,7 @@ MappingSettingsPanel::~MappingSettingsPanel()
 
 void MappingSettingsPanel::visibilityChanged()
 {
-    if (!isVisible())
+    if (!isVisible() && noteMapEditor != nullptr)
     {
         noteMapEditor->removeAllListeners();
     }
@@ -76,5 +79,6 @@ void MappingSettingsPanel::mappingEditorChanged(NoteMap& newNoteMap)
 
 void MappingSettingsPanel::registerEditorListener(MappingEditor::Listener* listenerIn)
 {
-    noteMapEditor->addListener(listenerIn);
+    if (noteMapEditor != nullptr)
+        noteMapEditor->addListener(listenerIn);
 }
