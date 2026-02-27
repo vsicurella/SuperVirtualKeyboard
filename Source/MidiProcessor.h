@@ -18,7 +18,8 @@
 
 class SvkMidiProcessor : public MidiInputCallback,
                          public MidiKeyboardStateListener,
-                         private AudioProcessorValueTreeState::Listener
+                         private AudioProcessorValueTreeState::Listener,
+                         public SvkState::Listener
 {
 public:
 
@@ -123,7 +124,19 @@ public:
     bool isMidiPaused();
     
     void parameterChanged(const String& paramID, float newValue) override;
-    
+
+    // SvkState::Listener overrides
+    void presetReloaded(SvkState& preset) override;
+    void periodShiftAmountChanged(int shiftAmount) override;
+    void periodShiftSizeChanged(bool isModeSize) override;
+    void transposeAmountChanged(int transposeAmount) override;
+    void voiceLimitChanged(int voiceLimit) override;
+    void mpePitchbendRangeChanged(int steps) override;
+    void globalPitchbendRangeChanged(int steps) override;
+    void midiChannelOutChanged(int channel) override;
+    void midiInputDeviceChanged(MidiDeviceInfo deviceInfo) override;
+    void midiOutputDeviceChanged(MidiDeviceInfo deviceInfo) override;
+
     // Listen to UI input from VirtualKeyboard
     void handleNoteOn(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;
     void handleNoteOff(MidiKeyboardState* source, int midiChannel, int midiNoteNumber, float velocity) override;

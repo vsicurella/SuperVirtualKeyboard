@@ -141,7 +141,7 @@ public:
 
     void hideSettings();
 
-    void beginColorEditing();
+    void beginColorEditing(ColourSettingsPanel* panel = nullptr);
 
     void endColorEditing();
 
@@ -189,6 +189,7 @@ private:
 
     bool settingsPanelOpen = false;
     bool isColorEditing = false;
+    ColourSettingsPanel* colourPanel = nullptr;
     bool inMappingMode = false;
     bool mappingSettingsOpen = false;
 

@@ -29,13 +29,11 @@ MappingSettingsPanel::MappingSettingsPanel(SvkState& presetIn)
         }
     )
 {
-    //noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
-    if (noteMapEditor != nullptr)
-    {
-        controls.set(0, noteMapEditor, true);
-        addAndMakeVisible(noteMapEditor);
-        getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
-    }
+    noteMapEditor = new NoteMapEditor(presetIn.getMidiInputMap());
+    noteMapEditor->addListener(this);
+    controls.set(0, noteMapEditor, true);
+    addAndMakeVisible(noteMapEditor);
+    getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
 
     //mappingModeChanged(pluginState->getMappingMode());
 
@@ -74,7 +72,7 @@ void MappingSettingsPanel::visibilityChanged()
 
 void MappingSettingsPanel::mappingEditorChanged(NoteMap& newNoteMap)
 {
-    //pluginState->setMidiInputMap(newNoteMap, true, false);
+    preset.setMidiInputMap(newNoteMap, true, true);
 }
 
 void MappingSettingsPanel::registerEditorListener(MappingEditor::Listener* listenerIn)

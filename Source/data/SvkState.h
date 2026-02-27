@@ -348,6 +348,16 @@ public:
     void setGlobalPitchbendRange(int semitones);
 
     /*
+        Get the MIDI channel used for virtual keyboard output (1–16)
+    */
+    int getMidiChannelOut() const;
+
+    /*
+        Set the MIDI channel used for virtual keyboard output (1–16)
+    */
+    void setMidiChannelOut(int channel);
+
+    /*
         Get Midi Input mapping
     */
     NoteMap getMidiInputMap() const;
@@ -439,6 +449,7 @@ public:
         
         virtual void midiInputDeviceChanged(MidiDeviceInfo deviceInfo) {}
         virtual void midiOutputDeviceChanged(MidiDeviceInfo deviceInfo) {}
+        virtual void midiChannelOutChanged(int channel) {}
         virtual void periodShiftAmountChanged(int shiftAmount) {}
         virtual void periodShiftSizeChanged(bool isModeSize) {}
         virtual void transposeAmountChanged(int transposeAmount) {}

@@ -13,6 +13,7 @@
 SvkMidiProcessor::SvkMidiProcessor(SvkState& stateIn)
     : state(stateIn)
 {
+    state.addPresetListener(this);
     midiSettingsNode = ValueTree(SvkProperty::midiSettingsNode);
     midiMapNode = ValueTree(SvkProperty::midiMapNode);
     midiDeviceNode = ValueTree(SvkProperty::midiDeviceSettingsNode);
@@ -37,7 +38,7 @@ SvkMidiProcessor::SvkMidiProcessor(SvkState& stateIn)
 
 SvkMidiProcessor::~SvkMidiProcessor()
 {
-    
+    state.removePresetListener(this);
 }
 
 //==============================================================================
@@ -566,6 +567,62 @@ void SvkMidiProcessor::pauseMidiInput(bool setPaused)
 bool SvkMidiProcessor::isMidiPaused()
 {
     return midiInputPaused;
+}
+
+//==============================================================================
+
+void SvkMidiProcessor::presetReloaded(SvkState& preset)
+{
+    restoreSettingsNode(preset.getMidiSettingsNode());
+    updateNoteTransposition();
+}
+
+void SvkMidiProcessor::periodShiftAmountChanged(int shiftAmount)
+{
+    periodShift = shiftAmount;
+    updateNoteTransposition();
+}
+
+void SvkMidiProcessor::periodShiftSizeChanged(bool isModeSize)
+{
+    periodShiftModeSize = isModeSize;
+    updateNoteTransposition();
+}
+
+void SvkMidiProcessor::transposeAmountChanged(int transposeAmount)
+{
+    transposeAmt = transposeAmount;
+    updateNoteTransposition();
+}
+
+void SvkMidiProcessor::voiceLimitChanged(int voiceLimit)
+{
+    maxNumVoices = voiceLimit;
+}
+
+void SvkMidiProcessor::mpePitchbendRangeChanged(int steps)
+{
+    pitchBendNoteMax = steps;
+}
+
+void SvkMidiProcessor::globalPitchbendRangeChanged(int steps)
+{
+    pitchBendGlobalMax = steps;
+}
+
+void SvkMidiProcessor::midiChannelOutChanged(int channel)
+{
+    midiChannelOut = jlimit(1, 16, channel);
+}
+
+void SvkMidiProcessor::midiInputDeviceChanged(MidiDeviceInfo deviceInfo)
+{
+    setMidiInput(deviceInfo.identifier);
+}
+
+void SvkMidiProcessor::midiOutputDeviceChanged(MidiDeviceInfo deviceInfo)
+{
+    setMidiOutput(deviceInfo.identifier);
 }
 
 //==============================================================================

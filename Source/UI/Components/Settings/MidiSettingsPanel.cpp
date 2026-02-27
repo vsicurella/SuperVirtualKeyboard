@@ -64,10 +64,10 @@ MidiSettingsPanel::MidiSettingsPanel(SvkState& presetIn)
 
     idToLabelledControl[SvkProperty::keyboardMidiChannel]->setComponentSize(100, 24);
     midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::keyboardMidiChannel]);
-    //midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
-    //midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
-    //midiChannelSlider->setValue(preest.getMidiChannelOut());
-    //midiChannelSlider->addListener(this);
+    midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
+    midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
+    midiChannelSlider->setValue(preset.getMidiChannelOut());
+    midiChannelSlider->addListener(this);
 
     // Setup device settings if on standalone version, or hide
     if (JUCEApplication::isStandaloneApp())
@@ -121,9 +121,9 @@ void MidiSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
         preset.setTransposeAmount(sliderThatChanged->getValue());
     }
 
-    else if (sliderThatChanged == periodShiftSlider)
+    else if (sliderThatChanged == midiChannelSlider)
     {
-        //preset.setMidiChannelOut(sliderThatChanged->getValue());
+        preset.setMidiChannelOut((int)sliderThatChanged->getValue());
     }
 }
 
@@ -132,17 +132,17 @@ void MidiSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
     // Midi Input Changed
     if (inputBox == comboBoxThatChanged)
     {
-        MidiDeviceInfo& device = availableIns.getReference(inputBox->getSelectedId() - 1);
-        DBG("Midi Input Selected: " + device.name);
-        //pluginState->getMidiProcessor()->setMidiInput(device.identifier);
+        int idx = inputBox->getSelectedId() - 1;
+        if (idx >= 0 && idx < availableIns.size())
+            preset.setMidiInputDevice(availableIns.getReference(idx));
     }
 
     // Midi Output Changed
     else if (outputBox == comboBoxThatChanged)
     {
-        MidiDeviceInfo& device = availableOuts.getReference(outputBox->getSelectedId() - 1);
-        DBG("Midi Output Selected: " + device.name);
-        //pluginState->getMidiProcessor()->setMidiOutput(device.identifier);
+        int idx = outputBox->getSelectedId() - 1;
+        if (idx >= 0 && idx < availableOuts.size())
+            preset.setMidiOutputDevice(availableOuts.getReference(idx));
     }
 }
 
@@ -159,12 +159,19 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableIns = inputDevices;
         inputBox->clear(dontSendNotification);
-        //inputBox->setText(pluginState->getMidiProcessor()->getInputName(), dontSendNotification);
 
         int i = 1;
-        for (auto device : availableIns)
-        {
+        for (auto& device : availableIns)
             inputBox->addItem(device.name, i++);
+
+        String currentIn = preset.getMidiInputName();
+        for (int i = 0; i < availableIns.size(); ++i)
+        {
+            if (availableIns[i].name == currentIn)
+            {
+                inputBox->setSelectedId(i + 1, dontSendNotification);
+                break;
+            }
         }
     }
 
@@ -174,12 +181,19 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableOuts = outputDevices;
         outputBox->clear(dontSendNotification);
-        //outputBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
 
         int i = 1;
-        for (auto device : availableOuts)
-        {
+        for (auto& device : availableOuts)
             outputBox->addItem(device.name, i++);
+
+        String currentOut = preset.getMidiOutputName();
+        for (int i = 0; i < availableOuts.size(); ++i)
+        {
+            if (availableOuts[i].name == currentOut)
+            {
+                outputBox->setSelectedId(i + 1, dontSendNotification);
+                break;
+            }
         }
     }
 }

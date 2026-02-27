@@ -35,7 +35,8 @@ public:
 
     virtual void performFocusFunction(var dataIn)
     {
-        focusFunctionCallback(dataIn);
+        if (focusFunctionCallback)
+            focusFunctionCallback(dataIn);
     }
     
 protected:

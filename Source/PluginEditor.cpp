@@ -799,8 +799,7 @@ void SvkPluginEditor::settingsTabChanged(int tabIndex, const String& tabName, Sv
 
     if (panelChangedTo->getName() == "ColourSettingsPanel")
     {
-        // TODO clean up
-        beginColorEditing();
+        beginColorEditing(static_cast<ColourSettingsPanel*>(panelChangedTo));
     }
     else if (isColorEditing)
     {
@@ -1063,10 +1062,13 @@ void SvkPluginEditor::hideSettings()
     getParentComponent()->setSize(getWidth(), getHeight() - defaultHeight);
 }
 
-void SvkPluginEditor::beginColorEditing()
+void SvkPluginEditor::beginColorEditing(ColourSettingsPanel* panel)
 {
     keyboard->setUIMode(VirtualKeyboard::UIMode::editMode);
     isColorEditing = true;
+    colourPanel = panel;
+    if (colourPanel)
+        colourPanel->setKeyboardPointer(keyboard.get());
     
     keyMappingStatusChanged(-1, false);
     mapModeBox->setEnabled(false);
@@ -1079,6 +1081,11 @@ void SvkPluginEditor::beginColorEditing()
 
 void SvkPluginEditor::endColorEditing()
 {
+    if (colourPanel)
+    {
+        colourPanel->setKeyboardPointer(nullptr);
+        colourPanel = nullptr;
+    }
     keyboard->setUIMode(VirtualKeyboard::UIMode::playMode);
     isColorEditing = false;
 

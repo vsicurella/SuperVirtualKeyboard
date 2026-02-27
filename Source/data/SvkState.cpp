@@ -527,6 +527,16 @@ void SvkState::setGlobalPitchbendRange(int semitones)
     midiProperties.setProperty(SvkProperty::pitchBendGlobalMax, semitones, nullptr);
 }
 
+int SvkState::getMidiChannelOut() const
+{
+    return jlimit(1, 16, (int)midiProperties.getProperty(SvkProperty::keyboardMidiChannel, 1));
+}
+
+void SvkState::setMidiChannelOut(int channel)
+{
+    midiProperties.setProperty(SvkProperty::keyboardMidiChannel, jlimit(1, 16, channel), nullptr);
+}
+
 NoteMap SvkState::getMidiInputMap() const
 {
     auto mapNode = mappingProperties.getChildWithName(SvkProperty::midiInputRemap);
@@ -717,6 +727,8 @@ void SvkState::handleStatePropertyChange(juce::ValueTree treeWhosePropertyHasCha
             listeners.call(&Listener::mpePitchbendRangeChanged, (int)midiProperties[property]);
         else if (property == SvkProperty::pitchBendGlobalMax)
             listeners.call(&Listener::globalPitchbendRangeChanged, (int)midiProperties[property]);
+        else if (property == SvkProperty::keyboardMidiChannel)
+            listeners.call(&Listener::midiChannelOutChanged, jlimit(1, 16, (int)midiProperties[property]));
     }
     else if (treeWhosePropertyHasChanged == keyboardProperties)
     {
