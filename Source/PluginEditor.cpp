@@ -635,7 +635,7 @@ void SvkPluginEditor::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     }
     else if (comboBoxThatHasChanged == mapModeBox.get())
     {
-        auto mode = (MappingMode)mapModeBox->getSelectedId();
+        auto mode = (MappingMode)(mapModeBox->getSelectedId() - 1);
         setMappingMode(mode);
         processor.setMapMode(mode);
     }
@@ -935,7 +935,7 @@ int SvkPluginEditor::getModeSelectorViewed()
 
 void SvkPluginEditor::setMappingMode(MappingMode mappingModeId, NotificationType notify)
 {
-    mapModeBox->setSelectedId((int)mappingModeId, notify);
+    mapModeBox->setSelectedId((int)mappingModeId + 1, notify);
     inMappingMode = mappingModeId > MappingMode::None;
     
     for (auto c : mappingComponents)
@@ -989,7 +989,7 @@ void SvkPluginEditor::setMappingStyleId(MappingStyle idIn, NotificationType noti
 {
     mapStyleBox->setSelectedId((int)idIn, notify);
 
-    if (idIn == MappingStyle::ModeToMode && mapModeBox->getSelectedId() == (int)MappingMode::Auto)
+    if (idIn == MappingStyle::ModeToMode && mapModeBox->getSelectedId() == (int)MappingMode::Auto + 1)
     {
         mapOrderEditBtn->setVisible(true);
         mapApplyBtn->setVisible(true);
@@ -1113,7 +1113,7 @@ void SvkPluginEditor::endColorEditing()
     mapApplyBtn->setEnabled(true);
     mapCopyToManualBtn->setEnabled(true);
 
-    setMappingMode(MappingMode(mapModeBox->getSelectedId()));
+    setMappingMode(MappingMode(mapModeBox->getSelectedId() - 1));
 }
 
 void SvkPluginEditor::beginManualMapping()
