@@ -252,6 +252,18 @@ int SvkMidiProcessor::getOutputNote(int midiNoteIn)
 
 String SvkMidiProcessor::setMidiInput(String deviceID)
 {
+    if (deviceID.isEmpty())
+    {
+        if (midiInput.get())
+            midiInput->stop();
+        midiInput = nullptr;
+        midiInputName = "";
+        inputSelected = "";
+        midiDeviceNode.setProperty(SvkProperty::midiInputName, "", nullptr);
+        DBG("MIDI input closed");
+        return midiInputName;
+    }
+
     std::unique_ptr<MidiInput> inputToOpen = MidiInput::openDevice(deviceID, this);
 
     if (inputToOpen.get())
@@ -272,12 +284,22 @@ String SvkMidiProcessor::setMidiInput(String deviceID)
         inputSelected = "";
         midiInput = nullptr;
     }
-    
+
     return midiInputName;
 }
 
 String SvkMidiProcessor::setMidiOutput(String deviceID)
 {
+    if (deviceID.isEmpty())
+    {
+        midiOutput = nullptr;
+        midiOutputName = "";
+        outputSelected = "";
+        midiDeviceNode.setProperty(SvkProperty::midiOutputName, "", nullptr);
+        DBG("MIDI output closed");
+        return midiOutputName;
+    }
+
     std::unique_ptr<MidiOutput> outputToOpen = MidiOutput::openDevice(deviceID);
 
     if (outputToOpen.get())
@@ -294,7 +316,7 @@ String SvkMidiProcessor::setMidiOutput(String deviceID)
         outputSelected = "";
         midiOutput = nullptr;
     }
-    
+
     return midiOutputName;
 }
 

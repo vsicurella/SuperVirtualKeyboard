@@ -46,6 +46,9 @@ private:
     Array<MidiDeviceInfo> availableIns;
     Array<MidiDeviceInfo> availableOuts;
 
+    static constexpr int noneItemId = 1;
+    static constexpr int deviceItemIdStart = 2;
+
     //SvkMidiProcessor* midiProcessor;
 
     

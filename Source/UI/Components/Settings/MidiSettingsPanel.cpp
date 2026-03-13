@@ -132,17 +132,29 @@ void MidiSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
     // Midi Input Changed
     if (inputBox == comboBoxThatChanged)
     {
-        int idx = inputBox->getSelectedId() - 1;
-        if (idx >= 0 && idx < availableIns.size())
-            preset.setMidiInputDevice(availableIns.getReference(idx));
+        int selectedId = inputBox->getSelectedId();
+        if (selectedId == noneItemId)
+            preset.setMidiInputDevice({});
+        else
+        {
+            int idx = selectedId - deviceItemIdStart;
+            if (idx >= 0 && idx < availableIns.size())
+                preset.setMidiInputDevice(availableIns.getReference(idx));
+        }
     }
 
     // Midi Output Changed
     else if (outputBox == comboBoxThatChanged)
     {
-        int idx = outputBox->getSelectedId() - 1;
-        if (idx >= 0 && idx < availableOuts.size())
-            preset.setMidiOutputDevice(availableOuts.getReference(idx));
+        int selectedId = outputBox->getSelectedId();
+        if (selectedId == noneItemId)
+            preset.setMidiOutputDevice({});
+        else
+        {
+            int idx = selectedId - deviceItemIdStart;
+            if (idx >= 0 && idx < availableOuts.size())
+                preset.setMidiOutputDevice(availableOuts.getReference(idx));
+        }
     }
 }
 
@@ -159,20 +171,25 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableIns = inputDevices;
         inputBox->clear(dontSendNotification);
+        inputBox->addItem(TRANS("None"), noneItemId);
 
-        int i = 1;
+        int i = deviceItemIdStart;
         for (auto& device : availableIns)
             inputBox->addItem(device.name, i++);
 
         String currentIn = preset.getMidiInputName();
+        bool found = false;
         for (int i = 0; i < availableIns.size(); ++i)
         {
             if (availableIns[i].name == currentIn)
             {
-                inputBox->setSelectedId(i + 1, dontSendNotification);
+                inputBox->setSelectedId(i + deviceItemIdStart, dontSendNotification);
+                found = true;
                 break;
             }
         }
+        if (!found)
+            inputBox->setSelectedId(noneItemId, dontSendNotification);
     }
 
     Array<MidiDeviceInfo> outputDevices = MidiOutput::getAvailableDevices();
@@ -181,19 +198,24 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableOuts = outputDevices;
         outputBox->clear(dontSendNotification);
+        outputBox->addItem(TRANS("None"), noneItemId);
 
-        int i = 1;
+        int i = deviceItemIdStart;
         for (auto& device : availableOuts)
             outputBox->addItem(device.name, i++);
 
         String currentOut = preset.getMidiOutputName();
+        bool found = false;
         for (int i = 0; i < availableOuts.size(); ++i)
         {
             if (availableOuts[i].name == currentOut)
             {
-                outputBox->setSelectedId(i + 1, dontSendNotification);
+                outputBox->setSelectedId(i + deviceItemIdStart, dontSendNotification);
+                found = true;
                 break;
             }
         }
+        if (!found)
+            outputBox->setSelectedId(noneItemId, dontSendNotification);
     }
 }
