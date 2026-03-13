@@ -598,7 +598,8 @@ void SvkState::setKeyPlacementType(VirtualKeyboard::KeyPlacementType placementTy
 
 float SvkState::getKeySizeRatio() const
 {
-    return (float)keyboardProperties[SvkProperty::pianoWHRatio];
+    float ratio = (float)keyboardProperties[SvkProperty::pianoWHRatio];
+    return (ratio < 0.01f) ? 0.25f : ratio;
 }
 
 void SvkState::setKeySizeRatio(float keyRatio)
