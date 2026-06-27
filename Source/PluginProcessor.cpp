@@ -164,8 +164,13 @@ void SvkAudioProcessor::getStateInformation (MemoryBlock& destData)
     // as intermediaries to make it easy to save and load complex data.
     
     MemoryOutputStream memOut(destData, true);
-    auto stateTree = buildStateValueTree();
-    svkValueTree.state.copyPropertiesAndChildrenFrom(stateTree, nullptr);
+    auto pluginStateNode = buildStateValueTree();
+
+    // svkValueTree.state is the svkParentNode wrapper that recallState() expects:
+    // svkParentNode > pluginStateNode > presetNode. Nest the node rather than
+    // flattening its children into the parent.
+    svkValueTree.state.removeAllChildren(nullptr);
+    svkValueTree.state.appendChild(pluginStateNode, nullptr);
     svkValueTree.state.writeToStream(memOut);
     DBG("Saving Plugin State node to internal memory:" + svkValueTree.state.toXmlString());
 }
@@ -322,6 +327,14 @@ void SvkAudioProcessor::recallState(ValueTree nodeIn, bool fallbackToDefaultSett
 
     if (stateIn.isValid())
     {
+        // Keep the APVTS-level state in sync with what we're recalling so that
+        // revertToSavedPreset() can read the restored device settings from it.
+        if (stateIn.hasType(SvkProperty::pluginStateNode))
+        {
+            svkValueTree.state.removeAllChildren(nullptr);
+            svkValueTree.state.appendChild(stateIn.createCopy(), nullptr);
+        }
+
         bool loaded = loadPreset(stateIn.getChildWithName(SvkProperty::presetNode), false);
         if (!loaded)
             loadPreset(SvkPreset::getDefaultPreset().getPresetNode(), false);
@@ -357,22 +370,21 @@ void SvkAudioProcessor::revertToSavedPreset(bool fallbackToDefaultSettings, bool
 
 ValueTree SvkAudioProcessor::buildStateValueTree()
 {
-    // TODO: make it so it's not necessary to call this before saving (?)
-
-    auto midiNodes = midiProcessor->getNode();
-    // pluginStateNode.getOrCreateChildWithName(SvkProperty::midiDeviceSettingsNode, nullptr).copyPropertiesAndChildrenFrom(midiProcessor->midiDeviceNode, nullptr);
-
-    auto presetManagerNode = presetManager->commitPreset();
-    //auto presetNode = thePresetNode;
-    
-    // presetNode.getOrCreateChildWithName(SvkProperty::pianoNode, nullptr).copyPropertiesAndChildrenFrom(pluginStateNode.getChildWithName(SvkProperty::pianoNode), nullptr);
+    // Flush live state into the backing nodes before serialising:
+    // onModeUpdate() refreshes the viewed mode / auto-map, and updateNodes()
+    // commits the current input/output note maps into the mapping node.
+    onModeUpdate(false, false);
+    midiProcessor->updateNodes();
+    presetManager->commitPreset();
 
     ValueTree pluginStateNode(SvkProperty::pluginStateNode);
     pluginStateNode.setProperty(SvkProperty::pluginPresetVersion, SVK_PRESET_VERSION, nullptr);
 
-    //pluginStateNode.addChild(presetNode, 0, nullptr);
+    // The preset carries the mapping mode/style, modes, keyboard and midi maps.
+    pluginStateNode.addChild(svkState.getPresetNode(), 0, nullptr);
 
-    onModeUpdate(false, false);
+    // MIDI device selections (only meaningful for the standalone build).
+    pluginStateNode.addChild(midiProcessor->midiDeviceNode.createCopy(), 1, nullptr);
 
     DBG("COMMITTED NODE:\n" + pluginStateNode.toXmlString());
 
