@@ -22,6 +22,7 @@
 
 #include "./UI/Dialogs/ModeInfoDialog.h"
 #include "./UI/Dialogs/MapByOrderDialog.h"
+#include "./UI/Dialogs/AboutDialog.h"
 
 #include "./IO/ReaperWriter.h"
 #include "./IO/AbletonMidiWriter.h"
@@ -143,6 +144,8 @@ public:
     void showMapOrderEditDialog();
 
     void showMainMenu();
+
+    void showAboutDialog();
 
     void showSettingsDialog();
 

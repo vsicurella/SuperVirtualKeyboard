@@ -32,6 +32,7 @@ static Identifier presetDirectory("PresetDirectory");
 static Identifier modeDirectory("ModeDirectory");
 static Identifier createPresetFolder("CreatePresetFolder");
 static Identifier saveFactoryModes("SaveFactoryPresets");
+static Identifier minimalViewSetting("MinimalView");
 
 // Preset Properties
 static Identifier presetProperties("PresetProperties");

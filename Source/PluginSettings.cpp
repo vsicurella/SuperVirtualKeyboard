@@ -67,6 +67,7 @@ ValueTree SvkPluginSettings::getSettingsNode(bool writeSettings)
     pluginSettingsNode.setProperty(SvkProperty::modeDirectory, currentModeLocation.getFullPathName(), nullptr);
     pluginSettingsNode.setProperty(SvkProperty::createPresetFolder, createPresetFolder, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::saveFactoryModes, saveFactoryModes, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::minimalViewSetting, minimalView, nullptr);
     
     if (writeSettings)
         writeSettingsToFile(pluginSettingsNode);
@@ -85,6 +86,7 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 
     createPresetFolder = (bool)pluginSettingsNodeIn[SvkProperty::createPresetFolder];
     saveFactoryModes = (bool)pluginSettingsNodeIn[SvkProperty::saveFactoryModes];
+    minimalView = (bool)pluginSettingsNodeIn[SvkProperty::minimalViewSetting];
 
     return true;
 }
@@ -114,6 +116,11 @@ bool SvkPluginSettings::getSaveFactoryModes()
     return saveFactoryModes;
 }
 
+bool SvkPluginSettings::getMinimalView()
+{
+    return minimalView;
+}
+
 void SvkPluginSettings::setPresetDirectory(File presetDirectoryIn)
 {
     currentPresetLocation = presetDirectoryIn;
@@ -137,6 +144,18 @@ void SvkPluginSettings::setCreatePresetFolder(bool shouldCreateFolder)
 void SvkPluginSettings::setSaveFactoryPresets(bool shouldSavePresets)
 {
     saveFactoryModes = shouldSavePresets;
+}
+
+void SvkPluginSettings::setMinimalView(bool shouldBeMinimal)
+{
+    if (minimalView == shouldBeMinimal)
+        return;
+
+    minimalView = shouldBeMinimal;
+
+    // Persist immediately so the preference survives even if the plugin isn't
+    // torn down cleanly (the destructor is the only other write point).
+    getSettingsNode(true);
 }
 
 bool SvkPluginSettings::writeSettingsToFile(ValueTree settingsNode)

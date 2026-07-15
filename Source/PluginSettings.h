@@ -31,6 +31,7 @@ class SvkPluginSettings
     
     bool createPresetFolder = true;
     bool saveFactoryModes = false;
+    bool minimalView = false;
     
     bool resetDirectories = false;
 
@@ -48,6 +49,7 @@ public:
 
     bool getCreatePresetFolder();
     bool getSaveFactoryModes();
+    bool getMinimalView();
     
     void setPresetDirectory(File presetDirectoryIn);
     void setModeDirectory(File modeDirectoryIn);
@@ -55,6 +57,7 @@ public:
 
     void setCreatePresetFolder(bool shouldCreateFolder);
     void setSaveFactoryPresets(bool shouldSavePresets);
+    void setMinimalView(bool shouldBeMinimal);
 
 private:
 

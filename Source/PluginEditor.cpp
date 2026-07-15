@@ -367,6 +367,11 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
 
     setSize(width, height);
     setResizeLimits(defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
+
+    // Restore the persisted minimal-view preference now that every control has
+    // its normal visibility (so exiting minimal view later restores correctly).
+    if (processor.getPluginSettings()->getMinimalView())
+        setMinimalView(true);
 }
 
 SvkPluginEditor::~SvkPluginEditor()
@@ -1169,6 +1174,9 @@ void SvkPluginEditor::setMinimalView(bool shouldBeMinimal)
         return;
 
     minimalView = shouldBeMinimal;
+
+    // Remember the choice as a global preference so it persists across reopens.
+    processor.getPluginSettings()->setMinimalView(shouldBeMinimal);
 
     // Every header-bar control except the keyboard viewport and the exit button.
     Array<Component*> headerComps = {
