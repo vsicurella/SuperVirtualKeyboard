@@ -130,6 +130,10 @@ def main() -> None:
     ap.add_argument("--cmake-arg", action="append", default=[], metavar="ARG",
                     help="Extra arg passed to the CMake configure step "
                          "(repeatable, e.g. --cmake-arg=-DSVK_COPY_PLUGIN_AFTER_BUILD=OFF)")
+    ap.add_argument("--jobs", "-j", type=int, default=None, metavar="N",
+                    help="Max parallel build jobs (default: the build tool's max). "
+                         "Lower this if the build is killed by the OOM killer — "
+                         "unbounded parallelism can exhaust RAM on CI runners.")
     ap.add_argument("--no-build", action="store_true", help="Skip configure/build; just zip")
     ap.add_argument("--clean", action="store_true", help="Delete the build dir first")
     args = ap.parse_args()
@@ -156,8 +160,13 @@ def main() -> None:
         configure += [f"-DCMAKE_BUILD_TYPE={args.config}"]
         configure += args.cmake_arg
         run(configure)
-        run(["cmake", "--build", str(build_dir),
-             "--config", args.config, "--parallel"])
+        build = ["cmake", "--build", str(build_dir),
+                 "--config", args.config, "--parallel"]
+        # A bare --parallel means "all cores"; on Make generators that is an
+        # unbounded `make -j`, which can OOM-kill memory-heavy JUCE builds.
+        if args.jobs is not None:
+            build.append(str(args.jobs))
+        run(build)
 
     art_dir = find_artefacts_dir(build_dir, args.config)
     items = collect_artefacts(art_dir)

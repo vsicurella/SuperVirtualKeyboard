@@ -65,9 +65,16 @@ jobs:
         env:
           juce_DIR: ${{ github.workspace }}/JUCE
         run: |
+          # Cap parallelism on Linux: the default Make generator otherwise runs
+          # an unbounded `make -j`, whose peak RAM OOM-kills the runner (exit 143).
+          JOBS_ARG=""
+          if [ "${{ runner.os }}" = "Linux" ]; then
+            JOBS_ARG="--jobs 2"
+          fi
           python build.py \
             --config "$BUILD_CONFIG" \
             --clean \
+            $JOBS_ARG \
             --cmake-arg=-DSVK_COPY_PLUGIN_AFTER_BUILD=OFF
 
       - name: Upload artifact
