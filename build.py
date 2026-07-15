@@ -127,6 +127,9 @@ def main() -> None:
     ap.add_argument("--build-dir", default="build", help="CMake build dir (default: build)")
     ap.add_argument("--dist-dir", default="dist", help="Zip output dir (default: dist)")
     ap.add_argument("--generator", default=None, help="CMake generator override (-G)")
+    ap.add_argument("--cmake-arg", action="append", default=[], metavar="ARG",
+                    help="Extra arg passed to the CMake configure step "
+                         "(repeatable, e.g. --cmake-arg=-DSVK_COPY_PLUGIN_AFTER_BUILD=OFF)")
     ap.add_argument("--no-build", action="store_true", help="Skip configure/build; just zip")
     ap.add_argument("--clean", action="store_true", help="Delete the build dir first")
     args = ap.parse_args()
@@ -151,6 +154,7 @@ def main() -> None:
             configure += ["-G", args.generator]
         # Single-config generators need the build type at configure time.
         configure += [f"-DCMAKE_BUILD_TYPE={args.config}"]
+        configure += args.cmake_arg
         run(configure)
         run(["cmake", "--build", str(build_dir),
              "--config", args.config, "--parallel"])
