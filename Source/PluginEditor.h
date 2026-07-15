@@ -142,6 +142,8 @@ public:
 
     void showMapOrderEditDialog();
 
+    void showMainMenu();
+
     void showSettingsDialog();
 
     void hideSettings();
@@ -171,13 +173,8 @@ private:
     SvkAudioProcessor& processor;
     SvkState& svkState;
 
-    std::unique_ptr<Image> saveIcon;
-    std::unique_ptr<Image> openIcon;
+    std::unique_ptr<Image> menuIcon;
     std::unique_ptr<Image> settingsIcon;
-
-    std::unique_ptr<PopupMenu> saveMenu;
-    std::unique_ptr<PopupMenu> loadMenu;
-    std::unique_ptr<PopupMenu> exportMenu;
 
     std::unique_ptr<MappingHelper> mappingHelper;
 
@@ -247,8 +244,7 @@ private:
     std::unique_ptr<TextButton> mapCopyToManualBtn;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<KeyboardViewport> keyboardViewport;
-    std::unique_ptr<ImageButton> saveButton;
-    std::unique_ptr<ImageButton> openButton;
+    std::unique_ptr<ImageButton> menuButton;
     std::unique_ptr<ImageButton> settingsButton;
 
 

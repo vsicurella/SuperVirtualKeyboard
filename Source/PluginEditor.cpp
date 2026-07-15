@@ -12,6 +12,62 @@
 
 using namespace VirtualKeyboard;
 
+namespace
+{
+    // A non-interactive, bold popup-menu section header with an icon. Behaves like
+    // PopupMenu::addSectionHeader (CustomComponent(false) -> can't be triggered or
+    // highlighted). The text is drawn to match the normal menu items exactly (same
+    // row height, effective text size and left indent, just bolded), and the icon
+    // sits in the tick/icon gutter items reserve, so text stays aligned/item-sized.
+    class MenuSectionHeader : public PopupMenu::CustomComponent
+    {
+    public:
+        MenuSectionHeader(String labelIn, std::function<void(Graphics&, Rectangle<int>)> drawIconIn)
+            : PopupMenu::CustomComponent(false),
+              label(std::move(labelIn)),
+              drawIcon(std::move(drawIconIn)) {}
+
+        void getIdealSize(int& idealWidth, int& idealHeight) override
+        {
+            auto f = getLookAndFeel().getPopupMenuFont();
+            idealHeight = roundToInt(f.getHeight() * 1.3f); // == item row height
+            idealWidth = roundToInt(f.getHeight() * 1.3f) + f.boldened().getStringWidth(label) + 12;
+        }
+
+        void paint(Graphics& g) override
+        {
+            // Item text sizing/indent, copied from LookAndFeel_V4::drawPopupMenuItem:
+            // the row is reduced by 1px, then the font is capped to that height / 1.3
+            // and a gutter the width of that height is reserved for the tick/icon.
+            auto r = getLocalBounds().reduced(1);
+            auto maxFontHeight = (float) r.getHeight() / 1.3f;
+
+            auto f = getLookAndFeel().getPopupMenuFont();
+            if (f.getHeight() > maxFontHeight)
+                f.setHeight(maxFontHeight);
+
+            r.reduce(jmin(5, getWidth() / 20), 0);
+
+            // Icon stays in the normal tick/icon gutter at the left; the margin is
+            // added AFTER it (before the label). Widening the gutter instead would
+            // recentre the icon and shove the whole row to the right.
+            auto gutter = r.removeFromLeft(roundToInt(maxFontHeight));
+            if (drawIcon)
+                drawIcon(g, gutter.withSizeKeepingCentre(roundToInt(maxFontHeight), roundToInt(maxFontHeight)));
+
+            r.removeFromLeft(roundToInt(maxFontHeight * 0.5f)); // gap between icon and label
+            r.removeFromRight(3);
+            g.setColour(Colours::whitesmoke);
+            g.setFont(f.boldened());
+            g.drawFittedText(label, r, Justification::centredLeft, 1);
+        }
+
+    private:
+        String label;
+        std::function<void(Graphics&, Rectangle<int>)> drawIcon;
+    };
+}
+
 //==============================================================================
 SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     : AudioProcessorEditor(&p), processor(p), svkState(processor.getState())
@@ -194,25 +250,15 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     addAndMakeVisible (keyboardViewport.get());    
     viewportScrollBar = &keyboardViewport->getHorizontalScrollBar();
 
-    saveButton.reset (new ImageButton ("Save Button"));
-    addAndMakeVisible (saveButton.get());
-    saveButton->setButtonText (TRANS("Save"));
-    saveButton->addListener (this);
-    saveButton->setImages (false, true, true,
+    menuButton.reset (new ImageButton ("Menu Button"));
+    addAndMakeVisible (menuButton.get());
+    menuButton->setButtonText (TRANS("Menu"));
+    menuButton->addListener (this);
+    menuButton->setImages (false, true, true,
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-    saveButton->setSize(28, 28);
-
-    openButton.reset (new ImageButton ("Open Button"));
-    addAndMakeVisible (openButton.get());
-    openButton->setButtonText (TRANS("Open"));
-    openButton->addListener (this);
-    openButton->setImages (false, true, true,
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000));
-    openButton->setSize(28, 28);
+    menuButton->setSize(28, 28);
 
     settingsButton.reset (new ImageButton ("Settings Button"));
     addAndMakeVisible (settingsButton.get());
@@ -224,11 +270,8 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
                                Image(), 1.000f, Colour (0x00000000));
     settingsButton->setSize(28, 28);
 
-    saveIcon.reset(new Image(Image::PixelFormat::RGB, saveButton->getWidth(), saveButton->getHeight(), true));
-    openIcon.reset(new Image(Image::PixelFormat::RGB, openButton->getWidth(), openButton->getHeight(), true));
-
-    saveButton->setImages(true, true, true, *saveIcon.get(), 0.0f, Colour(), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *saveIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
-    openButton->setImages(true, true, true, *openIcon.get(), 0.0f, Colour(), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *openIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
+    menuIcon.reset(new Image(Image::PixelFormat::RGB, menuButton->getWidth(), menuButton->getHeight(), true));
+    menuButton->setImages(true, true, true, *menuIcon.get(), 0.0f, Colour(), *menuIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *menuIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
     
     scaleTextBox->addListener(this);
@@ -239,17 +282,6 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
     // allows for implementing mouseDown() to update the menus
     //mode1Box->setInterceptsMouseClicks(false, false);
     //mode2Box->setInterceptsMouseClicks(false, false);
-
-
-    saveMenu.reset(new PopupMenu());
-    saveMenu->addItem("Save Mode", true, false, [&]() { processor.saveModeViewedToFile(); });
-    saveMenu->addItem("Save Preset", true, false, [&]() { processor.savePresetToFile(); });
-    saveMenu->addItem("Export for Reaper Note Names", true, false, [&]() { exportModeViewedForReaper(); });
-    saveMenu->addItem("Export for Ableton Folding", true, false, [&]() { exportModeViewedForAbleton(); });
-
-    loadMenu.reset(new PopupMenu());
-    loadMenu->addItem("Load Mode", true, false, [&]() { browseForModeToOpen(); });
-    loadMenu->addItem("Load Preset", true, false, [&]() { browseForPresetToOpen(); });
 
 
     int recallWidth = pluginEditorNode[SvkProperty::windowBoundsW];
@@ -306,8 +338,7 @@ SvkPluginEditor::~SvkPluginEditor()
     svkState.removePresetListener(this);
     processor.removePresetManagerListener(this);
     settingsButton = nullptr;
-    openButton = nullptr;
-    saveButton = nullptr;
+    menuButton = nullptr;
     keyboardViewport = nullptr;
     keyboard = nullptr;
     mapCopyToManualBtn = nullptr;
@@ -334,12 +365,8 @@ SvkPluginEditor::~SvkPluginEditor()
 
     settingsContainer = nullptr;
     mappingHelper = nullptr;
-    exportMenu = nullptr;
-    loadMenu = nullptr;
-    saveMenu = nullptr;
     settingsIcon = nullptr;
-    openIcon = nullptr;
-    saveIcon = nullptr;
+    menuIcon = nullptr;
 }
 
 //==============================================================================
@@ -521,8 +548,7 @@ void SvkPluginEditor::paint (Graphics& g)
     Colour buttonFill = getLookAndFeel().findColour(TextButton::ColourIds::buttonColourId);
     Colour buttonOutline = getLookAndFeel().findColour(TextEditor::ColourIds::outlineColourId);
 
-    drawSaveIcon(g, saveButton->getBoundsInParent(), buttonFill, buttonOutline);
-    drawLoadIcon(g, openButton->getBoundsInParent(), buttonFill, buttonOutline);
+    drawMenuIcon(g, menuButton->getBoundsInParent(), buttonFill, buttonOutline);
     drawSettingsIcon(g, settingsButton->getBoundsInParent(), buttonFill, buttonOutline);
 }
 
@@ -543,14 +569,11 @@ void SvkPluginEditor::resized()
     scaleEntryBtn->setBounds(scaleTextBox->getRight() + 8, scaleTextBox->getY(), 31, 24);
     modeInfoButton->setBounds(scaleTextBox->getX() - 32, scaleTextBox->getY(), 24, 24);
 
-    saveButton->setSize(barHeight, barHeight);
-    saveButton->setTopLeftPosition(gap, scaleTextBox->getY());
-
-    openButton->setSize(barHeight, barHeight);
-    openButton->setTopLeftPosition(saveButton->getRight() + gap, saveButton->getY());
+    menuButton->setSize(barHeight, barHeight);
+    menuButton->setTopLeftPosition(gap, scaleTextBox->getY());
 
     settingsButton->setSize(barHeight, barHeight);
-    settingsButton->setTopLeftPosition(openButton->getRight() + gap, saveButton->getY());
+    settingsButton->setTopLeftPosition(menuButton->getRight() + gap, menuButton->getY());
 
     mapModeBox->setTopLeftPosition(settingsButton->getRight() + gap, gap);
     mapModeBox->setSize(jmin(mapModeBoxWidth, modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
@@ -710,15 +733,9 @@ void SvkPluginEditor::buttonClicked (Button* buttonThatWasClicked)
     {
         processor.doAutoMapping();
     }
-    else if (buttonThatWasClicked == saveButton.get())
+    else if (buttonThatWasClicked == menuButton.get())
     {
-        auto options = PopupMenu::Options().withTargetComponent(saveButton.get());
-        saveMenu->showMenuAsync(options);
-    }
-    else if (buttonThatWasClicked == openButton.get())
-    {
-        auto options = PopupMenu::Options().withTargetComponent(openButton.get());
-        loadMenu->showMenuAsync(options);
+        showMainMenu();
     }
     else if (buttonThatWasClicked == settingsButton.get())
     {
@@ -1052,6 +1069,28 @@ void SvkPluginEditor::showMapOrderEditDialog()
 {
     mapByOrderDialog = new MapByOrderDialog(processor.getModeMapper(), processor.getState().getMode1(), processor.getState().getMode2());
     CallOutBox::launchAsynchronously(std::unique_ptr<Component>(mapByOrderDialog), mapStyleBox->getScreenBounds(), nullptr);
+}
+
+void SvkPluginEditor::showMainMenu()
+{
+    PopupMenu menu;
+
+    menu.addCustomItem(-1, std::make_unique<MenuSectionHeader>("Load",
+        [](Graphics& g, Rectangle<int> a) { drawLoadIcon(g, a, Colours::transparentBlack, Colours::transparentBlack); }));
+    menu.addItem("Mode", [this]() { browseForModeToOpen(); });
+    menu.addItem("Preset", [this]() { browseForPresetToOpen(); });
+
+    menu.addCustomItem(-1, std::make_unique<MenuSectionHeader>("Save",
+        [](Graphics& g, Rectangle<int> a) { drawSaveIcon(g, a, Colours::transparentBlack, Colours::transparentBlack); }));
+    menu.addItem("Mode", [this]() { processor.saveModeViewedToFile(); });
+    menu.addItem("Preset", [this]() { processor.savePresetToFile(); });
+
+    menu.addCustomItem(-1, std::make_unique<MenuSectionHeader>("Export",
+        [](Graphics& g, Rectangle<int> a) { drawExportIcon(g, a, Colours::transparentBlack, Colours::transparentBlack); }));
+    menu.addItem("for Reaper Note Names", [this]() { exportModeViewedForReaper(); });
+    menu.addItem("for Ableton Folding", [this]() { exportModeViewedForAbleton(); });
+
+    menu.showMenuAsync(PopupMenu::Options().withTargetComponent(menuButton.get()));
 }
 
 void SvkPluginEditor::showSettingsDialog()
