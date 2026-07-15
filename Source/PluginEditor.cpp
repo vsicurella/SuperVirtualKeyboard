@@ -1145,6 +1145,14 @@ void SvkPluginEditor::showExportKbmDialog()
     CallOutBox::launchAsynchronously(std::unique_ptr<Component>(exportKbmDialog), menuButton->getScreenBounds(), nullptr);
 }
 
+void SvkPluginEditor::showExportReaperDialog()
+{
+    exportReaperDialog = new ExportReaperDialog(
+        processor.getState().getModeViewed(),
+        processor.getPluginSettings());
+    CallOutBox::launchAsynchronously(std::unique_ptr<Component>(exportReaperDialog), menuButton->getScreenBounds(), nullptr);
+}
+
 void SvkPluginEditor::showMainMenu()
 {
     PopupMenu menu;
@@ -1161,7 +1169,7 @@ void SvkPluginEditor::showMainMenu()
 
     menu.addCustomItem(-1, std::make_unique<MenuSectionHeader>("Export",
         [](Graphics& g, Rectangle<int> a) { drawExportIcon(g, a, Colours::transparentBlack, Colours::transparentBlack); }));
-    menu.addItem("for Reaper Note Names", [this]() { exportModeViewedForReaper(); });
+    menu.addItem("for Reaper Note Names", [this]() { showExportReaperDialog(); });
     menu.addItem("for Ableton Folding", [this]() { exportModeViewedForAbleton(); });
     menu.addItem("for Scala Keyboard Mapping", [this]() { showExportKbmDialog(); });
 
@@ -1375,14 +1383,6 @@ bool SvkPluginEditor::browseForModeToOpen()
 bool SvkPluginEditor::browseForPresetToOpen()
 {
     return processor.loadPresetFromFile();
-}
-
-bool SvkPluginEditor::exportModeViewedForReaper()
-{
-    // The writer launches an async file chooser from its constructor, so it must
-    // outlive this function — hence a member rather than a local.
-    reaperWriter = std::make_unique<ReaperWriter>(processor.getState().getModeViewed());
-    return true;
 }
 
 bool SvkPluginEditor::exportModeViewedForAbleton()

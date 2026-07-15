@@ -34,6 +34,13 @@ static Identifier createPresetFolder("CreatePresetFolder");
 static Identifier saveFactoryModes("SaveFactoryPresets");
 static Identifier minimalViewSetting("MinimalView");
 
+// Reaper Note Name Export
+static Identifier reaperUseScaleDegrees("ReaperUseScaleDegrees");
+static Identifier reaperIncludeOctaves("ReaperIncludeOctaves");
+static Identifier reaperOctaveDelimiter("ReaperOctaveDelimiter");
+static Identifier reaperKeyCenterNote("ReaperKeyCenterNote");
+static Identifier reaperKeyCenterOctave("ReaperKeyCenterOctave");
+
 // Preset Properties
 static Identifier presetProperties("PresetProperties");
 static Identifier modeSelectorsNode("ModeSelectors");

@@ -13,6 +13,7 @@
 #include "PluginIDs.h"
 #include "CommonFunctions.h"
 #include "Constants.h"
+#include "IO/ReaperWriter.h"
 
 class SvkPluginSettings
 {
@@ -32,8 +33,10 @@ class SvkPluginSettings
     bool createPresetFolder = true;
     bool saveFactoryModes = false;
     bool minimalView = false;
-    
+
     bool resetDirectories = false;
+
+    ReaperWriter::Options reaperOptions;
 
 public:
 
@@ -50,7 +53,10 @@ public:
     bool getCreatePresetFolder();
     bool getSaveFactoryModes();
     bool getMinimalView();
-    
+
+    ReaperWriter::Options getReaperOptions();
+    void setReaperOptions(ReaperWriter::Options optionsIn);
+
     void setPresetDirectory(File presetDirectoryIn);
     void setModeDirectory(File modeDirectoryIn);
     void setSettingsDirectory(File settingsDirectoryIn);

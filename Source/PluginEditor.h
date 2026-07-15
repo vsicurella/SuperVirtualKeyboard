@@ -24,8 +24,8 @@
 #include "./UI/Dialogs/MapByOrderDialog.h"
 #include "./UI/Dialogs/AboutDialog.h"
 #include "./UI/Dialogs/ExportKbmDialog.h"
+#include "./UI/Dialogs/ExportReaperDialog.h"
 
-#include "./IO/ReaperWriter.h"
 #include "./IO/AbletonMidiWriter.h"
 
 class SvkPluginEditor : public AudioProcessorEditor, 
@@ -146,6 +146,8 @@ public:
 
     void showExportKbmDialog();
 
+    void showExportReaperDialog();
+
     void showMainMenu();
 
     void showAboutDialog();
@@ -173,8 +175,6 @@ public:
 
     bool browseForPresetToOpen();
 
-    bool exportModeViewedForReaper();
-
     bool exportModeViewedForAbleton();
 
 protected:
@@ -198,9 +198,9 @@ private:
     ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
     ExportKbmDialog* exportKbmDialog;
+    ExportReaperDialog* exportReaperDialog;
 
-    // Held as members so they outlive the async file choosers they launch.
-    std::unique_ptr<ReaperWriter> reaperWriter;
+    // Held as a member so it outlives the async file chooser it launches.
     std::unique_ptr<AbletonMidiWriter> abletonWriter;
 
     Array<Component*> mappingComponents;

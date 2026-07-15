@@ -68,7 +68,13 @@ ValueTree SvkPluginSettings::getSettingsNode(bool writeSettings)
     pluginSettingsNode.setProperty(SvkProperty::createPresetFolder, createPresetFolder, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::saveFactoryModes, saveFactoryModes, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::minimalViewSetting, minimalView, nullptr);
-    
+
+    pluginSettingsNode.setProperty(SvkProperty::reaperUseScaleDegrees, reaperOptions.useScaleDegrees, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::reaperIncludeOctaves, reaperOptions.includeOctaves, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::reaperOctaveDelimiter, reaperOptions.octaveDelimiter, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::reaperKeyCenterNote, reaperOptions.keyCenterNote, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::reaperKeyCenterOctave, reaperOptions.keyCenterOctave, nullptr);
+
     if (writeSettings)
         writeSettingsToFile(pluginSettingsNode);
     
@@ -87,6 +93,17 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
     createPresetFolder = (bool)pluginSettingsNodeIn[SvkProperty::createPresetFolder];
     saveFactoryModes = (bool)pluginSettingsNodeIn[SvkProperty::saveFactoryModes];
     minimalView = (bool)pluginSettingsNodeIn[SvkProperty::minimalViewSetting];
+
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperUseScaleDegrees))
+        reaperOptions.useScaleDegrees = (bool)pluginSettingsNodeIn[SvkProperty::reaperUseScaleDegrees];
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperIncludeOctaves))
+        reaperOptions.includeOctaves = (bool)pluginSettingsNodeIn[SvkProperty::reaperIncludeOctaves];
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperOctaveDelimiter))
+        reaperOptions.octaveDelimiter = pluginSettingsNodeIn[SvkProperty::reaperOctaveDelimiter].toString();
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperKeyCenterNote))
+        reaperOptions.keyCenterNote = (int)pluginSettingsNodeIn[SvkProperty::reaperKeyCenterNote];
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperKeyCenterOctave))
+        reaperOptions.keyCenterOctave = (int)pluginSettingsNodeIn[SvkProperty::reaperKeyCenterOctave];
 
     return true;
 }
@@ -119,6 +136,19 @@ bool SvkPluginSettings::getSaveFactoryModes()
 bool SvkPluginSettings::getMinimalView()
 {
     return minimalView;
+}
+
+ReaperWriter::Options SvkPluginSettings::getReaperOptions()
+{
+    return reaperOptions;
+}
+
+void SvkPluginSettings::setReaperOptions(ReaperWriter::Options optionsIn)
+{
+    reaperOptions = optionsIn;
+
+    // Persist immediately so the choices survive an unclean teardown.
+    getSettingsNode(true);
 }
 
 void SvkPluginSettings::setPresetDirectory(File presetDirectoryIn)
