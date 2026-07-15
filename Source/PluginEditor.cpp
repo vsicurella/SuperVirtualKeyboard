@@ -66,6 +66,34 @@ namespace
         String label;
         std::function<void(Graphics&, Rectangle<int>)> drawIcon;
     };
+
+    // The minimal-view exit button: same as a normal TextButton but with an almost
+    // square corner (the default LookAndFeel_V4 radius is 6px). Mirrors
+    // LookAndFeel_V4::drawButtonBackground with a smaller cornerSize.
+    class MinimalViewExitButton : public TextButton
+    {
+    public:
+        using TextButton::TextButton;
+
+        void paintButton(Graphics& g, bool shouldDrawHighlighted, bool shouldDrawDown) override
+        {
+            auto cornerSize = 1.5f;
+            auto bounds = getLocalBounds().toFloat().reduced(0.5f, 0.5f);
+
+            auto baseColour = findColour(TextButton::buttonColourId)
+                                  .withMultipliedSaturation(hasKeyboardFocus(true) ? 1.3f : 0.9f)
+                                  .withMultipliedAlpha(isEnabled() ? 1.0f : 0.5f);
+
+            if (shouldDrawDown || shouldDrawHighlighted)
+                baseColour = baseColour.contrasting(shouldDrawDown ? 0.2f : 0.05f);
+
+            g.setColour(baseColour);
+            g.fillRoundedRectangle(bounds, cornerSize);
+
+            g.setColour(findColour(ComboBox::outlineColourId));
+            g.drawRoundedRectangle(bounds, cornerSize, 1.0f);
+        }
+    };
 }
 
 //==============================================================================
@@ -270,6 +298,14 @@ SvkPluginEditor::SvkPluginEditor(SvkAudioProcessor& p)
                                Image(), 1.000f, Colour (0x00000000));
     settingsButton->setSize(28, 28);
 
+    // Thin, empty button shown only in minimal view, sitting where the menu
+    // button normally is; clicking it leaves minimal view.
+    minimalViewExitBtn.reset (new MinimalViewExitButton ("Minimal View Exit Button"));
+    addChildComponent (minimalViewExitBtn.get());
+    minimalViewExitBtn->setButtonText (String());
+    minimalViewExitBtn->setTooltip (TRANS("Exit Minimal View"));
+    minimalViewExitBtn->addListener (this);
+
     menuIcon.reset(new Image(Image::PixelFormat::RGB, menuButton->getWidth(), menuButton->getHeight(), true));
     menuButton->setImages(true, true, true, *menuIcon.get(), 0.0f, Colour(), *menuIcon.get(), 0.0f, Colours::white.withAlpha(0.25f), *menuIcon.get(), 0.0f, Colours::white.withAlpha(0.5f));
 
@@ -337,6 +373,7 @@ SvkPluginEditor::~SvkPluginEditor()
 {
     svkState.removePresetListener(this);
     processor.removePresetManagerListener(this);
+    minimalViewExitBtn = nullptr;
     settingsButton = nullptr;
     menuButton = nullptr;
     keyboardViewport = nullptr;
@@ -545,6 +582,9 @@ void SvkPluginEditor::paint (Graphics& g)
 {
     g.fillAll (Colour (0xff323e44));
 
+    if (minimalView)
+        return;
+
     Colour buttonFill = getLookAndFeel().findColour(TextButton::ColourIds::buttonColourId);
     Colour buttonOutline = getLookAndFeel().findColour(TextEditor::ColourIds::outlineColourId);
 
@@ -649,14 +689,28 @@ void SvkPluginEditor::resized()
 
     mode1RootLbl->setBounds(mode1RootSld->getX() - 32, mode1Box->getY(), 32, barHeight);
     mode2RootLbl->setBounds(mode2RootSld->getX() - 32, mode2Box->getY(), 32, barHeight);
-    
+
+    if (minimalView)
+    {
+        // Collapse the header into a top margin equal to the bottom margin (gap),
+        // and drop the thin exit button into it with its left edge flush with the
+        // keyboard's left edge and the menu button's width.
+        keyboardY = gap;
+        minimalViewExitBtn->setBounds(gap / 3, 0, barHeight, keyboardY);
+    }
+
     viewportScrollBar->removeListener(this);
 
+    // Minimal mode uses thinner horizontal margins and drops the bottom margin so
+    // the scroll bar sits flush against the window's bottom edge; normal mode keeps
+    // the full margins.
+    int keyboardMarginX = minimalView ? gap / 3 : gap;
     int scrollBarThickness = basicHeight / 28;
-    int keyboardViewWidth = getWidth() - gap * 2;
-    int keyboardViewHeight = jmax(basicHeight - keyboardY - gap, 1);
+    int keyboardViewWidth = getWidth() - keyboardMarginX * 2;
+    int keyboardMarginBottom = minimalView ? 0 : gap;
+    int keyboardViewHeight = jmax(basicHeight - keyboardY - keyboardMarginBottom, 1);
 
-    keyboardViewport->setBounds(gap, keyboardY, keyboardViewWidth, keyboardViewHeight);
+    keyboardViewport->setBounds(keyboardMarginX, keyboardY, keyboardViewWidth, keyboardViewHeight);
     keyboardViewport->setScrollBarThickness(scrollBarThickness);
     keyboardViewport->resizeKeyboard();
     keyboardViewport->centerOnKey((int)centerKeyPos);
@@ -740,6 +794,10 @@ void SvkPluginEditor::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == settingsButton.get())
     {
         showSettingsDialog();
+    }
+    else if (buttonThatWasClicked == minimalViewExitBtn.get())
+    {
+        setMinimalView(false);
     }
     else if (buttonThatWasClicked == mapManualCancel.get())
     {
@@ -1090,7 +1148,53 @@ void SvkPluginEditor::showMainMenu()
     menu.addItem("for Reaper Note Names", [this]() { exportModeViewedForReaper(); });
     menu.addItem("for Ableton Folding", [this]() { exportModeViewedForAbleton(); });
 
+    menu.addSeparator();
+    menu.addItem("Minimal View", [this]() { setMinimalView(true); });
+
     menu.showMenuAsync(PopupMenu::Options().withTargetComponent(menuButton.get()));
+}
+
+void SvkPluginEditor::setMinimalView(bool shouldBeMinimal)
+{
+    if (minimalView == shouldBeMinimal)
+        return;
+
+    minimalView = shouldBeMinimal;
+
+    // Every header-bar control except the keyboard viewport and the exit button.
+    Array<Component*> headerComps = {
+        scaleTextBox.get(), scaleEntryBtn.get(), modeInfoButton.get(),
+        menuButton.get(), settingsButton.get(), mapModeBox.get(),
+        mode1Box.get(), mode2Box.get(), mode1RootSld.get(), mode2RootSld.get(),
+        mode1RootLbl.get(), mode2RootLbl.get(), mode1ViewBtn.get(), mode2ViewBtn.get(),
+        mapStyleLbl.get(), mapStyleBox.get(), mapOrderEditBtn.get(), mapApplyBtn.get(),
+        mapManualTip.get(), mapManualStatus.get(), mapManualCancel.get(),
+        mapManualResetBtn.get(), mapCopyToManualBtn.get()
+    };
+
+    if (minimalView)
+    {
+        minimalViewRestoreVisible.clearQuick();
+        for (auto* c : headerComps)
+        {
+            minimalViewRestoreVisible.add(c->isVisible());
+            c->setVisible(false);
+        }
+        minimalViewExitBtn->setVisible(true);
+    }
+    else
+    {
+        for (int i = 0; i < headerComps.size(); ++i)
+            headerComps[i]->setVisible(minimalViewRestoreVisible[i]);
+        minimalViewExitBtn->setVisible(false);
+    }
+
+    // Hide the resize grip in minimal view so it can't overlap the keys.
+    if (resizableCorner != nullptr)
+        resizableCorner->setVisible(!minimalView);
+
+    resized();
+    repaint();
 }
 
 void SvkPluginEditor::showSettingsDialog()

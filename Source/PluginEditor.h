@@ -148,6 +148,13 @@ public:
 
     void hideSettings();
 
+    /*
+        Collapses the header bar into a thin top margin (matching the bottom margin)
+        and hides the resize grip, maximising the keyboard area. Leave via the thin
+        button placed where the menu button normally sits.
+    */
+    void setMinimalView(bool shouldBeMinimal);
+
     void beginColorEditing(ColourSettingsPanel* panel = nullptr);
 
     void endColorEditing();
@@ -194,6 +201,12 @@ private:
     ColourSettingsPanel* colourPanel = nullptr;
     bool inMappingMode = false;
     bool mappingSettingsOpen = false;
+
+    bool minimalView = false;
+    // Visibility of the collapsed header controls at the moment minimal view was
+    // entered, so leaving it restores exactly the prior state (mapping controls
+    // depend on the current mapping mode).
+    Array<bool> minimalViewRestoreVisible;
 
     String noKeySelectedTrans = TRANS("No key selected.");
     String waitingForTrans = TRANS("Waiting for input to map to key ");
@@ -246,6 +259,7 @@ private:
     std::unique_ptr<KeyboardViewport> keyboardViewport;
     std::unique_ptr<ImageButton> menuButton;
     std::unique_ptr<ImageButton> settingsButton;
+    std::unique_ptr<TextButton> minimalViewExitBtn;
 
 
     //==============================================================================
