@@ -1379,12 +1379,17 @@ bool SvkPluginEditor::browseForPresetToOpen()
 
 bool SvkPluginEditor::exportModeViewedForReaper()
 {
-    ReaperWriter rpp(processor.getState().getModeViewed());
+    // The writer launches an async file chooser from its constructor, so it must
+    // outlive this function — hence a member rather than a local.
+    reaperWriter = std::make_unique<ReaperWriter>(processor.getState().getModeViewed());
     return true;
 }
 
 bool SvkPluginEditor::exportModeViewedForAbleton()
 {
-    AbletonMidiWriter amw(processor.getState().getModeViewed());
+    // Construct (builds the MIDI sequence) then write() to launch the async chooser.
+    // Held as a member so it outlives that async operation.
+    abletonWriter = std::make_unique<AbletonMidiWriter>(processor.getState().getModeViewed());
+    abletonWriter->write();
     return true;
 }

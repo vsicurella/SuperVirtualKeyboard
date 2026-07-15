@@ -74,20 +74,20 @@ public:
 
         chooser = std::make_unique<FileChooser>("Save Ableton Midi Map", intendedFile, "*.mid");
 
-        bool fileWritten = false;
-        
         chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting,
-            [&](const FileChooser& chooser)
+            [this](const FileChooser& fc)
             {
-                auto result = chooser.getResult();
-                if (result.getParentDirectory().exists())
-                {
-                    writeTo(result);
-                    fileWritten = true;
-                }
+                auto result = fc.getResult();
+
+                // Empty result means the native dialog was cancelled.
+                if (result == File() || !result.getParentDirectory().exists())
+                    return;
+
+                // getResult() is the chosen file; writeTo() expects (directory, filename).
+                writeTo(result.getParentDirectory(), result.getFileName());
             });
-        
-        return fileWritten;
+
+        return true;
     }
 
     void refreshSequence()

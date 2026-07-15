@@ -199,6 +199,10 @@ private:
     MapByOrderDialog* mapByOrderDialog;
     ExportKbmDialog* exportKbmDialog;
 
+    // Held as members so they outlive the async file choosers they launch.
+    std::unique_ptr<ReaperWriter> reaperWriter;
+    std::unique_ptr<AbletonMidiWriter> abletonWriter;
+
     Array<Component*> mappingComponents;
 
     //TextFilterIntOrSpace txtFilter;
