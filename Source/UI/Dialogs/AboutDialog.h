@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    AboutSettingsPanel.h
-    Created: 28 Jun 2026
+    AboutDialog.h
+    Created: 15 Jul 2026
     Author:  Vincenzo Sicurella
 
   ==============================================================================
@@ -10,31 +10,32 @@
 
 #pragma once
 
-#include "SvkSettingsPanel.h"
+#include <JuceHeader.h>
 #include "Version.h"
 
-class AboutSettingsPanel : public SvkSettingsPanel
+// A simple pop-up shown from the main menu's "About" item. Displays the
+// application blurb and is dismissed by clicking outside its CallOutBox.
+class AboutDialog : public Component
 {
 public:
 
-    AboutSettingsPanel(SvkState& presetIn)
-        : SvkSettingsPanel("AboutSettingsPanel", presetIn,
-            StringArray(), Array<Identifier>(), Array<SvkControlProperties>())
+    AboutDialog()
     {
         aboutLabel.reset(new Label("AboutLabel", getBlurb()));
         aboutLabel->setJustificationType(Justification::topLeft);
         aboutLabel->setMinimumHorizontalScale(1.0f);
-        aboutLabel->setColour(Label::textColourId, Colour(0xff323e44).contrasting());
+        aboutLabel->setColour(Label::textColourId, backgroundColour.contrasting());
         addAndMakeVisible(aboutLabel.get());
 
-        setSize(100, 100);
+        setSize(320, 160);
     }
 
-    ~AboutSettingsPanel() override {}
+    ~AboutDialog() override {}
 
-    // No sections/controls to lay out; the base implementation only draws
-    // section-header backgrounds, which we don't have here.
-    void paint(Graphics&) override {}
+    void paint(Graphics& g) override
+    {
+        g.fillAll(backgroundColour);
+    }
 
     void resized() override
     {
@@ -49,10 +50,12 @@ private:
              + "Version " + SVK_VERSION_STRING + newLine + newLine
              + "A microtonal virtual MIDI keyboard by Everytone." + newLine
              + "Licensed under Unlicense." + newLine + newLine
-             + "https://www.everytone.zone";
+            //  + "https://www.everytone.zone"
+            ;
     }
 
+    const Colour backgroundColour = Colour(0xff323e44);
     std::unique_ptr<Label> aboutLabel;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutSettingsPanel)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AboutDialog)
 };

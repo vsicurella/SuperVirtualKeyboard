@@ -1151,7 +1151,16 @@ void SvkPluginEditor::showMainMenu()
     menu.addSeparator();
     menu.addItem("Minimal View", [this]() { setMinimalView(true); });
 
+    menu.addSeparator();
+    menu.addItem("About", [this]() { showAboutDialog(); });
+
     menu.showMenuAsync(PopupMenu::Options().withTargetComponent(menuButton.get()));
+}
+
+void SvkPluginEditor::showAboutDialog()
+{
+    CallOutBox::launchAsynchronously(std::make_unique<AboutDialog>(),
+        menuButton->getScreenBounds(), nullptr);
 }
 
 void SvkPluginEditor::setMinimalView(bool shouldBeMinimal)
