@@ -537,7 +537,7 @@ void SvkPluginEditor::resized()
         settingsContainer->resized();
     }
 
-    scaleTextBox->setSize(proportionOfWidth(0.2f), barHeight);
+    scaleTextBox->setSize(scaleBoxWidth, barHeight);
     scaleTextBox->setCentrePosition(proportionOfWidth(0.5f), barHeight / 2 + gap);
     
     scaleEntryBtn->setBounds(scaleTextBox->getRight() + 8, scaleTextBox->getY(), 31, 24);
@@ -553,7 +553,7 @@ void SvkPluginEditor::resized()
     settingsButton->setTopLeftPosition(openButton->getRight() + gap, saveButton->getY());
 
     mapModeBox->setTopLeftPosition(settingsButton->getRight() + gap, gap);
-    mapModeBox->setSize(jmin(proportionOfWidth(0.15f), modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
+    mapModeBox->setSize(jmin(mapModeBoxWidth, modeInfoButton->getX() - mapModeBox->getX() - gap), barHeight);
 
     mode1ViewBtn->setBounds(getWidth() - 32, gap, 32, barHeight);
     mode2ViewBtn->setBounds(getWidth() - 32, mode1ViewBtn->getBottom() + gap, 32, barHeight);
@@ -562,15 +562,25 @@ void SvkPluginEditor::resized()
 
     if (inMappingMode)
     {
-        mode1Box->setSize(proportionOfWidth(0.15f), barHeight);
-        mode1Box->setTopLeftPosition(mode1ViewBtn->getX() - mode1Box->getWidth() - gap / 2, gap);
+        int modeBoxW = jlimit(modeBoxWidthMin, modeBoxWidthMax, proportionOfWidth(0.15f));
 
-        mode2Box->setSize(proportionOfWidth(0.15f), barHeight);
+        // Stop the transpose slider/label group from sliding under the OK button:
+        // shrink the box (right edge fixed) so the group clears the button.
+        int transposeGroupW = gap + 80 + 32; // gap + slider + note-name label
+        int minBoxX = scaleEntryBtn->getRight() + gap + transposeGroupW;
+        int boxRight = mode1ViewBtn->getX() - gap / 2;
+        if (boxRight - modeBoxW < minBoxX)
+            modeBoxW = jmax(60, boxRight - minBoxX);
+
+        mode1Box->setSize(modeBoxW, barHeight);
+        mode1Box->setTopLeftPosition(boxRight - modeBoxW, gap);
+
+        mode2Box->setSize(modeBoxW, barHeight);
         mode2Box->setTopLeftPosition(mode1Box->getX(), mode2ViewBtn->getY());
 
         mapStyleLbl->setTopLeftPosition(gap / 2, scaleTextBox->getBottom() + gap);
         mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
-        mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapModeBox->getWidth(), barHeight);
+        mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapStyleBoxWidth, barHeight);
 
         mapManualTip->setBounds(mapStyleLbl->getX(), mapStyleLbl->getY(), mapManualTip->getFont().getStringWidth(mapManualTip->getText()), barHeight);
         mapManualStatus->setBounds(mapManualTip->getRight(), mapManualTip->getY(), mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, barHeight);
@@ -597,8 +607,18 @@ void SvkPluginEditor::resized()
     }
     else
     {
-        mode2Box->setSize(proportionOfWidth(0.15f) + mode2ViewBtn->getWidth(), barHeight);
-        mode2Box->setTopLeftPosition(getWidth() - mode2Box->getWidth() - gap, gap);
+        int modeBoxW = jlimit(modeBoxWidthMin, modeBoxWidthMax, proportionOfWidth(0.15f) + mode2ViewBtn->getWidth());
+
+        // Stop the transpose slider/label group from sliding under the OK button:
+        // shrink the box (right edge fixed) so the group clears the button.
+        int transposeGroupW = gap + 80 + 32; // gap + slider + note-name label
+        int minBoxX = scaleEntryBtn->getRight() + gap + transposeGroupW;
+        int boxRight = getWidth() - gap;
+        if (boxRight - modeBoxW < minBoxX)
+            modeBoxW = jmax(60, boxRight - minBoxX);
+
+        mode2Box->setSize(modeBoxW, barHeight);
+        mode2Box->setTopLeftPosition(boxRight - modeBoxW, gap);
     }
 
     mode1RootSld->setBounds(mode1Box->getX() - 80 - gap, mode1Box->getY(), 80, barHeight);

@@ -252,10 +252,21 @@ private:
 
 
     //==============================================================================
-    int defaultMinWidth = 750;
+    // = 2*modeBoxWidthMin + scaleBoxWidth + 350, so the transpose slider always
+    // clears the centered OK button at the minimum window width.
+    int defaultMinWidth = 880;
     int defaultMinHeight = 172;
     int defaultMaxWidth = 10e4;
     int defaultMaxHeight = 10e4;
+
+    // Fixed toolbar control widths so these controls size to their content instead
+    // of scaling with the window. Values in px, tuned for the default ~15-16pt UI
+    // font plus a ~35px combo arrow; adjust here if the font changes.
+    int scaleBoxWidth = 260;    // fits >= 19 single-digit steps plus separators
+    int mapModeBoxWidth = 125;  // fits "Mapping Off"
+    int mapStyleBoxWidth = 145; // fits "Scale To Mode"
+    int modeBoxWidthMin = 135;  // ~ an average-length mode title
+    int modeBoxWidthMax = 240;  // ~ 1.5x the longest default mode title
 
     TooltipWindow tooltip;
 
