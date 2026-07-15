@@ -1,6 +1,6 @@
 # SuperVirtualKeyboard
 
-LATEST VERSION: Alpha 2020-10-?? (v0.03)
+LATEST VERSION: Alpha 2026-07-15 (v0.4.0)
 
 ![SuperVirtualKeyboard Preview](/Resources/SVK-SuperPyth22-Preview.png)
 
