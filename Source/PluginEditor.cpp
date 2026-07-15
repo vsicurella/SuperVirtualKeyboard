@@ -1045,8 +1045,13 @@ void SvkPluginEditor::showSettingsDialog()
         settingsButton->setToggleState(true, dontSendNotification);
 
         addAndMakeVisible(settingsContainer.get());
-        getParentComponent()->setSize(getWidth(), getHeight() + defaultHeight);
-        
+        // Resize the editor itself, not the parent. In standalone the parent is
+        // the real window, but when hosted the parent is a host-owned wrapper the
+        // DAW doesn't track resizing the editor is what notifies the host.
+        setSize(getWidth(), getHeight() + defaultHeight);
+        // Keep the panel from being squished if the window is shrunk while open.
+        setResizeLimits(defaultMinWidth, defaultMinHeight + defaultHeight, defaultMaxWidth, defaultMaxHeight);
+
         int setToTab = 0;
         String lastTab = stateNode.getChildWithName(SvkProperty::pluginEditorNode)[SvkProperty::settingsTabName].toString();//processor.getPluginEditorNode()[SvkProperty::settingsTabName].toString();
         DBG("Last tab: " + lastTab);
@@ -1076,7 +1081,10 @@ void SvkPluginEditor::hideSettings()
     if (isColorEditing)
         endColorEditing();
 
-    getParentComponent()->setSize(getWidth(), getHeight() - defaultHeight);
+    // Restore the min height before shrinking, otherwise the constrainer clamps
+    // the editor back up to the settings-open minimum.
+    setResizeLimits(defaultMinWidth, defaultMinHeight, defaultMaxWidth, defaultMaxHeight);
+    setSize(getWidth(), getHeight() - defaultHeight);
 }
 
 void SvkPluginEditor::beginColorEditing(ColourSettingsPanel* panel)
