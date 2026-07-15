@@ -16,6 +16,7 @@
 #include "MappingSettingsPanel.h"
 #include "ColourSettingsPanel.h"
 #include "DebugSettingsPanel.h"
+#include "AboutSettingsPanel.h"
 
 //==============================================================================
 /*
@@ -57,6 +58,9 @@ public:
 
             else if (panelName == "Debug")
                 panels.add(new DebugSettingsPanel(presetIn));
+
+            else if (panelName == "About")
+                panels.add(new AboutSettingsPanel(presetIn));
         }
 
         for (int i = 0; i < panels.size(); i++)
@@ -143,6 +147,7 @@ private:
 //#if JUCE_DEBUG
 //        , "Debug"
 //#endif
+        , "About"
     };
 
     StringArray keyboardPanels = { "Keyboard", "Colors", "Debug" };
