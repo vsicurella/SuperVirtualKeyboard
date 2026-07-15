@@ -36,22 +36,14 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
   * The "by Layers" style will allow you to map a certain layer of keys (layer 1 = diatonic white keys, order 2 = pentatonic black keys) to a certain layer of keys in the output scale.
     * An example would be making a the scale pattern "7 7 7 7 7" which is 35-EDO, and then mapping your input white keys the 7-EDO output white keys, and your black keys to one of the 5-EDO subsets.
 
-### New in version 0.03:
-1. Improved preset structure and recalling, however *new preset format is incompatible with older presets*
+### New in version 0.04:
+1. Improved stability
    * Modes may still load
    * I can add support for old presets upon request
    * The new preset structure includes versioning which make backwards-compatibility more feasible
-1. Basic manual mapping
-1. Basic KBM file export
-1. New Settings menu
-   * Reintroduced key color features
-   * Adjacent key placement style
-   * Key highlighting options
-   * Fixed period shifting and transposition
-   * MIDI Device selection for standalone app
-   * Note mapping editor
-1. Simpler and improved GUI
-1. Smoothed window resizing
+1. Improved resizing-related controls
+1. Moved Save/Load into a main menu
+1. Added a "Minimal View" mode for a bare-bones interface
 
 ### To do:
 * Allow piano keys to be triggered by computer keyboard keys
