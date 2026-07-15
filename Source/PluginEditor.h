@@ -23,6 +23,7 @@
 #include "./UI/Dialogs/ModeInfoDialog.h"
 #include "./UI/Dialogs/MapByOrderDialog.h"
 #include "./UI/Dialogs/AboutDialog.h"
+#include "./UI/Dialogs/ExportKbmDialog.h"
 
 #include "./IO/ReaperWriter.h"
 #include "./IO/AbletonMidiWriter.h"
@@ -143,6 +144,8 @@ public:
 
     void showMapOrderEditDialog();
 
+    void showExportKbmDialog();
+
     void showMainMenu();
 
     void showAboutDialog();
@@ -194,6 +197,7 @@ private:
 
     ModeInfoDialog* modeInfo;
     MapByOrderDialog* mapByOrderDialog;
+    ExportKbmDialog* exportKbmDialog;
 
     Array<Component*> mappingComponents;
 

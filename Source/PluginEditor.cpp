@@ -1134,6 +1134,17 @@ void SvkPluginEditor::showMapOrderEditDialog()
     CallOutBox::launchAsynchronously(std::unique_ptr<Component>(mapByOrderDialog), mapStyleBox->getScreenBounds(), nullptr);
 }
 
+void SvkPluginEditor::showExportKbmDialog()
+{
+    ModeMapper* mapper = processor.getModeMapper();
+    exportKbmDialog = new ExportKbmDialog(
+        mapper->getMappingNode(),
+        *processor.getState().getMode1(),
+        *processor.getState().getMode2(),
+        *mapper);
+    CallOutBox::launchAsynchronously(std::unique_ptr<Component>(exportKbmDialog), menuButton->getScreenBounds(), nullptr);
+}
+
 void SvkPluginEditor::showMainMenu()
 {
     PopupMenu menu;
@@ -1152,6 +1163,7 @@ void SvkPluginEditor::showMainMenu()
         [](Graphics& g, Rectangle<int> a) { drawExportIcon(g, a, Colours::transparentBlack, Colours::transparentBlack); }));
     menu.addItem("for Reaper Note Names", [this]() { exportModeViewedForReaper(); });
     menu.addItem("for Ableton Folding", [this]() { exportModeViewedForAbleton(); });
+    menu.addItem("for Scala Keyboard Mapping", [this]() { showExportKbmDialog(); });
 
     menu.addSeparator();
     menu.addItem("Minimal View", [this]() { setMinimalView(true); });

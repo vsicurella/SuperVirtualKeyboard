@@ -12,7 +12,7 @@
 
 #include <JuceHeader.h>
 #include "../Components/LabelledComponent.h"
-#include "../../File IO/KbmWriter.h"
+#include "../../IO/KbmWriter.h"
 
 //==============================================================================
 /*
@@ -33,7 +33,7 @@ public:
         addAndMakeVisible(refNoteSldLabel.get());
 
         refFreqEditor = new TextEditor("ReferenceFreqEditor");
-        refFreqEditor->setInputRestrictions(0, "123456890.");
+        refFreqEditor->setInputRestrictions(0, "1234567890.");
         refFreqEditLabel.reset(new LabelledComponent(*refFreqEditor, "Tuning Reference Frequency:"));
         addAndMakeVisible(refFreqEditLabel.get());
 
@@ -49,7 +49,7 @@ public:
 
         cancelButton.reset(new TextButton("CancelButton"));
         cancelButton->setButtonText("Cancel");
-        cancelButton->onClick = [&]() { delete getParentComponent(); };
+        cancelButton->onClick = [this]() { closeCallout(); };
         addAndMakeVisible(cancelButton.get());
 
         if (mappingNode.hasProperty(SvkProperty::tuningRootNote))
@@ -61,6 +61,8 @@ public:
             refFreqEditor->setText(mappingNode[SvkProperty::tuningRootFreq].toString());
         else
             refFreqEditor->setText("440.0");
+
+        setSize(360, 140);
     }
 
     ~ExportKbmDialog() override
@@ -91,34 +93,48 @@ public:
 
     void saveAndClose()
     {
-        bool success = false;
-
-        File initialDirectory;
+        // Default to the user's Documents folder; only reuse a previously saved
+        // location if one was stored for this mapping.
+        File initialDirectory = File::getSpecialLocation(File::userDocumentsDirectory);
         if (mappingNode.hasProperty(SvkProperty::kbmFileLocation) && File::isAbsolutePath(mappingNode[SvkProperty::kbmFileLocation].toString()))
             initialDirectory = File(mappingNode[SvkProperty::kbmFileLocation]);
 
         chooser = std::make_unique<FileChooser>("Save KBM file...", initialDirectory, "*.kbm");
 
-        chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode, [&](const FileChooser& chooser)
+        chooser->launchAsync(FileBrowserComponent::FileChooserFlags::saveMode | FileBrowserComponent::FileChooserFlags::warnAboutOverwriting, [this](const FileChooser& fc)
         {
+            File fileOut = fc.getResult();
+
+            // Empty result means the native dialog was cancelled.
+            if (fileOut == File())
+                return;
+
             KbmWriter kbm = KbmWriter::fromModes(
                 &inputMode, &outputMode, mapper, 0, 127, -1,
                 refNoteSld->getValue(), refFreqEditor->getText().getDoubleValue()
             );
 
-            if (kbm.writeTo(chooser.getResult()))
+            if (kbm.writeTo(fileOut))
             {
-                success = true;
                 mappingNode.setProperty(SvkProperty::tuningRootNote, refNoteSld->getValue(), nullptr);
                 mappingNode.setProperty(SvkProperty::tuningRootFreq, refFreqEditor->getText().getDoubleValue(), nullptr);
-                mappingNode.setProperty(SvkProperty::kbmFileLocation, chooser.getResult().getParentDirectory().getFullPathName(), nullptr);
-            }
+                mappingNode.setProperty(SvkProperty::kbmFileLocation, fileOut.getParentDirectory().getFullPathName(), nullptr);
 
-            if (!success)
+                closeCallout();
+            }
+            else
             {
                 AlertWindow::showMessageBoxAsync(AlertWindow::AlertIconType::WarningIcon, "File Write Error", "Could not write .kbm file", "Ok");
             }
         });
+    }
+
+    // Dismisses the enclosing CallOutBox asynchronously (safe to call from a
+    // child's callback — unlike deleting the parent component synchronously).
+    void closeCallout()
+    {
+        if (auto* box = findParentComponentOfClass<CallOutBox>())
+            box->dismiss();
     }
 
 private:

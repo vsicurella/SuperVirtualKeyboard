@@ -19,13 +19,13 @@ public:
     KbmWriter(
         int sizeIn, int firstMidiNoteIn, int lastMidiNoteIn, int mappingRootNoteIn,
         int referenceMidiNoteIn, double referenceFreqIn, int periodDegreeIn, 
-        Array<int> mappingIn
+        juce::Array<int> mappingIn
     ) :
         size(sizeIn), firstMidiNote(firstMidiNoteIn), lastMidiNote(lastMidiNoteIn), mappingRootMidiNote(mappingRootNoteIn),
         referenceMidiNote(referenceMidiNoteIn), referenceFrequency(referenceFreqIn), periodDegree(periodDegreeIn), 
         mapping(mappingIn) {}
 
-    bool writeTo(const File& fileToWriteTo)
+    bool writeTo(const juce::File& fileToWriteTo)
     {
         if (!fileToWriteTo.existsAsFile())
         {
@@ -33,11 +33,11 @@ public:
                 return false;
         }
 
-        StringArray valuesOut =
+        juce::StringArray valuesOut =
         {
-            String(size), String(firstMidiNote), String(lastMidiNote),
-            String(mappingRootMidiNote), String(referenceMidiNote),
-            String(referenceFrequency), String(periodDegree), ""
+            juce::String(size), juce::String(firstMidiNote), juce::String(lastMidiNote),
+            juce::String(mappingRootMidiNote), juce::String(referenceMidiNote),
+            juce::String(referenceFrequency), juce::String(periodDegree), ""
         };
 
         // Ensure frequency is floating point
@@ -47,11 +47,11 @@ public:
         // Change OOB notes to x
         for (auto deg : mapping)
         {
-            String degOut = (deg < 0 || deg > 127) ? "x" : String(deg);
+            juce::String degOut = (deg < 0 || deg > 127) ? "x" : juce::String(deg);
             valuesOut.getReference(7) += degOut + '\n';
         }
 
-        String fileTextOut;
+        juce::String fileTextOut;
         for (int i = 0; i < sectionLabels.size(); i++)
         {
             if (i > 0)
@@ -71,7 +71,7 @@ public:
         int firstMidiNoteIn = 0, int lastMidiNoteIn = 127, int mappingRootNoteIn = -1,
         int referenceMidiNoteIn = 69, double referenceFreqIn = 440.0, int periodDegreeIn = -1)
     {
-        Array<int> periodMap = mapperIn.getSelectedPeriodMap(*inputMode, *outputMode);
+        juce::Array<int> periodMap = mapperIn.getSelectedPeriodMap(*inputMode, *outputMode);
 
         int middleNote = mappingRootNoteIn;
         int period = periodDegreeIn;
@@ -94,15 +94,15 @@ public:
         }
         
         return KbmWriter(
-            size, jlimit(0, 127, firstMidiNoteIn), jlimit(0, 127, lastMidiNoteIn), middleNote,
-            jlimit(0, 127, referenceMidiNoteIn), jlimit(10e-3, 20e3, referenceFreqIn), period, periodMap
+            size, juce::jlimit(0, 127, firstMidiNoteIn), juce::jlimit(0, 127, lastMidiNoteIn), middleNote,
+            juce::jlimit(0, 127, referenceMidiNoteIn), juce::jlimit(10e-3, 20e3, referenceFreqIn), period, periodMap
         );
     }
 
 
     //static KbmWriter fromNoteMap(const NoteMap& noteMapIn)
     //{
-    //    Array<int> mapping;
+    //    juce::Array<int> mapping;
     //}
 
 
@@ -115,9 +115,9 @@ private:
     int referenceMidiNote;
     double referenceFrequency;
     int periodDegree;
-    Array<int> mapping;
+    juce::Array<int> mapping;
 
-    StringArray sectionLabels =
+    juce::StringArray sectionLabels =
     {
         "! Template for a keyboard mapping\n!\n! Size of map. The pattern repeats every so many keys:\n",
         "! First MIDI note number to retune:\n",
