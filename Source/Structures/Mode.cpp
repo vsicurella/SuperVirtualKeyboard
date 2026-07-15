@@ -9,7 +9,7 @@ Author:  Vincenzo
 */
 
 #include "Mode.h"
-#include "..\PluginIDs.h"
+#include "../PluginIDs.h"
 
 Mode::Mode()
 {
