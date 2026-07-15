@@ -1,56 +1,52 @@
-/*
+/*  
   ==============================================================================
 
-    PluginControlComponent.h
-    Created: 8 Jul 2019
-    Author:  Vincenzo Sicurella
+    This file was auto-generated!
+
+    It contains the basic framework code for a JUCE plugin editor.
 
   ==============================================================================
 */
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "./PluginProcessor.h"
+#include "./Structures/MappingHelper.h"
 
-#include "../../PluginState.h"
-#include "../VectorResources.h"
-#include "ReferencedComboBox.h"
-#include "VirtualKeyboard/KeyboardComponent.h"
-#include "VirtualKeyboard/KeyboardViewport.h"
-#include "../../Structures/MappingHelper.h"
+#include "./UI/VectorResources.h"
 
-#include "Settings/SettingsContainer.h"
+#include "./UI/Components/VirtualKeyboard/KeyboardComponent.h"
+#include "./UI/Components/VirtualKeyboard/KeyboardViewport.h"
 
-#include "../Dialogs/ModeInfoDialog.h"
-#include "../Dialogs/MapByOrderDialog.h"
+#include "./UI/Components/Settings/SettingsContainer.h"
 
-#include "../../File IO/ReaperWriter.h"
-#include "../../File IO/AbletonMidiWriter.h"
+#include "./UI/Dialogs/ModeInfoDialog.h"
+#include "./UI/Dialogs/MapByOrderDialog.h"
+#include "./UI/Dialogs/AboutDialog.h"
 
-class PluginControlComponent  : public Component,
-                                public TextEditor::Listener,
-                                public ComboBox::Listener,
-                                public Slider::Listener,
-                                public Button::Listener,
-                                public ScrollBar::Listener,
-                                public ChangeListener,
-                                private SvkPluginState::Listener,
-                                private SettingsContainer::Listener,
-                                private MappingHelper::Listener,
-                                private Timer
+#include "./IO/ReaperWriter.h"
+#include "./IO/AbletonMidiWriter.h"
+
+class SvkPluginEditor : public AudioProcessorEditor, 
+                        protected ValueTree::Listener,
+                        public TextEditor::Listener,
+                        public ComboBox::Listener,
+                        public Slider::Listener,
+                        public Button::Listener,
+                        public ScrollBar::Listener,
+                        public ChangeListener,
+                        private SvkPresetManager::Listener,
+                        private SvkState::Listener,
+                        private SettingsContainer::Listener,
+                        private MappingHelper::Listener,
+                        private Timer
 {
 public:
-    //==============================================================================
-    PluginControlComponent (SvkPluginState* pluginStateIn);
+    SvkPluginEditor (SvkAudioProcessor&);
+    ~SvkPluginEditor();
 
-    ~PluginControlComponent();
-
-    //==============================================================================
-
-    void paint(Graphics& g) override;
+    void paint (Graphics&) override;
     void resized() override;
-
-    void mouseDown(const MouseEvent& e) override;
 
     void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
     void sliderValueChanged(Slider* sliderThatWasMoved) override;
@@ -68,16 +64,27 @@ public:
     void timerCallback() override;
 
     //==============================================================================
+    // SvkPresetManager::Listener implementation
+    
+    void modeLibraryUpdated(const PopupMenu& menu) override;
 
-    void presetLoaded(ValueTree presetNodeIn) override;
+    //==============================================================================
+    // SvkPreset::Listener implementation
+    
+    void presetReloaded(SvkState& stateIn) override;
 
-    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override;
+    void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override;
 
-    void inputMappingChanged(NoteMap* inputNoteMap) override;
+    void keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacementType placementType) override;
+    void keyboardHighlightStyleChanged(VirtualKeyboard::HighlightStyle highlightStyle) override;
+    void keyboardKeyRatioChanged(float keyRatio) override;
+    void keyParametersShown(int keyParameters) override;
 
-    void customModeChanged(Mode* newCustomMode) override;
+    void inputMappingChanged(const NoteMap* inputNoteMap) override;
 
-    void modeInfoChanged(Mode* modeEdited) override;
+    void customModeChanged(const Mode* newCustomMode) override;
+
+    //void modeInfoChanged(const Mode* modeEdited) override;
 
     void settingsTabChanged(int tabIndex, const String& tabName, SvkSettingsPanel* panelChangedTo) override;
 
@@ -85,7 +92,7 @@ public:
 
     void keyMapConfirmed(int keyNumber, int midiNote) override;
 
-    void mappingChanged(NoteMap&) override;
+    //void mappingChanged(NoteMap&) override;
 
     //==============================================================================
 
@@ -98,9 +105,8 @@ public:
     Viewport* getViewport();
     ComboBox* getMappingStyleBox();
 
-    ReferencedComboBox* getMode1Box();
-    ReferencedComboBox* getMode2Box();
-    void updateModeBoxMenus();
+    ComboBox* getMode1Box();
+    ComboBox* getMode2Box();
 
     ImageButton* getSettingsButton();
     TextButton* getModeInfoButton();
@@ -110,18 +116,18 @@ public:
     /*
         Sets controls to plugin state
     */
-    void loadPresetNode(ValueTree presetNodeIn);
+    void loadPreset(SvkState& stateIn);
 
     /*
         Updates UI to the new mode
     */
-    void onModeViewedChange(Mode* modeViewed);
+    void onModeViewedChange(const Mode* modeViewed);
 
     int getModeSelectorViewed();
 
-    void setMappingMode(int mappingModeId, NotificationType notify = NotificationType::dontSendNotification);
+    void setMappingMode(MappingMode mapModeIn, NotificationType notify = NotificationType::dontSendNotification);
 
-    void setMappingStyleId(int idIn, NotificationType notify = NotificationType::dontSendNotification);
+    void setMappingStyleId(MappingStyle idIn, NotificationType notify = NotificationType::dontSendNotification);
 
     void setMode1Root(int rootIn, NotificationType notify = NotificationType::dontSendNotification);
 
@@ -137,11 +143,22 @@ public:
 
     void showMapOrderEditDialog();
 
+    void showMainMenu();
+
+    void showAboutDialog();
+
     void showSettingsDialog();
 
     void hideSettings();
 
-    void beginColorEditing();
+    /*
+        Collapses the header bar into a thin top margin (matching the bottom margin)
+        and hides the resize grip, maximising the keyboard area. Leave via the thin
+        button placed where the menu button normally sits.
+    */
+    void setMinimalView(bool shouldBeMinimal);
+
+    void beginColorEditing(ColourSettingsPanel* panel = nullptr);
 
     void endColorEditing();
 
@@ -157,18 +174,17 @@ public:
 
     bool exportModeViewedForAbleton();
 
+protected:
+
+    void valueTreePropertyChanged(ValueTree&, const Identifier&) override;
+
+
 private:
+    SvkAudioProcessor& processor;
+    SvkState& svkState;
 
-    SvkPluginState* pluginState;
-    SvkPresetManager* presetManager;
-
-    std::unique_ptr<Image> saveIcon;
-    std::unique_ptr<Image> openIcon;
+    std::unique_ptr<Image> menuIcon;
     std::unique_ptr<Image> settingsIcon;
-
-    std::unique_ptr<PopupMenu> saveMenu;
-    std::unique_ptr<PopupMenu> loadMenu;
-    std::unique_ptr<PopupMenu> exportMenu;
 
     std::unique_ptr<MappingHelper> mappingHelper;
 
@@ -181,12 +197,19 @@ private:
 
     Array<Component*> mappingComponents;
 
-    TextFilterIntOrSpace txtFilter;
+    //TextFilterIntOrSpace txtFilter;
 
     bool settingsPanelOpen = false;
     bool isColorEditing = false;
+    ColourSettingsPanel* colourPanel = nullptr;
     bool inMappingMode = false;
     bool mappingSettingsOpen = false;
+
+    bool minimalView = false;
+    // Visibility of the collapsed header controls at the moment minimal view was
+    // entered, so leaving it restores exactly the prior state (mapping controls
+    // depend on the current mapping mode).
+    Array<bool> minimalViewRestoreVisible;
 
     String noKeySelectedTrans = TRANS("No key selected.");
     String waitingForTrans = TRANS("Waiting for input to map to key ");
@@ -215,8 +238,8 @@ private:
 
     //==============================================================================
     std::unique_ptr<TextEditor> scaleTextBox;
-    std::unique_ptr<ReferencedComboBox> mode1Box;
-    std::unique_ptr<ReferencedComboBox> mode2Box;
+    std::unique_ptr<ComboBox> mode1Box;
+    std::unique_ptr<ComboBox> mode2Box;
     std::unique_ptr<Slider> mode1RootSld;
     std::unique_ptr<Slider> mode2RootSld;
     std::unique_ptr<TextButton> scaleEntryBtn;
@@ -237,10 +260,29 @@ private:
     std::unique_ptr<TextButton> mapCopyToManualBtn;
     std::unique_ptr<VirtualKeyboard::Keyboard> keyboard;
     std::unique_ptr<KeyboardViewport> keyboardViewport;
-    std::unique_ptr<ImageButton> saveButton;
-    std::unique_ptr<ImageButton> openButton;
+    std::unique_ptr<ImageButton> menuButton;
     std::unique_ptr<ImageButton> settingsButton;
+    std::unique_ptr<TextButton> minimalViewExitBtn;
+
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginControlComponent)
+    // = 2*modeBoxWidthMin + scaleBoxWidth + 350, so the transpose slider always
+    // clears the centered OK button at the minimum window width.
+    int defaultMinWidth = 880;
+    int defaultMinHeight = 172;
+    int defaultMaxWidth = 10e4;
+    int defaultMaxHeight = 10e4;
+
+    // Fixed toolbar control widths so these controls size to their content instead
+    // of scaling with the window. Values in px, tuned for the default ~15-16pt UI
+    // font plus a ~35px combo arrow; adjust here if the font changes.
+    int scaleBoxWidth = 260;    // fits >= 19 single-digit steps plus separators
+    int mapModeBoxWidth = 125;  // fits "Mapping Off"
+    int mapStyleBoxWidth = 145; // fits "Scale To Mode"
+    int modeBoxWidthMin = 135;  // ~ an average-length mode title
+    int modeBoxWidthMax = 240;  // ~ 1.5x the longest default mode title
+
+    TooltipWindow tooltip;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SvkPluginEditor)
 };

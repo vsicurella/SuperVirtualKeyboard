@@ -8,7 +8,7 @@ Author:  Vincenzo
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "NoteMap.h"
 
 class MidiFilter

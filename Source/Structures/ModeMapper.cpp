@@ -12,28 +12,22 @@
 
 ModeMapper::ModeMapper()
 {
-    mappingNode = ValueTree(IDs::midiMapNode);
-    setMappingStyle(0);
+    mappingNode = ValueTree(SvkProperty::midiMapNode);
+    setMappingStyle(MappingStyle::ModeToMode);
     setMapOrdersParameters(0, 0, 0, 0);
 }
 
-ModeMapper::ModeMapper(ValueTree modeMappingNodeIn)
+ModeMapper::ModeMapper(ValueTree mappingNodeIn)
 {
-    if (!modeMappingNodeIn.hasType(IDs::midiMapNode))
-    {
-        modeMappingNodeIn = ValueTree(IDs::midiMapNode);
-        DBG("MODE MAPPER UNSYCHED");
-    }
+    mappingNode = mappingNodeIn;
 
-    mappingNode = modeMappingNodeIn;
-    
-    mappingStyle = mappingNode[IDs::autoMappingStyle];
+    mappingStyle = (MappingStyle)((int)mappingNode[SvkProperty::autoMappingStyle]);
 
-    mapByOrderNum1 = mappingNode[IDs::mode1OrderMapping];
-    mapByOrderNum2 = mappingNode[IDs::mode2OrderMapping];
+    mapByOrderNum1 = mappingNode[SvkProperty::mode1OrderMapping];
+    mapByOrderNum2 = mappingNode[SvkProperty::mode2OrderMapping];
 
-    mapByOrderOffset1 = mappingNode[IDs::mode1OrderOffsetMapping];
-    mapByOrderOffset2 = mappingNode[IDs::mode2OrderOffsetMapping];
+    mapByOrderOffset1 = mappingNode[SvkProperty::mode1OrderOffsetMapping];
+    mapByOrderOffset2 = mappingNode[SvkProperty::mode2OrderOffsetMapping];
 }
 
 ValueTree ModeMapper::getMappingNode()
@@ -61,10 +55,10 @@ int ModeMapper::getMode2OrderOffset() const
     return mapByOrderOffset2;
 }
 
-void ModeMapper::setMappingStyle(int mapTypeIn)
+void ModeMapper::setMappingStyle(MappingStyle mapTypeIn)
 {
     mappingStyle = mapTypeIn;
-    mappingNode.setProperty(IDs::autoMappingStyle, mapTypeIn, nullptr);
+    mappingNode.setProperty(SvkProperty::autoMappingStyle, (int)mapTypeIn, nullptr);
 }
 
 void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int offset2)
@@ -78,25 +72,25 @@ void ModeMapper::setMapOrdersParameters(int order1, int order2, int offset1, int
 void ModeMapper::setMode1OrderNum(int orderNumber)
 {
     mapByOrderNum1 = orderNumber;
-    mappingNode.setProperty(IDs::mode1OrderMapping, mapByOrderNum1, nullptr);
+    mappingNode.setProperty(SvkProperty::mode1OrderMapping, mapByOrderNum1, nullptr);
 }
 
 void ModeMapper::setMode2OrderNum(int orderNumber)
 {
     mapByOrderNum2 = orderNumber;
-    mappingNode.setProperty(IDs::mode2OrderMapping, mapByOrderNum2, nullptr);
+    mappingNode.setProperty(SvkProperty::mode2OrderMapping, mapByOrderNum2, nullptr);
 }
 
 void ModeMapper::setMode1OrderOffset(int orderOffset)
 {
     mapByOrderOffset1 = orderOffset;
-    mappingNode.setProperty(IDs::mode1OrderOffsetMapping, mapByOrderOffset1, nullptr);
+    mappingNode.setProperty(SvkProperty::mode1OrderOffsetMapping, mapByOrderOffset1, nullptr);
 }
 
 void ModeMapper::setMode2OrderOffset(int orderOffset)
 {
     mapByOrderOffset2 = orderOffset;
-    mappingNode.setProperty(IDs::mode2OrderOffsetMapping, mapByOrderOffset2, nullptr);
+    mappingNode.setProperty(SvkProperty::mode2OrderOffsetMapping, mapByOrderOffset2, nullptr);
 }
 
 void ModeMapper::setPreviousOrderNoteMap(NoteMap prevNoteMapIn)
@@ -106,38 +100,71 @@ void ModeMapper::setPreviousOrderNoteMap(NoteMap prevNoteMapIn)
 
 NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, NoteMap prevMap)
 {
-    return map(mode1, mode2, mappingStyle, mapByOrderNum1, mapByOrderNum2, mapByOrderOffset1, mapByOrderOffset2, prevMap);
+    auto args = MappingArguments(mode1, mode2);
+
+    args.mapStyle = mappingStyle;
+    args.order1 = mapByOrderNum1;
+    args.order2 = mapByOrderNum2;
+    args.offset1 = mapByOrderOffset1;
+    args.offset2 = mapByOrderOffset2;
+
+    return map(args, prevMap);
 }
 
-NoteMap ModeMapper::map(const Mode& mode1, const Mode& mode2, int mapStyleIn, int order1, int order2, int offset1, int offset2,
-                        NoteMap prevMap)
+NoteMap ModeMapper::map(MappingArguments args, NoteMap prevMap)
 {
     NoteMap mapOut;
         
-    if (mapStyleIn < 0)
-        mapStyleIn = mappingStyle;
-    else
-        setMappingStyle(mapStyleIn);
+    setMappingStyle(args.mapStyle);
 
-    mappingNode.setProperty(IDs::autoMappingStyle, mappingStyle, nullptr);
+    mappingNode.setProperty(SvkProperty::autoMappingStyle, (int)args.mapStyle, nullptr);
     
     switch (mappingStyle)
     {
-        case ModeToScale:
-            mapOut = mapToMode1Scale(mode1, mode2);
+        case MappingStyle::ModeToScale:
+            mapOut = mapToMode1Scale(args.mode1, args.mode2);
             break;
             
-        case ModeByOrder:
-            setMapOrdersParameters(order1, order2, offset1, offset2);
+        case MappingStyle::ModeByOrder:
+            setMapOrdersParameters(args.order1, args.order2, args.offset1, args.offset2);
             previousOrderMap = prevMap;
-            mapOut = mapByOrder(mode1, mode2, mapByOrderNum1, mapByOrderNum2, mapByOrderOffset1, mapByOrderOffset2, previousOrderMap);
+            mapOut = mapByOrder(args, previousOrderMap);
             break;
             
         default:
-            mapOut = mapFull(mode1, mode2);
+            mapOut = mapFull(args.mode1, args.mode2);
             break;
     }
     
+    return mapOut;
+}
+
+Array<int> ModeMapper::getSelectedPeriodMap(const Mode& mode1, const Mode& mode2) const
+{
+    Array<int> mapOut;
+    NoteMap fullMap;
+
+    switch (mappingStyle)
+    {
+    case MappingStyle::ModeToScale:
+        if (mode1.getScaleSize() == mode2.getModeSize())
+            mapOut = getScaleToModePeriodMap(mode1, mode2);
+        else // TODO: improve
+            mapOut = mapFull(mode1, mode2).getValues();
+        break;
+
+    case MappingStyle::ModeByOrder: // TODO: improve
+        mapOut = mapFull(mode1, mode2, previousOrderMap.getValues()).getValues();
+        break;
+
+    default: // ModeToMode
+        if (mode1.getModeSize() == mode2.getModeSize())
+            mapOut = getModeToModePeriodMap(mode1, mode2);
+        else
+            mapOut = degreeMapFullMode(mode1, mode2);
+        break;
+    }
+
     return mapOut;
 }
 
@@ -146,7 +173,7 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
     if (degreeMapIn.size() != mode1.getOrders().size())
         degreeMapIn = degreeMapFullMode(mode1, mode2);
     else
-        degreeMapIn = degreeMapPeriod(mode1, mode2);
+        degreeMapIn = getModeToModePeriodMap(mode1, mode2);
 
     NoteMap mappingOut;
     
@@ -174,22 +201,22 @@ NoteMap ModeMapper::mapFull(const Mode& mode1, const Mode& mode2, Array<int> deg
 }
 
 
-NoteMap ModeMapper::mapByOrder(const Mode& mode1, const Mode& mode2, int mode1Order, int mode2Order, int mode1Offset, int mode2Offset, NoteMap prevMap)
+NoteMap ModeMapper::mapByOrder(MappingArguments args, NoteMap prevMap)
 {
-    mode1Order = jlimit(0, mode1.getMaxStep() - 1, mode1Order);
-    mode2Order = jlimit(0, mode2.getMaxStep() - 1, mode2Order);
+    auto mode1Order = jlimit(0, args.mode1.getMaxStep() - 1, args.order1);
+    auto mode2Order = jlimit(0, args.mode2.getMaxStep() - 1, args.order2);
 
-    Array<int> midiNotesFrom = mode1.getNotesOfOrder(mode1Order);
-    Array<int> midiNotesTo = mode2.getNotesOfOrder(mode2Order);
+    Array<int> midiNotesFrom = args.mode1.getNotesOfOrder(mode1Order);
+    Array<int> midiNotesTo = args.mode2.getNotesOfOrder(mode2Order);
     
-    mode1Offset = jlimit(0, midiNotesFrom.size() - 1, mode1Offset);
-    mode2Offset = jlimit(0, midiNotesTo.size() - 1, mode2Offset);
+    auto mode1Offset = jlimit(0, midiNotesFrom.size() - 1, args.offset1);
+    auto mode2Offset = jlimit(0, midiNotesTo.size() - 1, args.offset2);
     
-    int rootNoteFrom = mode1.getRootNote();
-    int rootNoteTo = mode2.getRootNote();
+    int rootNoteFrom = args.mode1.getRootNote();
+    int rootNoteTo = args.mode2.getRootNote();
 
-    int rootIndexFrom = mode1.getNotesOfOrder().indexOf(rootNoteFrom);
-    int rootIndexTo = mode2.getNotesOfOrder().indexOf(rootNoteTo);
+    int rootIndexFrom = args.mode1.getNotesOfOrder().indexOf(rootNoteFrom);
+    int rootIndexTo = args.mode2.getNotesOfOrder().indexOf(rootNoteTo);
     int rootIndexOffset = rootIndexTo - rootIndexFrom + mode2Offset - mode1Offset;
     
     int mode1Index, mode2Index;
@@ -215,7 +242,7 @@ NoteMap ModeMapper::mapToMode1Period(const Mode& mode1, const Mode& mode2, Array
 {
     // ensure degree map is the same size as Mode1 Period
     if (degreeMapIn.size() != mode1.getScaleSize())
-        degreeMapIn = degreeMapPeriod(mode1, mode2);
+        degreeMapIn = getModeToModePeriodMap(mode1, mode2);
     
     int rootNoteFrom = mode1.getRootNote();
     int rootNoteTo = mode2.getRootNote();
@@ -304,7 +331,7 @@ NoteMap ModeMapper::stdMidiToMode(const Mode& modeMapped, int rootNoteStd)
         return mapFull(meantone7_12, modeMapped);
 }
 
-Array<int> ModeMapper::degreeMapPeriod(const Mode& mode1, const Mode& mode2)
+Array<int> ModeMapper::getModeToModePeriodMap(const Mode& mode1, const Mode& mode2)
 {
     Array<int> degreeMapOut;
     
@@ -350,6 +377,23 @@ Array<int> ModeMapper::degreeMapPeriod(const Mode& mode1, const Mode& mode2)
         }
         
         mode2ScaleIndex += mode2Step;
+    }
+
+    //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");
+    return degreeMapOut;
+}
+
+Array<int> ModeMapper::getScaleToModePeriodMap(const Mode& mode1, const Mode& mode2)
+{
+    Array<int> degreeMapOut;
+
+    Array<int> mode2Steps = mode2.getSteps();
+    int mode2ScaleIndex = 0;
+
+    for (int i = 0; i < mode2Steps.size(); i++)
+    {
+        degreeMapOut.add(mode2ScaleIndex);
+        mode2ScaleIndex += mode2Steps[i];
     }
 
     //DBGArray(degreeMapOut, "Mode1 -> Mode2 Scale Degrees");

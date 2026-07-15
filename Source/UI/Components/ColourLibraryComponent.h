@@ -70,6 +70,12 @@ public:
         repaint();
     }
 
+    void resetToTransparent()
+    {
+        parentPalette.set(index, Colour());
+        repaint();
+    }
+
     Colour getCurrentColour() const
     {
         return parentPalette[index];

@@ -17,13 +17,14 @@ class KeyboardSettingsPanel : public SvkSettingsPanel
     
 public:
     
-    KeyboardSettingsPanel(SvkPluginState*);
+    KeyboardSettingsPanel(SvkState& presetIn);
     
     void comboBoxChanged(ComboBox*) override;
     void sliderValueChanged(Slider*) override;
     void buttonClicked(Button*) override;
+    void refreshPanel() override;
 
-    void setKeyboardPointer(VirtualKeyboard::Keyboard*) override;
+    //void setKeyboardPointer(VirtualKeyboard::Keyboard*) override;
       
 private:
 

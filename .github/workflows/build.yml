@@ -1,0 +1,97 @@
+name: Build
+
+# Builds SuperVirtualKeyboard on Windows, macOS, and Linux and uploads the
+# packaged zip (produced by build.py) as a workflow artifact. On a tagged
+# push (v*), the zips are also attached to a GitHub Release.
+
+on:
+  push:
+    branches: [master]
+    tags: ["v*"]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+env:
+  JUCE_VERSION: "8.0.14"
+  BUILD_CONFIG: Release
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, name: windows }
+          - { os: macos-latest, name: macos }
+          - { os: ubuntu-latest, name: linux }
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so the git-derived version rev is correct
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libasound2-dev libjack-jackd2-dev libx11-dev libxcomposite-dev \
+            libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev \
+            libxrender-dev libglu1-mesa-dev freeglut3-dev mesa-common-dev \
+            libfreetype-dev libfontconfig1-dev libcurl4-openssl-dev ninja-build
+
+      - name: Cache JUCE
+        id: cache-juce
+        uses: actions/cache@v4
+        with:
+          path: JUCE
+          key: juce-${{ env.JUCE_VERSION }}-${{ runner.os }}
+
+      - name: Fetch JUCE
+        if: steps.cache-juce.outputs.cache-hit != 'true'
+        run: git clone --branch ${{ env.JUCE_VERSION }} --depth 1 https://github.com/juce-framework/JUCE.git JUCE
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build and package
+        shell: bash
+        env:
+          juce_DIR: ${{ github.workspace }}/JUCE
+        run: |
+          python build.py \
+            --config "$BUILD_CONFIG" \
+            --clean \
+            --cmake-arg=-DSVK_COPY_PLUGIN_AFTER_BUILD=OFF
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SuperVirtualKeyboard-${{ matrix.name }}
+          path: dist/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Attach to release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+      - name: Create/update release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.zip
+          fail_on_unmatched_files: true

@@ -10,16 +10,16 @@
 
 #include "MappingSettingsPanel.h"
 
-MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
+MappingSettingsPanel::MappingSettingsPanel(SvkState& presetIn)
     : SvkSettingsPanel(
-        "MappingSettings", pluginStateIn,
+        "MappingSettings", presetIn,
         {
             "Current Mapping",
             ""
             //"Advanced Mapping"
         },
         {
-            IDs::noteMapNode,
+            SvkProperty::noteMapNode,
             Identifier("Message")
         },
         {
@@ -29,11 +29,15 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
         }
     )
 {
-    noteMapEditor = new NoteMapEditor(*pluginState->getMidiInputFilterMap());
+    noteMapEditor = new NoteMapEditor(presetIn.getMidiInputMap());
+    noteMapEditor->addListener(this);
     controls.set(0, noteMapEditor, true);
     addAndMakeVisible(noteMapEditor);
-    noteMapEditor->addListener(this);
     getSectionFlexBox(0)->items.getReference(1).associatedComponent = noteMapEditor;
+
+    //mappingModeChanged(pluginState->getMappingMode());
+
+    //pluginState->addListener(this);
 
     Label* msg = new Label("Message", "Currently, you can only edit the key number. More mapping features on the way! :)");
     controls.set(1, msg, true);
@@ -45,40 +49,34 @@ MappingSettingsPanel::MappingSettingsPanel(SvkPluginState* pluginStateIn)
 
 MappingSettingsPanel::~MappingSettingsPanel()
 {
-}
 
-void MappingSettingsPanel::setEditorToListenTo(MappingEditor* mappingEditor)
-{
-    if (externalEditor)
-        externalEditor->removeListener(noteMapEditor);
-
-    externalEditor = mappingEditor;
-
-    externalEditor->addListener(noteMapEditor);
-}
-
-void MappingSettingsPanel::listenToEditor(MappingEditor::Listener* listenerIn)
-{
-    noteMapEditor->addListener(listenerIn);
 }
 
 void MappingSettingsPanel::visibilityChanged()
 {
-    if (!isVisible())
+    if (!isVisible() && noteMapEditor != nullptr)
     {
-        if (externalEditor)
-            externalEditor->removeListener(noteMapEditor);
-
         noteMapEditor->removeAllListeners();
     }
 }
 
-void MappingSettingsPanel::mappingChanged(NoteMap& noteMapIn)
+//void MappingSettingsPanel::mappingModeChanged(int mappingModeId)
+//{
+//    preset.setMidiInputMap(noteMapIn, true, false);
+//}
+
+//void MappingSettingsPanel::inputMappingChanged(NoteMap& newNoteMap)
+//{
+//    noteMapEditor->resetMapping(newNoteMap, false);
+//}
+
+void MappingSettingsPanel::mappingEditorChanged(NoteMap& newNoteMap)
 {
-    pluginState->setMidiInputMap(noteMapIn, true, false);
+    preset.setMidiInputMap(newNoteMap, true, true);
 }
 
-void MappingSettingsPanel::buttonClicked(Button* button)
+void MappingSettingsPanel::registerEditorListener(MappingEditor::Listener* listenerIn)
 {
-
+    if (noteMapEditor != nullptr)
+        noteMapEditor->addListener(listenerIn);
 }

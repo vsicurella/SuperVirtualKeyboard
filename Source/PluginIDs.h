@@ -9,11 +9,12 @@
 */
 
 #pragma once
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 // IDENTIFIERS
 
-namespace IDs
+
+namespace SvkProperty
 {
 // Plugin State & Presets
 static Identifier svkParentNode("SVKValueTreeParent");
@@ -31,6 +32,7 @@ static Identifier presetDirectory("PresetDirectory");
 static Identifier modeDirectory("ModeDirectory");
 static Identifier createPresetFolder("CreatePresetFolder");
 static Identifier saveFactoryModes("SaveFactoryPresets");
+static Identifier minimalViewSetting("MinimalView");
 
 // Preset Properties
 static Identifier presetProperties("PresetProperties");
@@ -98,11 +100,11 @@ static Identifier modeMapFromRootNote("ModeMapFromRootNote");
 static Identifier modeMapFromPreset("ModeMapFromPreset");
 static Identifier mappingMode("MappingMode");
 static Identifier autoMappingStyle("ModeMappingType");
-static Identifier manualMappingEditOn("ManualMappingEditOn");
 static Identifier mode1OrderMapping("Mode1OrderMapping");
 static Identifier mode2OrderMapping("Mode2OrderMapping");
 static Identifier mode1OrderOffsetMapping("Mode1OrderOffsetMapping");
 static Identifier mode2OrderOffsetMapping("Mode2OrderOffsetMapping");
+static Identifier kbmFileLocation("KbmFileLocation");
 
 // Keyboard Window
 static Identifier pluginEditorNode("PluginWindow");

@@ -9,7 +9,7 @@ Author:  Vincenzo
 */
 
 #include "Mode.h"
-
+#include "..\PluginIDs.h"
 
 Mode::Mode()
 {
@@ -81,29 +81,29 @@ Mode::Mode(ValueTree modeNodeIn, bool copyNode)
         else
             modeNode = modeNodeIn;
 
-        stepsString = modeNode[IDs::stepString];
+        stepsString = modeNode[SvkProperty::stepString];
         steps = parseIntStringToArray(stepsString);
         ordersDefault = unfoldStepsToOrders(steps);
         
-        scaleSize = modeNode[IDs::scaleSize];
+        scaleSize = modeNode[SvkProperty::scaleSize];
         if (scaleSize == 0)
             scaleSize = ordersDefault.size();
         
-        modeSize = modeNode[IDs::modeSize];
+        modeSize = modeNode[SvkProperty::modeSize];
         if (modeSize == 0)
             modeSize = steps.size();
     
-        family = modeNode[IDs::family];
+        family = modeNode[SvkProperty::family];
         if (family == "")
             family = "undefined";
         
-        info = modeNode[IDs::modeInfo];
+        info = modeNode[SvkProperty::modeInfo];
         
-        name = modeNode[IDs::modeName];
+        name = modeNode[SvkProperty::modeName];
         if (name == "")
             name = getDescription();
         
-        rootNote = modeNode[IDs::rootMidiNote];
+        rootNote = modeNode[SvkProperty::rootMidiNote];
         if (rootNote < 0 || rootNote > 127)
             rootNote = 60;
 
@@ -118,16 +118,16 @@ Mode::~Mode() {}
 void Mode::updateNode(bool initializeNode)
 {
     if (initializeNode)
-        modeNode = ValueTree(IDs::modePresetNode);
+        modeNode = ValueTree(SvkProperty::modePresetNode);
 
-    modeNode.setProperty(IDs::modeName, name, nullptr);
-    modeNode.setProperty(IDs::scaleSize, scaleSize, nullptr);
-    modeNode.setProperty(IDs::modeSize, modeSize, nullptr);
-    modeNode.setProperty(IDs::stepString, stepsString, nullptr);
-    modeNode.setProperty(IDs::family, family, nullptr);
-    modeNode.setProperty(IDs::modeInfo, info, nullptr);
-    modeNode.setProperty(IDs::factoryPreset, false, nullptr);
-    modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
+    modeNode.setProperty(SvkProperty::modeName, name, nullptr);
+    modeNode.setProperty(SvkProperty::scaleSize, scaleSize, nullptr);
+    modeNode.setProperty(SvkProperty::modeSize, modeSize, nullptr);
+    modeNode.setProperty(SvkProperty::stepString, stepsString, nullptr);
+    modeNode.setProperty(SvkProperty::family, family, nullptr);
+    modeNode.setProperty(SvkProperty::modeInfo, info, nullptr);
+    modeNode.setProperty(SvkProperty::factoryPreset, false, nullptr);
+    modeNode.setProperty(SvkProperty::rootMidiNote, rootNote, nullptr);
 }
 
 void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
@@ -136,30 +136,30 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
     {
         modeNode = nodeIn;
         
-        stepsString = modeNode[IDs::stepString];
+        stepsString = modeNode[SvkProperty::stepString];
         steps = parseIntStringToArray(stepsString);
         ordersDefault = unfoldStepsToOrders(steps);
         
-        scaleSize = modeNode[IDs::scaleSize];
+        scaleSize = modeNode[SvkProperty::scaleSize];
         if (scaleSize == 0)
             scaleSize = ordersDefault.size();
         
-        modeSize = modeNode[IDs::modeSize];
+        modeSize = modeNode[SvkProperty::modeSize];
         if (modeSize == 0)
             modeSize = steps.size();
         
-        family = modeNode[IDs::family];
+        family = modeNode[SvkProperty::family];
         if (family == "")
             family = "undefined";
         
-        info = modeNode[IDs::modeInfo];
+        info = modeNode[SvkProperty::modeInfo];
         
-        name = modeNode[IDs::modeName];
+        name = modeNode[SvkProperty::modeName];
         if (name == "")
             name = getDescription();
         
         if (useNodeRoot)
-            rootNote = modeNode[IDs::rootMidiNote];
+            rootNote = modeNode[SvkProperty::rootMidiNote];
 
         if (rootNote < 0 || rootNote > 127)
             rootNote = 60;
@@ -171,7 +171,7 @@ void Mode::restoreNode(ValueTree nodeIn, bool useNodeRoot)
 
 bool Mode::isValidMode(ValueTree nodeIn)
 {
-    String steps = nodeIn.getProperty(IDs::stepString).toString();
+    String steps = nodeIn.getProperty(SvkProperty::stepString).toString();
     Array<int> stepsArray = Mode::parseIntStringToArray(steps);
 
     int length = stepsArray.size();
@@ -183,7 +183,7 @@ bool Mode::isValidMode(ValueTree nodeIn)
 
 ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
-    ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
+    ValueTree modeNodeOut = ValueTree(SvkProperty::modePresetNode);
     Array<int> steps = parseIntStringToArray(stepsIn);
     Array<int> orders = unfoldStepsToOrders(steps);
     Array<int> mosClass = intervalAmounts(steps);
@@ -191,28 +191,28 @@ ValueTree Mode::createNode(String stepsIn, String familyIn, String nameIn, Strin
     if (rootNoteIn < 0 || rootNoteIn > 127)
         rootNoteIn = 60;
 
-    modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
-    modeNodeOut.setProperty(IDs::modeSize, steps.size(), nullptr);
-    modeNodeOut.setProperty(IDs::stepString, stepsIn, nullptr);
-    modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
-    modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
-    modeNodeOut.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-    modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
+    modeNodeOut.setProperty(SvkProperty::scaleSize, orders.size(), nullptr);
+    modeNodeOut.setProperty(SvkProperty::modeSize, steps.size(), nullptr);
+    modeNodeOut.setProperty(SvkProperty::stepString, stepsIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::family, familyIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::modeInfo, infoIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::rootMidiNote, rootNoteIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::factoryPreset, factoryPreset, nullptr);
 
     if (nameIn == "")
     {
         String modeName = familyIn + "[" + String(steps.size()) + "] " + String(orders.size());
-        modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+        modeNodeOut.setProperty(SvkProperty::modeName, modeName, nullptr);
     }
     else
-        modeNodeOut.setProperty(IDs::modeName, nameIn, nullptr);
+        modeNodeOut.setProperty(SvkProperty::modeName, nameIn, nullptr);
     
     return modeNodeOut;
 }
 
 ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, String infoIn, int rootNoteIn, bool factoryPreset)
 {
-    ValueTree modeNodeOut = ValueTree(IDs::modePresetNode);
+    ValueTree modeNodeOut = ValueTree(SvkProperty::modePresetNode);
     Array<int> orders = unfoldStepsToOrders(stepsIn);
     Array<int> mosClass = intervalAmounts(stepsIn);
     String stepsStr = intArrayToString(stepsIn);
@@ -220,21 +220,21 @@ ValueTree Mode::createNode(Array<int> stepsIn, String familyIn, String nameIn, S
     if (rootNoteIn < 0 || rootNoteIn > 127)
         rootNoteIn = 60;
 
-    modeNodeOut.setProperty(IDs::scaleSize, orders.size(), nullptr);
-    modeNodeOut.setProperty(IDs::modeSize, stepsIn.size(), nullptr);
-    modeNodeOut.setProperty(IDs::stepString, stepsStr, nullptr);
-    modeNodeOut.setProperty(IDs::family, familyIn, nullptr);
-    modeNodeOut.setProperty(IDs::modeInfo, infoIn, nullptr);
-    modeNodeOut.setProperty(IDs::rootMidiNote, rootNoteIn, nullptr);
-    modeNodeOut.setProperty(IDs::factoryPreset, factoryPreset, nullptr);
+    modeNodeOut.setProperty(SvkProperty::scaleSize, orders.size(), nullptr);
+    modeNodeOut.setProperty(SvkProperty::modeSize, stepsIn.size(), nullptr);
+    modeNodeOut.setProperty(SvkProperty::stepString, stepsStr, nullptr);
+    modeNodeOut.setProperty(SvkProperty::family, familyIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::modeInfo, infoIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::rootMidiNote, rootNoteIn, nullptr);
+    modeNodeOut.setProperty(SvkProperty::factoryPreset, factoryPreset, nullptr);
 
     if (nameIn == "")
     {
         String modeName = familyIn + "[" + String(stepsStr.length()) + "] " + String(orders.size());
-        modeNodeOut.setProperty(IDs::modeName, modeName, nullptr);
+        modeNodeOut.setProperty(SvkProperty::modeName, modeName, nullptr);
     }
     else
-        modeNodeOut.setProperty(IDs::modeName, nameIn, nullptr);
+        modeNodeOut.setProperty(SvkProperty::modeName, nameIn, nullptr);
 
     return modeNodeOut;
 }
@@ -255,20 +255,20 @@ void Mode::updateProperties()
 void Mode::setFamily(String familyIn)
 {
     family = familyIn;
-    modeNode.setProperty(IDs::family, family, nullptr);
+    modeNode.setProperty(SvkProperty::family, family, nullptr);
 }
 
 void Mode::setName(String nameIn)
 {
     name = nameIn;
-    modeNode.setProperty(IDs::modeName, name, nullptr);
+    modeNode.setProperty(SvkProperty::modeName, name, nullptr);
 }
 
 
 void Mode::setInfo(String infoIn)
 {
     info = infoIn;
-    modeNode.setProperty(IDs::modeInfo, infoIn, nullptr);
+    modeNode.setProperty(SvkProperty::modeInfo, infoIn, nullptr);
 }
 
 void Mode::setRootNote(int rootNoteIn)
@@ -279,7 +279,7 @@ void Mode::setRootNote(int rootNoteIn)
         updateProperties();
     }
 
-    modeNode.setProperty(IDs::rootMidiNote, rootNote, nullptr);
+    modeNode.setProperty(SvkProperty::rootMidiNote, rootNote, nullptr);
 }
 
 void Mode::rotate(int rotateAmt)
@@ -293,11 +293,11 @@ void Mode::rotate(int rotateAmt)
     steps = newSteps;
     stepsString = intArrayToString(steps);
 
-    ValueTree degreeColors = modeNode.getChildWithName(IDs::pianoKeyColorsNode).getChildWithName(IDs::pianoKeyColorsDegree);
+    ValueTree degreeColors = modeNode.getChildWithName(SvkProperty::pianoKeyColorsNode).getChildWithName(SvkProperty::pianoKeyColorsDegree);
     for (auto degreeNode : degreeColors)
     {
-        int newDeg = totalModulus((int)degreeNode[IDs::pianoKeyColorsDegree] - rotateAmt, scaleSize);
-        degreeNode.setProperty(IDs::pianoKeyColorsDegree, newDeg, nullptr);
+        int newDeg = totalModulus((int)degreeNode[SvkProperty::pianoKeyColorsDegree] - rotateAmt, scaleSize);
+        degreeNode.setProperty(SvkProperty::pianoKeyColorsDegree, newDeg, nullptr);
     }
     
     updateProperties();
@@ -544,7 +544,7 @@ int Mode::isSimilarTo(Mode* modeToCompare) const
     return (rotations % (mode1Steps.size() + 1)) - 1;
 }
 
-Array<Array<int>> Mode::getNotesOrders()
+Array<Array<int>> Mode::getNotesOrders() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getMaxStep());
@@ -557,7 +557,7 @@ Array<Array<int>> Mode::getNotesOrders()
     return notesOut;
 }
 
-Array<Array<int>> Mode::getNotesInScaleDegrees()
+Array<Array<int>> Mode::getNotesInScaleDegrees() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getScaleSize());
@@ -565,7 +565,7 @@ Array<Array<int>> Mode::getNotesInScaleDegrees()
     return notesOut;
 }
 
-Array<Array<int>> Mode::getNotesInModalDegrees()
+Array<Array<int>> Mode::getNotesInModalDegrees() const
 {
     Array<Array<int>> notesOut;
     notesOut.resize(getModeSize());

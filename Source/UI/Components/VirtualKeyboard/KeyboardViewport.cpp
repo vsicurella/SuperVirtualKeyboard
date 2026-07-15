@@ -33,7 +33,7 @@ KeyboardViewport::KeyboardViewport(VirtualKeyboard::Keyboard* keyboardIn, const 
     setScrollingStyle(scrollingStyleIn);
 
     keyboard = keyboardIn;
-    setViewedComponent(keyboard);
+    setViewedComponent(keyboard, false);
 }
 
 void KeyboardViewport::viewedComponentChanged(Component* newComponent)
@@ -251,7 +251,8 @@ void KeyboardViewport::redrawButtons(int heightIn)
 
 void KeyboardViewport::resizeKeyboard()
 {
-    keyboard->setBounds(0, 0, keyboard->getPianoWidth(getMaximumVisibleHeight()), getMaximumVisibleHeight());
+    int heightWithScrollbar = getHeight() - getScrollBarThickness();
+    keyboard->setBounds(0, 0, keyboard->getPianoWidth(heightWithScrollbar), heightWithScrollbar);
 }
 
 void KeyboardViewport::resized()

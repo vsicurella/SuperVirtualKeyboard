@@ -10,16 +10,16 @@
 
 #include "KeyboardSettingsPanel.h"
 
-KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel("KeyboardSettingsPanel", pluginStateIn,
+KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
+    : SvkSettingsPanel("KeyboardSettingsPanel", presetIn,
         {
             "Keyboard settings"
         },
         {
-            IDs::keyboardKeysStyle,
-            IDs::keyboardHighlightStyle,
-            IDs::pianoWHRatio,
-            IDs::pianoKeyShowNumber
+            SvkProperty::keyboardKeysStyle,
+            SvkProperty::keyboardHighlightStyle,
+            SvkProperty::pianoWHRatio,
+            SvkProperty::pianoKeyShowNumber
         }, 
         {
             SvkControlProperties(ControlTypeNames::MenuControl, "Key Layout Style", true),
@@ -42,6 +42,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
     keyLayoutBox->addItem(TRANS("Nested Center"), 2);
     keyLayoutBox->addItem(TRANS("Flat"), 3);
     keyLayoutBox->addItem(TRANS("Adjacent"), 4);
+    keyLayoutBox->setSelectedId((int)preset.getKeyPlacementType(), dontSendNotification);
 
     highlightLabel = static_cast<LabelledComponent*>(controls[1]);
     highlightLabel->setComponentSize(96, controlMinHeight);
@@ -57,7 +58,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
     keyHighlightBox->addItem(TRANS("Border"), 3);
     keyHighlightBox->addItem(TRANS("Circles"), 4);
     keyHighlightBox->addItem(TRANS("Squares"), 5);
-    keyHighlightBox->addListener(this);
+    keyHighlightBox->setSelectedId((int)preset.getKeyHighlightStyle(), dontSendNotification);
 
     ratioLabel = static_cast<LabelledComponent*>(controls[2]);
     ratioLabel->setComponentSize(225, controlMinHeight);
@@ -65,59 +66,63 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkPluginState* pluginStateIn)
 
     keyRatioSlider = LabelledComponent::getComponentPointer<Slider>(ratioLabel);
     keyRatioSlider->setRange(0.01, 1, 0.01);
+    keyRatioSlider->setValue(preset.getKeySizeRatio(), dontSendNotification);
     keyRatioSlider->addListener(this);
 
     showNoteNumbers = static_cast<TextButton*>(controls[3]);
     showNoteNumbers->setSize(Font().getStringWidth(showNoteNumbers->getButtonText()) + 5, controlMinHeight);
+    showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
     showNoteNumbers->addListener(this);
 }
 
 void KeyboardSettingsPanel::comboBoxChanged(ComboBox* boxThatChanged)
 {
-    if (virtualKeyboard)
-    {
-        if (boxThatChanged == keyLayoutBox)
-        {
-            virtualKeyboard->setKeyStyle(boxThatChanged->getSelectedId());
-            virtualKeyboard->resized();
-        }
 
-        else if (boxThatChanged == keyHighlightBox)
-        {
-            virtualKeyboard->setHighlightStyle(boxThatChanged->getSelectedId());
-        }
+    if (boxThatChanged == keyLayoutBox)
+    {
+        preset.setKeyPlacementType((VirtualKeyboard::KeyPlacementType)boxThatChanged->getSelectedId());
+    }
+
+    else if (boxThatChanged == keyHighlightBox)
+    {
+        preset.setKeyHighlightStyle((VirtualKeyboard::HighlightStyle)boxThatChanged->getSelectedId());
     }
 }
 
 void KeyboardSettingsPanel::sliderValueChanged(Slider* sliderChanged)
 {
-    if (virtualKeyboard)
+
+    if (sliderChanged == keyRatioSlider)
     {
-        if (sliderChanged == keyRatioSlider)
-        {
-            virtualKeyboard->setKeySizeRatio(sliderChanged->getValue());
-            virtualKeyboard->resized();
-        }
+        preset.setKeySizeRatio(sliderChanged->getValue());
     }
+    
 }
 
 void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
 {
-    if (virtualKeyboard)
+
+    if (clickedButton == showNoteNumbers)
     {
-        if (clickedButton == showNoteNumbers)
-        {
-            virtualKeyboard->setShowNoteNumbers(clickedButton->getToggleState());
-        }
+        preset.setShowNumbers(clickedButton->getToggleState());
     }
+    
 }
 
-void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+void KeyboardSettingsPanel::refreshPanel()
 {
-    virtualKeyboard = keyboardPointer;
-
-    keyLayoutBox->setSelectedId(virtualKeyboard->getKeyPlacementStyle(), dontSendNotification);
-    keyHighlightBox->setSelectedId(virtualKeyboard->getHighlightStyle(), dontSendNotification);
-    keyRatioSlider->setValue(virtualKeyboard->getKeySizeRatio(), dontSendNotification);
-    showNoteNumbers->setToggleState(virtualKeyboard->isShowingNoteNumbers(), dontSendNotification);
+    keyLayoutBox->setSelectedId((int)preset.getKeyPlacementType(), dontSendNotification);
+    keyHighlightBox->setSelectedId((int)preset.getKeyHighlightStyle(), dontSendNotification);
+    keyRatioSlider->setValue(preset.getKeySizeRatio(), dontSendNotification);
+    showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
 }
+
+//void KeyboardSettingsPanel::setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
+//{
+//    virtualKeyboard = keyboardPointer;
+//
+//    keyLayoutBox->setSelectedId(virtualKeyboard->getKeyPlacementStyle(), dontSendNotification);
+//    keyHighlightBox->setSelectedId(virtualKeyboard->getHighlightStyle(), dontSendNotification);
+//    keyRatioSlider->setValue(virtualKeyboard->getKeySizeRatio(), dontSendNotification);
+//    showNoteNumbers->setToggleState(virtualKeyboard->isShowingNoteNumbers(), dontSendNotification);
+//}

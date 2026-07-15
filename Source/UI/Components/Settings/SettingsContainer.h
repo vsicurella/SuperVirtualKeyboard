@@ -9,26 +9,23 @@
 */
 
 #pragma once
-#include "../../../PluginState.h"
 
 #include "GeneralSettingsPanel.h"
 #include "MidiSettingsPanel.h"
 #include "KeyboardSettingsPanel.h"
 #include "MappingSettingsPanel.h"
 #include "ColourSettingsPanel.h"
-//#include "ControlSettingsPanel.h"
 #include "DebugSettingsPanel.h"
 
 //==============================================================================
 /*
 */
-class SettingsContainer : public TabbedComponent, public SvkPluginState::Listener
+class SettingsContainer : public TabbedComponent, public SvkState::Listener
 {
 public:
     
-    SettingsContainer(SvkPluginState* pluginStateIn)
-    : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop),
-        pluginState(pluginStateIn)
+    SettingsContainer(SvkPluginSettings& globalSettings, SvkState& presetIn)
+        : TabbedComponent(TabbedButtonBar::Orientation::TabsAtTop)
     {
         tabColour = Colour(0xff323e44);
         backgroundColour = tabColour.darker();
@@ -44,22 +41,22 @@ public:
         for (auto panelName : panelNames)
         {
             if (panelName == "General")
-                panels.add(new GeneralSettingsPanel(pluginState));
+                panels.add(new GeneralSettingsPanel(globalSettings, presetIn));
 
             else if (panelName == "Midi")
-                panels.add(new MidiSettingsPanel(pluginState));
+                panels.add(new MidiSettingsPanel(presetIn));
 
             else if (panelName == "Keyboard")
-                panels.add(new KeyboardSettingsPanel(pluginState));
+                panels.add(new KeyboardSettingsPanel(presetIn));
 
             else if (panelName == "Mapping")
-                panels.add(new MappingSettingsPanel(pluginState));
+                panels.add(new MappingSettingsPanel(presetIn));
 
             else if (panelName == "Colors")
-                panels.add(new ColourSettingsPanel(pluginState));
+                panels.add(new ColourSettingsPanel(presetIn));
 
             else if (panelName == "Debug")
-                panels.add(new DebugSettingsPanel(pluginState));
+                panels.add(new DebugSettingsPanel(presetIn));
         }
 
         for (int i = 0; i < panels.size(); i++)
@@ -92,16 +89,13 @@ public:
         );
     }
 
-    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPtrIn)
+    void presetReloaded(SvkState& stateIn) override
     {
-        for (int i = 0; i < panelNames.size(); i++)
-        {
-            if (keyboardPanels.contains(panelNames[i]))
-                panels[i]->setKeyboardPointer(keyboardPtrIn);
-        }
+        for (auto p : panels)
+            p->refreshPanel();
     }
 
-    void modeViewedChanged(Mode* modeIn, int selectorNumber, int slotNumber) override
+    void modeViewedChanged(const Mode* modeIn, int selectorNumber, int slotNumber) override
     {
         for (auto p : panels)
         {
@@ -127,8 +121,6 @@ protected:
     ListenerList<Listener> listeners;
 
 private:
-
-    SvkPluginState* pluginState;
 
     Array<SvkSettingsPanel*> panels;
     std::unique_ptr<Viewport> view;

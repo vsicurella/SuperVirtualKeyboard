@@ -5,7 +5,7 @@
     Created: 6 May 2019 7:31:20pm
     Author:  Vincenzo
 
-  ==============================================================================
+  ================S==============================================================
 */
 
 #pragma once
@@ -19,17 +19,17 @@ struct ScaleSizeSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-           (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+           (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (sz1 < sz2) return -1;
             else if (sz1 > sz2) return 1;
@@ -56,17 +56,17 @@ struct ModeSizeSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-            (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+            (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (m1 < m2) return -1;
             else if (m1 > m2) return 1;
@@ -92,17 +92,17 @@ struct FamilyNameSorter
 
     static int compareElements(const ValueTree t1, const ValueTree t2)
     {
-        if ((t1.hasType(IDs::modePresetNode) || t1.hasType(IDs::presetNode)) &&
-            (t2.hasType(IDs::modePresetNode) || t2.hasType(IDs::presetNode)))
+        if ((t1.hasType(SvkProperty::modePresetNode) || t1.hasType(SvkProperty::presetNode)) &&
+            (t2.hasType(SvkProperty::modePresetNode) || t2.hasType(SvkProperty::presetNode)))
         {
-            int sz1 = (int) t1[IDs::scaleSize];
-            int sz2 = (int) t2[IDs::scaleSize];
+            int sz1 = (int) t1[SvkProperty::scaleSize];
+            int sz2 = (int) t2[SvkProperty::scaleSize];
 
-            int m1 = (int) t1[IDs::modeSize];
-            int m2 = (int) t2[IDs::modeSize];
+            int m1 = (int) t1[SvkProperty::modeSize];
+            int m2 = (int) t2[SvkProperty::modeSize];
 
-            String f1 = t1[IDs::family];
-            String f2 = t2[IDs::family];
+            String f1 = t1[SvkProperty::family];
+            String f2 = t2[SvkProperty::family];
 
             if (f1 < f2) return -1;
             else if (f1 > f2) return 1;
@@ -145,51 +145,27 @@ struct Pair
     }
 };
 
+static bool toggleMenuItemEnablement(PopupMenu& menuIn, int itemIdIn, bool shouldBeEnabled)
+{
+    PopupMenu::MenuItemIterator menuItems(menuIn);
+    while (menuItems.next())
+    {
+        PopupMenu::Item& item = menuItems.getItem();
+        if (item.itemID == itemIdIn)
+        {
+            item.isEnabled = shouldBeEnabled;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //struct MidiPitch : Pair<int, int>
 //{
 //    MidiPitch(int midiNoteIn=-1, int pitchbendIn=0)
 //    : Pair<int, int>(midiNoteIn, pitchbendIn) {}
 //};
-
-class TextFilterIntOrSpace : public TextEditor::InputFilter
-{
-    String filterNewText(TextEditor&, const String& newInput) override
-    {
-        String out;
-
-        for (int c = 0; c < newInput.length(); c++)
-        {
-            if (newInput[c] >= 48 && newInput[c] < 58)
-            {
-                out += newInput[c];
-                continue;
-            }
-
-            out += " ";
-        }
-
-        return out;
-    }
-};
-
-class TextFilterInt : public TextEditor::InputFilter
-{
-    String filterNewText(TextEditor&, const String& newInput) override
-    {
-        String out;
-
-        for (int c = 0; c < newInput.length(); c++)
-        {
-            if (newInput[c] == 45 || (newInput[c] >= 48 && newInput[c] < 58))
-            {
-                out += newInput[c];
-                continue;
-            }
-        }
-
-        return out;
-    }
-};
 
 //static Point<int> pointFromString(Point<int>& p, String pointToStringIn)
 //{
@@ -452,4 +428,9 @@ static void DBGArray(Array<T>& arrayIn, String arrayName="Array")
     {
         DBG(String(i) + ": " + String(arrayIn[i]));
     }
+}
+
+static double getStdFrequency(int midiNoteIn)
+{
+    return 440.0 * pow(2, (midiNoteIn - 69) / 12.0);
 }

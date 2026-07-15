@@ -13,21 +13,35 @@
 
 namespace VirtualKeyboard
 {
-    enum UIMode
+    enum class UIMode
     {
         playMode = 0,
         editMode,
         mapMode
     };
 
-    enum Orientation
+    static juce::String UIModeToString(UIMode mode)
+    {
+        switch (mode)
+        {
+        case UIMode::playMode:
+            return "Play";
+        case UIMode::editMode:
+            return "Edit";
+        case UIMode::mapMode:
+            return "Map";
+        }
+        return juce::String("Unknown UIMode");
+    }
+
+    enum class Orientation
     {
         horizontal = 0,
         verticalLeft,
         verticalRight
     };
 
-    enum HighlightStyle
+    enum class HighlightStyle
     {
         full = 1,
         inside,
@@ -36,7 +50,7 @@ namespace VirtualKeyboard
         squares
     };
 
-    enum VelocityStyle
+    enum class VelocityStyle
     {
         linear = 1,
         curved,
@@ -49,7 +63,7 @@ namespace VirtualKeyboard
         stepped
     };
 
-    enum KeyPlacementType
+    enum class KeyPlacementType
     {
         nestedRight = 1,
         nestedCenter,
@@ -66,18 +80,53 @@ namespace VirtualKeyboard
     };
 }
 
-enum MappingStyle
+enum class MappingMode
+{
+    None = 0,
+    Auto,
+    Manual
+};
+
+static juce::String MappingModeToString(MappingMode mode)
+{
+    switch (mode)
+    {
+    case MappingMode::None:
+        return "None";
+    case MappingMode::Auto:
+        return "Auto";
+    case MappingMode::Manual:
+        return "Manual";
+    }
+    return juce::String("Unknown MappingMode");
+}
+
+enum class MappingStyle
 {
     ModeToMode = 1,
     ModeToScale,
     ModeByOrder
 };
 
+static juce::String MappingStyleToString(MappingStyle style)
+{
+    switch (style)
+    {
+    case MappingStyle::ModeToMode:
+        return "ModeToMode";
+    case MappingStyle::ModeToScale:
+        return "ModeToScale";
+    case MappingStyle::ModeByOrder:
+        return "ModeByOrder";
+    }
+    return juce::String("Unknown MappingStyle");
+}
+
 enum PluginStateNodeStatus
 {
     InvalidNode = 0,
     CurrentVersion,
     AlphaVersion,
-
+    IsPresetNode = 0x0100,
     IsAPVTSNode = 0x1000
 };

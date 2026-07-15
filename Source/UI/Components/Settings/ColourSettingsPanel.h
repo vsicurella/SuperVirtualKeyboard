@@ -36,9 +36,12 @@ public:
     {
         FocussedComponent::setComponentToFocusOn(componentPtr);
 
+        // Only sync the selector to an already-painted (opaque) swatch.
+        // For transparent/unedited swatches, keep the current selector color so
+        // the swatch only gets colored when the user actually moves the picker.
         PaintSwatch* swatch = dynamic_cast<PaintSwatch*>(componentPtr);
-        if (swatch)
-            setCurrentColour(swatch->getCurrentColour());
+        if (swatch && swatch->getCurrentColour().isOpaque())
+            setCurrentColour(swatch->getCurrentColour(), dontSendNotification);
     }
 
 
@@ -51,7 +54,8 @@ private:
         if (focussed)
             focussed->performFocusFunction(getCurrentColour().toString());
         
-        focusserCallback(currentFocus, getCurrentColour().toString());
+        if (focusserCallback)
+            focusserCallback(currentFocus, getCurrentColour().toString());
     }
 };
 
@@ -59,7 +63,7 @@ class ColourSettingsPanel : public SvkSettingsPanel
 {
 public:
 
-    ColourSettingsPanel(SvkPluginState*);
+    ColourSettingsPanel(SvkState& presetIn);
 
     ~ColourSettingsPanel() override;
 
@@ -75,9 +79,9 @@ public:
 
     void mouseUp(const MouseEvent& event) override;
 
-    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer) override;
-
     void refreshPanel() override;
+
+    void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardIn);
 
     ColourSelector* getColourSelector();
 
@@ -87,10 +91,12 @@ private:
 
 private:
 
+    VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
+
     FocussedColourSelector* colourSelector;
-    
-    ColourLibraryComponent* keyColourLibrary;
-    ColourLibraryComponent* noteOnColourLibrary;
+
+    ColourLibraryComponent* keyColourLibrary = nullptr;
+    ColourLibraryComponent* noteOnColourLibrary = nullptr;
 
     const int paintTypeRadioGroup = 100;
 

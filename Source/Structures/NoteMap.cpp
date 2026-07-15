@@ -45,15 +45,15 @@ NoteMap::NoteMap(Array<int> valuesIn, int nullValIn)
 }
 
 NoteMap::NoteMap(ValueTree noteMappingNode)
-    : NoteMap(noteMappingNode[IDs::mappingSize], true, -1)
+    : NoteMap(noteMappingNode[SvkProperty::mappingSize], true, -1)
 {
     for (auto child : noteMappingNode)
     {
-        if (child.hasType(IDs::noteMapNode))
+        if (child.hasType(SvkProperty::noteMapNode))
         {
-            int key = child[IDs::mappingMidiNoteIn];
+            int key = child[SvkProperty::mappingMidiNoteIn];
             if (key < size)
-                setValue(key, child[IDs::pianoKeyNumber]);
+                setValue(key, child[SvkProperty::pianoKeyNumber]);
         }
     }
 }
@@ -77,15 +77,15 @@ NoteMap::NoteMap(const NoteMap& mapToCopy)
 ValueTree NoteMap::getAsValueTree(Identifier parentNodeId, bool includeIdentities) const
 {
     ValueTree node(parentNodeId);
-    node.setProperty(IDs::mappingSize, size, nullptr);
+    node.setProperty(SvkProperty::mappingSize, size, nullptr);
 
     for (int i = 0; i < size; i++)
     {
         if (includeIdentities || values[i] != i)
         {
-            ValueTree value(IDs::noteMapNode);
-            value.setProperty(IDs::mappingMidiNoteIn, i, nullptr);
-            value.setProperty(IDs::pianoKeyNumber, values[i], nullptr);
+            ValueTree value(SvkProperty::noteMapNode);
+            value.setProperty(SvkProperty::mappingMidiNoteIn, i, nullptr);
+            value.setProperty(SvkProperty::pianoKeyNumber, values[i], nullptr);
             node.appendChild(value, nullptr);
         }
     }

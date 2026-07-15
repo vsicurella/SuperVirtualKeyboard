@@ -9,7 +9,7 @@
 */
 
 #pragma once
-#include "../../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 
 static void drawSaveIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFill=Colour(),
                          Colour outLineColor=Colours::lightgrey)
@@ -22,37 +22,43 @@ static void drawSaveIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFi
     
     g.setColour(Colours::whitesmoke);
 
-    int boundsSize = bounds.getWidth();
-    float imgSize = boundsSize * 7.0f / 8.0f;
-    float thickness = imgSize / 32.0f;
-    Rectangle<float> boundsReduced = bounds.reduced(bounds.getWidth() - imgSize).toFloat();
-    
+    // Float geometry (no int truncation) + a floored, proportional stroke so the
+    // icon stays crisp at small sizes and fractional DPI scaling.
+    int size = jmin(bounds.getWidth(), bounds.getHeight());
+    float imgSize = size * 7.0f / 8.0f;
+    float thickness = jmax(1.0f, imgSize / 14.0f);
+    Rectangle<float> boundsReduced = bounds.toFloat().reduced(size / 8.0f);
+
     Path outline = Path();
 
-    outline.addLineSegment(Line<float>(boundsReduced.getTopLeft().toFloat(), boundsReduced.getBottomLeft().toFloat()), thickness);
-    outline.addLineSegment(Line<float>(boundsReduced.getBottomLeft().toFloat(), boundsReduced.getBottomRight().toFloat()), thickness);
-    
+    outline.addLineSegment(Line<float>(boundsReduced.getTopLeft(), boundsReduced.getBottomLeft()), thickness);
+    outline.addLineSegment(Line<float>(boundsReduced.getBottomLeft(), boundsReduced.getBottomRight()), thickness);
+
     float corner = imgSize / 6.0f;
-    Point<float> cornerBottom = boundsReduced.getTopRight().withY(  boundsReduced.getTopRight().getY() + corner);
-    Point<float> cornerLeft = boundsReduced.getTopRight().withX(  boundsReduced.getTopRight().getX() - corner);
-    
-    outline.addLineSegment(Line<float>(boundsReduced.getBottomRight().toFloat(), cornerBottom), thickness);
+    Point<float> cornerBottom = boundsReduced.getTopRight().withY(boundsReduced.getTopRight().getY() + corner);
+    Point<float> cornerLeft = boundsReduced.getTopRight().withX(boundsReduced.getTopRight().getX() - corner);
+
+    outline.addLineSegment(Line<float>(boundsReduced.getBottomRight(), cornerBottom), thickness);
     outline.addLineSegment(Line<float>(cornerBottom, cornerLeft), thickness);
-    outline.addLineSegment(Line<float>(cornerLeft, boundsReduced.getTopLeft().toFloat()), thickness);
-    
+    outline.addLineSegment(Line<float>(cornerLeft, boundsReduced.getTopLeft()), thickness);
+
     outline = outline.createPathWithRoundedCorners(2.0f);
     g.fillPath(outline);
-    
-    g.drawRect(boundsReduced.reduced(corner, 0).withTrimmedBottom(boundsReduced.getHeight() * 2.0f/3.0f));
-    
-    float lineWidth = bounds.getWidth() * 1.0f / 8.0f;
-    float lineX1 = boundsReduced.getTopLeft().getX() + lineWidth;
-    float lineX2 = boundsReduced.getTopRight().getX() - lineWidth;
+
+    // Shutter (outline scales with the stroke instead of a fixed 1px line).
+    g.drawRect(boundsReduced.reduced(corner, 0).withTrimmedBottom(boundsReduced.getHeight() * 2.0f/3.0f), thickness);
+
+    // Label lines drawn as thickness-aware filled rects (crisp at any DPI).
+    float lineWidth = size / 8.0f;
+    float lineX1 = boundsReduced.getX() + lineWidth;
+    float lineX2 = boundsReduced.getRight() - lineWidth;
     float height = boundsReduced.getHeight();
-    
-    g.drawHorizontalLine(boundsReduced.getTopLeft().getY() + height * 0.6f, lineX1, lineX2);
-    g.drawHorizontalLine(boundsReduced.getTopLeft().getY() + height * 0.7f, lineX1, lineX2);
-    g.drawHorizontalLine(boundsReduced.getTopLeft().getY() + height * 0.8f, lineX1, lineX2);
+
+    for (float p : { 0.6f, 0.72f, 0.84f })
+    {
+        float y = boundsReduced.getY() + height * p;
+        g.fillRect(Rectangle<float>(lineX1, y - thickness / 2.0f, lineX2 - lineX1, thickness));
+    }
 }
 
 static void drawLoadIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFill=Colour(),
@@ -66,14 +72,15 @@ static void drawLoadIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFi
     
     g.setColour(Colours::whitesmoke);
 
-    int boundsSize = bounds.getWidth();
-    float imgSize = boundsSize * 7.0f / 8.0f;
-    float thickness = imgSize / 32.0f;
+    // Float geometry + a floored, proportional stroke for DPI/size robustness.
+    int size = jmin(bounds.getWidth(), bounds.getHeight());
+    float imgSize = size * 7.0f / 8.0f;
+    float thickness = jmax(1.0f, imgSize / 14.0f);
     float tabHeight = imgSize / 9.0f;
     float tabWidth = imgSize / 3.0f;
-    Rectangle<float> boundsReduced = bounds.reduced(bounds.getWidth() - imgSize).toFloat();
+    Rectangle<float> boundsReduced = bounds.toFloat().reduced(size / 8.0f);
     boundsReduced.reduce(0, imgSize/20);
-    
+
     Path outline = Path();
     outline.addLineSegment(Line<float>(boundsReduced.getTopLeft(), boundsReduced.getBottomLeft()), thickness);
     outline.addLineSegment(Line<float>(boundsReduced.getBottomLeft(), boundsReduced.getBottomRight()), thickness);
@@ -149,6 +156,77 @@ static void drawSettingsIcon(Graphics& g, Rectangle<int> bounds, Colour backgrou
     gear = gear.createPathWithRoundedCorners(thickness);
     g.fillPath(gear);
     float cR = radiusBody / 2.0f;
-    
+
     g.drawEllipse(center.getX() - cR, center.getY() - cR, cR * 2, cR * 2, thickness);
+}
+
+static void drawMenuIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFill=Colour(),
+                         Colour outLineColor=Colours::whitesmoke)
+{
+    g.setColour(backgroundFill);
+    g.fillRoundedRectangle(bounds.toFloat(), 3);
+
+    g.setColour(outLineColor);
+    g.drawRoundedRectangle(bounds.toFloat(), 3, 1);
+
+    g.setColour(Colours::whitesmoke);
+
+    int boundsSize = bounds.getWidth();
+    float imgSize = boundsSize * 7.0f / 8.0f;
+    float thickness = jmax(1.0f, imgSize / 32.0f);
+    Rectangle<float> boundsReduced = bounds.reduced(bounds.getWidth() - imgSize).toFloat();
+
+    float x1 = boundsReduced.getX();
+    float x2 = boundsReduced.getRight();
+
+    // three evenly spaced horizontal lines
+    for (int i = 1; i <= 3; ++i)
+    {
+        float y = boundsReduced.getY() + boundsReduced.getHeight() * i / 4.0f;
+        g.fillRect(Rectangle<float>(x1, y - thickness / 2.0f, x2 - x1, thickness));
+    }
+}
+
+static void drawExportIcon(Graphics& g, Rectangle<int> bounds, Colour backgroundFill=Colour(),
+                           Colour outLineColor=Colours::whitesmoke)
+{
+    g.setColour(backgroundFill);
+    g.fillRoundedRectangle(bounds.toFloat(), 3);
+
+    g.setColour(outLineColor);
+    g.drawRoundedRectangle(bounds.toFloat(), 3, 1);
+
+    g.setColour(Colours::whitesmoke);
+
+    // Float geometry + a floored, proportional stroke for DPI/size robustness.
+    int size = jmin(bounds.getWidth(), bounds.getHeight());
+    float imgSize = size * 7.0f / 8.0f;
+    float thickness = jmax(1.0f, imgSize / 14.0f);
+    Rectangle<float> r = bounds.toFloat().reduced(size / 8.0f);
+
+    // A square on the left, with a gap in its right edge where the arrow exits.
+    float boxSize = r.getHeight() * 0.62f;
+    Rectangle<float> box(r.getX(), r.getCentreY() - boxSize / 2.0f, boxSize, boxSize);
+    float gapHalf = boxSize * 0.20f;
+
+    Path boxPath;
+    boxPath.addLineSegment(Line<float>(box.getTopLeft(), box.getBottomLeft()), thickness);
+    boxPath.addLineSegment(Line<float>(box.getTopLeft(), box.getTopRight()), thickness);
+    boxPath.addLineSegment(Line<float>(box.getBottomLeft(), box.getBottomRight()), thickness);
+    boxPath.addLineSegment(Line<float>(box.getTopRight(), Point<float>(box.getRight(), box.getCentreY() - gapHalf)), thickness);
+    boxPath.addLineSegment(Line<float>(Point<float>(box.getRight(), box.getCentreY() + gapHalf), box.getBottomRight()), thickness);
+    g.fillPath(boxPath);
+
+    // An arrow that starts inside the box and extends out past its right edge.
+    float arrowY = r.getCentreY();
+    float shaftStart = box.getX() + boxSize * 0.4f;
+    float shaftEnd = r.getRight();
+    float head = imgSize * 0.2f;
+
+    Path arrow;
+    arrow.addLineSegment(Line<float>(Point<float>(shaftStart, arrowY), Point<float>(shaftEnd, arrowY)), thickness);
+    arrow.addLineSegment(Line<float>(Point<float>(shaftEnd, arrowY), Point<float>(shaftEnd - head, arrowY - head)), thickness);
+    arrow.addLineSegment(Line<float>(Point<float>(shaftEnd, arrowY), Point<float>(shaftEnd - head, arrowY + head)), thickness);
+    arrow = arrow.createPathWithRoundedCorners(thickness);
+    g.fillPath(arrow);
 }

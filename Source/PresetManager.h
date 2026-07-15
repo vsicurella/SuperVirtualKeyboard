@@ -10,12 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
-
 #include "CommonFunctions.h"
 #include "PluginIDs.h"
-#include "Structures/Preset.h"
+#include "data/SvkState.h"
 #include "Structures/Mode.h"
+#include "Structures/NoteMap.h"
 
 class SvkPresetManager : public ChangeBroadcaster
 {
@@ -30,15 +29,11 @@ class SvkPresetManager : public ChangeBroadcaster
     ModeSizeSorter modeSizeSort;
     FamilyNameSorter familyNameSort;
 
-    SvkPreset svkPresetSaved;
-    SvkPreset svkPresetWorking;
-    
-    OwnedArray<Mode> modeSlots;
-    std::unique_ptr<Mode> modeCustom;
-    
+    PopupMenu modeMenu;
+
     std::unique_ptr<FileChooser> chooser;
 
-    // Methods
+private:
     void createFactoryModes();
     void resortModeLibrary();
 
@@ -49,49 +44,29 @@ class SvkPresetManager : public ChangeBroadcaster
     void addModeToSort(ValueTree modeNodeIn);
     int addAndSortMode(ValueTree modeNodeIn);
 
+    void updateModeMenu();
+
 public:
 
     ValueTree presetLibraryNode;
     ValueTree modeLibraryNode;
     ValueTree pluginSettingsNode;
 
-    SvkPresetManager(ValueTree pluginSettingsNodeIn);
+    SvkPresetManager(SvkState& stateIn, ValueTree pluginSettingsNodeIn);
     ~SvkPresetManager();
 
-    SvkPreset& getPreset();
+    //SvkPreset& getPreset();
     int getNumMenuItems(bool withFactoryMenu=true, bool withUserMenu=true, bool withFavMenu=true, bool withSlots=true);
-
-    int getNumModeSlots() const;
     
-    Array<int> getModeSlotsInUse() const;
+    //Array<int> getModeSlotsInUse() const ;
 
-    int getModeSlotOfSelector(int modeSelectorNumIn) const;
+    //int getModeSlotOfSelector(int modeSelectorNumIn) const;
+
+    //bool isPresetEdited() const;
 
     ValueTree getModeInLibrary(int indexIn);
 
-    /*
-        Returns the mode in the given mode slot number
-    */
-    Mode* getModeInSlot(int modeSlotNumIn);
-
-    /*
-        Returns the mode used by given selector
-        If the selector is set to an invalid slot, this will return nullptr
-    */
-    Mode* getModeBySelector(int selectorNumber);
-
-    Mode* getModeCustom();
-    
-    Mode* setModeCustom(ValueTree modeNodeIn);
-    Mode* setModeCustom(String stepsIn, String familyIn = "undefined", String nameIn = "", String infoIn = "", int rootNoteIn = 60);
-
-    int setSlotToMode(int modeSlotNum, ValueTree modeNode);
-    int addSlot(ValueTree modeNode);
-    int setSlotAndSelection(int modeSlotNum, int modeSelectorNum, ValueTree modeNode);
-    int addSlotAndSetSelection(int modeSelectorNumber, ValueTree modeNode);
-
-    void removeMode(int modeSlotNum);
-    void resetModeSlots();
+    const PopupMenu& getModeMenu() const { return modeMenu; }
 
     /*
         Replaces the mode slot the selector is pointed to with a new mode
@@ -99,7 +74,7 @@ public:
     */
     void handleModeSelection(int selectorNumber, int idIn);
 
-    bool loadPreset(ValueTree presetNodeIn, bool sendChangeSignal=true);
+    //bool loadPreset(SvkPreset presetNodeIn, bool sendChangeSignal=true);
 
     bool saveNodeToFile(ValueTree nodeToSave, String saveMsg, String fileEnding, String absolutePath = "");
     bool savePresetToFile(String absolutePath="");
@@ -115,14 +90,31 @@ public:
         Reverts the changes made since the last recall
         Returns true if successful
     */
-    bool resetToSavedPreset();
+    bool resetToSavedPreset(bool sendChangeMessage);
 
     static ValueTree parseNodeFile(File fileIn);
     static ValueTree parseModeFile(File fileIn);
     static ValueTree parsePresetFile(File fileIn);
-    
-    void requestModeMenu(PopupMenu* comboBoxToUse);
+
+    class Listener
+    {
+    public:
+
+        virtual ~Listener() {};
+
+        virtual void modeLibraryUpdated(const PopupMenu& menu) {};
+    };
+
+    void addListener(SvkPresetManager::Listener* listenerIn) { listeners.add(listenerIn); }
+
+    void removeListener(SvkPresetManager::Listener* listenerIn) { listeners.remove(listenerIn); }
+
+protected:
+
+    ListenerList<Listener> listeners;
 
 private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
+    SvkState& state;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPresetManager)
 };

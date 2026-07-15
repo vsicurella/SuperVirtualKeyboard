@@ -10,43 +10,37 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginIDs.h"
 #include "CommonFunctions.h"
 #include "Constants.h"
 
 class SvkPluginSettings
 {
-    const String appFolderName = "SuperVirtualKeyboard";
-    const String settingsFileName = "SuperVirtualKeyboard.svksettings";
-    const String presetSubDirectory = "Presets";
-    const String modeSubDirectory = "Modes";
+    const String appFolderName        = "SuperVirtualKeyboard";
+    const String settingsFileName     = "SuperVirtualKeyboard.svksettings";
+    const String presetSubDirectory   = "Presets";
+    const String modeSubDirectory     = "Modes";
 
-    File factoryDefaultSettingsLocation = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
-    File factoryDefaultPresetLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(presetSubDirectory);
-    File factoryDefaultModeLocation = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(modeSubDirectory);
+    File factoryDefaultSettingsLocation   = File::getSpecialLocation(File::userApplicationDataDirectory).getChildFile(appFolderName);
+    File factoryDefaultPresetLocation     = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(presetSubDirectory);
+    File factoryDefaultModeLocation       = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile(appFolderName).getChildFile(modeSubDirectory);
 
     File currentSettingsLocation;
     File currentPresetLocation;
     File currentModeLocation;
-
-    ValueTree pluginSettingsNode;
     
     bool createPresetFolder = true;
     bool saveFactoryModes = false;
+    bool minimalView = false;
     
     bool resetDirectories = false;
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 
 public:
 
     SvkPluginSettings();
     ~SvkPluginSettings();
 
-    ValueTree getSettingsNode();
-
-    bool updateNode(bool writeSettings=false);
+    ValueTree getSettingsNode(bool writeSettings=false);
     bool restoreNode(ValueTree pluginSettingsNodeIn);
 
     String getSettingsPath();
@@ -55,6 +49,7 @@ public:
 
     bool getCreatePresetFolder();
     bool getSaveFactoryModes();
+    bool getMinimalView();
     
     void setPresetDirectory(File presetDirectoryIn);
     void setModeDirectory(File modeDirectoryIn);
@@ -62,5 +57,11 @@ public:
 
     void setCreatePresetFolder(bool shouldCreateFolder);
     void setSaveFactoryPresets(bool shouldSavePresets);
+    void setMinimalView(bool shouldBeMinimal);
 
+private:
+
+    bool writeSettingsToFile(ValueTree settingsNode);
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SvkPluginSettings)
 };

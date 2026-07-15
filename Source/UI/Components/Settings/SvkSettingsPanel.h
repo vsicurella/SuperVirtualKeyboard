@@ -9,7 +9,8 @@
 */
 
 #pragma once
-#include "../../../PluginState.h"
+#include "../../../data/SvkState.h"
+#include "../../../PluginSettings.h"
 #include "../DirectoryBrowserComponent.h"
 #include "../LabelledComponent.h"
 #include "../VirtualKeyboard/KeyboardComponent.h"
@@ -19,10 +20,10 @@
 #define defaultSectionAsFlexItem FlexItem(100, 100).withFlex(1.0f);
 
 class SvkSettingsPanel : public Component,
-    protected Slider::Listener,
-    protected Button::Listener,
-    protected ComboBox::Listener,
-    protected DirectoryBrowserComponent::Listener
+                         protected Slider::Listener,
+                         protected Button::Listener,
+                         protected ComboBox::Listener,
+                         protected DirectoryBrowserComponent::Listener
 {
 
 public:
@@ -60,7 +61,7 @@ public:
     
     SvkSettingsPanel(
         String                       panelName,
-        SvkPluginState*              pluginStateIn,
+        SvkState&                    presetIn,
         StringArray                  sectionNamesIn,
         Array<Identifier>            controlIdsIn,
         Array<SvkControlProperties>  controlTypesIn,
@@ -68,7 +69,7 @@ public:
         Array<FlexBox>               sectionBoxStyle = Array<FlexBox>(),
         Array<FlexItem>              sectionItemsStyle = Array<FlexItem>()
     ) :
-        pluginState(pluginStateIn),
+        preset(presetIn),
         sectionNames(sectionNamesIn),
         controlIdentifiers(controlIdsIn),
         controlTypes(controlTypesIn),
@@ -126,11 +127,6 @@ public:
     void resized() override
     {
         flexParent.performLayout(getLocalBounds());
-    }
-
-    virtual void setKeyboardPointer(VirtualKeyboard::Keyboard* keyboardPointer)
-    {
-        virtualKeyboard = keyboardPointer;
     }
 
     virtual void refreshPanel() {};
@@ -259,9 +255,9 @@ private:
     }
 
 protected:
-    
-    SvkPluginState* pluginState;
 
+    SvkState& preset;
+    
     StringArray sectionNames;
     int numSections;
 
@@ -281,5 +277,5 @@ protected:
     int controlMinWidth = 250;
     int controlMinHeight = 24;
 
-    VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
+    //VirtualKeyboard::Keyboard* virtualKeyboard = nullptr;
 };

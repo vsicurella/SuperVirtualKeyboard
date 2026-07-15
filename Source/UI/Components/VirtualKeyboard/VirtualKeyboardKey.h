@@ -11,7 +11,7 @@
  */
 
 #pragma once
-#include "../JuceLibraryCode/JuceHeader.h"
+#include <JuceHeader.h>
 #include "../../../PluginIDs.h"
 #include "../../../PluginModes.h"
 
@@ -39,9 +39,6 @@ namespace VirtualKeyboard
         void setPath(Path keyPathIn);
         
         void paint(juce::Graphics& g) override;
-        void resized() override;
-        
-        void mouseExit(const MouseEvent& e) override;
 
         ValueTree node;
 
@@ -71,6 +68,6 @@ namespace VirtualKeyboard
         float velocityFixed = 1;
 
         Colour color = Colours::transparentBlack;
-        int highlightStyleId = HighlightStyle::full;
+        VirtualKeyboard::HighlightStyle highlightStyleId = VirtualKeyboard::HighlightStyle::full;
     };
 }

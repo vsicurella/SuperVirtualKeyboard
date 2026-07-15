@@ -52,7 +52,6 @@ class TableSlider : public TableComponent, public Slider {};
 class NoteMapEditor : public Component, 
                       public TableListBoxModel, 
                       public MappingEditor,
-                      public MappingEditor::Listener,
                       private Button::Listener, 
                       private Label::Listener
 {
@@ -104,10 +103,6 @@ public:
     void mapMidiNoteToKey(int midiNoteIn, int keyNumberOut) override;
 
     void resetMapping(NoteMap mappingIn = NoteMap(), bool sendMessage = true) override;
-
-    // MappingEditor::Listener implementation
-
-    void mappingChanged(NoteMap& newMapping) override;
 
     //=============================================================================
 

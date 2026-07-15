@@ -98,33 +98,33 @@ Path VirtualKeyboard::KeyGraphics::getKey(int keyNumber)
     int nextStep = mode.getStepsOfOrders()[keyNumber + 1];
 
     // get key style
-    int keyShape = 0;
-    if (order == 0)
-    {
-        // has left notch
-        if (prevStep > 1)
-        {
-            keyShape += VirtualKeyboard::NotchPrevious;
-        }
+    //int keyShape = 0;
+    //if (order == 0)
+    //{
+    //    // has left notch
+    //    if (prevStep > 1)
+    //    {
+    //        keyShape += VirtualKeyboard::NotchPrevious;
+    //    }
 
-        // has right notch
-        if (nextStep > 1)
-        {
-            keyShape += VirtualKeyboard::NotchNext;
-        }
-    }
-    // Not a top layer key
-    else if (order < step - 1)
-    {
-        if (keyPlacement == VirtualKeyboard::nestedCenter)
-            keyShape = VirtualKeyboard::nestedCenter;
-        else
-            keyShape += VirtualKeyboard::NotchNext;
-    }
-    else
-    {
-        // Key is a rectangle
-    }
+    //    // has right notch
+    //    if (nextStep > 1)
+    //    {
+    //        keyShape += VirtualKeyboard::NotchNext;
+    //    }
+    //}
+    //// Not a top layer key
+    //else if (order < step - 1)
+    //{
+    //    if (keyPlacement == VirtualKeyboard::nestedCenter)
+    //        keyShape = VirtualKeyboard::nestedCenter;
+    //    else
+    //        keyShape += VirtualKeyboard::NotchNext;
+    //}
+    //else
+    //{
+    //    // Key is a rectangle
+    //}
 
     float keyWidth = baseKeyWidth - (order * baseKeyWidth * widthLayerMult);
     float keyHeight = baseKeyHeight - (order * baseKeyHeight * heightLayerMult);
@@ -133,48 +133,48 @@ Path VirtualKeyboard::KeyGraphics::getKey(int keyNumber)
     keyPathPoints.add({ 0, keyHeight });
     keyPathPoints.add({ keyWidth, keyHeight });
 
-    if (keyShape & VirtualKeyboard::NotchPrevious != 0)
-    {
-        float notchWidth = (baseKeyWidth - (prevOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
-        float prevKeyHeight = baseKeyHeight - (prevOrder * baseKeyHeight * heightLayerMult);
+    //if (keyShape & VirtualKeyboard::NotchPrevious != 0)
+    //{
+    //    float notchWidth = (baseKeyWidth - (prevOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
+    //    float prevKeyHeight = baseKeyHeight - (prevOrder * baseKeyHeight * heightLayerMult);
 
-        keyPathPoints.insert(0, { 0, prevKeyHeight });
-        keyPathPoints.insert(0, { notchWidth, prevKeyHeight });
-        keyPathPoints.insert(0, { notchWidth, 0 });
-    }
-    else
-    {
+    //    keyPathPoints.insert(0, { 0, prevKeyHeight });
+    //    keyPathPoints.insert(0, { notchWidth, prevKeyHeight });
+    //    keyPathPoints.insert(0, { notchWidth, 0 });
+    //}
+    //else
+    //{
         keyPathPoints.insert(0, { 0, 0 });
-    }
+    //}
 
-    if (keyShape & VirtualKeyboard::NotchNext != 0)
-    {
-        float notchX = keyWidth - (baseKeyWidth - (nextOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
-        float nextKeyHeight = baseKeyHeight - (nextOrder * baseKeyHeight * heightLayerMult);
+    //if (keyShape & VirtualKeyboard::NotchNext != 0)
+    //{
+    //    float notchX = keyWidth - (baseKeyWidth - (nextOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
+    //    float nextKeyHeight = baseKeyHeight - (nextOrder * baseKeyHeight * heightLayerMult);
 
-        keyPathPoints.add({ keyWidth, nextKeyHeight });
-        keyPathPoints.add({ notchX, nextKeyHeight });
-        keyPathPoints.add({ notchX, 0 });
-    }
-    else
-    {
+    //    keyPathPoints.add({ keyWidth, nextKeyHeight });
+    //    keyPathPoints.add({ notchX, nextKeyHeight });
+    //    keyPathPoints.add({ notchX, 0 });
+    //}
+    //else
+    //{
         keyPathPoints.add({ keyWidth, 0 });
-    }
+    //}
 
-    if (keyShape == VirtualKeyboard::NotchCenter)
-    {
-        float nextKeyWidth = (baseKeyWidth - (nextOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
-        float notchX0 = (keyWidth - nextKeyWidth) / 2;
-        float notchX1 = keyWidth - notchX0;
-        float nextKeyHeight = baseKeyHeight - (nextOrder * baseKeyHeight * heightLayerMult);
+    //if (keyShape == VirtualKeyboard::NotchCenter)
+    //{
+    //    float nextKeyWidth = (baseKeyWidth - (nextOrder * baseKeyWidth * widthLayerMult)) / 2.0f;
+    //    float notchX0 = (keyWidth - nextKeyWidth) / 2;
+    //    float notchX1 = keyWidth - notchX0;
+    //    float nextKeyHeight = baseKeyHeight - (nextOrder * baseKeyHeight * heightLayerMult);
 
-        keyPathPoints.insert(0, { 0, 0 });
-        keyPathPoints.insert(0, { notchX0, 0 });
-        keyPathPoints.insert(0, { notchX0, nextKeyHeight });
-        keyPathPoints.add({ keyWidth, 0 });
-        keyPathPoints.add({ notchX1, 0 });
-        keyPathPoints.add({ notchX1, nextKeyHeight });
-    }
+    //    keyPathPoints.insert(0, { 0, 0 });
+    //    keyPathPoints.insert(0, { notchX0, 0 });
+    //    keyPathPoints.insert(0, { notchX0, nextKeyHeight });
+    //    keyPathPoints.add({ keyWidth, 0 });
+    //    keyPathPoints.add({ notchX1, 0 });
+    //    keyPathPoints.add({ notchX1, nextKeyHeight });
+    //}
 
     // Build Path
     Path keyPath;

@@ -20,6 +20,8 @@
 
 class Mode
 {
+    ValueTree modeNode;
+
     String name;
     int scaleSize;
     int modeSize;
@@ -46,14 +48,14 @@ class Mode
     
 public:
     
-    ValueTree modeNode;
-
     Mode();
     Mode(String stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
     Mode(Array<int> stepsIn, String familyIn="undefined", int rootNoteIn=60, String nameIn="", String infoIn="");
     Mode(ValueTree modeNodeIn, bool copyNode=false);
 
     ~Mode();
+
+    ValueTree getNode() const { return modeNode; }
 
     void updateNode(bool initializeNode=false);
     void restoreNode(ValueTree nodeIn, bool useNodeRoot=true);
@@ -176,17 +178,17 @@ public:
     /*
         Returns a table of note numbers (with current root) organized by key order.
     */
-    Array<Array<int>> getNotesOrders();
+    Array<Array<int>> getNotesOrders() const;
 
     /*
         Returns a table of note numbers (with current root) organized by scale degree.
     */
-    Array<Array<int>> getNotesInScaleDegrees();
+    Array<Array<int>> getNotesInScaleDegrees() const;
 
     /*
         Returns a table of note numbers (with current root) organized by modal degree.
     */
-    Array<Array<int>> getNotesInModalDegrees();
+    Array<Array<int>> getNotesInModalDegrees() const;
 
     /*
     Simply parses a string reprsenting step sizes and returns a vector

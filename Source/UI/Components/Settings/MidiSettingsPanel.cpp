@@ -10,18 +10,18 @@
 
 #include "MidiSettingsPanel.h"
 
-MidiSettingsPanel::MidiSettingsPanel(SvkPluginState* pluginStateIn)
-    : SvkSettingsPanel("MidiSettingsPanel", pluginStateIn, 
+MidiSettingsPanel::MidiSettingsPanel(SvkState& presetIn)
+    : SvkSettingsPanel("MidiSettingsPanel", presetIn, 
         { 
             "Filters",
             "Devices"
         },
         { 
-            IDs::periodShift,
-            IDs::transposeAmt,
-            IDs::keyboardMidiChannel,
-            IDs::midiInputName,
-            IDs::midiOutputName 
+            SvkProperty::periodShift,
+            SvkProperty::transposeAmt,
+            SvkProperty::keyboardMidiChannel,
+            SvkProperty::midiInputName,
+            SvkProperty::midiOutputName 
         },
         { 
             SvkControlProperties(ControlTypeNames::SliderControl, "Period Shift", true, 0, 0, -10, 10),
@@ -34,11 +34,11 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPluginState* pluginStateIn)
 {
     Array<Identifier> labelledControlIDs =
     {
-        IDs::periodShift,
-        IDs::transposeAmt,
-        IDs::keyboardMidiChannel,
-        IDs::midiInputName,
-        IDs::midiOutputName
+        SvkProperty::periodShift,
+        SvkProperty::transposeAmt,
+        SvkProperty::keyboardMidiChannel,
+        SvkProperty::midiInputName,
+        SvkProperty::midiOutputName
     };
 
     for (auto id : labelledControlIDs)
@@ -46,46 +46,46 @@ MidiSettingsPanel::MidiSettingsPanel(SvkPluginState* pluginStateIn)
         idToLabelledControl.set(id, static_cast<LabelledComponent*>(idToControl[id]));
     }
 
-    midiProcessor = pluginState->getMidiProcessor();
+    //midiProcessor = pluginState->getMidiProcessor();
 
-    idToLabelledControl[IDs::periodShift]->setComponentSize(100, 24);
-    periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::periodShift]);
+    idToLabelledControl[SvkProperty::periodShift]->setComponentSize(100, 24);
+    periodShiftSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::periodShift]);
     periodShiftSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     periodShiftSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
-    periodShiftSlider->setValue(midiProcessor->getPeriodShift());
+    periodShiftSlider->setValue(preset.getPeriodShift());
     periodShiftSlider->addListener(this);
 
-    idToLabelledControl[IDs::transposeAmt]->setComponentSize(100, 24);
-    transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::transposeAmt]);
+    idToLabelledControl[SvkProperty::transposeAmt]->setComponentSize(100, 24);
+    transposeSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::transposeAmt]);
     transposeSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     transposeSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
-    transposeSlider->setValue(midiProcessor->getTransposeAmt());
+    transposeSlider->setValue(preset.getTransposeAmount());
     transposeSlider->addListener(this);
 
-    idToLabelledControl[IDs::keyboardMidiChannel]->setComponentSize(100, 24);
-    midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[IDs::keyboardMidiChannel]);
+    idToLabelledControl[SvkProperty::keyboardMidiChannel]->setComponentSize(100, 24);
+    midiChannelSlider = LabelledComponent::getComponentPointer<Slider>(idToLabelledControl[SvkProperty::keyboardMidiChannel]);
     midiChannelSlider->setSliderStyle(Slider::SliderStyle::IncDecButtons);
     midiChannelSlider->setTextBoxStyle(Slider::TextBoxLeft, false, 40, 24);
-    midiChannelSlider->setValue(midiProcessor->getMidiChannelOut());
+    midiChannelSlider->setValue(preset.getMidiChannelOut());
     midiChannelSlider->addListener(this);
 
     // Setup device settings if on standalone version, or hide
     if (JUCEApplication::isStandaloneApp())
     {
-        inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiInputName]);
+        inputBoxLabelled = static_cast<LabelledComponent*>(idToControl[SvkProperty::midiInputName]);
         inputBoxLabelled->setComponentSize(320, 24);
         inputBox = LabelledComponent::getComponentPointer<ComboBox>(inputBoxLabelled);
         inputBox->addListener(this);
 
-        outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[IDs::midiOutputName]);
+        outputBoxLabelled = static_cast<LabelledComponent*>(idToControl[SvkProperty::midiOutputName]);
         outputBoxLabelled->setComponentSize(320, 24);
         outputBox = LabelledComponent::getComponentPointer<ComboBox>(outputBoxLabelled);
         outputBox->addListener(this);
     }
     else
     {
-        controls.removeObject(idToControl[IDs::midiInputName], true);
-        controls.removeObject(idToControl[IDs::midiOutputName], true);
+        controls.removeObject(idToControl[SvkProperty::midiInputName], true);
+        controls.removeObject(idToControl[SvkProperty::midiOutputName], true);
 
         sectionHeaderLabels.remove(1);
         flexParent.items.remove(1);
@@ -113,17 +113,17 @@ void MidiSettingsPanel::sliderValueChanged(Slider* sliderThatChanged)
 {
     if (sliderThatChanged == periodShiftSlider)
     {
-        midiProcessor->setPeriodShift(sliderThatChanged->getValue());
+        preset.setPeriodShift(sliderThatChanged->getValue());
     }
 
     else if (sliderThatChanged == transposeSlider)
     {
-        midiProcessor->setTransposeAmt(sliderThatChanged->getValue());
+        preset.setTransposeAmount(sliderThatChanged->getValue());
     }
 
-    else if (sliderThatChanged == periodShiftSlider)
+    else if (sliderThatChanged == midiChannelSlider)
     {
-        midiProcessor->setMidiChannelOut(sliderThatChanged->getValue());
+        preset.setMidiChannelOut((int)sliderThatChanged->getValue());
     }
 }
 
@@ -132,17 +132,29 @@ void MidiSettingsPanel::comboBoxChanged(ComboBox* comboBoxThatChanged)
     // Midi Input Changed
     if (inputBox == comboBoxThatChanged)
     {
-        MidiDeviceInfo& device = availableIns.getReference(inputBox->getSelectedId() - 1);
-        DBG("Midi Input Selected: " + device.name);
-        pluginState->getMidiProcessor()->setMidiInput(device.identifier);
+        int selectedId = inputBox->getSelectedId();
+        if (selectedId == noneItemId)
+            preset.setMidiInputDevice({});
+        else
+        {
+            int idx = selectedId - deviceItemIdStart;
+            if (idx >= 0 && idx < availableIns.size())
+                preset.setMidiInputDevice(availableIns.getReference(idx));
+        }
     }
 
     // Midi Output Changed
     else if (outputBox == comboBoxThatChanged)
     {
-        MidiDeviceInfo& device = availableOuts.getReference(outputBox->getSelectedId() - 1);
-        DBG("Midi Output Selected: " + device.name);
-        pluginState->getMidiProcessor()->setMidiOutput(device.identifier);
+        int selectedId = outputBox->getSelectedId();
+        if (selectedId == noneItemId)
+            preset.setMidiOutputDevice({});
+        else
+        {
+            int idx = selectedId - deviceItemIdStart;
+            if (idx >= 0 && idx < availableOuts.size())
+                preset.setMidiOutputDevice(availableOuts.getReference(idx));
+        }
     }
 }
 
@@ -159,13 +171,25 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableIns = inputDevices;
         inputBox->clear(dontSendNotification);
-        inputBox->setText(pluginState->getMidiProcessor()->getInputName(), dontSendNotification);
+        inputBox->addItem(TRANS("None"), noneItemId);
 
-        int i = 1;
-        for (auto device : availableIns)
-        {
+        int i = deviceItemIdStart;
+        for (auto& device : availableIns)
             inputBox->addItem(device.name, i++);
+
+        String currentIn = preset.getMidiInputName();
+        bool found = false;
+        for (int i = 0; i < availableIns.size(); ++i)
+        {
+            if (availableIns[i].name == currentIn)
+            {
+                inputBox->setSelectedId(i + deviceItemIdStart, dontSendNotification);
+                found = true;
+                break;
+            }
         }
+        if (!found)
+            inputBox->setSelectedId(noneItemId, dontSendNotification);
     }
 
     Array<MidiDeviceInfo> outputDevices = MidiOutput::getAvailableDevices();
@@ -174,12 +198,24 @@ void MidiSettingsPanel::refreshDevices()
     {
         availableOuts = outputDevices;
         outputBox->clear(dontSendNotification);
-        outputBox->setText(pluginState->getMidiProcessor()->getOutputName(), dontSendNotification);
+        outputBox->addItem(TRANS("None"), noneItemId);
 
-        int i = 1;
-        for (auto device : availableOuts)
-        {
+        int i = deviceItemIdStart;
+        for (auto& device : availableOuts)
             outputBox->addItem(device.name, i++);
+
+        String currentOut = preset.getMidiOutputName();
+        bool found = false;
+        for (int i = 0; i < availableOuts.size(); ++i)
+        {
+            if (availableOuts[i].name == currentOut)
+            {
+                outputBox->setSelectedId(i + deviceItemIdStart, dontSendNotification);
+                found = true;
+                break;
+            }
         }
+        if (!found)
+            outputBox->setSelectedId(noneItemId, dontSendNotification);
     }
 }

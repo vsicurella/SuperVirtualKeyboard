@@ -10,30 +10,31 @@
 
 #pragma once
 
+#include "../../../PresetManager.h"
 #include "SvkSettingsPanel.h"
 #include "../NoteMapEditor.h"
 
-class MappingSettingsPanel : public SvkSettingsPanel, public MappingEditor::Listener
+class MappingSettingsPanel : public SvkSettingsPanel, 
+                             public SvkPresetManager::Listener, 
+                             public MappingEditor::Listener
 {
 public:
 
-    MappingSettingsPanel(SvkPluginState* pluginStateIn);
+    MappingSettingsPanel(SvkState& presetIn);
     ~MappingSettingsPanel();
-
-    void buttonClicked(Button*) override;
-
-    void setEditorToListenTo(MappingEditor* mappingEditor);
-
-    void listenToEditor(MappingEditor::Listener* listenerIn);
 
     void visibilityChanged() override;
 
-    //================================================================
+    //void mappingModeChanged(int mappingModeId) override;
 
-    void mappingChanged(NoteMap&) override;
+    //void inputMappingChanged(NoteMap&) override;
+
+    void mappingEditorChanged(NoteMap&) override;
+
+    void registerEditorListener(MappingEditor::Listener* listenerIn);
 
 private:
 
-    MappingEditor* externalEditor = nullptr;
-    NoteMapEditor* noteMapEditor;
+    Label* currentMappingLabel;
+    NoteMapEditor* noteMapEditor = nullptr;
 };
