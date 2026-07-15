@@ -156,7 +156,7 @@ void ColourLibraryComponent::setupFlex()
         FlexItem labelAsItem;
         labelAsItem.associatedComponent = row;
         labelAsItem.minHeight = 24;
-        labelAsItem.minWidth = Font().getStringWidth(row->getText());
+        labelAsItem.minWidth = GlyphArrangement::getStringWidthInt(Font(), row->getText());
         flexBox.items.add(labelAsItem);
 
         FlexItem boxAsItem;

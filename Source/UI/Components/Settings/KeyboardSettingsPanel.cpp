@@ -70,7 +70,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
     keyRatioSlider->addListener(this);
 
     showNoteNumbers = static_cast<TextButton*>(controls[3]);
-    showNoteNumbers->setSize(Font().getStringWidth(showNoteNumbers->getButtonText()) + 5, controlMinHeight);
+    showNoteNumbers->setSize(GlyphArrangement::getStringWidthInt(Font(), showNoteNumbers->getButtonText()) + 5, controlMinHeight);
     showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
     showNoteNumbers->addListener(this);
 }

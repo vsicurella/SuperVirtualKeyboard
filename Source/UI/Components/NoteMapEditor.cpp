@@ -14,10 +14,10 @@
 NoteMapEditor::NoteMapEditor(NoteMap noteMapIn)
 {
     header = &table.getHeader();
-    header->addColumn("Note In", ColumnType::MidiNoteIn,font.getStringWidth("128"), font.getStringWidth("Note In"));
-    header->addColumn("Key", ColumnType::KeyNumber, font.getStringWidth("128"), font.getStringWidth("Key"));
-    header->addColumn("Note Out", ColumnType::MidiNoteOut, font.getStringWidth("128"), font.getStringWidth("Note Out"));
-    header->addColumn("+/-", ColumnType::ToggleMapping, font.getStringWidth("+/-"), font.getStringWidth("+/-"));
+    header->addColumn("Note In", ColumnType::MidiNoteIn,GlyphArrangement::getStringWidthInt(font, "128"), GlyphArrangement::getStringWidthInt(font, "Note In"));
+    header->addColumn("Key", ColumnType::KeyNumber, GlyphArrangement::getStringWidthInt(font, "128"), GlyphArrangement::getStringWidthInt(font, "Key"));
+    header->addColumn("Note Out", ColumnType::MidiNoteOut, GlyphArrangement::getStringWidthInt(font, "128"), GlyphArrangement::getStringWidthInt(font, "Note Out"));
+    header->addColumn("+/-", ColumnType::ToggleMapping, GlyphArrangement::getStringWidthInt(font, "+/-"), GlyphArrangement::getStringWidthInt(font, "+/-"));
     header->setStretchToFitActive(true);
 
     table.setColour(ListBox::outlineColourId, Colours::darkgrey);
@@ -170,10 +170,10 @@ int NoteMapEditor::getColumnAutoSizeWidth(int columnId)
     switch (ColumnType(columnId))
     {
     case ColumnType::ToggleMapping:
-        return font.getStringWidth("+");
+        return GlyphArrangement::getStringWidthInt(font, "+");
 
     default:
-        return font.getStringWidth("128");
+        return GlyphArrangement::getStringWidthInt(font, "128");
     }
 }
 

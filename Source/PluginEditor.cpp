@@ -31,7 +31,7 @@ namespace
         {
             auto f = getLookAndFeel().getPopupMenuFont();
             idealHeight = roundToInt(f.getHeight() * 1.3f); // == item row height
-            idealWidth = roundToInt(f.getHeight() * 1.3f) + f.boldened().getStringWidth(label) + 12;
+            idealWidth = roundToInt(f.getHeight() * 1.3f) + GlyphArrangement::getStringWidthInt(f.boldened(), label) + 12;
         }
 
         void paint(Graphics& g) override
@@ -650,8 +650,8 @@ void SvkPluginEditor::resized()
         mapStyleLbl->setSize(mapModeBox->getX() - mapStyleLbl->getX(), barHeight);
         mapStyleBox->setBounds(mapStyleLbl->getRight(), mapStyleLbl->getY(), mapStyleBoxWidth, barHeight);
 
-        mapManualTip->setBounds(mapStyleLbl->getX(), mapStyleLbl->getY(), mapManualTip->getFont().getStringWidth(mapManualTip->getText()), barHeight);
-        mapManualStatus->setBounds(mapManualTip->getRight(), mapManualTip->getY(), mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, barHeight);
+        mapManualTip->setBounds(mapStyleLbl->getX(), mapStyleLbl->getY(), GlyphArrangement::getStringWidthInt(mapManualTip->getFont(), mapManualTip->getText()), barHeight);
+        mapManualStatus->setBounds(mapManualTip->getRight(), mapManualTip->getY(), GlyphArrangement::getStringWidthInt(mapManualStatus->getFont(), mapManualStatus->getText()) + 8, barHeight);
 
         mapOrderEditBtn->setBounds(mapStyleBox->getRight() + gap, mapStyleBox->getY(), 55, barHeight);
         mapApplyBtn->setBounds(mapOrderEditBtn->getRight() + gap, mapOrderEditBtn->getY(), 55, barHeight);
@@ -964,7 +964,7 @@ void SvkPluginEditor::keyMappingStatusChanged(int keyNumber, bool preparedToMap)
         mapManualCancel->setVisible(false);
     }
 
-    mapManualStatus->setSize(mapManualStatus->getFont().getStringWidth(mapManualStatus->getText()) + 8, mapManualStatus->getHeight());
+    mapManualStatus->setSize(GlyphArrangement::getStringWidthInt(mapManualStatus->getFont(), mapManualStatus->getText()) + 8, mapManualStatus->getHeight());
     resized();
 }
 

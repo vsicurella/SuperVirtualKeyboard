@@ -64,7 +64,7 @@ public:
         label->setJustificationType(Justification::verticallyCentred);
         addAndMakeVisible(label.get());
 
-        setLabelSize(font.getStringWidth(label->getText()) + 8, 24);
+        setLabelSize(GlyphArrangement::getStringWidthInt(font, label->getText()) + 8, 24);
 
         // Default Size
         component->setSize(225, 24);
