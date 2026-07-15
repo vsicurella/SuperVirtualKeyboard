@@ -783,6 +783,11 @@ void SvkPluginEditor::keyboardKeyPlacementTypeChanged(VirtualKeyboard::KeyPlacem
     keyboard->resized();
 }
 
+void SvkPluginEditor::keyboardHighlightStyleChanged(VirtualKeyboard::HighlightStyle highlightStyle)
+{
+    keyboard->setHighlightStyle(highlightStyle);
+}
+
 void SvkPluginEditor::keyboardKeyRatioChanged(float keyRatio)
 {
     keyboard->setKeySizeRatio(keyRatio, true);

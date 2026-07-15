@@ -58,7 +58,7 @@ KeyboardSettingsPanel::KeyboardSettingsPanel(SvkState& presetIn)
     keyHighlightBox->addItem(TRANS("Border"), 3);
     keyHighlightBox->addItem(TRANS("Circles"), 4);
     keyHighlightBox->addItem(TRANS("Squares"), 5);
-    keyHighlightBox->addListener(this);
+    keyHighlightBox->setSelectedId((int)preset.getKeyHighlightStyle(), dontSendNotification);
 
     ratioLabel = static_cast<LabelledComponent*>(controls[2]);
     ratioLabel->setComponentSize(225, controlMinHeight);
@@ -112,6 +112,7 @@ void KeyboardSettingsPanel::buttonClicked(Button* clickedButton)
 void KeyboardSettingsPanel::refreshPanel()
 {
     keyLayoutBox->setSelectedId((int)preset.getKeyPlacementType(), dontSendNotification);
+    keyHighlightBox->setSelectedId((int)preset.getKeyHighlightStyle(), dontSendNotification);
     keyRatioSlider->setValue(preset.getKeySizeRatio(), dontSendNotification);
     showNoteNumbers->setToggleState(preset.areNoteNumbersShown(), dontSendNotification);
 }
