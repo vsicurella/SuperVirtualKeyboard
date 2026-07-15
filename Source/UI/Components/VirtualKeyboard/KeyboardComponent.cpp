@@ -733,8 +733,12 @@ Key* Keyboard::getKeyFromPosition(Point<int> posIn)
 }
 
 Key* Keyboard::getKeyFromPositionMouseEvent(const MouseEvent& e)
-{    
-    Point<int> ep = Point<int>(e.getScreenX() - getScreenX(), e.getPosition().getY());
+{
+    // Map the event into this component's local space. getEventRelativeTo handles
+    // any DPI/global-scale/affine transform between screen and local coordinates;
+    // the old "getScreenX() - getScreenX()" math silently multiplied the offset by
+    // the scale factor, so clicks landed on a higher key the further right they were.
+    Point<int> ep = e.getEventRelativeTo(this).getPosition();
     return getKeyFromPosition(ep);
 }
 
