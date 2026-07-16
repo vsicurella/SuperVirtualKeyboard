@@ -12,7 +12,7 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateVersion.cmake")
 set(SVK_VERSION_FULL "${PROJECT_VERSION}.${SVK_VERSION_REV}")
 message(STATUS "SuperVirtualKeyboard version: ${SVK_VERSION_FULL}")
 
-add_subdirectory($ENV{juce_DIR} subprojects/juce)
+add_subdirectory($ENV{JUCE_PATH} subprojects/juce)
 
 # When ON, the built VST3 is copied to the OS default plugin folder after each
 # build (Windows: %CommonProgramFiles%\VST3, macOS: ~/Library/Audio/Plug-Ins/VST3,

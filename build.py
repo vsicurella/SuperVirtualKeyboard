@@ -5,7 +5,7 @@ Configures and builds the CMake project, then zips the VST3 and Standalone
 artefacts into dist/ with the version and platform baked into the filename.
 
 Works on Windows, macOS, and Linux. Requires: python3, cmake, git, and the
-juce_DIR environment variable pointing at your JUCE checkout (same as CMake).
+JUCE_PATH environment variable pointing at your JUCE checkout (same as CMake).
 
 Examples:
     python build.py                       # configure + build Release + zip
@@ -142,9 +142,9 @@ def main() -> None:
     version = project_version()
     log(f"{PRODUCT} {version} ({platform_tag()}, {args.config})")
 
-    if "juce_DIR" not in os.environ and not (build_dir / "CMakeCache.txt").exists():
-        fail("juce_DIR is not set and no existing CMake cache found. "
-             "Set juce_DIR to your JUCE checkout (see CMakeLists.txt).")
+    if "JUCE_PATH" not in os.environ and not (build_dir / "CMakeCache.txt").exists():
+        fail("JUCE_PATH is not set and no existing CMake cache found. "
+             "Set JUCE_PATH to your JUCE checkout (see CMakeLists.txt).")
 
     if args.clean and build_dir.exists():
         log(f"cleaning {build_dir}")

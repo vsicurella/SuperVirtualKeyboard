@@ -63,7 +63,7 @@ jobs:
       - name: Build and package
         shell: bash
         env:
-          juce_DIR: ${{ github.workspace }}/JUCE
+          JUCE_PATH: ${{ github.workspace }}/JUCE
         run: |
           # Cap parallelism on Linux: the default Make generator otherwise runs
           # an unbounded `make -j`, whose peak RAM OOM-kills the runner (exit 143).
