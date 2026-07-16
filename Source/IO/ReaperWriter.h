@@ -22,9 +22,30 @@ public:
     */
     struct Options
     {
+        /*
+            How chromatic (non-mode) notes are spelled under Mode Degrees numbering.
+            Only meaningful when useScaleDegrees is false.
+        */
+        enum class AccidentalStyle
+        {
+            // Fractional modal degree, e.g. 1.5 (the historical behavior).
+            Decimals = 0,
+
+            // Integer mode degree plus ^/v marks; a note inside a step is spelled as
+            // the lower degree raised (^) or the upper degree lowered (v), whichever
+            // needs fewer marks. On an exact midpoint tie, prefer ups (sharp-like).
+            UpsPreferUp = 1,
+
+            // As above, but midpoint ties prefer downs (flat-like).
+            UpsPreferDown = 2
+        };
+
         // false = mode degrees (diatonic degree with a fractional accidental level,
         // the historical behavior); true = scale degrees numbered 0..(scaleSize-1).
         bool useScaleDegrees = false;
+
+        // How chromatic notes are spelled (only used when useScaleDegrees is false).
+        AccidentalStyle accidentalStyle = AccidentalStyle::Decimals;
 
         // Append an octave (period) number after the degree.
         bool includeOctaves = false;

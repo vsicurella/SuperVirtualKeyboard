@@ -70,6 +70,7 @@ ValueTree SvkPluginSettings::getSettingsNode(bool writeSettings)
     pluginSettingsNode.setProperty(SvkProperty::minimalViewSetting, minimalView, nullptr);
 
     pluginSettingsNode.setProperty(SvkProperty::reaperUseScaleDegrees, reaperOptions.useScaleDegrees, nullptr);
+    pluginSettingsNode.setProperty(SvkProperty::reaperAccidentalStyle, (int)reaperOptions.accidentalStyle, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::reaperIncludeOctaves, reaperOptions.includeOctaves, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::reaperOctaveDelimiter, reaperOptions.octaveDelimiter, nullptr);
     pluginSettingsNode.setProperty(SvkProperty::reaperKeyCenterNote, reaperOptions.keyCenterNote, nullptr);
@@ -96,6 +97,8 @@ bool SvkPluginSettings::restoreNode(ValueTree pluginSettingsNodeIn)
 
     if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperUseScaleDegrees))
         reaperOptions.useScaleDegrees = (bool)pluginSettingsNodeIn[SvkProperty::reaperUseScaleDegrees];
+    if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperAccidentalStyle))
+        reaperOptions.accidentalStyle = (ReaperWriter::Options::AccidentalStyle)(int)pluginSettingsNodeIn[SvkProperty::reaperAccidentalStyle];
     if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperIncludeOctaves))
         reaperOptions.includeOctaves = (bool)pluginSettingsNodeIn[SvkProperty::reaperIncludeOctaves];
     if (pluginSettingsNodeIn.hasProperty(SvkProperty::reaperOctaveDelimiter))

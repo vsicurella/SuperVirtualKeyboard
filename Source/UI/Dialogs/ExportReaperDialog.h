@@ -31,8 +31,18 @@ public:
         degreeTypeBox->addItem("Mode Degrees", 1);
         degreeTypeBox->addItem("Scale Degrees", 2);
         degreeTypeBox->setSelectedId(options.useScaleDegrees ? 2 : 1, dontSendNotification);
+        degreeTypeBox->onChange = [this]() { updateAccidentalControlsEnabled(); };
         degreeTypeLabel.reset(new LabelledComponent(*degreeTypeBox, "Degree Numbering:"));
         addAndMakeVisible(degreeTypeLabel.get());
+
+        // Accidental spelling for chromatic notes; only meaningful under Mode Degrees.
+        accidentalFormatBox = new ComboBox("AccidentalFormatBox");
+        accidentalFormatBox->addItem("Decimals", 1);
+        accidentalFormatBox->addItem("Ups & Downs (Prefer Ups)", 2);
+        accidentalFormatBox->addItem("Ups & Downs (Prefer Downs)", 3);
+        accidentalFormatBox->setSelectedId(accidentalStyleToId(options.accidentalStyle), dontSendNotification);
+        accidentalFormatLabel.reset(new LabelledComponent(*accidentalFormatBox, "Accidentals Format:"));
+        addAndMakeVisible(accidentalFormatLabel.get());
 
         keyCenterNoteSld = new Slider(Slider::SliderStyle::IncDecButtons, Slider::TextBoxLeft);
         keyCenterNoteSld->setRange(0, 127, 1);
@@ -70,8 +80,9 @@ public:
         addAndMakeVisible(cancelButton.get());
 
         updateOctaveControlsEnabled();
+        updateAccidentalControlsEnabled();
 
-        setSize(360, 232);
+        setSize(360, 264);
     }
 
     ~ExportReaperDialog() override
@@ -90,8 +101,11 @@ public:
         degreeTypeLabel->setComponentSize(120, 24);
         degreeTypeLabel->setTopLeftPosition(8, 8);
 
+        accidentalFormatLabel->setComponentSize(180, 24);
+        accidentalFormatLabel->setTopLeftPosition(8, degreeTypeLabel->getBottom() + 8);
+
         keyCenterNoteLabel->setComponentSize(88, 24);
-        keyCenterNoteLabel->setTopLeftPosition(8, degreeTypeLabel->getBottom() + 8);
+        keyCenterNoteLabel->setTopLeftPosition(8, accidentalFormatLabel->getBottom() + 8);
 
         includeOctavesButton->setBounds(8, keyCenterNoteLabel->getBottom() + 8, getWidth() - 16, 24);
 
@@ -148,6 +162,7 @@ private:
     {
         ReaperWriter::Options options;
         options.useScaleDegrees = degreeTypeBox->getSelectedId() == 2;
+        options.accidentalStyle = idToAccidentalStyle(accidentalFormatBox->getSelectedId());
         options.includeOctaves = includeOctavesButton->getToggleState();
         options.octaveDelimiter = delimiterEditor->getText();
         options.keyCenterNote = (int) keyCenterNoteSld->getValue();
@@ -161,6 +176,32 @@ private:
         bool octavesOn = includeOctavesButton->getToggleState();
         delimiterEditor->setEnabled(octavesOn);
         keyCenterOctaveSld->setEnabled(octavesOn);
+    }
+
+    // Accidentals only exist under Mode Degrees; Scale Degrees numbers every note.
+    void updateAccidentalControlsEnabled()
+    {
+        accidentalFormatBox->setEnabled(degreeTypeBox->getSelectedId() == 1);
+    }
+
+    static int accidentalStyleToId(ReaperWriter::Options::AccidentalStyle style)
+    {
+        switch (style)
+        {
+            case ReaperWriter::Options::AccidentalStyle::UpsPreferUp:   return 2;
+            case ReaperWriter::Options::AccidentalStyle::UpsPreferDown: return 3;
+            default:                                                    return 1;
+        }
+    }
+
+    static ReaperWriter::Options::AccidentalStyle idToAccidentalStyle(int id)
+    {
+        switch (id)
+        {
+            case 2:  return ReaperWriter::Options::AccidentalStyle::UpsPreferUp;
+            case 3:  return ReaperWriter::Options::AccidentalStyle::UpsPreferDown;
+            default: return ReaperWriter::Options::AccidentalStyle::Decimals;
+        }
     }
 
     File getDefaultDirectory() const
@@ -189,6 +230,9 @@ private:
 
     std::unique_ptr<LabelledComponent> degreeTypeLabel;
     ComboBox* degreeTypeBox;
+
+    std::unique_ptr<LabelledComponent> accidentalFormatLabel;
+    ComboBox* accidentalFormatBox;
 
     std::unique_ptr<LabelledComponent> keyCenterNoteLabel;
     Slider* keyCenterNoteSld;

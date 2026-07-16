@@ -36,6 +36,7 @@ static Identifier minimalViewSetting("MinimalView");
 
 // Reaper Note Name Export
 static Identifier reaperUseScaleDegrees("ReaperUseScaleDegrees");
+static Identifier reaperAccidentalStyle("ReaperAccidentalStyle");
 static Identifier reaperIncludeOctaves("ReaperIncludeOctaves");
 static Identifier reaperOctaveDelimiter("ReaperOctaveDelimiter");
 static Identifier reaperKeyCenterNote("ReaperKeyCenterNote");

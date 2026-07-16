@@ -85,7 +85,7 @@ String ReaperWriter::build_label(int midiNote) const
         // Floored division so notes below the key center land in the previous octave.
         octave = (rel - degree) / scaleSize;
     }
-    else
+    else if (options.accidentalStyle == Options::AccidentalStyle::Decimals)
     {
         // Modal degrees are monotonic across the keyboard and advance by exactly
         // modeSize per period, so subtracting the key center's value and wrapping
@@ -97,6 +97,56 @@ String ReaperWriter::build_label(int midiNote) const
         float degree = relDegree - period * modeSize;
 
         degreeText = String(degree);
+        octave = period;
+    }
+    else
+    {
+        // Ups & downs: express every note as an integer mode degree plus ^/v marks.
+        // A note inside a step of s edosteps at order o is either the lower degree
+        // raised by o ups, or the upper degree lowered by (s - o) downs; the shorter
+        // spelling wins, with midpoint ties broken by the chosen preference.
+        Array<float> modeDegrees = mode->getModalDegrees();
+
+        int order = mode->getOrder(midiNote);
+        int stepSize = mode->getNoteStep(midiNote);
+
+        // Absolute mode degree of the scale note at or below this note.
+        int lowerDegAbs = (int) std::floor(modeDegrees[midiNote]);
+
+        int baseAbs;    // the scale degree we spell from
+        String marks;
+
+        if (order == 0)
+        {
+            baseAbs = lowerDegAbs;  // in-mode note, no accidental
+        }
+        else
+        {
+            int upCount = order;                // raise the lower degree
+            int downCount = stepSize - order;   // lower the upper degree
+
+            bool useUp = upCount < downCount
+                || (upCount == downCount
+                    && options.accidentalStyle == Options::AccidentalStyle::UpsPreferUp);
+
+            if (useUp)
+            {
+                baseAbs = lowerDegAbs;
+                marks = String::repeatedString("^", upCount);
+            }
+            else
+            {
+                baseAbs = lowerDegAbs + 1;
+                marks = String::repeatedString("v", downCount);
+            }
+        }
+
+        // Anchor the integer degree to the key center, then wrap to modeSize.
+        // rounding guards against float error when the key center is a scale note.
+        int relBase = (int) std::floor(baseAbs - modeDegrees[options.keyCenterNote] + 0.5f);
+        int period = (int) std::floor(relBase / (float) modeSize);
+
+        degreeText = String(relBase - period * modeSize) + marks;
         octave = period;
     }
 
