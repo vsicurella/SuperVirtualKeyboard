@@ -698,10 +698,10 @@ void SvkPluginEditor::resized()
     if (minimalView)
     {
         // Collapse the header into a top margin equal to the bottom margin (gap),
-        // and drop the thin exit button into it with its left edge flush with the
-        // keyboard's left edge and the menu button's width.
+        // and let the exit button fill that whole thin gap across the full width
+        // of the plugin so it's an easy target rather than a tiny sliver.
         keyboardY = gap;
-        minimalViewExitBtn->setBounds(gap / 3, 0, barHeight, keyboardY);
+        minimalViewExitBtn->setBounds(0, 0, getWidth(), keyboardY);
     }
 
     viewportScrollBar->removeListener(this);
