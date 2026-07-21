@@ -1206,6 +1206,13 @@ void SvkPluginEditor::setMinimalView(bool shouldBeMinimal)
     // Remember the choice as a global preference so it persists across reopens.
     processor.getPluginSettings()->setMinimalView(shouldBeMinimal);
 
+    // Minimal view has no room for the settings panel, so close it on the way in.
+    if (minimalView && settingsPanelOpen)
+    {
+        settingsButton->setToggleState(false, dontSendNotification);
+        hideSettings();
+    }
+
     // Every header-bar control except the keyboard viewport and the exit button.
     Array<Component*> headerComps = {
         scaleTextBox.get(), scaleEntryBtn.get(), modeInfoButton.get(),
