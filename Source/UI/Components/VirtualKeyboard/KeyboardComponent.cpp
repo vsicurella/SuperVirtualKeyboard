@@ -202,6 +202,9 @@ void Keyboard::resized()
         {
             adjacentStyleStepWidth = keyOrder1Width / (modeKey.step - 1);
 
+            // Left edge of the band the adjacent-style step keys are laid out in.
+            float adjacentBandLeft = modeKey.getX() + keyWidth - (keyOrder1Width / 2);
+
             for (int s = 1; s < modeKey.step; s++)
             {
                 Key* stepKey = keys[modeKey.keyNumber + s];
@@ -209,17 +212,24 @@ void Keyboard::resized()
                 if (s > 1 && keyPlacementSelected == KeyPlacementType::nestedRight)
                 {
                     keyX = modeKey.getX() + keyWidth + (keys[modeKey.keyNumber + 1]->getWidth() / 2) - stepKey->getWidth();
+                    stepKey->setTopLeftPosition(keyX, 0);
                 }
                 else if (stepKey->step > 2 && keyPlacementSelected == KeyPlacementType::adjacent)
                 {
-                    keyX = modeKey.getX() + keyWidth - (keyOrder1Width / 2) + (stepKey->order - 1) * adjacentStyleStepWidth;
+                    // Derive each key's left edge and width from the rounded band
+                    // boundaries so neighbouring keys share an exact pixel edge.
+                    // Truncating each float position (and width) independently
+                    // could otherwise leave a 1px blank gap between keys at some
+                    // zoom levels, more likely for larger accidental sets (step >= 4).
+                    int thisLeft = roundToInt(adjacentBandLeft + (stepKey->order - 1) * adjacentStyleStepWidth);
+                    int nextLeft = roundToInt(adjacentBandLeft + stepKey->order * adjacentStyleStepWidth);
+                    stepKey->setBounds(thisLeft, 0, jmax(stepKey->getWidth(), nextLeft - thisLeft), stepKey->getHeight());
                 }
                 else
                 {
                     keyX = modeKey.getX() + keyWidth - stepKey->getWidth() / 2;
+                    stepKey->setTopLeftPosition(keyX, 0);
                 }
-
-                stepKey->setTopLeftPosition(keyX, 0);
             }
         }
     }
