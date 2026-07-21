@@ -886,6 +886,14 @@ void SvkPluginEditor::modeViewedChanged(const Mode* modeIn, int selectorNumber, 
         : processor.getMidiProcessor()->getRemappedKeyboardState();
 
     keyboard->displayKeyboardState(displayState);
+
+    // Refresh the preset selector so its name (and embedded mode/scale size)
+    // reflects the viewed mode, including custom scales entered via the text box.
+    if (selectorNumber == 1)
+        mode2Box->setText(modeIn->getName(), dontSendNotification);
+    else
+        mode1Box->setText(modeIn->getName(), dontSendNotification);
+
     onModeViewedChange(modeIn);
 }
 
