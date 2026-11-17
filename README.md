@@ -63,6 +63,8 @@ Super Virtual Keyboard is a MIDI-controller plugin that allows you to explore di
 
 > Note: this is a MIDI-controller plugin that produces MIDI, not audio. Route its output to an instrument, and set that instrument's tuning to match your scale. Tuning features planned in a future version.
 
+The VST3 is tagged as an instrument (VST3i), so in Ableton Live load it on a MIDI track as an instrument, then route its MIDI output to another track's input.
+
 ## Download & Install
 
 Grab the latest build for your platform from the [Releases page](https://github.com/vsicurella/SuperVirtualKeyboard/releases). Each zip contains the VST3 and Standalone versions.
@@ -85,6 +87,8 @@ python build.py                    # configure + build Release, then zip into di
 Useful flags: `--config Debug`, `--clean`, `--jobs N` (limit parallelism on low-memory machines). Run `python build.py --help` for the full list.
 
 By default the built VST3 is copied into your OS plugin folder after each build (on Windows, into %LOCALAPPDATA%/Programs/Common/VST3 so no admin rights are needed). Disable with `-DSVK_COPY_PLUGIN_AFTER_BUILD=OFF`.
+
+The VST3 is tagged `Instrument|Tools` by default. To build it as an effect (`Fx|Tools`) instead, for hosts where you'd rather load it in an insert slot, pass `-DSVK_VST3_INSTRUMENT=OFF` (with `build.py`: `--cmake-arg=-DSVK_VST3_INSTRUMENT=OFF`). The plugin ID is the same either way.
 
 ## Contributing
 

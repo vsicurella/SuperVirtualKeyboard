@@ -20,6 +20,18 @@ add_subdirectory($ENV{JUCE_PATH} subprojects/juce)
 # the build must run elevated (admin) or the copy step will fail.
 option(SVK_COPY_PLUGIN_AFTER_BUILD "Copy the built VST3 to the OS plugin folder after building" ON)
 
+# When ON, the VST3 is tagged "Instrument|Tools" (a "VST3i") so hosts such as
+# Ableton Live load it on instrument tracks, which Live requires for a plugin to
+# take MIDI in and send MIDI out. When OFF it is tagged "Fx|Tools" and shows up
+# as an effect instead (e.g. in Cubase insert slots). The plugin ID is the same
+# either way, so saved sessions load with both builds.
+option(SVK_VST3_INSTRUMENT "Tag the VST3 as an Instrument (VST3i)" ON)
+if(SVK_VST3_INSTRUMENT)
+    set(SVK_VST3_CATEGORIES Instrument Tools)
+else()
+    set(SVK_VST3_CATEGORIES Fx Tools)
+endif()
+
 # On Windows, copy to a user-writable folder so the post-build copy doesn't need
 # admin rights (the default %CommonProgramFiles%\VST3 lives under Program Files).
 # JUCE_VST3_COPY_DIR is an INHERITED property read during juce_add_plugin, so it
@@ -37,18 +49,18 @@ juce_add_plugin(
         PLUGIN_MANUFACTURER_CODE evtn
         PLUGIN_CODE Svk0
         FORMATS VST3 Standalone
+        VST3_CATEGORIES ${SVK_VST3_CATEGORIES}
+        NEEDS_MIDI_INPUT TRUE
+        NEEDS_MIDI_OUTPUT TRUE
+        EDITOR_WANTS_KEYBOARD_FOCUS TRUE
         COPY_PLUGIN_AFTER_BUILD ${SVK_COPY_PLUGIN_AFTER_BUILD}
         DOCUMENT_EXTENSIONS "svk"
-        )
-juce_generate_juce_header(SuperVirtualKeyboard)
-
-set_directory_properties(
-    PROPERTIES
-        COMPANY_COPYRIGHT "AGPL-3"
         COMPANY_NAME "Everytone"
         COMPANY_WEBSITE "https://www.everytone.zone"
         COMPANY_EMAIL "someone@everytone.zone"
-)
+        COMPANY_COPYRIGHT "AGPL-3"
+        )
+juce_generate_juce_header(SuperVirtualKeyboard)
 
 juce_add_binary_data(SuperVirtualKeyboard_BinaryData
     SOURCES
