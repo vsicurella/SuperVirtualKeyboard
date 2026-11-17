@@ -4,7 +4,7 @@
 [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](UNLICENSE.txt)
 [![Platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey.svg)](#requirements)
 
-LATEST VERSION: Alpha 2026-07-15 (v0.4.0)
+LATEST VERSION: Alpha 2026-11-17 (v0.4.1)
 
 ![SuperVirtualKeyboard Preview](/Resources/SVK-SuperPyth22-Preview.png)
 

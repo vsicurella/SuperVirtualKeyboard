@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.27)
 # ── Version ───────────────────────────────────────────────────────────────────
 # Developer edits MAJOR.MINOR.PATCH here. The trailing rev is derived
 # automatically from the git commit count (see cmake/GenerateVersion.cmake).
-project(SUPERVIRTUALKEYBOARD VERSION 0.4.0)
+project(SUPERVIRTUALKEYBOARD VERSION 0.4.1)
 
 # Derive the rev now (configure time) so it can be baked into the plugin's
 # version metadata. The header is additionally regenerated at build time so the
