@@ -90,6 +90,19 @@ By default the built VST3 is copied into your OS plugin folder after each build 
 
 The VST3 is tagged `Instrument|Tools` by default. To build it as an effect (`Fx|Tools`) instead, for hosts where you'd rather load it in an insert slot, pass `-DSVK_VST3_INSTRUMENT=OFF` (with `build.py`: `--cmake-arg=-DSVK_VST3_INSTRUMENT=OFF`). The plugin ID is the same either way.
 
+### Releasing
+
+Bump the version with `set_version.py`. It updates `project(... VERSION)` in CMakeLists.txt and the "LATEST VERSION" line above, and can commit and tag the bump. It never pushes.
+
+```sh
+python set_version.py                      # print the current version
+python set_version.py minor --dry-run      # preview: major | minor | patch | X.Y.Z
+python set_version.py minor --tag          # write, commit, and tag vX.Y.Z locally
+git push && git push origin vX.Y.Z         # pushing the tag triggers the release build
+```
+
+Use `--tag v0.5.0-alpha` for a custom tag name, or `--label Beta` to change the README label.
+
 ## Contributing
 
 Submit bug reports and ideas [here](https://github.com/vsicurella/SuperVirtualKeyboard/issues).
