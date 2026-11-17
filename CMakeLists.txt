@@ -12,7 +12,14 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateVersion.cmake")
 set(SVK_VERSION_FULL "${PROJECT_VERSION}.${SVK_VERSION_REV}")
 message(STATUS "SuperVirtualKeyboard version: ${SVK_VERSION_FULL}")
 
-add_subdirectory($ENV{JUCE_PATH} subprojects/juce)
+# JUCE_PATH (environment variable) must point at your JUCE checkout. It is read
+# on every configure, so it has to be set even when a build dir already exists.
+if(NOT DEFINED ENV{JUCE_PATH} OR NOT IS_DIRECTORY "$ENV{JUCE_PATH}")
+    message(FATAL_ERROR
+        "JUCE_PATH is not set or is not a directory (got: '$ENV{JUCE_PATH}'). "
+        "Set the JUCE_PATH environment variable to your JUCE checkout.")
+endif()
+add_subdirectory("$ENV{JUCE_PATH}" subprojects/juce)
 
 # When ON, the built VST3 is copied to the OS default plugin folder after each
 # build (Windows: %CommonProgramFiles%\VST3, macOS: ~/Library/Audio/Plug-Ins/VST3,
